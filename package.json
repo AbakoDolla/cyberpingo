@@ -1,0 +1,53 @@
+{
+  "name": "cyberpingo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CyberPingo - gamified cybersecurity learning platform (monorepo root)",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "dev:web": "pnpm --filter @cyberpingo/web dev",
+    "dev:api": "pnpm --filter @cyberpingo/api dev",
+    "build": "pnpm --filter @cyberpingo/types build && pnpm --filter @cyberpingo/api build && pnpm --filter @cyberpingo/web build",
+    "build:web": "pnpm --filter @cyberpingo/types build && pnpm --filter @cyberpingo/web build",
+    "build:api": "pnpm --filter @cyberpingo/types build && pnpm --filter @cyberpingo/api build",
+    "typecheck": "pnpm --filter @cyberpingo/types build && pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:generate": "pnpm --filter @cyberpingo/api db:generate",
+    "db:migrate": "pnpm --filter @cyberpingo/api db:migrate",
+    "db:studio": "pnpm --filter @cyberpingo/api db:studio",
+    "clean": "pnpm -r exec rimraf dist node_modules && rimraf node_modules"
+  },
+  "devDependencies": {
+    "@cyberpingo/config": "workspace:*",
+    "@eslint/js": "^9.11.1",
+    "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.12",
+    "globals": "^15.10.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.8.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
+  }
+}

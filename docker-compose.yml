@@ -1,0 +1,23 @@
+# Local development database for CyberPingo.
+# Start with: docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cyberpingo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cyberpingo
+      POSTGRES_PASSWORD: cyberpingo
+      POSTGRES_DB: cyberpingo
+    ports:
+      - '5432:5432'
+    volumes:
+      - cyberpingo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cyberpingo -d cyberpingo']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  cyberpingo_postgres_data:
