@@ -1,0 +1,19 @@
+{
+  "name": "@cyberpingo/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared TypeScript and Prettier configuration for the CyberPingo monorepo",
+  "license": "UNLICENSED",
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./prettier": "./prettier.js"
+  },
+  "files": [
+    "tsconfig.base.json",
+    "prettier.js"
+  ],
+  "scripts": {
+    "typecheck": "echo \"@cyberpingo/config contains no TypeScript sources\"",
+    "test": "echo \"@cyberpingo/config has no tests\""
+  }
+}

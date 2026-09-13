@@ -1,0 +1,51 @@
+name: Frontend
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/web/**'
+      - 'packages/**'
+      - '.github/workflows/frontend.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'eslint.config.mjs'
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    name: Install / Lint / Typecheck / Test / Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm --filter @cyberpingo/types build
+
+      - name: Lint
+        run: pnpm --filter @cyberpingo/web lint
+
+      - name: Typecheck
+        run: pnpm --filter @cyberpingo/web typecheck
+
+      - name: Test
+        run: pnpm --filter @cyberpingo/web test
+
+      - name: Build
+        run: pnpm --filter @cyberpingo/web build
+        env:
+          VITE_API_URL: http://localhost:3000/api/v1

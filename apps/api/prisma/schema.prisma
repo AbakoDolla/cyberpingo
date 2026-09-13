@@ -1,0 +1,210 @@
+// CyberPingo V1 database schema.
+// Docs: ../../../docs/DATABASE.md
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CourseDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ChallengeCategory {
+  NETWORKING
+  LINUX
+  SECURITY_FUNDAMENTALS
+  LOG_ANALYSIS
+  AUTHENTICATION
+  WEB_SECURITY
+  THREAT_DETECTION
+  SIEM
+  VULNERABILITY_MANAGEMENT
+}
+
+enum SubmissionStatus {
+  PENDING
+  CORRECT
+  INCORRECT
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+/// Platform user. `passwordHash` must never be exposed through the API.
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  avatar       String?
+  xp           Int      @default(0)
+  level        Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  progress    Progress[]
+  submissions ChallengeSubmission[]
+  badges      UserBadge[]
+
+  @@map("users")
+}
+
+model Course {
+  id               String           @id @default(cuid())
+  slug             String           @unique
+  title            String
+  description      String
+  difficulty       CourseDifficulty @default(BEGINNER)
+  estimatedMinutes Int              @default(0)
+  published        Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  lessons  Lesson[]
+  progress Progress[]
+
+  @@map("courses")
+}
+
+model Lesson {
+  id        String   @id @default(cuid())
+  courseId  String
+  slug      String
+  title     String
+  content   String
+  order     Int      @default(0)
+  xpReward  Int      @default(10)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course     Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  quizzes    Quiz[]
+  challenges Challenge[]
+  progress   Progress[]
+
+  @@unique([courseId, slug])
+  @@index([courseId])
+  @@map("lessons")
+}
+
+model Quiz {
+  id        String   @id @default(cuid())
+  lessonId  String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lesson    Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+
+  @@index([lessonId])
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id     String @id @default(cuid())
+  quizId String
+  prompt String
+  /// Answer options rendered by the client.
+  choices String[]
+  /// Index of the correct option. Never serialized to the client.
+  correctIndex Int
+  order        Int @default(0)
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@map("quiz_questions")
+}
+
+model Challenge {
+  id          String            @id @default(cuid())
+  lessonId    String?
+  slug        String            @unique
+  title       String
+  description String
+  category    ChallengeCategory @default(SECURITY_FUNDAMENTALS)
+  /// Hash of the expected flag/answer. Never serialized to the client.
+  solutionHash String
+  xpReward     Int              @default(50)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  lesson      Lesson?               @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  submissions ChallengeSubmission[]
+
+  @@index([lessonId])
+  @@map("challenges")
+}
+
+model ChallengeSubmission {
+  id          String           @id @default(cuid())
+  challengeId String
+  userId      String
+  status      SubmissionStatus @default(PENDING)
+  awardedXp   Int              @default(0)
+  createdAt   DateTime         @default(now())
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([challengeId])
+  @@map("challenge_submissions")
+}
+
+model Progress {
+  id          String         @id @default(cuid())
+  userId      String
+  courseId    String?
+  lessonId    String?
+  status      ProgressStatus @default(NOT_STARTED)
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@map("progress")
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  icon        String?
+  createdAt   DateTime @default(now())
+
+  users UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}

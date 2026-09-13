@@ -1,0 +1,73 @@
+name: Backend
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/api/**'
+      - 'packages/**'
+      - '.github/workflows/backend.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'eslint.config.mjs'
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    name: Install / Lint / Typecheck / Test / Build
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://cyberpingo:cyberpingo@localhost:5432/cyberpingo_test?schema=public
+      JWT_ACCESS_SECRET: ci-access-secret-value-0123456789
+      JWT_REFRESH_SECRET: ci-refresh-secret-value-0123456789
+      CORS_ORIGIN: http://localhost:5173
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cyberpingo
+          POSTGRES_PASSWORD: cyberpingo
+          POSTGRES_DB: cyberpingo_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cyberpingo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        run: pnpm --filter @cyberpingo/types build
+
+      - name: Generate Prisma client
+        run: pnpm --filter @cyberpingo/api db:generate
+
+      - name: Lint
+        run: pnpm --filter @cyberpingo/api lint
+
+      - name: Typecheck
+        run: pnpm --filter @cyberpingo/api typecheck
+
+      - name: Test
+        run: pnpm --filter @cyberpingo/api test
+
+      - name: Build
+        run: pnpm --filter @cyberpingo/api build
