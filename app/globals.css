@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-space-grotesk: "Space Grotesk", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-jetbrains-mono: "JetBrains Mono", monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #050816;
+  color: #E6EAF2;
+}
+
+::selection {
+  background: #8B5CF6;
+  color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0F172A;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00A8FF;
+}
+
+/* Visible keyboard focus */
+:focus-visible {
+  outline: 2px solid #00A8FF;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #00A8FF 0%, #8B5CF6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+.grid-lines {
+  background-image:
+    linear-gradient(rgba(0, 168, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 168, 255, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
