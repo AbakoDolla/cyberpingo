@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Cyberpingo — Frontend MVP 1
 
 Frontend Next.js (App Router) + TypeScript + Tailwind CSS pour Cyberpingo,
@@ -43,3 +44,7 @@ implémentées avec des données mockées :
 - Ajouter l'authentification (Auth.js ou JWT)
 - Remplacer les données mockées de `data/` par des appels API
 - Connecter le Mentor IA à un vrai moteur (ex. API Claude)
+=======
+# cyberpingo
+🐧 CyberPingo — Gamified cybersecurity learning app. Duolingo-style meets cyber-futuristic UI.
+>>>>>>> 8b49f28315df8a892666d5d35d76a7ce29ccdbd9
