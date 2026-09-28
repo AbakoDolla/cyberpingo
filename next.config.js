@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Keep loopback hosts intact so auth redirects do not change the preview origin.
+  skipMiddlewareUrlNormalize: true,
 
   // Compression gzip/brotli des réponses HTTP
   compress: true,
@@ -31,13 +33,13 @@ const nextConfig = {
           { key: "Permissions-Policy",         value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
-      // Cache long terme sur les assets statiques Next.js (hachés — safe)
-      {
+      // Les chunks de développement changent sans changer de nom.
+      ...(process.env.NODE_ENV === "production" ? [{
         source: "/_next/static/(.*)",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
-      },
+      }] : []),
       // Cache sur les fichiers publics (fonts, images, etc.)
       {
         source: "/public/(.*)",

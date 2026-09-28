@@ -18,7 +18,7 @@ interface FormErrors {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, loading } = useAuth();
+  const { register, loading, error } = useAuth();
   const { loginMock } = useUserActions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,6 +72,7 @@ export default function RegisterPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <p className="text-sm text-slate-300">Profil de démonstration local : n’utilise pas tes vrais identifiants. Aucune vérification d’identité ni synchronisation cloud.</p>
         <Input
           label="Adresse email"
           type="email"
@@ -102,6 +103,7 @@ export default function RegisterPage() {
           error={errors.confirmPassword}
           autoComplete="new-password"
         />
+        {error && <p role="alert" className="text-sm text-cyber-red">{error}</p>}
         <Button type="submit" variant="primary" className="w-full" loading={loading}>
           Créer mon compte
         </Button>

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
-import Button from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
 import { courses } from "@/data/courses";
 import { useUser } from "@/context/UserContext";
@@ -31,7 +30,7 @@ const courseIconMap: Record<string, React.ComponentType<{ size?: number; strokeW
 export default function CourseDetailPage({ params }: { params: { id: string } }) {
   const course = courses.find((c) => c.slug === params.id);
   const { publishedCourses } = usePublishStore();
-  const { getCourseProgress, user } = useUser();
+  const { user } = useUser();
 
   // Cherche dans les cours statiques puis publiés
   const foundCourse: Course | undefined = course ?? (() => {
@@ -55,7 +54,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
     );
   }
 
-  const progress = getCourseProgress(foundCourse.id);
+  const progress = foundCourse.lessons.length ? Math.round(foundCourse.lessons.filter((lesson) => user.completedLessons.includes(lesson.id)).length / foundCourse.lessons.length * 100) : 0;
   const CourseIcon = courseIconMap[foundCourse.slug] ?? IconShield;
 
   return (
@@ -125,9 +124,9 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                         </div>
                       </div>
                     </div>
-                    <Button variant={done ? "ghost" : "secondary"} size="sm">
+                    <span className="shrink-0 ml-3 text-sm text-cyber-blue">
                       {done ? "Revoir" : "Ouvrir"}
-                    </Button>
+                    </span>
                   </Link>
                 );
               })}

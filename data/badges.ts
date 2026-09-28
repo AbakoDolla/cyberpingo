@@ -7,8 +7,8 @@ import { Badge } from "@/types";
 export const badges: Badge[] = [
   {
     id: "b1",
-    name: "Premier cours",
-    description: "Termine ton tout premier cours Cyberpingo.",
+    name: "Première leçon",
+    description: "Termine ta toute première leçon CyberPingo.",
     icon: "award",
     earned: false,
   },
@@ -29,7 +29,7 @@ export const badges: Badge[] = [
   {
     id: "b4",
     name: "10 quiz réussis",
-    description: "Valide 10 quiz avec un score suffisant.",
+    description: "Valide 10 quiz différents avec au moins 70 % de bonnes réponses.",
     icon: "brain",
     earned: false,
   },

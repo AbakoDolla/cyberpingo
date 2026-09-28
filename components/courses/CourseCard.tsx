@@ -8,7 +8,7 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import {
-  IconShield, IconNetwork, IconLinux, IconGlobe, IconCrosshair, IconLock,
+  IconShield, IconNetwork, IconLinux, IconGlobe, IconCrosshair, IconLock, IconActivity,
 } from "@/components/ui/Icon";
 
 const levelLabel: Record<string, string> = {
@@ -23,11 +23,12 @@ const courseIconMap: Record<string, React.ComponentType<{ size?: number; strokeW
   linux: IconLinux,
   "securite-web": IconGlobe,
   "pentest-intro": IconCrosshair,
+  "analyse-logs": IconActivity,
 };
 
 export default function CourseCard({ course }: { course: Course }) {
-  const { getCourseProgress } = useUser();
-  const progress = getCourseProgress(course.id);
+  const { user } = useUser();
+  const progress = course.lessons.length ? Math.round(course.lessons.filter((lesson) => user.completedLessons.includes(lesson.id)).length / course.lessons.length * 100) : 0;
   const CourseIcon = courseIconMap[course.slug] ?? IconShield;
 
   const content = (

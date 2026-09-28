@@ -4,23 +4,27 @@
  * vrais appels à `services/`.
  */
 
-export function readStorage<T>(key: string, fallback: T): T {
+export function readStorage<T>(key: string, fallback: T, onError?: () => void): T {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = window.localStorage.getItem(key);
     if (!raw) return fallback;
     return JSON.parse(raw) as T;
-  } catch {
+  } catch (error) {
+    console.error("Lecture du stockage local impossible.", error);
+    onError?.();
     return fallback;
   }
 }
 
-export function writeStorage<T>(key: string, value: T): void {
-  if (typeof window === "undefined") return;
+export function writeStorage<T>(key: string, value: T): boolean {
+  if (typeof window === "undefined") return false;
   try {
     window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Stockage indisponible (navigation privée, quota) : on ignore silencieusement.
+    return true;
+  } catch (error) {
+    console.error("Sauvegarde locale impossible.", error);
+    return false;
   }
 }
 

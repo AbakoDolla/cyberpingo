@@ -1,4 +1,5 @@
 import { Quiz } from "@/types";
+import { expandedQuizzes, reviewQuizzes } from "./learning-expansion";
 
 export const quizzes: Quiz[] = [
   {
@@ -41,4 +42,6 @@ export const quizzes: Quiz[] = [
       },
     ],
   },
+  ...expandedQuizzes,
+  ...reviewQuizzes,
 ];

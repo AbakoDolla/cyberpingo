@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { lessons } from "@/data/lessons";
 import { useUser } from "@/context/UserContext";
 import {
-  IconDashboard, IconCourses, IconShield, IconAI, IconProfile,
+  IconDashboard, IconCourses, IconShield, IconAI, IconProfile, IconActivity,
 } from "@/components/ui/Icon";
 
 // Leçons indexées par id — O(1) à la place de find() O(n)
@@ -25,7 +25,7 @@ function DailyMissionMini() {
 
   return (
     <>
-      <p className="text-xs text-white/40 uppercase tracking-widest mb-1">Mission du jour</p>
+      <p className="text-xs text-slate-400 mb-2">Prochaine leçon</p>
       {nextLesson ? (
         <Link
           href={`/lessons/${nextLesson.id}`}
@@ -47,6 +47,7 @@ export default function Sidebar() {
   // useMemo : navItems ne change que si isAdmin change (rarissime)
   const navItems = useMemo(() => [
     ...(user.isAdmin ? [{ href: "/dashboard", label: "Dashboard", Icon: IconDashboard }] : []),
+    { href: "/progression", label: "Ma progression", Icon: IconActivity },
     { href: "/courses",    label: "Cours",       Icon: IconCourses },
     { href: "/challenges", label: "Challenges",  Icon: IconShield  },
     { href: "/mentor",     label: "Mentor IA",   Icon: IconAI      },
@@ -56,18 +57,19 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen sticky top-0 border-r border-white/5 bg-dark-navy/40 px-4 py-6">
       <Logo className="px-2 mb-8" />
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-1" aria-label="Navigation de l’espace apprenant">
         {navItems.map(({ href, label, Icon }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           return (
             <Link
               key={href}
               href={href}
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors",
                 active
                   ? "bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/30"
-                  : "text-white/50 hover:text-white hover:bg-white/5 border border-transparent"
+                  : "text-slate-300 hover:text-white hover:bg-white/5 border border-transparent"
               )}
             >
               <Icon size={16} strokeWidth={active ? 2 : 1.6} />
@@ -76,6 +78,7 @@ export default function Sidebar() {
           );
         })}
       </nav>
+      <Link href="/parametres" className="px-3 py-3 text-sm text-slate-300 hover:text-cyber-blue" aria-current={pathname === "/parametres" ? "page" : undefined}>Paramètres</Link>
 
       <div className="mt-auto px-3 py-4 rounded-xl bg-cyber-black/60 border border-white/5">
         <DailyMissionMini />

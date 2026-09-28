@@ -1,25 +1,27 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import "./intro.css";
+import "./learner.css";
 import Providers from "./providers";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const spaceGrotesk = localFont({
+  src: "../public/fonts/space-grotesk-latin.woff2",
+  weight: "300 700",
   variable: "--font-space-grotesk",
   display: "swap",
 });
 
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const inter = localFont({
+  src: "../public/fonts/inter-latin.woff2",
+  weight: "100 900",
   variable: "--font-inter",
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
+const jetbrainsMono = localFont({
+  src: "../public/fonts/jetbrains-mono-latin.woff2",
+  weight: "100 800",
   variable: "--font-jetbrains-mono",
   display: "swap",
   preload: false, // Non critique pour le LCP — chargé à la demande
@@ -27,11 +29,12 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Cyberpingo — Apprends. Pratique. Deviens cyber-pro.",
-    template: "%s · Cyberpingo",
+    default: "CyberPingo — Apprends. Pratique. Protège.",
+    template: "%s · CyberPingo",
   },
   description:
-    "La plateforme mondiale pour apprendre, pratiquer et être recruté en cybersécurité. Gamifiée, guidée par IA, pensée pour les débutants.",
+    "Apprends la cybersécurité pas à pas, comme un jeu. Des leçons courtes, des quiz et des défis pratiques pour développer les bons réflexes avec CyberPingo.",
+  icons: { icon: "/images/cyberpingo-transparent.png" },
 };
 
 export default function RootLayout({

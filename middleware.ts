@@ -42,5 +42,8 @@ export const config = {
     "/profile/:path*",
     "/lessons/:path*",
     "/quiz/:path*",
+    "/progression/:path*",
+    "/parametres/:path*",
+    "/onboarding/:path*",
   ],
 };

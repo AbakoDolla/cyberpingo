@@ -1,342 +1,184 @@
 "use client";
 
-
-import {
-  createContext, useCallback, useContext, useEffect,
-  useMemo, useRef, useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { currentUser as mockUser } from "@/data/users";
 import { courses } from "@/data/courses";
-import { lessons } from "@/data/lessons";
-import {
-  readStorage, writeStorage,
-  setSessionCookie, clearSessionCookie,
-  setAdminCookie, clearAdminCookie,
-} from "@/lib/storage";
-import { User, OnboardingAnswers } from "@/types";
+import { readStorage, writeStorage, setSessionCookie, clearSessionCookie, setAdminCookie, clearAdminCookie } from "@/lib/storage";
+import { dailyGoals, isStoredUser, migrateUser, profileKey, recordQuiz, resetUserProgress, rewardProgress } from "@/lib/learning-progress";
+import type { User, Quiz, OnboardingAnswers } from "@/types";
 
 const STORAGE_KEY = "cyberpingo_user_v1";
+const guest: User = { ...mockUser, id: "guest", name: "Explorateur", username: "explorateur", email: "", isAdmin: false };
+const storageMessage = "Sauvegarde locale indisponible. Tes changements restent en mémoire pour cette session ; exporte tes données avant de fermer la page.";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface XpToastState {
-  amount: number;
-  id: number;
-  isLevelUp?: boolean;
-}
-
+export interface XpToastState { amount: number; id: number; isLevelUp?: boolean }
 interface UserStateValue {
   user: User;
   isAuthenticated: boolean;
+  hydrated: boolean;
+  storageError: string | null;
   getCourseProgress: (courseId: string) => number;
 }
-
 interface UserActionsValue {
   addXp: (amount: number) => void;
   completeLesson: (lessonId: string, xp: number) => void;
   completeChallenge: (challengeId: string, xp: number) => void;
-  completeQuiz: () => void;
+  completeQuiz: (quiz: Quiz, score: number) => number;
   applyOnboarding: (answers: OnboardingAnswers) => void;
-  loginMock: (loggedInUser: User) => void;
+  updateProfile: (name: string, dailyMinutes: number) => boolean;
+  loginMock: (user: User) => void;
   logout: () => void;
-  resetProgress: () => void;
+  resetProgress: () => boolean;
 }
 
-// ─── Contextes séparés ────────────────────────────────────────────────────────
-// 3 contextes au lieu d'un → chaque consommateur ne re-rend que lorsque
-// la tranche dont il a besoin change.
-
-/** Données utilisateur + progression. Change à chaque mutation XP/leçon. */
 const UserStateContext = createContext<UserStateValue | null>(null);
-
-/** Actions stables (useCallback avec deps vides ou quasi-stables). Ne change jamais. */
 const UserActionsContext = createContext<UserActionsValue | null>(null);
-
-/**
- * État du toast XP. Change souvent (toutes les 2-3s quand l'utilisateur gagne des XP).
- * Isolé pour que seul AppShell (qui affiche le Toast) re-rende lors des toasts.
- */
 const XpToastContext = createContext<XpToastState | null>(null);
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function computeLevel(xp: number): { level: number; xpToNextLevel: number } {
-  let level = 1;
-  let threshold = 800;
-  let remaining = xp;
-  while (remaining >= threshold) {
-    remaining -= threshold;
-    level += 1;
-    threshold = Math.round(threshold * 1.2);
-  }
-  return { level, xpToNextLevel: threshold };
-}
-
-function computeSkills(completedLessons: string[]): User["skills"] {
-  const courseSkillMap: Record<string, string> = {
-    c1: "Networking", c2: "Networking",
-    c3: "Linux",
-    c4: "Web Security", c5: "Web Security",
-  };
-  const skillTotals: Record<string, { done: number; total: number }> = {
-    Networking: { done: 0, total: 0 },
-    Linux: { done: 0, total: 0 },
-    "Web Security": { done: 0, total: 0 },
-    Cryptographie: { done: 0, total: 0 },
-  };
-  for (const course of courses) {
-    const sk = courseSkillMap[course.id];
-    if (!sk || !skillTotals[sk]) continue;
-    skillTotals[sk].total += course.lessons.length;
-    for (const lesson of course.lessons) {
-      if (completedLessons.includes(lesson.id)) skillTotals[sk].done += 1;
-    }
-  }
-  return Object.entries(skillTotals).map(([name, { done, total }]) => ({
-    name,
-    percent: total === 0 ? 0 : Math.round((done / total) * 100),
-  }));
-}
-
-function computeBadges(user: User): User["badges"] {
-  return user.badges.map((badge) => {
-    if (badge.earned) return badge;
-    let earned = false;
-    if (badge.id === "b1" && user.completedLessons.length >= 1) earned = true;
-    if (badge.id === "b2" && user.streak >= 7) earned = true;
-    if (badge.id === "b3" && user.completedChallenges.length >= 1) earned = true;
-    if (badge.id === "b4" && user.completedQuizzes >= 10) earned = true;
-    if (badge.id === "b5") {
-      const c2Lessons = lessons.filter((l) => l.courseId === "c2");
-      if (c2Lessons.length > 0 && c2Lessons.every((l) => user.completedLessons.includes(l.id)))
-        earned = true;
-    }
-    return earned
-      ? { ...badge, earned: true, earnedAt: new Date().toISOString().split("T")[0] }
-      : badge;
-  });
-}
-
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User>(mockUser);
+  const [user, setUser] = useState<User>(guest);
+  const current = useRef(user);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const [lastXpToast, setLastXpToast] = useState<XpToastState | null>(null);
-  const prevLevelRef = useRef<number>(mockUser.level);
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Hydratation depuis localStorage
-  useEffect(() => {
-    const stored = readStorage<User | null>(STORAGE_KEY, null);
-    if (stored) {
-      const migrated: User = {
-        ...stored,
-        completedLessons:    stored.completedLessons    ?? [],
-        completedChallenges: stored.completedChallenges ?? [],
-        completedQuizzes:    stored.completedQuizzes    ?? 0,
-      };
-      setUser(migrated);
-      prevLevelRef.current = migrated.level;
+  const readProfile = useCallback((key: string) => {
+    const stored = readStorage<unknown>(key, null, () => setStorageError(storageMessage));
+    if (stored !== null && !isStoredUser(stored)) {
+      console.error("Le profil local est endommagé.");
+      setStorageError("Le profil local est illisible. Reconnecte-toi avec ton profil de démonstration.");
+      return null;
     }
-    const hasCookie =
-      typeof document !== "undefined" && document.cookie.includes("cyberpingo_session=1");
-    setIsAuthenticated(hasCookie);
+    return isStoredUser(stored) ? migrateUser(stored) : null;
   }, []);
 
-  // Nettoyage du timer de toast au démontage
-  useEffect(() => () => { if (toastTimerRef.current) clearTimeout(toastTimerRef.current); }, []);
+  useEffect(() => {
+    const hasCookie = document.cookie.split("; ").includes("cyberpingo_session=1");
+    if (hasCookie) {
+      const stored = readProfile(STORAGE_KEY);
+      if (stored && stored.id !== "guest") {
+        current.current = stored;
+        setUser(stored);
+        setIsAuthenticated(true);
+      } else {
+        clearSessionCookie();
+        clearAdminCookie();
+        setStorageError("Aucun profil local ne correspond à cette session. Reconnecte-toi pour continuer.");
+      }
+    }
+    setHydrated(true);
+    return () => { if (timer.current) clearTimeout(timer.current); };
+  }, [readProfile]);
 
-  // ── Progression des cours (stable tant que completedLessons ne change pas) ──
-
-  const getCourseProgress = useCallback(
-    (courseId: string): number => {
-      const course = courses.find((c) => c.id === courseId);
-      if (!course || course.lessons.length === 0) return 0;
-      const done = course.lessons.filter((l) => user.completedLessons.includes(l.id)).length;
-      return Math.round((done / course.lessons.length) * 100);
-    },
-    [user.completedLessons]
-  );
-
-  // ── Toast XP (propre, sans setTimeout dans un setter) ──────────────────────
-
-  const triggerToast = useCallback((amount: number, isLevelUp = false) => {
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    const toastId = Date.now();
-    setLastXpToast({ amount, id: toastId, isLevelUp });
-    toastTimerRef.current = setTimeout(() => {
-      setLastXpToast((cur) => (cur?.id === toastId ? null : cur));
-    }, isLevelUp ? 2600 : 2000);
-  }, []);
-
+  // The ref serializes rapid actions without side effects in React state updaters.
   const persist = useCallback((next: User) => {
+    current.current = next;
     setUser(next);
-    writeStorage(STORAGE_KEY, next);
+    const profileSaved = writeStorage(profileKey(next.id), next);
+    const activeSaved = writeStorage(STORAGE_KEY, next);
+    const saved = profileSaved && activeSaved;
+    setStorageError(saved ? null : storageMessage);
+    return saved;
   }, []);
 
-  // ── Actions mutations ───────────────────────────────────────────────────────
+  const showReward = useCallback((amount: number, previous: User, next: User) => {
+    if (amount <= 0) return;
+    if (timer.current) clearTimeout(timer.current);
+    setLastXpToast({ amount, id: Date.now(), isLevelUp: next.level > previous.level });
+    timer.current = setTimeout(() => setLastXpToast(null), 2600);
+  }, []);
 
   const addXp = useCallback((amount: number) => {
-    setUser((prev) => {
-      const nextXp = prev.xp + amount;
-      const { level, xpToNextLevel } = computeLevel(nextXp);
-      const leveledUp = level > prevLevelRef.current;
-      if (leveledUp) prevLevelRef.current = level;
-      const next = { ...prev, xp: nextXp, level, xpToNextLevel };
-      writeStorage(STORAGE_KEY, next);
-      return next;
-    });
-    // triggerToast en dehors du setter — plus de side-effect dans l'updater
-    setTimeout(() => triggerToast(amount, false), 0);
-  }, [triggerToast]);
+    const previous = current.current;
+    const next = rewardProgress(previous, amount);
+    persist(next);
+    showReward(amount, previous, next);
+  }, [persist, showReward]);
 
-  const completeLesson = useCallback((lessonId: string, xp: number) => {
-    setUser((prev) => {
-      if (prev.completedLessons.includes(lessonId)) return prev;
-      const completedLessons = [...prev.completedLessons, lessonId];
-      const nextXp = prev.xp + xp;
-      const { level, xpToNextLevel } = computeLevel(nextXp);
-      const leveledUp = level > prevLevelRef.current;
-      if (leveledUp) prevLevelRef.current = level;
-      const skills = computeSkills(completedLessons);
-      const badges = computeBadges({ ...prev, completedLessons, xp: nextXp });
-      const next: User = { ...prev, xp: nextXp, level, xpToNextLevel, completedLessons, skills, badges };
-      writeStorage(STORAGE_KEY, next);
-      return next;
-    });
-    setTimeout(() => triggerToast(xp, false), 0);
-  }, [triggerToast]);
+  const completeLesson = useCallback((id: string, xp: number) => {
+    const previous = current.current;
+    if (previous.completedLessons.includes(id)) return;
+    const next = rewardProgress({ ...previous, completedLessons: [...previous.completedLessons, id] }, xp);
+    persist(next);
+    showReward(xp, previous, next);
+  }, [persist, showReward]);
 
-  const completeChallenge = useCallback((challengeId: string, xp: number) => {
-    setUser((prev) => {
-      if (prev.completedChallenges.includes(challengeId)) return prev;
-      const completedChallenges = [...prev.completedChallenges, challengeId];
-      const nextXp = prev.xp + xp;
-      const { level, xpToNextLevel } = computeLevel(nextXp);
-      const leveledUp = level > prevLevelRef.current;
-      if (leveledUp) prevLevelRef.current = level;
-      const badges = computeBadges({ ...prev, completedChallenges, xp: nextXp });
-      const next: User = { ...prev, xp: nextXp, level, xpToNextLevel, completedChallenges, badges };
-      writeStorage(STORAGE_KEY, next);
-      return next;
-    });
-    setTimeout(() => triggerToast(xp, false), 0);
-  }, [triggerToast]);
+  const completeChallenge = useCallback((id: string, xp: number) => {
+    const previous = current.current;
+    if (previous.completedChallenges.includes(id)) return;
+    const next = rewardProgress({ ...previous, completedChallenges: [...previous.completedChallenges, id] }, xp);
+    persist(next);
+    showReward(xp, previous, next);
+  }, [persist, showReward]);
 
-  const completeQuiz = useCallback(() => {
-    setUser((prev) => {
-      const completedQuizzes = prev.completedQuizzes + 1;
-      const badges = computeBadges({ ...prev, completedQuizzes });
-      const next: User = { ...prev, completedQuizzes, badges };
-      writeStorage(STORAGE_KEY, next);
-      return next;
-    });
-  }, []);
+  const completeQuiz = useCallback((quiz: Quiz, score: number) => {
+    const previous = current.current;
+    const result = recordQuiz(previous, quiz, score);
+    if (result.user !== previous) persist(result.user);
+    showReward(result.awarded, previous, result.user);
+    return result.awarded;
+  }, [persist, showReward]);
 
   const applyOnboarding = useCallback((answers: OnboardingAnswers) => {
-    setUser((prev) => {
-      const next: User = {
-        ...prev,
-        goal: answers.goal ?? prev.goal,
-        skillLevel: answers.skillLevel ?? prev.skillLevel,
-        dailyMinutes: answers.dailyMinutes ?? prev.dailyMinutes,
-      };
-      writeStorage(STORAGE_KEY, next);
-      return next;
-    });
-  }, []);
+    const previous = current.current;
+    persist({ ...previous, goal: answers.goal ?? previous.goal, skillLevel: answers.skillLevel ?? previous.skillLevel, dailyMinutes: answers.dailyMinutes ?? previous.dailyMinutes, knownAreas: answers.knownAreas });
+  }, [persist]);
+
+  const updateProfile = useCallback((name: string, dailyMinutes: number) => {
+    if (name.trim().length < 2 || name.trim().length > 50 || !dailyGoals.includes(dailyMinutes)) throw new Error("Choisis un nom de 2 à 50 caractères et un objectif proposé.");
+    return persist({ ...current.current, name: name.trim(), dailyMinutes });
+  }, [persist]);
 
   const loginMock = useCallback((loggedInUser: User) => {
+    const stored = readProfile(profileKey(loggedInUser.id));
+    // Recover profiles created before full-email IDs and per-profile persistence.
+    const matchingEmail = (profile: User | null) => profile?.email.toLowerCase() === loggedInUser.email.toLowerCase();
+    const legacy = stored ?? readProfile(profileKey(`user-${loggedInUser.username}`));
+    const active = matchingEmail(legacy) ? legacy : readProfile(STORAGE_KEY);
+    const matching = matchingEmail(active) ? active : null;
+    const profile = migrateUser({ ...(matching ?? loggedInUser), id: loggedInUser.id, email: loggedInUser.email, isAdmin: loggedInUser.isAdmin });
     setSessionCookie();
-    if (loggedInUser.isAdmin) setAdminCookie();
-    else clearAdminCookie();
-    const STORAGE_KEY_USER = `cyberpingo_user_${loggedInUser.id}`;
-    const stored = readStorage<User | null>(STORAGE_KEY_USER, null);
-    const profile: User = stored
-      ? {
-          ...stored,
-          isAdmin: loggedInUser.isAdmin,
-          completedLessons:    stored.completedLessons    ?? [],
-          completedChallenges: stored.completedChallenges ?? [],
-          completedQuizzes:    stored.completedQuizzes    ?? 0,
-        }
-      : loggedInUser;
+    if (profile.isAdmin) setAdminCookie(); else clearAdminCookie();
     persist(profile);
-    prevLevelRef.current = profile.level;
     setIsAuthenticated(true);
-  }, [persist]);
+  }, [persist, readProfile]);
 
   const logout = useCallback(() => {
     clearSessionCookie();
     clearAdminCookie();
-    persist(mockUser);
-    prevLevelRef.current = mockUser.level;
+    if (timer.current) clearTimeout(timer.current);
+    setLastXpToast(null);
+    current.current = guest;
+    setUser(guest);
     setIsAuthenticated(false);
-  }, [persist]);
+  }, []);
 
   const resetProgress = useCallback(() => {
-    prevLevelRef.current = mockUser.level;
-    persist(mockUser);
+    if (timer.current) clearTimeout(timer.current);
+    setLastXpToast(null);
+    return persist(resetUserProgress(current.current));
   }, [persist]);
 
-  // ── Valeurs mémoïsées par contexte ─────────────────────────────────────────
-  // Chaque objet ne change que si ses dépendances changent.
-  // Les consommateurs de UserActionsContext ne re-rendent JAMAIS (actions stables).
-
-  const stateValue = useMemo<UserStateValue>(
-    () => ({ user, isAuthenticated, getCourseProgress }),
-    [user, isAuthenticated, getCourseProgress]
-  );
-
-  const actionsValue = useMemo<UserActionsValue>(
-    () => ({
-      addXp, completeLesson, completeChallenge, completeQuiz,
-      applyOnboarding, loginMock, logout, resetProgress,
-    }),
-    [addXp, completeLesson, completeChallenge, completeQuiz,
-      applyOnboarding, loginMock, logout, resetProgress]
-  );
-
-  return (
-    <UserStateContext.Provider value={stateValue}>
-      <UserActionsContext.Provider value={actionsValue}>
-        <XpToastContext.Provider value={lastXpToast}>
-          {children}
-        </XpToastContext.Provider>
-      </UserActionsContext.Provider>
-    </UserStateContext.Provider>
-  );
+  const getCourseProgress = useCallback((id: string) => {
+    const course = courses.find((item) => item.id === id);
+    return course?.lessons.length ? Math.round(course.lessons.filter((lesson) => user.completedLessons.includes(lesson.id)).length / course.lessons.length * 100) : 0;
+  }, [user.completedLessons]);
+  const state = useMemo(() => ({ user, isAuthenticated, hydrated, storageError, getCourseProgress }), [user, isAuthenticated, hydrated, storageError, getCourseProgress]);
+  const actions = useMemo(() => ({ addXp, completeLesson, completeChallenge, completeQuiz, applyOnboarding, updateProfile, loginMock, logout, resetProgress }), [addXp, completeLesson, completeChallenge, completeQuiz, applyOnboarding, updateProfile, loginMock, logout, resetProgress]);
+  return <UserStateContext.Provider value={state}><UserActionsContext.Provider value={actions}><XpToastContext.Provider value={lastXpToast}>{children}</XpToastContext.Provider></UserActionsContext.Provider></UserStateContext.Provider>;
 }
 
-// ─── Hooks publics ────────────────────────────────────────────────────────────
-
-/** Données utilisateur. Re-rend quand user ou isAuthenticated change. */
 export function useUser() {
-  const ctx = useContext(UserStateContext);
-  if (!ctx) throw new Error("useUser doit être utilisé à l'intérieur de <UserProvider>");
-  return ctx;
+  const value = useContext(UserStateContext);
+  if (!value) throw new Error("useUser doit être utilisé dans UserProvider.");
+  return value;
 }
-
-/** Actions. Ne provoque JAMAIS de re-render (stable). */
 export function useUserActions() {
-  const ctx = useContext(UserActionsContext);
-  if (!ctx) throw new Error("useUserActions doit être utilisé à l'intérieur de <UserProvider>");
-  return ctx;
+  const value = useContext(UserActionsContext);
+  if (!value) throw new Error("useUserActions doit être utilisé dans UserProvider.");
+  return value;
 }
-
-/** Toast XP. Re-rend uniquement quand un toast XP apparaît/disparaît. */
-export function useXpToast() {
-  return useContext(XpToastContext);
-}
-
-/**
- * Hook de compatibilité rétrograde — combine useUser + useUserActions.
- * À utiliser quand les deux sont nécessaires dans le même composant.
- * Préférer useUser() ou useUserActions() séparément si possible.
- */
-export function useUserFull() {
-  const state = useUser();
-  const actions = useUserActions();
-  return { ...state, ...actions };
-}
+export function useXpToast() { return useContext(XpToastContext); }
+export function useUserFull() { return { ...useUser(), ...useUserActions() }; }

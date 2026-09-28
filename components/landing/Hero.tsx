@@ -1,72 +1,113 @@
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
-import Button from "@/components/ui/Button";
+import { useState } from "react";
+import {
+  IconArrowRight, IconAward, IconBolt, IconCheck, IconCourses,
+  IconLesson, IconLock, IconProfile, IconShield, IconTarget, IconX,
+} from "@/components/ui/Icon";
+
+const benefits = [
+  { Icon: IconLesson, title: "100 % en ligne", detail: "et accessible partout" },
+  { Icon: IconTarget, title: "Apprentissage", detail: "gamifié" },
+  { Icon: IconShield, title: "Exercices pratiques", detail: "pour les bons réflexes" },
+  { Icon: IconAward, title: "Des badges", detail: "à chaque étape" },
+];
+
+function ProgressDemo() {
+  const [stage, setStage] = useState<"path" | "question" | "success">("path");
+  const [incorrect, setIncorrect] = useState(false);
+  const completed = stage === "success";
+  const xp = completed ? 380 : 320;
+
+  return (
+    <div className={`progress-demo ${completed ? "demo-complete" : ""}`} id="demo-progression">
+      <div className="demo-brand">
+        <span><IconShield size={21} /> CyberPingo</span>
+        <span className="demo-label">Démo interactive</span>
+      </div>
+      <div className="demo-player">
+        <span className="player-avatar"><IconProfile size={25} /></span>
+        <div className="demo-player-details">
+          <div><strong>Niveau 3 · Débutant</strong><span>{xp} / 500 XP</span></div>
+          <div className="demo-progress" role="progressbar" aria-label="Progression de démonstration" aria-valuemin={0} aria-valuemax={500} aria-valuenow={xp}>
+            <span style={{ transform: `scaleX(${xp / 500})` }} />
+          </div>
+        </div>
+      </div>
+      {stage === "question" ? (
+        <div className="demo-question">
+          <div className="demo-question-heading">
+            <strong>Le bon réflexe cyber</strong>
+            <button type="button" aria-label="Revenir au parcours de démonstration" onClick={() => setStage("path")}><IconX size={16} /></button>
+          </div>
+          <p>Comment protéger au mieux tes comptes ?</p>
+          <button type="button" onClick={() => setIncorrect(true)}>Réutiliser un mot de passe complexe</button>
+          <button type="button" onClick={() => { setIncorrect(false); setStage("success"); }}>Un mot de passe unique par compte</button>
+          <p className="demo-feedback" role="status">{incorrect ? "Presque ! Un mot de passe réutilisé expose plusieurs comptes si l’un d’eux est compromis." : "Choisis une réponse. Aucun compte nécessaire."}</p>
+        </div>
+      ) : (
+        <div className="demo-lessons">
+          <div className="demo-lesson done"><span><IconShield size={17} /></span><p>Introduction à la cybersécurité</p><IconCheck size={17} /></div>
+          <div className="demo-lesson done"><span><IconLock size={17} /></span><p>Les menaces du web</p><IconCheck size={17} /></div>
+          <button className={`demo-lesson current ${completed ? "is-complete" : ""}`} type="button" onClick={() => { setIncorrect(false); setStage("question"); }}>
+            <span><IconLock size={17} /></span><p>Sécurité des mots de passe</p>
+            {completed ? <IconCheck size={17} /> : <span className="play-icon" aria-hidden="true">▶</span>}
+          </button>
+          <div className="demo-lesson locked"><span><IconCourses size={17} /></span><p>Réseaux et protocoles</p><IconLock size={14} /></div>
+          <div className="demo-lesson locked"><span><IconShield size={17} /></span><p>Système et sécurité</p><IconLock size={14} /></div>
+        </div>
+      )}
+      <div className={`demo-bottom ${completed ? "demo-reward" : ""}`} role="status">
+        {completed
+          ? <><IconAward size={17} /><span>Bien joué ! +60 XP de démonstration</span></>
+          : <><IconBolt size={15} /><span>Un petit pas aujourd&apos;hui. Un niveau de plus demain.</span></>}
+      </div>
+    </div>
+  );
+}
 
 export default function Hero() {
   return (
-    <section id="accueil" className="relative overflow-hidden grid-lines">
-      <div className="absolute inset-0 bg-cyber-radial pointer-events-none" />
-      <div className="max-w-7xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32 grid md:grid-cols-2 gap-16 items-center relative">
-        <div>
-          <span className="inline-flex items-center gap-2 text-xs font-medium text-cyber-blue bg-cyber-blue/10 border border-cyber-blue/20 px-3 py-1.5 rounded-full">
-            Nouvelle génération d&apos;apprentissage cybersécurité
-          </span>
-          <h1 className="mt-6 font-display font-bold text-4xl md:text-6xl leading-tight">
-            Apprends la cybersécurité comme tu joues à ton jeu préféré
-          </h1>
-          <p className="mt-6 text-lg text-white/70 max-w-lg">
-            Cyberpingo transforme les débutants en professionnels grâce à des
-            leçons interactives, des challenges pratiques et un mentor IA
-            disponible à chaque étape.
+    <section id="accueil" className="public-hero" aria-labelledby="hero-title">
+      <div className="hero-lab" aria-hidden="true" />
+      <div className="public-container hero-inner">
+        <div className="hero-copy">
+          <span className="hero-badge"><IconShield size={17} /> La cybersécurité, c&apos;est pour toi !</span>
+          <h1 id="hero-title">Apprends la cybersécurité <span>pas à pas, comme un jeu !</span></h1>
+          <p className="hero-description">
+            CyberPingo est une plateforme d&apos;apprentissage interactive qui te
+            permet de maîtriser la cybersécurité, du niveau débutant à avancé,
+            à travers des leçons courtes, des défis pratiques et un suivi de ta progression.
           </p>
-          <div className="mt-9 flex flex-col sm:flex-row gap-4">
-            <Link href="/register">
-              <Button variant="primary" size="lg" className="w-full sm:w-auto">
-                Commencer gratuitement
-              </Button>
+          <div className="hero-actions">
+            <Link href="/register" className="public-button button-primary">
+              Commencer maintenant <IconArrowRight size={17} />
             </Link>
-            <a href="#parcours">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-                Explorer les parcours
-              </Button>
+            <a href="#fonctionnalites" className="public-button button-outline">
+              <span className="button-play" aria-hidden="true">▶</span> Découvrir la plateforme
             </a>
           </div>
-          <div className="mt-10 flex items-center gap-8 text-sm text-white/50">
-            <div>
-              <p className="text-2xl font-display font-bold text-white">40+</p>
-              modules pratiques
-            </div>
-            <div>
-              <p className="text-2xl font-display font-bold text-white">100%</p>
-              gratuit pour démarrer
-            </div>
-          </div>
+          <ul className="hero-benefits" aria-label="Les avantages de CyberPingo">
+            {benefits.map(({ Icon, title, detail }) => (
+              <li key={title}><span className="benefit-icon"><Icon size={21} /></span><span>{title}<br />{detail}</span></li>
+            ))}
+          </ul>
         </div>
-
-        <div className="relative flex justify-center">
-          <div className="absolute w-72 h-72 bg-cyber-blue/20 rounded-full blur-3xl" />
-          <svg
-            viewBox="0 0 320 360"
-            className="relative w-64 md:w-80 drop-shadow-[0_0_40px_rgba(0,168,255,0.35)]"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <ellipse cx="160" cy="330" rx="90" ry="14" fill="#0F172A" />
-            <path d="M160 20 L280 70 V180 C280 260 226 320 160 340 C94 320 40 260 40 180 V70 L160 20Z" fill="url(#hero-gradient)" />
-            <circle cx="130" cy="150" r="12" fill="#050816" />
-            <circle cx="190" cy="150" r="12" fill="#050816" />
-            <circle cx="134" cy="146" r="4" fill="#00FF88" />
-            <circle cx="194" cy="146" r="4" fill="#00FF88" />
-            <path d="M110 200c25 22 75 22 100 0" stroke="#050816" strokeWidth="8" strokeLinecap="round" fill="none" />
-            <path d="M160 20 V60" stroke="#00FF88" strokeWidth="4" strokeLinecap="round" />
-            <circle cx="160" cy="14" r="8" fill="#00FF88" />
-            <rect x="80" y="230" width="160" height="6" rx="3" fill="#8B5CF6" opacity="0.6" />
-            <rect x="80" y="248" width="110" height="6" rx="3" fill="#00A8FF" opacity="0.6" />
-            <defs>
-              <linearGradient id="hero-gradient" x1="40" y1="20" x2="280" y2="340" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#00A8FF" />
-                <stop offset="1" stopColor="#8B5CF6" />
-              </linearGradient>
-            </defs>
-          </svg>
+        <div className="hero-visual" aria-label="CyberPingo, ton compagnon d’apprentissage, et un aperçu interactif de la progression">
+          <Image
+            src="/images/hero-mascot.png"
+            alt="La mascotte CyberPingo en veste à capuche, dans son laboratoire bleu lumineux."
+            width={371}
+            height={432}
+            priority
+            sizes="(max-width: 600px) 230px, (max-width: 1100px) 340px, 400px"
+            className="hero-mascot"
+          />
+          <ProgressDemo />
+          <p className="hero-note">Petits pas.<br /><span>Grands réflexes !</span><span aria-hidden="true">↙</span></p>
+          <div className="companion-caption"><span className="status-dot" /> Ton compagnon de progression</div>
         </div>
       </div>
     </section>

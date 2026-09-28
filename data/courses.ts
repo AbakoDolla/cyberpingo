@@ -1,7 +1,7 @@
 import { Course } from "@/types";
 import { lessons } from "./lessons";
 
-export const courses: Course[] = [
+const courseDefinitions: Course[] = [
   {
     id: "c1",
     slug: "fondamentaux",
@@ -48,15 +48,15 @@ export const courses: Course[] = [
     id: "c4",
     slug: "securite-web",
     title: "Sécurité Web",
-    description: "OWASP Top 10, failles courantes et bonnes pratiques défensives.",
+    description: "HTTPS, comptes sécurisés et détection du phishing : les bons réflexes du web.",
     level: "intermediaire",
     durationMinutes: 180,
     lessonCount: 12,
     progress: 0,
     category: "Sécurité Web",
-    locked: true,
+    locked: false,
     icon: "securite-web",
-    lessons: [],
+    lessons: lessons.filter((l) => l.courseId === "c4"),
   },
   {
     id: "c5",
@@ -68,8 +68,21 @@ export const courses: Course[] = [
     lessonCount: 14,
     progress: 0,
     category: "Pentest",
-    locked: true,
+    locked: false,
     icon: "pentest-intro",
-    lessons: [],
+    lessons: lessons.filter((l) => l.courseId === "c5"),
+  },
+  {
+    id: "c6", slug: "analyse-logs", title: "Analyse de logs",
+    description: "Lire les événements, relier les indices et qualifier une alerte sans conclure trop vite.",
+    level: "intermediaire", durationMinutes: 34, lessonCount: 3, progress: 0,
+    category: "Détection", locked: false, icon: "analyse-logs",
+    lessons: lessons.filter((lesson) => lesson.courseId === "c6"),
   },
 ];
+
+export const courses: Course[] = courseDefinitions.map((course) => ({
+  ...course,
+  lessonCount: course.lessons.length,
+  durationMinutes: course.lessons.reduce((total, lesson) => total + lesson.durationMinutes, 0),
+}));

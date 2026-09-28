@@ -11,6 +11,7 @@ import { formatXP } from "@/lib/utils";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import { IconLogout, IconFlame, IconBolt } from "@/components/ui/Icon";
+import Link from "next/link";
 
 export default function ProfilePage() {
   const { user, getCourseProgress } = useUser();
@@ -29,6 +30,7 @@ export default function ProfilePage() {
   return (
     <AppShell>
       <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
+        <div className="study-actions"><Link href="/progression" className="study-link">Ma progression détaillée</Link><Link href="/parametres" className="study-link">Modifier mon profil et mes préférences</Link></div>
         <div className="bg-dark-navy border border-white/5 rounded-xl2 p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
           <Avatar name={user.name} size="lg" />
           <div className="flex-1">

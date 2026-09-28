@@ -14,6 +14,7 @@ export interface User {
   goal: OnboardingGoal;
   skillLevel: SkillLevel;
   dailyMinutes: number;
+  knownAreas?: string[];
   badges: Badge[];
   skills: SkillProgress[];
   /** IDs des leçons terminées par l'utilisateur */
@@ -22,8 +23,18 @@ export interface User {
   completedChallenges: string[];
   /** Nombre de quiz validés */
   completedQuizzes: number;
+  quizResults: Record<string, QuizResult>;
+  lastActivityDate?: string;
   /** true = accès au panneau d'administration */
   isAdmin?: boolean;
+}
+
+export interface QuizResult {
+  score: number;
+  totalQuestions: number;
+  earnedXp: number;
+  passed: boolean;
+  completedAt: string;
 }
 
 export interface SkillProgress {

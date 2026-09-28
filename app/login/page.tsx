@@ -9,6 +9,7 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserActions } from "@/context/UserContext";
+import { safeReturnPath } from "@/lib/learning-progress";
 
 function LoginForm() {
   const router = useRouter();
@@ -31,10 +32,7 @@ function LoginForm() {
       loginMock(result);
       // Admin → dashboard, utilisateur simple → /courses
       const isAdminUser = result.isAdmin === true;
-      const fallback = isAdminUser ? "/dashboard" : "/courses";
-      const next = searchParams.get("next") ?? fallback;
-      // Empêche un non-admin d'être redirigé vers /dashboard via ?next=
-      const safeDest = !isAdminUser && next.startsWith("/dashboard") ? "/courses" : next;
+      const safeDest = safeReturnPath(searchParams.get("next"), isAdminUser);
       router.push(safeDest);
     }
   }
@@ -61,6 +59,7 @@ function LoginForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <p className="text-sm text-slate-300">Prototype : utilise une adresse et un mot de passe de démonstration, jamais tes vrais identifiants. Les progrès restent dans ce navigateur.</p>
         <Input
           label="Adresse email"
           type="email"

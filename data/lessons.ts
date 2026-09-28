@@ -1,4 +1,5 @@
 import { Lesson } from "@/types";
+import { expandedLessons } from "./learning-expansion";
 
 export const lessons: Lesson[] = [
   // ── Cours c1 : Fondamentaux de la cybersécurité ──────────────────────────
@@ -66,6 +67,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "l-c1-3",
+    quizId: "review-fundamentaux",
     courseId: "c1",
     title: "Les acteurs de la cybersécurité",
     order: 3,
@@ -227,6 +229,7 @@ export const lessons: Lesson[] = [
   },
   {
     id: "l-c3-2",
+    quizId: "review-linux",
     courseId: "c3",
     title: "Permissions et gestion des utilisateurs",
     order: 2,
@@ -262,4 +265,5 @@ export const lessons: Lesson[] = [
       },
     ],
   },
+  ...expandedLessons,
 ];

@@ -91,21 +91,20 @@ export default function OnboardingPage() {
       const exists = a.knownAreas.includes(value);
       return {
         ...a,
-        knownAreas: exists ? a.knownAreas.filter((v) => v !== value) : [...a.knownAreas, value],
+        knownAreas: exists ? a.knownAreas.filter((v) => v !== value) : value === "aucune" ? ["aucune"] : [...a.knownAreas.filter((v) => v !== "aucune"), value],
       };
     });
   }
 
-  async function handleNext() {
+  function handleNext() {
     if (!isLast) {
       setStepIndex((i) => i + 1);
       return;
     }
     setGenerating(true);
     // Sauvegarde les préférences dans le UserContext avant de rediriger.
-    await new Promise((resolve) => setTimeout(resolve, 1400));
     applyOnboarding(answers);
-    router.push("/dashboard");
+    router.push("/progression");
   }
 
   return (
@@ -124,10 +123,10 @@ export default function OnboardingPage() {
           <div className="bg-dark-navy border border-white/5 rounded-xl2 p-10 text-center">
             <div className="w-14 h-14 mx-auto rounded-full border-4 border-white/10 border-t-cyber-blue animate-spin" />
             <h2 className="mt-6 font-display text-xl font-semibold">
-              Nous créons ta roadmap personnalisée…
+              Ton espace d’apprentissage s’ouvre…
             </h2>
             <p className="mt-2 text-sm text-white/50">
-              Cyberpingo adapte ton parcours à ton niveau et à ton objectif.
+              Retrouve tes parcours et ton objectif quotidien.
             </p>
           </div>
         ) : (
@@ -166,7 +165,7 @@ export default function OnboardingPage() {
                 Précédent
               </Button>
               <Button variant="primary" onClick={handleNext} disabled={!canContinue}>
-                {isLast ? "Créer ma roadmap" : "Continuer"}
+                {isLast ? "Commencer à apprendre" : "Continuer"}
               </Button>
             </div>
           </div>

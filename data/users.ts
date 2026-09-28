@@ -25,5 +25,6 @@ export const currentUser: User = {
   completedLessons: [],
   completedChallenges: [],
   completedQuizzes: 0,
+  quizResults: {},
   isAdmin: true,
 };

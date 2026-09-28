@@ -27,7 +27,7 @@ function createUserFromEmail(email: string): User {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
   return {
-    id: `user-${username}`,
+    id: `user-${encodeURIComponent(email.trim().toLowerCase())}`,
     name: displayName,
     username,
     email,
@@ -50,6 +50,7 @@ function createUserFromEmail(email: string): User {
     completedLessons: [],
     completedChallenges: [],
     completedQuizzes: 0,
+    quizResults: {},
     isAdmin: false,
   };
 }
