@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -27,9 +28,10 @@ const courseIconMap: Record<string, React.ComponentType<{ size?: number; strokeW
   "pentest-intro": IconCrosshair,
 };
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
+export default function CourseDetailPage() {
+  const params = useParams<{ id: string }>();
   const course = courses.find((c) => c.slug === params.id);
-  const { publishedCourses } = usePublishStore();
+  const { publishedCourses, hydrated } = usePublishStore();
   const { user } = useUser();
 
   // Cherche dans les cours statiques puis publiés
@@ -48,7 +50,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
     return (
       <AppShell>
         <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-          <p className="text-white/50">Cours introuvable.</p>
+          <p className="text-white/50" role="status">{hydrated ? "Cours introuvable." : "Chargement du cours…"}</p>
         </div>
       </AppShell>
     );

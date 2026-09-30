@@ -100,6 +100,6 @@ export const publicFaq = [
   },
   {
     question: "Mes données sont-elles synchronisées entre mes appareils ?",
-    answer: "Pas encore. Cette version est un prototype : le compte et la progression sont conservés dans ton navigateur. La synchronisation avec un backend reste à connecter. N’utilise pas de mot de passe que tu emploies sur un autre service.",
+    answer: "Oui. Ta progression est enregistrée sur ton compte CyberPingo : connecte-toi sur ton téléphone ou ton ordinateur et reprends exactement là où tu t’étais arrêté.",
   },
 ];

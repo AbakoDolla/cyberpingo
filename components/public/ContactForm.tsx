@@ -1,30 +1,83 @@
 "use client";
 
 import { useState } from "react";
-import { downloadText } from "@/lib/download";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { friendlyError } from "@/lib/learner-mapping";
+
+const SUBJECTS = ["Signaler un problème", "Proposer un contenu", "Améliorer une explication", "Autre"] as const;
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+type State = { kind: "idle" | "sending" | "sent" | "error"; message: string };
 
 export default function ContactForm() {
-  const [status, setStatus] = useState("");
+  const [state, setState] = useState<State>({ kind: "idle", message: "" });
+  const [length, setLength] = useState(0);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    if (String(form.get("website") ?? "")) {
+      setState({ kind: "sent", message: "Merci, ton message a bien été envoyé à l’équipe." });
+      return;
+    }
+    const subject = String(form.get("subject") ?? "");
+    const email = String(form.get("email") ?? "").trim();
+    const message = String(form.get("message") ?? "").trim();
+    if (!SUBJECTS.includes(subject as (typeof SUBJECTS)[number])) { setState({ kind: "error", message: "Choisis un sujet dans la liste." }); return; }
+    if (email && !EMAIL_PATTERN.test(email)) { setState({ kind: "error", message: "L’adresse e-mail semble incomplète." }); return; }
+    if (message.length < 20) { setState({ kind: "error", message: "Décris ta demande en au moins 20 caractères." }); return; }
+    if (message.length > 5000) { setState({ kind: "error", message: "Ton message dépasse 5 000 caractères." }); return; }
+    if (!isSupabaseConfigured) { setState({ kind: "error", message: "L’envoi de messages n’est pas encore activé sur ce site." }); return; }
+
+    setState({ kind: "sending", message: "Envoi en cours…" });
+    const { error } = await getSupabaseBrowserClient().rpc("submit_contact_message", { p_subject: subject, p_email: email, p_message: message });
+    if (error) {
+      setState({ kind: "error", message: friendlyError(error, "Le message n’a pas pu être envoyé. Réessaie dans un instant.") });
+      return;
+    }
+    formElement.reset();
+    setLength(0);
+    setState({
+      kind: "sent",
+      message: email
+        ? "Merci ! Ton message a été transmis à l’équipe, qui te répondra à l’adresse indiquée."
+        : "Merci ! Ton message a été transmis à l’équipe. Sans adresse e-mail, nous ne pourrons pas te répondre directement.",
+    });
+  }
+
   return (
-    <form className="public-form" onSubmit={(event) => {
-      event.preventDefault();
-      const form = new FormData(event.currentTarget);
-      const message = String(form.get("message") ?? "").trim();
-      if (message.length < 20) { setStatus("Décris le problème en au moins 20 caractères."); return; }
-      try {
-        downloadText("retour-cyberpingo.txt", `Sujet : ${form.get("subject")}\nContact facultatif : ${form.get("email") || "Non renseigné"}\n\n${message}\n\nBrouillon local : ce message n’a pas été envoyé.`, "text/plain;charset=utf-8");
-        setStatus("Brouillon préparé. Le téléchargement a été demandé au navigateur ; aucun message n’a été envoyé.");
-      } catch (error) {
-        console.error("Préparation du brouillon impossible.", error);
-        setStatus("Le fichier n’a pas pu être préparé. Copie ton message et publie-le sur GitHub si son contenu peut être public.");
-      }
-    }}>
-      <label>Sujet<select name="subject"><option>Signaler un problème</option><option>Proposer un contenu</option><option>Améliorer une explication</option></select></label>
-      <label>E-mail de contact (facultatif)<input type="email" name="email" autoComplete="email" maxLength={254} /></label>
-      <label>Ton message<textarea name="message" required minLength={20} maxLength={5000} rows={7} placeholder="Quelle page ? Qu’attendais-tu ? Que s’est-il passé ?" /></label>
-      <p>Pas de mot de passe, de clé API ou de donnée confidentielle. Ce formulaire ne transmet rien : il prépare un fichier texte à conserver ou à partager.</p>
-      <button type="submit" className="public-button button-primary">Télécharger mon brouillon</button>
-      <p role="status">{status}</p>
+    <form className="public-form" onSubmit={(event) => void handleSubmit(event)} noValidate>
+      <label>Sujet
+        <select name="subject" defaultValue={SUBJECTS[0]}>
+          {SUBJECTS.map((subject) => <option key={subject}>{subject}</option>)}
+        </select>
+      </label>
+      <label>E-mail pour te répondre (facultatif)
+        <input type="email" name="email" autoComplete="email" maxLength={254} placeholder="toi@exemple.fr" />
+      </label>
+      <label>Ton message
+        <textarea
+          name="message"
+          required
+          minLength={20}
+          maxLength={5000}
+          rows={7}
+          placeholder="Quelle page ? Qu’attendais-tu ? Que s’est-il passé ?"
+          onChange={(event) => setLength(event.target.value.trim().length)}
+          aria-describedby="contact-count"
+        />
+      </label>
+      <p id="contact-count" className="text-xs opacity-60">{length} / 5 000 caractères (20 minimum)</p>
+      <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+        <label>Ne pas remplir<input type="text" name="website" tabIndex={-1} autoComplete="off" /></label>
+      </div>
+      <p>N’inclus ni mot de passe, ni clé API, ni donnée confidentielle. Seule l’équipe CyberPingo lit ces messages ; ils sont limités à 5 envois par heure.</p>
+      <button type="submit" className="public-button button-primary" disabled={state.kind === "sending"}>
+        {state.kind === "sending" ? "Envoi…" : "Envoyer à l’équipe"}
+      </button>
+      <p role={state.kind === "error" ? "alert" : "status"} data-state={state.kind}>{state.message}</p>
     </form>
   );
 }

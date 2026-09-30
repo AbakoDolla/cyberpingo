@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import MockTerminal from "@/components/challenges/MockTerminal";
 import Badge from "@/components/ui/Badge";
@@ -8,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { challenges } from "@/data/challenges";
 import { useUserFull } from "@/context/UserContext";
+import { usePublishStore } from "@/hooks/usePublishStore";
 import { IconHint } from "@/components/ui/Icon";
 
 const difficultyLabel: Record<string, string> = {
@@ -16,42 +18,48 @@ const difficultyLabel: Record<string, string> = {
   avance: "Avancé",
 };
 
-export default function ChallengeDetailPage({ params }: { params: { id: string } }) {
-  const challenge = challenges.find((c) => c.slug === params.id);
+export default function ChallengeDetailPage() {
+  const params = useParams<{ id: string }>();
+  const { publishedChallenges, hydrated } = usePublishStore();
+  const challenge = [...challenges, ...publishedChallenges].find((c) => c.slug === params.id);
   const [answer, setAnswer] = useState("");
   const [showHints, setShowHints] = useState(false);
-  const [result, setResult] = useState<"idle" | "correct" | "incorrect">("idle");
+  const [result, setResult] = useState<"idle" | "checking" | "correct" | "incorrect">("idle");
+  const [awarded, setAwarded] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const { completeChallenge, user } = useUserFull();
 
   if (!challenge) {
     return (
       <AppShell>
         <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-          <p className="text-white/50">Challenge introuvable.</p>
+          <p className="text-white/50" role="status">{hydrated ? "Challenge introuvable." : "Chargement du challenge…"}</p>
         </div>
       </AppShell>
     );
   }
 
   const alreadyCompleted = user.completedChallenges.includes(challenge.id);
+  const locked = result === "correct" || result === "checking" || alreadyCompleted;
 
-  function handleValidate() {
-    const trimmed = answer.trim().toLowerCase();
-    if (!trimmed) return;
-
-    const expected = challenge!.expectedAnswer.toLowerCase();
-    if (trimmed === expected) {
-      setResult("correct");
-      if (!alreadyCompleted) {
-        completeChallenge(challenge!.id, challenge!.xpReward);
-      }
-    } else {
-      setResult("incorrect");
+  // The flag is checked by the database; the page never receives the expected answer.
+  async function handleValidate() {
+    const trimmed = answer.trim();
+    if (!trimmed || result === "checking") return;
+    setResult("checking");
+    setError(null);
+    try {
+      const outcome = await completeChallenge(challenge!.id, trimmed);
+      setAwarded(outcome.awarded);
+      setResult(outcome.correct ? "correct" : "incorrect");
+    } catch (err) {
+      setResult("idle");
+      setError(err instanceof Error ? err.message : "Ta réponse n’a pas pu être vérifiée.");
     }
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") handleValidate();
+    if (e.key === "Enter") void handleValidate();
   }
 
   return (
@@ -92,22 +100,23 @@ export default function ChallengeDetailPage({ params }: { params: { id: string }
                 if (result === "incorrect") setResult("idle");
               }}
               onKeyDown={handleKeyDown}
-              disabled={result === "correct" || alreadyCompleted}
-              error={result === "incorrect" ? "Réponse incorrecte, réessaie." : undefined}
+              disabled={locked}
+              error={result === "incorrect" ? "Réponse incorrecte, réessaie." : error ?? undefined}
             />
             <Button
               variant="success"
-              onClick={handleValidate}
-              disabled={result === "correct" || alreadyCompleted}
+              onClick={() => void handleValidate()}
+              disabled={locked}
+              aria-busy={result === "checking"}
               className="shrink-0"
             >
-              Valider
+              {result === "checking" ? "Vérification…" : "Valider"}
             </Button>
           </div>
 
           {(result === "correct" || alreadyCompleted) && (
             <p className="mt-4 text-sm text-cyber-green">
-              ✅ Bravo, challenge résolu !{!alreadyCompleted && ` +${challenge.xpReward} XP ajoutés à ton profil.`}
+              ✅ Bravo, challenge résolu !{awarded > 0 && ` +${awarded} XP ajoutés à ton profil.`}
             </p>
           )}
 

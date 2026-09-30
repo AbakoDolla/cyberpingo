@@ -27,6 +27,8 @@ export interface User {
   lastActivityDate?: string;
   /** true = accès au panneau d'administration */
   isAdmin?: boolean;
+  /** Parcours personnalisé terminé après l’inscription */
+  onboardingCompleted?: boolean;
 }
 
 export interface QuizResult {
@@ -122,8 +124,6 @@ export interface Challenge {
   hints: string[];
   terminalLines: string[];
   flagPlaceholder: string;
-  /** Réponse attendue (insensible à la casse) pour la validation réelle */
-  expectedAnswer: string;
 }
 
 export interface Badge {
@@ -237,7 +237,8 @@ export interface PublishedChallenge {
   hints: string[];
   terminalLines: string[];
   flagPlaceholder: string;
-  expectedAnswer: string;
+  /** Only present while an admin drafts the challenge; the database strips it on publish. */
+  expectedAnswer?: string;
   publishedAt: string;
   sourceFileName: string;
 }

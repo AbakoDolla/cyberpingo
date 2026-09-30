@@ -21,7 +21,7 @@ export default function ProgressionPage() {
   const level = computeLevel(user.xp);
   const attempts = Object.entries(user.quizResults);
   return <AppShell><div className="study-page">
-    <header className="study-heading"><h1>Chaque pas compte, {user.name}.</h1><p>Retrouve tes acquis, tes meilleurs scores et la prochaine étape. Sauvegarde locale sur cet appareil.</p></header>
+    <header className="study-heading"><h1>Chaque pas compte, {user.name}.</h1><p>Retrouve tes acquis, tes meilleurs scores et la prochaine étape, synchronisés sur ton compte.</p></header>
     <div className="study-overview">
       <div><p className="text-cyber-blue">Niveau {user.level}</p><h2>{user.xp} XP au total</h2><p>{level.xpToNextLevel - level.levelXp} XP avant le prochain niveau</p><ProgressBar value={level.levelXp / level.xpToNextLevel * 100} tone="blue" /></div>
       <dl><div><dt>Leçons terminées</dt><dd>{completed} / {allLessons.length}</dd></div><div><dt>Quiz validés</dt><dd>{user.completedQuizzes}</dd></div><div><dt>Défis réussis</dt><dd>{user.completedChallenges.length}</dd></div><div><dt>Série de jours (UTC)</dt><dd>{user.streak}</dd></div></dl>

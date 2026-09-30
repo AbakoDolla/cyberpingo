@@ -28,7 +28,6 @@ export const challenges: Challenge[] = [
       "443/tcp  open   https     nginx 1.18.0",
     ],
     flagPlaceholder: "Nom du service sur le port 22",
-    expectedAnswer: "ssh",
   },
   {
     id: "ch2",
@@ -50,7 +49,6 @@ export const challenges: Challenge[] = [
       "Creator       : agent-formation-01",
     ],
     flagPlaceholder: "Logiciel utilisé pour créer le document",
-    expectedAnswer: "libreoffice",
   },
   {
     id: "ch3",
@@ -65,7 +63,6 @@ export const challenges: Challenge[] = [
     hints: ["La commande chmod modifie les permissions d'un fichier.", "La permission 644 donne rw-r--r--."],
     terminalLines: ["$ ls -l config.env", "-rwxrwxrwx 1 root root 220 config.env"],
     flagPlaceholder: "Commande chmod à utiliser",
-    expectedAnswer: "chmod 644 config.env",
   },
   {
     id: "ch4",
@@ -80,7 +77,6 @@ export const challenges: Challenge[] = [
     hints: ["Essaie plusieurs décalages entre 1 et 25.", "Le décalage utilisé ici est 13 (ROT13)."],
     terminalLines: ["Message chiffré : Pbqr Fnyhgngvbany"],
     flagPlaceholder: "Message déchiffré",
-    expectedAnswer: "Code Salutational",
   },
   {
     id: "ch5",
@@ -95,7 +91,6 @@ export const challenges: Challenge[] = [
     hints: ["Une requête SQL mal filtrée peut être manipulée avec des guillemets et OR.", "Le classique : ' OR '1'='1"],
     terminalLines: ["POST /login", "username=admin' OR '1'='1", "password=anything"],
     flagPlaceholder: "Entrée qui exploite la faille",
-    expectedAnswer: "' OR '1'='1",
   },
   {
     id: "ch6",
@@ -110,6 +105,5 @@ export const challenges: Challenge[] = [
     hints: ["Un bon mot de passe combine longueur et diversité de caractères.", "Les mots du dictionnaire sont faibles."],
     terminalLines: ["azerty123", "P#7mK!q2Lx9$", "motdepasse"],
     flagPlaceholder: "Le mot de passe le plus faible",
-    expectedAnswer: "motdepasse",
   },
 ];

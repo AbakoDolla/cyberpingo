@@ -1,64 +1,40 @@
-// ─── Types temps réel ────────────────────────────────────────────────────────
+import type { ActivityKind } from "@/types/database";
 
-export type UserStatus = "online" | "idle" | "offline";
+export type LearnerStatus = "online" | "idle" | "offline";
 
-export type RealtimeAction =
-  | "page_view"
-  | "lesson_start"
-  | "lesson_complete"
-  | "challenge_start"
-  | "challenge_complete"
-  | "quiz_start"
-  | "quiz_complete"
-  | "login"
-  | "logout"
-  | "mentor_chat";
-
-export interface RealtimeSession {
-  sessionId: string;
+export interface LiveSession {
   userId: string;
-  username: string;
   displayName: string;
-  level: number;
   xp: number;
-  status: UserStatus;
+  role: "learner" | "admin";
   currentPage: string;
-  connectedAt: string;      // ISO
-  lastActivityAt: string;   // ISO
-  disconnectedAt?: string;  // ISO — défini si offline
-  ipMasked: string;         // ex: "192.168.x.x" — masqué pour la vie privée
-  actions: RealtimeEvent[];
+  visible: boolean;
+  connectedAt: string;
+  lastSeenAt: string;
+  endedAt: string | null;
 }
 
-export interface RealtimeEvent {
-  id: string;
-  sessionId: string;
+export interface LiveEvent {
+  id: number;
   userId: string;
-  username: string;
   displayName: string;
-  action: RealtimeAction;
-  label: string;           // Description lisible de l'action
-  page: string;            // Chemin de la page concernée
-  timestamp: string;       // ISO
-  xpDelta?: number;        // XP gagné lors de l'action (si applicable)
+  kind: ActivityKind;
+  label: string;
+  page: string | null;
+  xpDelta: number;
+  createdAt: string;
 }
 
-export interface RealtimeStats {
-  totalOnline: number;
-  totalIdle: number;
-  totalOffline: number;
-  totalSessions: number;
-  peakOnlineToday: number;
-  totalLoginsToday: number;
-  totalXpEarnedToday: number;
-  mostVisitedPages: { page: string; count: number }[];
-  actionCounts: Record<RealtimeAction, number>;
-}
+export type LiveConnection = "connecting" | "live" | "offline";
 
-export interface RealtimeState {
-  sessions: RealtimeSession[];
-  events: RealtimeEvent[];   // Flux global des 50 derniers événements
-  stats: RealtimeStats;
-  lastUpdated: string;       // ISO
-  connected: boolean;        // true = WebSocket connecté / polling actif
+/** Online: heartbeat within 2 minutes on a visible tab. Idle: recent but hidden or quiet. */
+export const ONLINE_WINDOW_MS = 2 * 60 * 1000;
+export const IDLE_WINDOW_MS = 15 * 60 * 1000;
+
+export function sessionStatus(session: Pick<LiveSession, "visible" | "lastSeenAt" | "endedAt">, now: number): LearnerStatus {
+  if (session.endedAt) return "offline";
+  const age = now - new Date(session.lastSeenAt).getTime();
+  if (age <= ONLINE_WINDOW_MS && session.visible) return "online";
+  if (age <= IDLE_WINDOW_MS) return "idle";
+  return "offline";
 }

@@ -13,11 +13,13 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   onClose: () => void;
-  onPublishCourse: (course: PublishedCourse) => void;
-  onPublishChallenge: (challenge: PublishedChallenge) => void;
+  onPublishCourse: (course: PublishedCourse) => Promise<PublishedCourse>;
+  onPublishChallenge: (challenge: PublishedChallenge) => Promise<PublishedChallenge>;
 }
 
-const ACCEPTED = ".txt,.md,.pdf,.docx,.rst";
+const ACCEPTED = ".txt,.md,.rst,.pdf";
+const MAX_TEXT_BYTES = 5 * 1024 * 1024;
+const MAX_PDF_BYTES = 3 * 1024 * 1024;
 
 const INITIAL_STATE: PublishState = {
   step: "idle",
@@ -32,11 +34,19 @@ const INITIAL_STATE: PublishState = {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
-async function readFileAsText(file: File): Promise<string> {
-  // PDF et DOCX : on extrait le texte brut lisible (approche simple sans lib)
-  if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
-    return `[Fichier PDF : ${file.name}]\nTaille : ${(file.size / 1024).toFixed(1)} Ko\n\nNote : le contenu textuel de ce PDF a été transmis pour analyse.`;
-  }
+const isPdf = (file: File) => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+/** PDFs are sent to Gemini as base64 so the model reads the real document. */
+function readPdfAsBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? "").split(",")[1] ?? "");
+    reader.onerror = () => reject(new Error("Impossible de lire le fichier."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => resolve((e.target?.result as string) ?? "");
@@ -134,12 +144,16 @@ function DropZone({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={fileName ? `Fichier sélectionné : ${fileName}. Changer de fichier` : "Choisir un fichier à analyser"}
       onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); } }}
       className={cn(
-        "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200",
+        "border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyber-blue",
         dragging ? "border-cyber-blue bg-cyber-blue/10" : "border-white/15 hover:border-white/30 bg-white/[0.02]"
       )}
     >
@@ -162,7 +176,7 @@ function DropZone({
         <>
           <p className="font-medium text-white/70">Glisse ton fichier ici</p>
           <p className="text-xs text-white/40 mt-2">
-            Formats : .txt, .md, .pdf, .docx, .rst — max 5 Mo
+            Formats : .txt, .md, .rst (5 Mo max) ou .pdf (3 Mo max)
           </p>
         </>
       )}
@@ -356,9 +370,9 @@ function ChallengeReview({
           </div>
         </div>
         <div>
-          <label className="block text-xs text-white/50 mb-1">Réponse attendue</label>
+          <label className="block text-xs text-white/50 mb-1">Réponse attendue <span className="text-white/30">(gardée secrète, vérifiée par le serveur)</span></label>
           <input
-            value={challenge.expectedAnswer}
+            value={challenge.expectedAnswer ?? ""}
             onChange={(e) => onChange({ ...challenge, expectedAnswer: e.target.value })}
             className="w-full bg-cyber-black border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-cyber-blue outline-none font-mono"
           />
@@ -392,19 +406,36 @@ function ChallengeReview({
 
 export default function PublishModal({ onClose, onPublishCourse, onPublishChallenge }: Props) {
   const [state, setState] = useState<PublishState>(INITIAL_STATE);
+  const [pdfData, setPdfData] = useState<string | null>(null);
+  const [published, setPublished] = useState({ course: false, challenge: false });
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   const update = useCallback((patch: Partial<PublishState>) => {
     setState((prev) => ({ ...prev, ...patch }));
   }, []);
 
   async function handleFileSelect(file: File) {
-    if (file.size > 5 * 1024 * 1024) {
-      update({ error: "Fichier trop volumineux (max 5 Mo)." });
+    const pdf = isPdf(file);
+    if (file.size > (pdf ? MAX_PDF_BYTES : MAX_TEXT_BYTES)) {
+      update({ error: pdf ? "PDF trop volumineux (3 Mo maximum)." : "Fichier trop volumineux (5 Mo maximum)." });
+      return;
+    }
+    if (!/\.(txt|md|rst|pdf)$/i.test(file.name)) {
+      update({ error: "Format non pris en charge. Utilise un fichier .txt, .md, .rst ou .pdf." });
       return;
     }
     update({ error: null });
-    const content = await readFileAsText(file);
-    update({ fileName: file.name, fileContent: content, step: "uploading" });
+    try {
+      if (pdf) {
+        setPdfData(await readPdfAsBase64(file));
+        update({ fileName: file.name, fileContent: "", step: "uploading" });
+      } else {
+        setPdfData(null);
+        update({ fileName: file.name, fileContent: await readFileAsText(file), step: "uploading" });
+      }
+    } catch (cause) {
+      update({ error: cause instanceof Error ? cause.message : "Impossible de lire le fichier." });
+    }
   }
 
   async function handleAnalyze() {
@@ -418,16 +449,19 @@ export default function PublishModal({ onClose, onPublishCourse, onPublishChalle
           content: state.fileContent,
           fileName: state.fileName,
           type: state.type,
+          ...(pdfData ? { fileData: pdfData, mimeType: "application/pdf" } : {}),
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
         update({ step: "error", error: data.error ?? "Erreur lors de l'analyse." });
         return;
       }
 
+      setPublished({ course: false, challenge: false });
+      setPublishError(null);
       update({
         step: "review",
         generatedCourse: data.course ?? null,
@@ -440,21 +474,33 @@ export default function PublishModal({ onClose, onPublishCourse, onPublishChalle
   }
 
   async function handlePublish() {
-    update({ step: "publishing" });
-    // Simule un court délai de "publication"
-    await new Promise((r) => setTimeout(r, 600));
-
-    if (state.type === "course" && state.generatedCourse) {
-      onPublishCourse(state.generatedCourse);
-      // Publie aussi le challenge lié si présent
-      if (state.generatedChallenge) {
-        onPublishChallenge(state.generatedChallenge);
-      }
-    } else if (state.type === "challenge" && state.generatedChallenge) {
-      onPublishChallenge(state.generatedChallenge);
+    const { generatedCourse: course, generatedChallenge: challenge, type } = state;
+    const wantsChallenge = Boolean(challenge) && (type === "challenge" || Boolean(challenge?.expectedAnswer?.trim()));
+    if (type === "challenge" && !challenge?.expectedAnswer?.trim()) {
+      setPublishError("Indique la réponse attendue du challenge avant de publier.");
+      return;
     }
-
-    update({ step: "done" });
+    update({ step: "publishing" });
+    setPublishError(null);
+    const done = { ...published };
+    try {
+      // Each part is published once, so a retry after a partial failure never duplicates content.
+      if (type === "course" && course && !done.course) {
+        await onPublishCourse(course);
+        done.course = true;
+        setPublished({ ...done });
+      }
+      if (wantsChallenge && challenge && !done.challenge) {
+        await onPublishChallenge(challenge);
+        done.challenge = true;
+        setPublished({ ...done });
+      }
+      update({ step: "done" });
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "La publication a échoué.";
+      setPublishError(done.course ? `Le cours est publié, mais le challenge lié a échoué : ${message}` : message);
+      update({ step: "review" });
+    }
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -501,12 +547,12 @@ export default function PublishModal({ onClose, onPublishCourse, onPublishChalle
                 Importe un fichier contenant le contenu à analyser.
                 Gemini extraira automatiquement la structure pédagogique.
               </p>
-              <DropZone onFile={handleFileSelect} fileName={state.fileName} />
+              <DropZone onFile={(file) => void handleFileSelect(file)} fileName={state.fileName} />
               {state.error && (
                 <p className="text-sm text-cyber-red">{state.error}</p>
               )}
               <div className="flex justify-between">
-                <Button variant="ghost" onClick={() => update({ step: "idle", fileName: "", fileContent: "" })}>
+                <Button variant="ghost" onClick={() => { setPdfData(null); update({ step: "idle", fileName: "", fileContent: "" }); }}>
                   Retour
                 </Button>
                 <Button
@@ -545,13 +591,15 @@ export default function PublishModal({ onClose, onPublishCourse, onPublishChalle
                 />
               )}
 
+              {publishError && <p role="alert" className="text-sm text-cyber-red">{publishError}</p>}
+
               <div className="flex justify-between pt-2">
-                <Button variant="ghost" onClick={() => update({ step: "uploading" })}>
+                <Button variant="ghost" onClick={() => update({ step: "uploading" })} disabled={published.course || published.challenge}>
                   Re-analyser
                 </Button>
-                <Button variant="primary" onClick={handlePublish}>
+                <Button variant="primary" onClick={() => void handlePublish()}>
                   <IconCheck size={15} strokeWidth={2.5} />
-                  Publier
+                  {publishError ? "Réessayer la publication" : "Publier"}
                 </Button>
               </div>
             </div>
@@ -577,7 +625,7 @@ export default function PublishModal({ onClose, onPublishCourse, onPublishChalle
                   {state.type === "course"
                     ? `Le cours "${state.generatedCourse?.title}" est maintenant disponible.`
                     : `Le challenge "${state.generatedChallenge?.title}" est maintenant disponible.`}
-                  {state.type === "course" && state.generatedChallenge && (
+                  {state.type === "course" && published.challenge && (
                     <span className="block mt-1">Un challenge lié a aussi été publié.</span>
                   )}
                 </p>

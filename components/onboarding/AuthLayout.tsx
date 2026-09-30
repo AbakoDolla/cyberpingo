@@ -9,7 +9,7 @@ export default function AuthLayout({
   title: string;
   subtitle: string;
   children: React.ReactNode;
-  footer: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen grid-lines flex items-center justify-center px-6 py-12">
@@ -22,7 +22,7 @@ export default function AuthLayout({
           <p className="mt-2 text-sm text-white/60 text-center">{subtitle}</p>
           <div className="mt-8">{children}</div>
         </div>
-        <p className="mt-6 text-center text-sm text-white/50">{footer}</p>
+        {footer && <p className="mt-6 text-center text-sm text-white/60">{footer}</p>}
       </div>
     </div>
   );

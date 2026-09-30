@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { PublishedCourse, PublishedChallenge } from "@/types";
 import { usePublishStore } from "@/hooks/usePublishStore";
-import PublishModal from "./PublishModal";
 import Button from "@/components/ui/Button";
 import {
   IconPlus, IconCourses, IconShield, IconLesson, IconBolt,
@@ -34,6 +34,15 @@ const levelLabel: Record<string, string> = {
   avance: "Avancé",
 };
 
+// Chargé à la demande : seuls les admins qui ouvrent la modale téléchargent ce code.
+const PublishModal = dynamic(() => import("./PublishModal"), {
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+    </div>
+  ),
+});
+
 // ─── Cards ────────────────────────────────────────────────────────────────────
 
 function PublishedCourseCard({
@@ -50,9 +59,11 @@ function PublishedCourseCard({
           <IconCourses size={16} strokeWidth={1.6} className="text-cyber-blue" />
         </div>
         <button
+          type="button"
           onClick={onDelete}
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-white/20 hover:text-cyber-red hover:bg-cyber-red/10 transition-colors opacity-0 group-hover:opacity-100"
-          title="Supprimer"
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-white/40 hover:text-cyber-red hover:bg-cyber-red/10 transition-colors sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyber-red"
+          title="Retirer ce cours"
+          aria-label={`Retirer le cours ${course.title}`}
         >
           <IconTrash size={13} />
         </button>
@@ -108,9 +119,11 @@ function PublishedChallengeCard({
           <CatIcon size={16} strokeWidth={1.6} className="text-cyber-green" />
         </div>
         <button
+          type="button"
           onClick={onDelete}
-          className="w-7 h-7 rounded-lg flex items-center justify-center text-white/20 hover:text-cyber-red hover:bg-cyber-red/10 transition-colors opacity-0 group-hover:opacity-100"
-          title="Supprimer"
+          className="w-7 h-7 rounded-lg flex items-center justify-center text-white/40 hover:text-cyber-red hover:bg-cyber-red/10 transition-colors sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyber-red"
+          title="Retirer ce challenge"
+          aria-label={`Retirer le challenge ${challenge.title}`}
         >
           <IconTrash size={13} />
         </button>
@@ -151,11 +164,23 @@ export default function AdminPublishSection() {
     publishedCourses, publishedChallenges,
     publishCourse, publishChallenge,
     unpublishCourse, unpublishChallenge,
-    hydrated,
+    hydrated, error: loadError, refresh,
   } = usePublishStore();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"courses" | "challenges">("courses");
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  async function remove(kind: "course" | "challenge", id: string, title: string) {
+    const label = kind === "course" ? "le cours" : "le challenge";
+    if (!window.confirm(`Retirer ${label} « ${title} » ? Les apprenants n’y auront plus accès et leurs XP associés seront conservés.`)) return;
+    setActionError(null);
+    try {
+      await (kind === "course" ? unpublishCourse(id) : unpublishChallenge(id));
+    } catch (cause) {
+      setActionError(cause instanceof Error ? cause.message : "La suppression a échoué.");
+    }
+  }
 
   if (!hydrated) return null;
 
@@ -164,6 +189,12 @@ export default function AdminPublishSection() {
   return (
     <>
       <div className="bg-dark-navy border border-white/5 rounded-xl2 p-6">
+        {(actionError || loadError) && (
+          <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-cyber-red/30 bg-cyber-red/10 px-4 py-3 text-sm text-red-100">
+            <span>{actionError ?? loadError}</span>
+            {loadError && !actionError && <button type="button" className="text-cyber-blue hover:underline" onClick={() => void refresh()}>Réessayer</button>}
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
@@ -218,7 +249,7 @@ export default function AdminPublishSection() {
                     <PublishedCourseCard
                       key={c.id}
                       course={c}
-                      onDelete={() => unpublishCourse(c.id)}
+                      onDelete={() => void remove("course", c.id, c.title)}
                     />
                   ))
                 )}
@@ -234,7 +265,7 @@ export default function AdminPublishSection() {
                     <PublishedChallengeCard
                       key={c.id}
                       challenge={c}
-                      onDelete={() => unpublishChallenge(c.id)}
+                      onDelete={() => void remove("challenge", c.id, c.title)}
                     />
                   ))
                 )}
@@ -251,7 +282,7 @@ export default function AdminPublishSection() {
             </div>
             <p className="text-sm text-white/50">Aucune publication</p>
             <p className="text-xs text-white/30 mt-1">
-              Clique sur "Publier" pour importer un fichier
+              Clique sur « Publier » pour importer un fichier
             </p>
           </div>
         )}
@@ -260,8 +291,8 @@ export default function AdminPublishSection() {
       {modalOpen && (
         <PublishModal
           onClose={() => setModalOpen(false)}
-          onPublishCourse={(course) => { publishCourse(course); }}
-          onPublishChallenge={(challenge) => { publishChallenge(challenge); }}
+          onPublishCourse={publishCourse}
+          onPublishChallenge={publishChallenge}
         />
       )}
     </>

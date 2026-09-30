@@ -18,7 +18,7 @@ export default function Footer() {
         </div>
         {groups.map((group) => <div key={group.title}><h2>{group.title}</h2>{group.links.map((link) => <Link key={link.href} href={link.href}>{link.label}</Link>)}</div>)}
       </div>
-      <div className="public-container footer-bottom"><span>© {new Date().getFullYear()} CyberPingo.</span><span>Prototype pédagogique · <Link href="/confidentialite">Données stockées localement</Link></span></div>
+      <div className="public-container footer-bottom"><span>© {new Date().getFullYear()} CyberPingo.</span><span>Plateforme pédagogique gratuite · <Link href="/confidentialite">Tes données</Link></span></div>
     </footer>
   );
 }

@@ -50,6 +50,9 @@
 .settings-data > p { margin-block: 14px 24px; }
 .reset-confirmation { padding: 22px; border: 1px solid #a36b70; border-radius: 12px; background: #291622; }
 .reset-confirmation p { color: #ffe1e4; margin-bottom: 20px; }
+.reset-confirmation label { display: block; color: #ffe1e4; font-size: 14px; margin-bottom: 10px; }
+.reset-confirmation input { width: 100%; max-width: 320px; min-height: 48px; margin-bottom: 20px; border: 1px solid #a36b70; background: #1a0d15; border-radius: 8px; padding: 12px; color: #f8fafc; letter-spacing: 0.08em; }
+.reset-confirmation input:focus-visible { outline: 2px solid #ff8a95; outline-offset: 2px; }
 .settings-status { border: 1px solid #397461; background: #082d29; color: #c7ffe8; padding: 18px; margin-block: 24px; border-radius: 10px; }
 .settings-status.is-error { border-color: #b77a7e; background: #311821; color: #ffd9dd; }
 @media (max-width: 1000px) { .study-overview { grid-template-columns: 1fr; } .study-next { align-items: flex-start; flex-direction: column; } }

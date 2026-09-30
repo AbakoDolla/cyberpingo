@@ -38,7 +38,6 @@ export default function ChallengesPage() {
     hints: pc.hints,
     terminalLines: pc.terminalLines,
     flagPlaceholder: pc.flagPlaceholder,
-    expectedAnswer: pc.expectedAnswer,
   }));
 
   const allChallenges = [...staticChallenges, ...publishedAsChallenges];

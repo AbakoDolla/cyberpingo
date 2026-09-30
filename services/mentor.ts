@@ -152,10 +152,15 @@ export async function sendMessageToMentor(
       body: JSON.stringify({ message, history }),
     });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const data = await res.json();
-    content = data.content ?? localFallback(message);
+    const data = await res.json().catch(() => ({}));
+    // Quota, session and validation messages are meant for the learner; other failures use local answers.
+    if (res.status === 429 || res.status === 401 || res.status === 400) {
+      content = typeof data.error === "string" ? data.error : localFallback(message);
+    } else if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    } else {
+      content = data.content ?? localFallback(message);
+    }
   } catch {
     // Fallback sur la base locale si l'API est indisponible
     content = localFallback(message);

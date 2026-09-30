@@ -67,7 +67,7 @@ export default function CoursesPage() {
         {hydrated && filteredPublished.length > 0 && (
           <div className="mt-10">
             <div className="flex items-center gap-3 mb-4">
-              <h2 className="font-display font-semibold text-lg">Cours publiés sur cet appareil</h2>
+              <h2 className="font-display font-semibold text-lg">Cours publiés par l’équipe</h2>
               <span className="text-xs px-2 py-0.5 rounded-full bg-cyber-green/10 text-cyber-green border border-cyber-green/20">
                 Nouveau
               </span>

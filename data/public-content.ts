@@ -61,7 +61,7 @@ export const articles: Article[] = [
     sections: [
       { title: "Identifie ce qui compte", text: "Commence par les fichiers irremplaçables : documents, photos et informations nécessaires à tes activités. La synchronisation seule n’est pas toujours une sauvegarde : une suppression ou un chiffrement malveillant peut aussi être synchronisé." },
       { title: "Sépare les copies", text: "Conserve plusieurs copies sur des supports distincts, dont une séparée de l’appareil habituel. Protège les sauvegardes sensibles par chiffrement et conserve la clé de récupération en sécurité. Un disque toujours branché peut être affecté par le même incident que ton ordinateur." },
-      { title: "Teste avec un petit fichier", text: "Restaure régulièrement un document dans un dossier temporaire et vérifie son contenu. Note la date du test et les étapes nécessaires. CyberPingo propose un export JSON des progrès locaux dans les paramètres : il s’agit d’une copie lisible, sans synchronisation ni réimport automatique.", checklist: ["Planifier une fréquence adaptée aux changements.", "Vérifier l’espace disponible et les erreurs.", "Documenter une restauration que tu sais réellement refaire."] },
+      { title: "Teste avec un petit fichier", text: "Restaure régulièrement un document dans un dossier temporaire et vérifie son contenu. Note la date du test et les étapes nécessaires. CyberPingo propose un export JSON de ta progression dans les paramètres : il s’agit d’une copie lisible, sans réimport automatique.", checklist: ["Planifier une fréquence adaptée aux changements.", "Vérifier l’espace disponible et les erreurs.", "Documenter une restauration que tu sais réellement refaire."] },
     ],
     source: { label: "ANSSI — bonnes pratiques", url: "https://cyber.gouv.fr/bonnes-pratiques-protegez-vous" },
   },
@@ -78,7 +78,7 @@ export const informationPages: Record<string, {
       { title: "Des parcours qui ont un fil conducteur", text: "Pars des fondamentaux, explore les réseaux et Linux, puis apprends à protéger le web, lire les logs et cadrer un test autorisé. Le programme détaillé reste consultable avant de créer un profil.", href: "/parcours", link: "Explorer les programmes" },
       { title: "Des quiz avec une explication", text: "Chaque réponse est expliquée. Tu peux recommencer sans limite pour comprendre tes erreurs. Les XP d’un quiz ne sont attribués qu’à la première tentative et aux améliorations de ton meilleur score : répéter la même note ne rapporte rien de plus." },
       { title: "Des défis, pas de vraies cibles", text: "Les exercices proposent des indices, des traces et une réponse à retrouver. Tout se passe dans une simulation pédagogique : aucune commande n’est exécutée sur un serveur distant.", href: "/challenges", link: "Essayer les défis" },
-      { title: "Un suivi personnel", text: "Leçons terminées, meilleurs scores et badges se retrouvent dans ta progression. Le profil et l’objectif quotidien sont modifiables. Les données restent dans ce navigateur ; il n’y a pas encore de synchronisation entre appareils.", href: "/progression", link: "Voir ma progression" },
+      { title: "Un suivi personnel", text: "Leçons terminées, meilleurs scores et badges se retrouvent dans ta progression. Le profil et l’objectif quotidien sont modifiables. Tout est enregistré sur ton compte et se retrouve sur chacun de tes appareils.", href: "/progression", link: "Voir ma progression" },
       { title: "Un mentor optionnel", text: "L’interface du mentor est disponible. Ses réponses nécessitent une clé Gemini configurée côté serveur. N’y saisis ni secret, ni donnée personnelle, ni information professionnelle confidentielle. Les réponses générées doivent toujours être vérifiées.", href: "/mentor", link: "Ouvrir le mentor" },
     ],
   },
@@ -88,7 +88,7 @@ export const informationPages: Record<string, {
     sections: [
       { title: "Apprendre avec des situations compréhensibles", text: "Un e-mail suspect, une permission trop large, une connexion inhabituelle : nous partons de situations concrètes avant d’introduire le vocabulaire. Les exemples relient chaque concept à une décision et à ses conséquences." },
       { title: "Pratiquer avec responsabilité", text: "Savoir faire implique de savoir où s’arrêter. L’autorisation, la protection des données et la restitution des résultats font partie des parcours au même titre que les outils." },
-      { title: "Un projet en construction, sans promesses cachées", text: "Cette version est un prototype fonctionnel. Les contenus intégrés et la progression locale sont utilisables. L’authentification est simulée ; les comptes cloud, le forum et les certificats accrédités ne sont pas disponibles. N’utilise pas de mot de passe réel.", href: "/fonctionnalites", link: "Voir ce qui est disponible" },
+      { title: "Un projet en construction, sans promesses cachées", text: "Les comptes, la progression synchronisée, les quiz corrigés côté serveur et les défis sont disponibles. Le forum et les certificats accrédités ne le sont pas encore : nous préférons te dire ce qui existe vraiment.", href: "/fonctionnalites", link: "Voir ce qui est disponible" },
     ],
   },
   communaute: {
@@ -101,23 +101,24 @@ export const informationPages: Record<string, {
     ],
   },
   confidentialite: {
-    title: "Tes données dans cette version.",
-    introduction: "Cette notice décrit le fonctionnement du prototype, pas une promesse de service cloud.",
+    title: "Tes données, expliquées simplement.",
+    introduction: "Ce que CyberPingo enregistre, pourquoi, et comment garder le contrôle.",
     sections: [
-      { title: "Profil et progression locale", text: "Le nom, l’adresse de démonstration, les préférences, les leçons, scores et XP sont enregistrés dans le localStorage de ce navigateur. Chaque profil local possède sa sauvegarde. La suppression des données du navigateur les efface. Un export JSON est disponible dans les paramètres." },
-      { title: "Cookies et animation", text: "Des cookies de démonstration indiquent l’état connecté et le rôle, pour une durée maximale de trente jours. Ils ne constituent pas une authentification sécurisée. Le sessionStorage retient si l’animation de démarrage a déjà été affichée dans l’onglet." },
-      { title: "Services externes optionnels", text: "Si le mentor est configuré, les messages saisis sont transmis au fournisseur Gemini par le serveur. Les liens vers GitHub et les sites de documentation relèvent de leurs propres politiques. Le formulaire de contact prépare uniquement un fichier local et ne transmet pas ton message." },
-      { title: "Contrôle et limites", text: "Tu peux modifier ton profil, exporter ou réinitialiser tes progrès dans les paramètres. Pour supprimer toutes les données locales, efface les données de ce site dans le navigateur. Sur un appareil partagé, déconnecte-toi ; la déconnexion ne supprime pas les profils locaux. N’y stocke aucune donnée sensible.", href: "/parametres", link: "Gérer mes données locales" },
+      { title: "Compte et progression", text: "Ton adresse e-mail, ton nom affiché, tes préférences d’apprentissage, tes leçons terminées, tes scores, tes défis résolus et tes badges sont enregistrés sur ton compte, hébergé chez Supabase. Les mots de passe sont gérés par le service d’authentification et ne sont jamais visibles par l’équipe." },
+      { title: "Activité et sécurité", text: "Pour faire fonctionner la série quotidienne et l’espace d’administration, nous enregistrons tes connexions, la page ouverte pendant une session et les actions pédagogiques (leçon terminée, quiz, défi). Le formulaire de contact conserve une empreinte de l’adresse IP pour limiter les abus, jamais l’adresse elle-même." },
+      { title: "Cookies et animation", text: "Des cookies de session, strictement nécessaires, maintiennent ta connexion de façon sécurisée. Le sessionStorage retient seulement si l’animation de démarrage a déjà été affichée dans l’onglet. Aucun cookie publicitaire n’est utilisé." },
+      { title: "Services externes", text: "Si le mentor est activé, les messages saisis sont transmis au fournisseur Gemini par le serveur. Les liens vers GitHub et les sites de documentation relèvent de leurs propres politiques. Les messages de contact ne sont lus que par l’équipe CyberPingo." },
+      { title: "Contrôle et suppression", text: "Dans les paramètres, tu peux modifier ton profil, télécharger une copie de tes données, réinitialiser ta progression ou supprimer définitivement ton compte. Sur un appareil partagé, pense à te déconnecter.", href: "/parametres", link: "Gérer mes données" },
     ],
   },
   conditions: {
     title: "Un cadre clair pour apprendre.",
-    introduction: "CyberPingo est ici proposé comme prototype pédagogique, sans garantie de disponibilité ni certification professionnelle.",
+    introduction: "CyberPingo est une plateforme pédagogique gratuite, sans garantie de disponibilité ni certification professionnelle.",
     sections: [
       { title: "Usage pédagogique uniquement", text: "Les cours, quiz et exercices servent à comprendre les bonnes pratiques. Ils ne remplacent ni un audit, ni un conseil juridique, ni l’intervention d’une équipe de réponse à incident." },
       { title: "Autorisation et responsabilité", text: "N’applique aucune technique sur un système tiers sans autorisation explicite. Respecte le périmètre convenu, les règles de l’organisation et les lois applicables. Les exemples de la plateforme ne donnent aucune autorisation de tester un service réel." },
-      { title: "Compte de démonstration et données", text: "La connexion simule un compte ; ce n’est pas un mécanisme d’identité de production. N’utilise pas tes vrais identifiants. Les progrès sont locaux, peuvent être perdus et ne valent pas diplôme. Les badges représentent uniquement une progression pédagogique." },
-      { title: "Contenu et signalements", text: "Les contenus évoluent et peuvent comporter des erreurs. Signale un problème avec le contexte nécessaire, sans publier d’information confidentielle. Les illustrations fournies pour ce projet restent soumises aux droits de leurs titulaires.", href: "/contact", link: "Préparer un retour" },
+      { title: "Ton compte", text: "Tu es responsable de la confidentialité de ton mot de passe : choisis-en un unique, que tu n’utilises nulle part ailleurs. Un compte par personne. L’équipe peut suspendre un compte utilisé pour nuire à la plateforme ou à d’autres apprenants. Les badges représentent uniquement une progression pédagogique et ne valent pas diplôme." },
+      { title: "Contenu et signalements", text: "Les contenus évoluent et peuvent comporter des erreurs. Signale un problème avec le contexte nécessaire, sans publier d’information confidentielle. Les illustrations fournies pour ce projet restent soumises aux droits de leurs titulaires.", href: "/contact", link: "Envoyer un retour" },
     ],
   },
 };

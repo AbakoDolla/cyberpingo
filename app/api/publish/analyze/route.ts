@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PublishedCourse, PublishedChallenge, PublishType } from "@/types";
+import type { PublishType } from "@/types";
+import { getRequestUser } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { GeminiError, generateContent, isGeminiConfigured } from "@/lib/gemini";
+import { normalizePublishedChallenge, normalizePublishedCourse } from "@/lib/publishing";
 
-const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+export const maxDuration = 60;
 
 // ─── Prompts ─────────────────────────────────────────────────────────────────
 
@@ -136,107 +139,87 @@ FORMAT JSON EXACT :
 // ─── Nettoyage de la réponse Gemini ──────────────────────────────────────────
 
 function extractJson(raw: string): string {
-  // Retire les balises markdown ```json ... ```
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (fenced) return fenced[1].trim();
-  // Cherche le premier { et le dernier }
   const start = raw.indexOf("{");
   const end = raw.lastIndexOf("}");
   if (start !== -1 && end !== -1) return raw.slice(start, end + 1);
   return raw.trim();
 }
 
+const MAX_TEXT_LENGTH = 200_000;
+const MAX_PDF_BASE64_LENGTH = 4_000_000; // ≈ 3 Mo, sous la limite de corps des fonctions Vercel.
+
+interface AnalyzeBody {
+  content?: unknown;
+  fileName?: unknown;
+  type?: unknown;
+  fileData?: unknown;
+  mimeType?: unknown;
+}
+
+const failure = (error: string, status: number) => NextResponse.json({ error }, { status });
+
 // ─── Handler ─────────────────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: "Clé API Gemini non configurée." }, { status: 500 });
-  }
+  if (!isSupabaseConfigured) return failure("Le service de comptes n’est pas configuré.", 503);
+  const { user, isAdmin } = await getRequestUser();
+  if (!user) return failure("Connecte-toi pour publier du contenu.", 401);
+  if (!isAdmin) return failure("Seuls les administrateurs peuvent publier du contenu.", 403);
+  if (!isGeminiConfigured()) return failure("L’analyse automatique n’est pas configurée : ajoute GEMINI_API_KEY côté serveur.", 503);
 
-  let body: { content?: string; fileName?: string; type?: PublishType };
+  let body: AnalyzeBody;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
+    return failure("Corps de requête invalide.", 400);
   }
 
-  const { content, fileName, type } = body;
-  if (!content || !fileName || !type) {
-    return NextResponse.json({ error: "Champs manquants : content, fileName, type." }, { status: 400 });
-  }
+  const type: PublishType | null = body.type === "course" || body.type === "challenge" ? body.type : null;
+  const fileName = typeof body.fileName === "string" ? body.fileName.replace(/[\r\n"]/g, " ").trim().slice(0, 200) : "";
+  const isPdf = body.mimeType === "application/pdf" && typeof body.fileData === "string";
+  const content = typeof body.content === "string" ? body.content.slice(0, MAX_TEXT_LENGTH) : "";
+  if (!type || !fileName) return failure("Indique le type de contenu et le nom du fichier.", 400);
+  if (isPdf && (body.fileData as string).length > MAX_PDF_BASE64_LENGTH) return failure("PDF trop volumineux : 3 Mo maximum.", 413);
+  if (isPdf && !/^[A-Za-z0-9+/=]+$/.test(body.fileData as string)) return failure("Le PDF transmis est illisible.", 400);
+  if (!isPdf && content.trim().length < 40) return failure("Le fichier ne contient pas assez de texte à analyser.", 400);
 
-  const prompt = type === "course"
-    ? buildCoursePrompt(content, fileName)
-    : buildChallengePrompt(content, fileName);
+  const documentText = isPdf ? "(Le contenu complet est fourni dans le document PDF joint.)" : content;
+  const prompt = type === "course" ? buildCoursePrompt(documentText, fileName) : buildChallengePrompt(documentText, fileName);
+  const parts: Record<string, unknown>[] = [{ text: prompt }];
+  if (isPdf) parts.unshift({ inline_data: { mime_type: "application/pdf", data: body.fileData } });
 
+  let rawText: string;
   try {
-    const geminiRes = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 4096,
-          responseMimeType: "application/json",
-        },
-      }),
-    });
+    rawText = await generateContent({
+      contents: [{ role: "user", parts }],
+      generationConfig: { temperature: 0.4, maxOutputTokens: 8192, responseMimeType: "application/json" },
+    }, 55_000);
+  } catch (error) {
+    if (error instanceof GeminiError && error.status === 429) return failure("Le service d’analyse est saturé. Réessaie dans une minute.", 429);
+    console.error("Publish analyze error", error instanceof GeminiError ? error.status : error);
+    return failure("Gemini n’a pas pu analyser le fichier. Réessaie dans un instant.", 502);
+  }
 
-    if (!geminiRes.ok) {
-      const err = await geminiRes.json().catch(() => ({}));
-      console.error("Gemini error:", geminiRes.status, err);
-      return NextResponse.json(
-        { error: "Gemini n'a pas pu analyser le fichier.", details: err },
-        { status: geminiRes.status }
-      );
-    }
+  let parsed: { course?: unknown; challenge?: unknown };
+  try {
+    parsed = JSON.parse(extractJson(rawText));
+  } catch {
+    return failure("La réponse générée était incomplète. Relance l’analyse.", 502);
+  }
 
-    const geminiData = await geminiRes.json();
-    const rawText: string =
-      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-
-    let parsed: { course?: PublishedCourse; challenge?: PublishedChallenge };
-    try {
-      parsed = JSON.parse(extractJson(rawText));
-    } catch {
-      console.error("JSON parse error, raw:", rawText.slice(0, 500));
-      return NextResponse.json(
-        { error: "La réponse de Gemini n'est pas un JSON valide.", raw: rawText.slice(0, 800) },
-        { status: 502 }
-      );
-    }
-
-    // Injecter timestamp réel pour unicité des IDs
-    const ts = Date.now().toString();
-    const replacer = (obj: unknown): unknown => {
-      if (typeof obj === "string") return obj.replace(/<timestamp_placeholder>/g, ts);
-      if (Array.isArray(obj)) return obj.map(replacer);
-      if (obj && typeof obj === "object") {
-        return Object.fromEntries(
-          Object.entries(obj as Record<string, unknown>).map(([k, v]) => [k, replacer(v)])
-        );
-      }
-      return obj;
-    };
-
-    const result = replacer(parsed) as { course?: PublishedCourse; challenge?: PublishedChallenge };
-
-    // Ajouter métadonnées
-    const publishedAt = new Date().toISOString();
-    if (result.course) {
-      result.course.publishedAt = publishedAt;
-      result.course.sourceFileName = fileName;
-    }
-    if (result.challenge) {
-      (result.challenge as PublishedChallenge & { publishedAt: string; sourceFileName: string }).publishedAt = publishedAt;
-      (result.challenge as PublishedChallenge & { sourceFileName: string }).sourceFileName = fileName;
-    }
-
-    return NextResponse.json(result);
-  } catch (err) {
-    console.error("Publish analyze error:", err);
-    return NextResponse.json({ error: "Erreur interne du serveur." }, { status: 500 });
+  const now = new Date();
+  const meta = { publishedAt: now.toISOString(), sourceFileName: fileName };
+  // Fresh identifiers are generated here; the AI-provided ones are never trusted.
+  const withoutId = (value: unknown) => ({ ...(value && typeof value === "object" ? value as Record<string, unknown> : {}), id: undefined, ...meta });
+  try {
+    const course = type === "course" && parsed.course ? normalizePublishedCourse(withoutId(parsed.course), { now }) : null;
+    const challenge = parsed.challenge ? normalizePublishedChallenge(withoutId(parsed.challenge), { now }) : null;
+    if (type === "course" && !course) return failure("Aucun cours exploitable n’a été généré. Relance l’analyse.", 502);
+    if (type === "challenge" && !challenge) return failure("Aucun challenge exploitable n’a été généré. Relance l’analyse.", 502);
+    return NextResponse.json({ course, challenge });
+  } catch (error) {
+    return failure(error instanceof Error ? error.message : "Le contenu généré est invalide. Relance l’analyse.", 502);
   }
 }

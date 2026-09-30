@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import LessonBlockRenderer from "@/components/courses/LessonBlockRenderer";
 import Button from "@/components/ui/Button";
@@ -9,9 +11,12 @@ import { courses } from "@/data/courses";
 import { useUserFull } from "@/context/UserContext";
 import { usePublishStore } from "@/hooks/usePublishStore";
 
-export default function LessonPage({ params }: { params: { id: string } }) {
+export default function LessonPage() {
+  const params = useParams<{ id: string }>();
   const { publishedCourses, hydrated } = usePublishStore();
   const { completeLesson, user } = useUserFull();
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const allLessons = [...lessons, ...publishedCourses.flatMap((course) => course.lessons)];
   const lesson = allLessons.find((item) => item.id === params.id);
   const course = [...courses, ...publishedCourses].find((item) => item.id === lesson?.courseId);
@@ -20,6 +25,11 @@ export default function LessonPage({ params }: { params: { id: string } }) {
   const previous = siblings[index - 1];
   const next = siblings[index + 1];
   const completed = !!lesson && user.completedLessons.includes(lesson.id);
+  const finish = async (id: string) => {
+    setSaving(true);
+    setError(null);
+    try { await completeLesson(id); } catch (err) { setError(err instanceof Error ? err.message : "La leçon n’a pas pu être enregistrée."); } finally { setSaving(false); }
+  };
 
   return <AppShell>
     {!lesson ? <div className="study-empty"><h1>{hydrated ? "Leçon introuvable." : "Chargement de la leçon…"}</h1><Link className="study-link" href="/courses">Retour aux cours</Link></div> :
@@ -32,9 +42,10 @@ export default function LessonPage({ params }: { params: { id: string } }) {
           <h2>{completed ? "Cette leçon fait partie de tes acquis." : "Prêt à retenir l’essentiel ?"}</h2>
           <p>{completed ? "Tu peux la relire à tout moment, sans gagner une deuxième fois les XP." : "Marque la leçon comme terminée, puis vérifie ta compréhension avec le quiz lorsqu’il est proposé."}</p>
           <div className="study-actions">
-            {!completed && <Button variant="success" onClick={() => completeLesson(lesson.id, lesson.xpReward)}>Terminer la leçon</Button>}
+            {!completed && <Button variant="success" onClick={() => finish(lesson.id)} disabled={saving} aria-busy={saving}>{saving ? "Enregistrement…" : "Terminer la leçon"}</Button>}
             {lesson.quizId && <Link className="study-button" href={`/quiz/${lesson.quizId}`}>{user.quizResults[lesson.quizId] ? "Refaire le quiz" : "Passer le quiz"}</Link>}
           </div>
+          {error && <p className="mt-4 text-sm text-cyber-red" role="alert">{error}</p>}
         </div>
         <nav className="study-actions justify-between mt-8" aria-label="Navigation des leçons">
           {previous && <Link className="study-link" href={`/lessons/${previous.id}`}>← Leçon précédente</Link>}

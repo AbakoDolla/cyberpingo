@@ -10,6 +10,7 @@ import { courses } from "@/data/courses";
 import { formatXP } from "@/lib/utils";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { IconLogout, IconFlame, IconBolt } from "@/components/ui/Icon";
 import Link from "next/link";
 
@@ -17,14 +18,20 @@ export default function ProfilePage() {
   const { user, getCourseProgress } = useUser();
   const { logout } = useUserActions();
   const router = useRouter();
+  const [leaving, setLeaving] = useState(false);
   const completedCourses = courses.filter(
     (c) => getCourseProgress(c.id) === 100
   ).length;
   const completedChallenges = user.completedChallenges.length;
 
-  function handleLogout() {
-    logout();
-    router.push("/login");
+  async function handleLogout() {
+    setLeaving(true);
+    try {
+      await logout();
+    } finally {
+      router.replace("/login?etat=deconnexion");
+      router.refresh();
+    }
   }
 
   return (
@@ -39,7 +46,7 @@ export default function ProfilePage() {
                 <h1 className="font-display text-2xl font-semibold">{user.name}</h1>
                 <p className="text-white/50">@{user.username}</p>
               </div>
-              <Button variant="secondary" size="sm" onClick={handleLogout} className="flex items-center gap-2">
+              <Button variant="secondary" size="sm" onClick={() => void handleLogout()} loading={leaving} className="flex items-center gap-2">
                 <IconLogout size={14} />
                 Se déconnecter
               </Button>

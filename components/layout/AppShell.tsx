@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import MobileNav from "./MobileNav";
 import Toast from "@/components/ui/Toast";
-import { useUser, useXpToast } from "@/context/UserContext";
+import { useUser, useUserActions, useXpToast } from "@/context/UserContext";
 import Link from "next/link";
 import Logo from "./Logo";
 
@@ -14,7 +15,13 @@ import Logo from "./Logo";
  */
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const lastXpToast = useXpToast();
-  const { hydrated, isAuthenticated, storageError, user } = useUser();
+  const { hydrated, isAuthenticated, syncError, user } = useUser();
+  const { refresh } = useUserActions();
+  const [retrying, setRetrying] = useState(false);
+  const retry = async () => {
+    setRetrying(true);
+    try { await refresh(); } finally { setRetrying(false); }
+  };
 
   return (
     <div className="learner-shell flex min-h-screen bg-cyber-black">
@@ -22,11 +29,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex-1 min-w-0 pb-24 md:pb-0">
         <header className="learner-topbar">
           <div className="md:hidden"><Logo /></div>
-          <p className="hidden md:block">Ton espace d’apprentissage <span>· Profil local</span></p>
+          <p className="hidden md:block">Ton espace d’apprentissage <span>· Progression synchronisée</span></p>
           <div className="learner-toplinks">{user.isAdmin && <Link href="/dashboard">Admin</Link>}<Link href="/ressources">Guides</Link><Link href="/parametres">Paramètres</Link></div>
         </header>
-        {storageError && <p className="storage-warning" role="alert">{storageError}</p>}
-        {!hydrated ? <p className="p-10 text-slate-300" role="status">Chargement de ton profil local…</p> : !isAuthenticated ? <div className="p-10"><h1 className="text-2xl">Reconnecte-toi pour continuer.</h1><Link href="/login" className="study-link">Ouvrir la connexion</Link></div> : children}
+        {syncError && <div className="storage-warning" role="alert"><span>{syncError}</span> <button type="button" className="study-link" onClick={retry} disabled={retrying}>{retrying ? "Nouvel essai…" : "Réessayer"}</button></div>}
+        {!hydrated ? <p className="p-10 text-slate-300" role="status">Chargement de ton espace…</p> : !isAuthenticated ? <div className="p-10"><h1 className="text-2xl">Reconnecte-toi pour continuer.</h1><Link href="/login" className="study-link">Ouvrir la connexion</Link></div> : children}
       </main>
       <MobileNav />
 

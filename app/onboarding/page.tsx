@@ -66,6 +66,7 @@ export default function OnboardingPage() {
     knownAreas: [],
   });
   const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const step = steps[stepIndex];
   const progress = ((stepIndex + 1) / steps.length) * 100;
@@ -96,15 +97,21 @@ export default function OnboardingPage() {
     });
   }
 
-  function handleNext() {
+  async function handleNext() {
     if (!isLast) {
       setStepIndex((i) => i + 1);
       return;
     }
     setGenerating(true);
-    // Sauvegarde les préférences dans le UserContext avant de rediriger.
-    applyOnboarding(answers);
-    router.push("/progression");
+    setError(null);
+    try {
+      await applyOnboarding(answers);
+      router.replace("/progression");
+      router.refresh();
+    } catch (cause) {
+      setGenerating(false);
+      setError(cause instanceof Error ? cause.message : "Tes préférences n’ont pas pu être enregistrées. Réessaie.");
+    }
   }
 
   return (
@@ -156,6 +163,8 @@ export default function OnboardingPage() {
               })}
             </div>
 
+            {error && <p role="alert" className="mt-6 text-sm text-cyber-red text-center">{error}</p>}
+
             <div className="mt-8 flex items-center justify-between">
               <Button
                 variant="ghost"
@@ -164,7 +173,7 @@ export default function OnboardingPage() {
               >
                 Précédent
               </Button>
-              <Button variant="primary" onClick={handleNext} disabled={!canContinue}>
+              <Button variant="primary" onClick={() => void handleNext()} disabled={!canContinue}>
                 {isLast ? "Commencer à apprendre" : "Continuer"}
               </Button>
             </div>
