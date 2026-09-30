@@ -67,6 +67,8 @@
 .public-form > p { color: #b5c5df; font-size: 13px; }
 .public-form > button { justify-self: start; }
 .public-form [role="status"]:not(:empty) { color: #c2ecff; border: 1px solid #426783; padding: 16px; border-radius: 8px; }
+.public-form > [role="status"][data-state="sent"] { color: #c9f7e1; border-color: #3f7d64; background: #0f2a22; }
+.public-form > [role="alert"]:not(:empty) { color: #ffd9dd; border: 1px solid #b77a7e; background: #311821; padding: 16px; border-radius: 8px; }
 .home-resources { border-top: 1px solid #19334c; padding-block: 40px; }
 .home-resources h2 { font-size: 26px; font-weight: 650; }
 .public-site .home-resources p { color: #b5c5df; margin-block: 12px 18px; }
