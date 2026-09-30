@@ -1,135 +1,92 @@
+// Unit tests for the pure client modules (no network, no database). The database behaviour
+// itself (RLS, RPCs, anti-cheat) is covered by tests/database.test.cjs.
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const ts = require("typescript");
+const { load, root } = require("../scripts/ts-loader.cjs");
 
-// Compile the TypeScript modules in memory with the project's compiler.
-const root = path.resolve(__dirname, "..");
-const cache = new Map();
-function load(file) {
-  const filename = path.resolve(root, `${file}.ts`);
-  if (cache.has(filename)) return cache.get(filename);
-  const output = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
-  }).outputText;
-  const module = { exports: {} };
-  cache.set(filename, module.exports);
-  const localRequire = (specifier) => {
-    if (!specifier.startsWith("@/") && !specifier.startsWith(".")) return require(specifier);
-    const target = specifier.startsWith("@/") ? path.join(root, specifier.slice(2)) : path.resolve(path.dirname(filename), specifier);
-    return load(path.relative(root, target));
-  };
-  vm.runInThisContext(`(function(require,module,exports){${output}\n})`, { filename })(localRequire, module, module.exports);
-  return module.exports;
-}
-
-const { courses } = load("data/courses");
-const { lessons } = load("data/lessons");
-const { quizzes } = load("data/quizzes");
-const { currentUser } = load("data/users");
-const { resetUserProgress, computeSkills, computeLevel, safeReturnPath, dailyGoals } = load("lib/learning-progress");
-const { buildUser, effectiveStreak, friendlyError } = load("lib/learner-mapping");
-const { normalizePublishedCourse, normalizePublishedChallenge, slugify } = load("lib/publishing");
-const { passwordProblem } = load("lib/auth-client");
+const { computeLevelInfo, dateInZone, effectiveStreak } = load("lib/levels");
+const { safeReturnPath, DAILY_GOALS } = load("lib/navigation");
+const { asRole, isStaff, isSuperadmin } = load("lib/roles");
+const { AppError, toAppError, errorMessage, unwrap } = load("lib/errors");
+const { normalizeCourseImport, parseCourseImportJson, slugifyCourse, validateAdminQuizQuestions } = load("lib/course-import");
+const { parseLessonBlocks, videoEmbed } = load("lib/lesson-content");
+const { pageLabel } = load("lib/page-labels");
 const { sessionStatus } = load("types/realtime");
-const { pageLabel, courseTitle } = load("lib/page-labels");
+const { passwordProblem } = load("services/auth.service");
 
-test("six complete courses, seventeen lessons and twelve linked quizzes", () => {
-  assert.equal(courses.length, 6);
-  assert.equal(lessons.length, 17);
-  assert.equal(quizzes.length, 12);
-  for (const collection of [courses, lessons, quizzes]) assert.equal(new Set(collection.map((item) => item.id)).size, collection.length);
-  for (const course of courses) {
-    assert.equal(course.locked, false);
-    assert.equal(course.lessonCount, course.lessons.length);
-    assert.equal(course.durationMinutes, course.lessons.reduce((sum, lesson) => sum + lesson.durationMinutes, 0));
-    assert.deepEqual(course.lessons.map((lesson) => lesson.order).sort((a, b) => a - b), course.lessons.map((_, index) => index + 1));
+const LEVELS = [
+  { level: 3, required_xp: 300, title: "Analyste" },
+  { level: 1, required_xp: 0, title: "Recrue" },
+  { level: 2, required_xp: 100, title: "Veilleur" },
+];
+
+test("level info mirrors private.level_info() thresholds and rounding", () => {
+  assert.deepEqual(computeLevelInfo(0, LEVELS), {
+    xp: 0, level: 1, title: "Recrue", current_level_xp: 0,
+    next_level: 2, next_level_xp: 100, next_title: "Veilleur", progress_percentage: 0,
+  });
+  assert.equal(computeLevelInfo(99, LEVELS).level, 1);
+  assert.equal(computeLevelInfo(99, LEVELS).progress_percentage, 99);
+  assert.equal(computeLevelInfo(100, LEVELS).level, 2);
+  assert.equal(computeLevelInfo(299, LEVELS).progress_percentage, 99);
+  const top = computeLevelInfo(5000, LEVELS);
+  assert.equal(top.level, 3);
+  assert.equal(top.next_level, null);
+  assert.equal(top.progress_percentage, 100);
+  assert.equal(computeLevelInfo(-50, LEVELS).level, 1);
+});
+
+test("streaks survive until the end of the next day in the learner's timezone", () => {
+  const now = new Date("2026-09-10T02:00:00Z");
+  assert.equal(dateInZone(now, "Europe/Paris"), "2026-09-10");
+  assert.equal(dateInZone(now, "America/New_York"), "2026-09-09");
+  assert.equal(dateInZone(now, "Not/AZone"), "2026-09-10");
+  assert.equal(effectiveStreak(4, "2026-09-09", "Europe/Paris", now), 4);
+  assert.equal(effectiveStreak(4, "2026-09-08", "Europe/Paris", now), 0);
+  assert.equal(effectiveStreak(4, "2026-09-08", "America/New_York", now), 4);
+  assert.equal(effectiveStreak(4, null, "Europe/Paris", now), 0);
+});
+
+test("return paths stay inside the app and keep learners out of the admin area", () => {
+  for (const next of ["https://example.test", "//example.test", "/\\example.test", "javascript:alert(1)", "/courses/../../admin", "/login", "", null]) {
+    assert.equal(safeReturnPath(next, "user"), "/dashboard");
   }
-  for (const lesson of lessons) {
-    assert.ok(courses.some((course) => course.id === lesson.courseId && course.lessons.includes(lesson)));
-    if (lesson.quizId) assert.ok(quizzes.some((quiz) => quiz.id === lesson.quizId && quiz.lessonId === lesson.id));
-  }
-  for (const quiz of quizzes) {
-    assert.ok(lessons.some((lesson) => lesson.id === quiz.lessonId && lesson.quizId === quiz.id));
-    assert.ok(quiz.questions.length >= 2);
-    for (const question of quiz.questions) assert.ok(question.options.includes(question.correctAnswer) && question.explanation);
-  }
+  assert.equal(safeReturnPath(null, "admin"), "/admin");
+  assert.equal(safeReturnPath("/admin/cours", "user"), "/dashboard");
+  assert.equal(safeReturnPath("/admin/cours", "superadmin"), "/admin/cours");
+  assert.equal(safeReturnPath("/quiz/2b1f-quiz", "user"), "/quiz/2b1f-quiz");
+  assert.equal(safeReturnPath("/parametres", "user"), "/parametres");
+  assert.deepEqual([...DAILY_GOALS], [10, 20, 30, 45, 60, 90]);
 });
 
-test("reset retains identity and preferences without administrative escalation", () => {
-  const user = { ...currentUser, id: "learner", name: "Pingo", email: "pingo@example.test", isAdmin: false, dailyMinutes: 30, xp: 990, completedLessons: ["web-https"] };
-  const reset = resetUserProgress(user);
-  for (const field of ["id", "name", "email", "isAdmin", "dailyMinutes", "goal"]) assert.equal(reset[field], user[field]);
-  assert.equal(reset.xp, 0);
-  assert.deepEqual(reset.quizResults, {});
-  assert.deepEqual(reset.completedLessons, []);
-  assert.ok(reset.badges.every((badge) => !badge.earned));
-});
-
-test("level thresholds and skills reflect actual curriculum", () => {
-  assert.deepEqual(computeLevel(0), { level: 1, xpToNextLevel: 800, levelXp: 0 });
-  assert.deepEqual(computeLevel(800), { level: 2, xpToNextLevel: 960, levelXp: 0 });
-  assert.equal(computeLevel(1760).level, 3);
-  const skills = computeSkills(courses.find((course) => course.id === "c6").lessons.map((lesson) => lesson.id));
-  assert.equal(skills.find((skill) => skill.name === "Détection").percent, 100);
-  assert.equal(skills.find((skill) => skill.name === "Réseaux").percent, 0);
-});
-
-test("return paths stay in the learner app and respect admin restrictions", () => {
-  for (const next of ["https://example.test", "//example.test", "/\\example.test", "javascript:alert(1)", "/dashboard", "/courses/../../dashboard", "/login", ""]) assert.equal(safeReturnPath(next, false), "/courses");
-  assert.equal(safeReturnPath(null, true), "/dashboard");
-  assert.equal(safeReturnPath("/quiz/quiz-web-https", false), "/quiz/quiz-web-https");
-  assert.equal(safeReturnPath("/parametres", false), "/parametres");
-  assert.equal(safeReturnPath("/onboarding", false), "/onboarding");
-  assert.equal(safeReturnPath("/dashboard", true), "/dashboard");
-  assert.ok([10, 20, 30, 60, 90].every((minutes) => dailyGoals.includes(minutes)));
-});
-
-test("streaks survive until the end of the next UTC day only", () => {
-  const now = new Date("2026-09-10T08:00:00Z");
-  assert.equal(effectiveStreak(4, "2026-09-10", now), 4);
-  assert.equal(effectiveStreak(4, "2026-09-09", now), 4);
-  assert.equal(effectiveStreak(4, "2026-09-08", now), 0);
-  assert.equal(effectiveStreak(4, null, now), 0);
-});
-
-test("database snapshots map to the learner model used by the interface", () => {
-  const snapshot = {
-    profile: {
-      id: "11111111-1111-1111-1111-111111111111", email: "pingo@example.test", display_name: "Pingo", username: "pingo",
-      role: "admin", goal: "professionnel", skill_level: "intermediaire", daily_minutes: 30, known_areas: ["reseau"],
-      onboarding_completed: true, xp: 900, streak: 3, last_activity_date: "2026-09-10", created_at: "2026-09-01T10:00:00Z", updated_at: "2026-09-10T10:00:00Z",
-    },
-    lessons: [{ lesson_id: "l1", course_id: "c1", xp_earned: 50, completed_at: "2026-09-10T09:00:00Z" }],
-    quizzes: [
-      { quiz_id: "q-pass", best_score: 3, total_questions: 3, earned_xp: 80, passed: true, attempts: 1, best_at: "2026-09-10T09:00:00Z", last_attempt_at: "2026-09-10T09:00:00Z" },
-      { quiz_id: "q-fail", best_score: 1, total_questions: 3, earned_xp: 20, passed: false, attempts: 2, best_at: "2026-09-10T09:00:00Z", last_attempt_at: "2026-09-10T09:00:00Z" },
-    ],
-    challenges: [{ challenge_id: "ch1", xp_earned: 100, completed_at: "2026-09-10T09:00:00Z" }],
-    badges: [{ badge_id: "b1", earned_at: "2026-09-10T09:00:00Z" }],
-  };
-  const user = buildUser(snapshot, new Date("2026-09-11T12:00:00Z"));
-  assert.equal(user.isAdmin, true);
-  assert.equal(user.level, 2);
-  assert.equal(user.streak, 3);
-  assert.equal(user.joinedAt, "2026-09-01");
-  assert.deepEqual(user.completedLessons, ["l1"]);
-  assert.deepEqual(user.completedChallenges, ["ch1"]);
-  assert.equal(user.completedQuizzes, 1);
-  assert.equal(user.quizResults["q-fail"].passed, false);
-  assert.equal(user.badges.find((badge) => badge.id === "b1").earnedAt, "2026-09-10");
-  assert.equal(buildUser({ ...snapshot, profile: { ...snapshot.profile, role: "learner" } }, new Date("2026-09-20T00:00:00Z")).streak, 0);
+test("unknown roles fall back to the least privileged one", () => {
+  assert.equal(asRole("superadmin"), "superadmin");
+  assert.equal(asRole("root"), "user");
+  assert.equal(asRole(null), "user");
+  assert.equal(isStaff("admin"), true);
+  assert.equal(isStaff("user"), false);
+  assert.equal(isSuperadmin("admin"), false);
 });
 
 test("errors are translated without leaking database internals", () => {
-  assert.equal(friendlyError({ message: "Trop de messages envoyés.", hint: "cyberpingo" }), "Trop de messages envoyés.");
-  assert.equal(friendlyError({ message: "Invalid login credentials" }), "Adresse e-mail ou mot de passe incorrect.");
-  assert.match(friendlyError({ message: "Email rate limit exceeded" }), /Trop de tentatives/);
-  assert.match(friendlyError(new TypeError("Failed to fetch")), /Connexion au serveur impossible/);
-  assert.equal(friendlyError({ message: "relation \"private.content_challenges\" does not exist" }, "Oups"), "Oups");
-  assert.equal(friendlyError(null, "Oups"), "Oups");
+  assert.equal(errorMessage({ message: "Leçon verrouillée.", hint: "cyberpingo", code: "P0001" }), "Leçon verrouillée.");
+  assert.equal(errorMessage({ message: "Invalid login credentials" }), "Adresse e-mail ou mot de passe incorrect.");
+  assert.equal(toAppError({ message: "Email rate limit exceeded" }).kind, "rate_limited");
+  assert.equal(toAppError(new TypeError("Failed to fetch")).kind, "network");
+  assert.equal(toAppError({ message: "JWT expired" }).kind, "unauthenticated");
+  assert.equal(errorMessage({ message: 'relation "private.quiz_answers" does not exist', code: "42P01" }, "Oups"), "Oups");
+  assert.doesNotMatch(errorMessage({ message: 'relation "private.quiz_answers" does not exist', code: "42P01" }), /private|relation/);
+  assert.equal(toAppError({ message: "new row violates row-level security policy" }).kind, "forbidden");
+  assert.equal(toAppError({ message: "duplicate key value", code: "23505" }).message, "Cet élément existe déjà.");
+  assert.equal(toAppError({ message: "x", code: "PGRST116" }).kind, "not_found");
+  const original = new AppError("conflict", "Déjà terminé.");
+  assert.equal(toAppError(original), original);
+  assert.equal(unwrap({ data: 42, error: null }), 42);
+  assert.throws(() => unwrap({ data: null, error: { message: "boom", code: "XX000" } }, "Échec."), (error) => error instanceof AppError && error.message === "Échec.");
 });
 
 test("passwords need eight characters with letters and digits", () => {
@@ -139,47 +96,80 @@ test("passwords need eight characters with letters and digits", () => {
   assert.equal(passwordProblem("pingouin42"), null);
 });
 
-test("published courses are namespaced, linked and idempotent", () => {
-  const draft = {
-    id: "c1",
-    title: "Sécurité des réseaux Wi-Fi",
-    level: "expert",
-    lessons: [
-      { id: "draft-a", title: "WPA3", blocks: [{ type: "text", content: "Contenu" }, { type: "script", content: "alert(1)" }], quizId: "quiz-a" },
-      { id: "draft-b", title: "", blocks: [] },
-    ],
-    quizzes: [
-      { id: "quiz-a", lessonId: "draft-a", questions: [
-        { prompt: "WPA3 remplace ?", options: ["WPA2", "WEP"], correctAnswer: "WPA2", explanation: "Oui" },
-        { prompt: "Invalide", options: ["A"], correctAnswer: "A" },
-      ] },
-      { id: "quiz-orphan", lessonId: "missing", questions: [{ prompt: "?", options: ["A", "B"], correctAnswer: "A" }] },
-    ],
-  };
-  const course = normalizePublishedCourse(draft, { now: new Date("2026-09-10T00:00:00Z"), makeId: () => "pub-abc-1234" });
-  assert.equal(course.id, "pub-abc-1234");
-  assert.equal(course.slug, "securite-des-reseaux-wi-fi-abc-1234");
-  assert.equal(course.level, "debutant");
-  assert.deepEqual(course.lessons.map((lesson) => lesson.id), ["pub-abc-1234-l1", "pub-abc-1234-l2"]);
-  assert.equal(course.lessons[0].blocks.length, 1);
-  assert.equal(course.lessons[0].quizId, "pub-abc-1234-q1");
-  assert.equal(course.lessons[1].title, "Leçon 2");
-  assert.equal(course.quizzes.length, 1);
-  assert.equal(course.quizzes[0].questions.length, 1);
-  assert.deepEqual(normalizePublishedCourse(course, { makeId: () => "pub-other-0000" }), course);
-  assert.throws(() => normalizePublishedCourse({ title: "Vide", lessons: [] }), /au moins une leçon/);
-  assert.equal(slugify("Élévation de privilèges !"), "elevation-de-privileges");
+test("course imports are normalised, sanitised and valid for the admin editor", () => {
+  const imported = normalizeCourseImport({
+    course: {
+      title: "  Sécurité des réseaux Wi-Fi  ",
+      level: "expert",
+      modules: [
+        {
+          lessons: [{
+            title: "WPA3",
+            durationMinutes: 999,
+            blocks: [
+              { type: "text", content: "Contenu" },
+              { type: "script", content: "alert(1)" },
+              { type: "image", url: "http://insecure.test/a.png" },
+              { type: "video", url: "https://youtu.be/abcdef123" },
+            ],
+            quiz: { questions: [
+              { prompt: "WPA3 est-il plus sûr ?", type: "true_false", answers: [{ label: "Vrai", correct: false }, { label: "Faux", correct: true }] },
+              { question: "Quel protocole remplace WPA2 ?", options: ["WPA3", "WEP", "TKIP"] },
+              { prompt: "Deux bonnes réponses", type: "single_choice", answers: [{ label: "A", is_correct: true }, { label: "B", is_correct: true }] },
+            ] },
+          }],
+        },
+        { title: "Module vide" },
+      ],
+    },
+  });
+  assert.equal(imported.title, "Sécurité des réseaux Wi-Fi");
+  assert.equal(imported.slug, "securite-des-reseaux-wi-fi");
+  assert.equal(imported.level, "debutant");
+  assert.equal(imported.modules.length, 2);
+  assert.equal(imported.modules[0].title, "Module 1");
+  const [lesson] = imported.modules[0].lessons;
+  assert.equal(lesson.duration_minutes, 240);
+  assert.deepEqual(lesson.blocks.map((block) => block.type), ["text", "video"]);
+  const [trueFalse, options, single] = lesson.quiz.questions;
+  assert.deepEqual(trueFalse.answers.map((answer) => answer.is_correct), [false, true]);
+  assert.equal(options.question_type, "single_choice");
+  assert.deepEqual(options.answers.map((answer) => [answer.label, answer.is_correct]), [["WPA3", true], ["WEP", false], ["TKIP", false]]);
+  assert.deepEqual(single.answers.map((answer) => answer.is_correct), [true, false]);
+  assert.equal(validateAdminQuizQuestions(lesson.quiz.questions), null);
+  assert.equal(imported.modules[1].lessons.length, 1);
+  assert.throws(() => normalizeCourseImport({ title: "Vide", modules: [] }), /au moins un module/);
+  assert.throws(() => normalizeCourseImport("texte"), /objet cours/);
+  assert.throws(() => parseCourseImportJson("{pas du json"));
+  assert.equal(slugifyCourse("Élévation de privilèges !"), "elevation-de-privileges");
+  assert.equal(slugifyCourse("!!!"), "cours");
 });
 
-test("published challenges fall back to safe values", () => {
-  const challenge = normalizePublishedChallenge({ title: "  Trouve le port  ", category: "magie", xpReward: 99999, expectedAnswer: "  flag{22}  ", objectives: ["Scanner", "", 4] }, { makeId: () => "pub-chal-0001" });
-  assert.equal(challenge.id, "pub-chal-0001");
-  assert.equal(challenge.title, "Trouve le port");
-  assert.equal(challenge.category, "securite");
-  assert.equal(challenge.xpReward, 1000);
-  assert.equal(challenge.expectedAnswer, "flag{22}");
-  assert.deepEqual(challenge.objectives, ["Scanner"]);
-  assert.equal(challenge.status, "disponible");
+test("admin quiz validation explains the first problem", () => {
+  const question = (overrides) => ({ question_type: "single_choice", prompt: "Q", image_url: null, explanation: "", difficulty: "facile", xp_reward: 10, answers: [{ label: "A", is_correct: true }, { label: "B", is_correct: false }], ...overrides });
+  assert.match(validateAdminQuizQuestions([]), /au moins une question/);
+  assert.match(validateAdminQuizQuestions([question({ prompt: " " })]), /Question 1 : renseigne/);
+  assert.match(validateAdminQuizQuestions([question(), question({ answers: [{ label: "A", is_correct: false }, { label: "B", is_correct: false }] })]), /Question 2 : coche/);
+  assert.match(validateAdminQuizQuestions([question({ answers: [{ label: "A", is_correct: true }, { label: "B", is_correct: true }] })]), /une seule bonne réponse/);
+  assert.equal(validateAdminQuizQuestions([question({ question_type: "multiple_choice", answers: [{ label: "A", is_correct: true }, { label: "B", is_correct: true }] })]), null);
+});
+
+test("lesson content skips unknown blocks and non-https media", () => {
+  const blocks = parseLessonBlocks({ blocks: [
+    { type: "heading", content: "Titre" },
+    { type: "code", content: "nmap -sV 10.0.0.1", language: "bash" },
+    { type: "image", url: "javascript:alert(1)" },
+    { type: "resource", url: "https://example.test/guide.pdf", content: "Guide" },
+    { type: "iframe", content: "<script>" },
+    "texte brut",
+  ] });
+  assert.deepEqual(blocks.map((block) => block.type), ["heading", "code", "resource"]);
+  assert.equal(blocks[1].language, "bash");
+  assert.deepEqual(parseLessonBlocks(null), []);
+  assert.deepEqual(parseLessonBlocks({ blocks: "x" }), []);
+  assert.deepEqual(videoEmbed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"), { kind: "iframe", src: "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" });
+  assert.deepEqual(videoEmbed("https://vimeo.com/123456"), { kind: "iframe", src: "https://player.vimeo.com/video/123456" });
+  assert.deepEqual(videoEmbed("https://cdn.example.test/cours.mp4"), { kind: "file", src: "https://cdn.example.test/cours.mp4" });
 });
 
 test("supervision statuses and page labels are derived from heartbeats", () => {
@@ -191,11 +181,10 @@ test("supervision statuses and page labels are derived from heartbeats", () => {
   assert.equal(sessionStatus({ visible: true, lastSeenAt: at(3600), endedAt: null }, now), "offline");
   assert.equal(sessionStatus({ visible: true, lastSeenAt: at(5), endedAt: at(1) }, now), "offline");
   assert.equal(pageLabel("/mentor"), "Mentor IA");
-  assert.equal(pageLabel(`/courses/${courses[1].slug}`), `Cours · ${courses[1].title}`);
-  assert.equal(pageLabel(`/lessons/${lessons[0].id}`), `Leçon · ${lessons[0].title}`);
+  assert.equal(pageLabel("/courses/bases-cyber", new Map([["bases-cyber", "Les bases de la cybersécurité"]])), "Cours · Les bases de la cybersécurité");
+  assert.equal(pageLabel("/lessons/abc"), "Leçon · abc");
+  assert.equal(pageLabel("/inconnu/abc"), "/inconnu/abc");
   assert.equal(pageLabel(null), "Page inconnue");
-  assert.equal(courseTitle("c1"), courses[0].title);
-  assert.equal(courseTitle("pub-inconnu"), "pub-inconnu");
 });
 
 test("startup animation re-registers dismissal during Strict Mode effect replay", () => {

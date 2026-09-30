@@ -1,42 +1,8 @@
 const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const path = require("node:path");
-const { root } = require("../scripts/ts-loader.cjs");
 const { buildContentSeed, contentId, OUTPUT } = require("../scripts/generate-content-seed.cjs");
-
-const migrationsDir = path.join(root, "supabase", "migrations");
-const seedDir = path.join(root, "supabase", "seed");
-
-// Minimal stand-ins for what Supabase provides before project migrations run, including its
-// permissive default grants (so the tests prove every migration revokes what it must).
-const SUPABASE_STUBS = `
-  create role anon nologin;
-  create role authenticated nologin;
-  create schema auth;
-  create table auth.users (id uuid primary key default gen_random_uuid(), email text, raw_user_meta_data jsonb not null default '{}');
-  create function auth.uid() returns uuid language sql stable as $$
-    select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
-  $$;
-  grant usage on schema auth, public to anon, authenticated;
-  grant execute on function auth.uid() to anon, authenticated;
-  alter default privileges in schema public grant all on tables to anon, authenticated;
-  alter default privileges in schema public grant all on sequences to anon, authenticated;
-  alter default privileges in schema public grant all on functions to anon, authenticated;
-
-  create schema storage;
-  create table storage.buckets (id text primary key, name text not null, public boolean not null default false,
-    file_size_limit bigint, allowed_mime_types text[]);
-  create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text references storage.buckets (id),
-    name text not null, owner uuid default auth.uid(), unique (bucket_id, name));
-  create function storage.foldername(name text) returns text[] language sql immutable as $$
-    select (string_to_array(name, '/'))[1:greatest(cardinality(string_to_array(name, '/')) - 1, 0)]
-  $$;
-  alter table storage.objects enable row level security;
-  grant usage on schema storage to anon, authenticated;
-  grant select, insert, update, delete on storage.objects to anon, authenticated;
-  grant select on storage.buckets to anon, authenticated;
-`;
+const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
 
 let db;
 const ids = {};
@@ -88,20 +54,7 @@ const ledgerTotal = async (uid) => Number((await sql("select coalesce(sum(amount
 const profile = async (uid) => (await sql("select * from public.profiles where id = $1", [uid]))[0];
 
 before(async () => {
-  const { PGlite } = await import("@electric-sql/pglite");
-  db = new PGlite();
-  await db.exec(SUPABASE_STUBS);
-  for (const file of fs.readdirSync(migrationsDir).filter((name) => name.endsWith(".sql")).sort()) {
-    try {
-      await db.exec(fs.readFileSync(path.join(migrationsDir, file), "utf8"));
-    } catch (error) {
-      error.message = `${file}: ${error.message}`;
-      throw error;
-    }
-  }
-  for (const file of fs.readdirSync(seedDir).filter((name) => name.endsWith(".sql")).sort()) {
-    await db.exec(fs.readFileSync(path.join(seedDir, file), "utf8"));
-  }
+  db = await createSupabaseDatabase({ seed: true });
   for (const [name, email, meta] of [
     ["alice", "alice.martin@example.test", { display_name: "Alice", timezone: "America/Montreal" }],
     ["bob", "bob@example.test", {}],
