@@ -1,165 +1,93 @@
 # CyberPingo
 
-Plateforme francophone d'apprentissage de la cybersécurité : parcours, leçons,
-quiz, challenges, mentor IA et console d'administration en temps réel.
+Plateforme francophone d'apprentissage de la cybersécurité, gamifiée à la manière de Duolingo : parcours, modules, leçons, quiz, labs, XP, niveaux, séries quotidiennes, badges, défis et certificats vérifiables.
 
-- **Frontend** : Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS
-- **Backend** : Supabase (Auth, Postgres + RLS, fonctions RPC, Realtime)
-- **IA** : Gemini, appelé uniquement côté serveur (mentor et analyse de PDF)
+Le frontend est une application **Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS**. Le backend est **Supabase** : Auth, PostgreSQL avec Row Level Security, Storage, Realtime et Edge Functions.
 
-## Démarrer en local
+> **Pourquoi Next.js et pas Vite ?** Le projet existait déjà en Next.js. Next apporte le rendu serveur des pages publiques (SEO, partage des certificats), un middleware qui protège les routes avant tout rendu, et des routes API serveur pour les clés secrètes (Gemini). Les conventions du cahier des charges sont conservées : `VITE_SUPABASE_*` devient `NEXT_PUBLIC_SUPABASE_*`, et `src/services` devient `services/`.
+
+## Fonctionnalités
+
+| Domaine | Ce qui fonctionne réellement |
+|---|---|
+| Comptes | Inscription avec confirmation par e-mail, connexion, OAuth GitHub/Google (optionnel), mot de passe oublié, changement d'e-mail, suppression de compte |
+| Profil | Pseudo, nom affiché, bio, avatar (Storage), objectif quotidien, fuseau horaire, préférences de notifications |
+| Apprentissage | Catalogue publié, inscription au cours, modules ordonnés, leçons en blocs JSON, temps minimal de lecture, sauvegarde de la progression |
+| Quiz | Correction côté serveur, bonnes réponses révélées seulement après soumission, meilleure note conservée |
+| Labs | Drapeaux stockés hors de portée du client, comparaison normalisée, budget de tentatives |
+| Gamification | Registre d'XP, 20 niveaux, séries quotidiennes selon le fuseau de l'utilisateur, badges, défis du jour, objectif quotidien |
+| Certificats | Émis automatiquement à la fin d'un parcours, PDF généré par Edge Function, page publique `/certificat/[code]` |
+| Notifications | Badges, niveaux, séries, certificats, annonces des administrateurs, temps réel |
+| Mentor IA | Assistant Gemini côté serveur, quota de 40 messages par jour et par utilisateur |
+| Administration | Vue d'ensemble en direct, utilisateurs (rôles, XP, bannissement), éditeur de cours et de quiz, import IA, labs, badges, défis, certificats, annonces, messages de contact, journal d'audit |
+
+Aucune donnée n'est simulée : chaque écran lit Supabase et affiche un état de chargement, un état vide ou une erreur propre.
+
+## Démarrage rapide
+
+Prérequis : Node.js 20 ou plus, un projet Supabase (voir [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)).
 
 ```bash
 npm install
-cp .env.example .env.local   # puis renseigne les valeurs
-npm run dev
+cp .env.example .env.local      # puis renseigner l'URL et la clé anon Supabase
+npm run dev                     # http://localhost:3000
 ```
 
-L'application démarre sur http://localhost:3000. Sans variables Supabase, les
-pages publiques restent consultables et les écrans de connexion affichent un
-message de configuration.
+Sans variables Supabase, l'application démarre mais toutes les pages privées redirigent vers `/login`, qui affiche un message de configuration.
 
-## Mettre en place Supabase
+Pour créer la base : appliquer les migrations (`npx supabase db push`), charger `supabase/seed/01_starter_content.sql`, puis promouvoir le premier compte :
 
-1. Crée un projet sur https://supabase.com (région Europe conseillée).
-2. Dans **SQL Editor**, exécute dans l'ordre :
-   - `supabase/migrations/20260928190000_cyberpingo_backend.sql`
-   - `supabase/migrations/20260928190100_catalog_content.sql`
+```sql
+update public.profiles set role = 'superadmin' where email = 'vous@exemple.com';
+```
 
-   Avec la CLI : `supabase link --project-ref <ref>` puis `supabase db push`.
-3. **Project Settings > API** : copie l'URL et la clé `anon` dans `.env.local`
-   (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
-4. **Authentication > URL Configuration** :
-   - Site URL : l'URL de production (par exemple `https://cyberpingo.vercel.app`)
-   - Redirect URLs : `http://localhost:3000/**`, `http://127.0.0.1:3000/**`
-     et `https://<ton-domaine>/**`
-5. Crée ton compte depuis `/register`, puis promeus-le administrateur :
+## Scripts
 
-   ```sql
-   update public.profiles set role = 'admin' where email = 'toi@exemple.fr';
-   ```
-
-   Les administrateurs suivants peuvent être promus depuis l'onglet
-   **Apprenants** de la console.
-6. Recommandé en production : configure un SMTP personnalisé
-   (**Authentication > Emails > SMTP Settings**). Le service d'e-mail intégré
-   de Supabase est limité à quelques envois par heure.
-7. Optionnel : active GitHub ou Google dans **Authentication > Providers** et
-   liste-les dans `NEXT_PUBLIC_SUPABASE_OAUTH_PROVIDERS=github,google`.
-
-Les liens reçus par e-mail (confirmation, réinitialisation) utilisent PKCE : ils
-doivent être ouverts dans le navigateur où la demande a été faite. Sinon,
-l'écran de connexion propose d'en demander un nouveau.
-
-## Architecture du backend
-
-Tout le backend est décrit dans `supabase/migrations/`. Aucune clé
-`service_role` n'est utilisée par l'application.
-
-| Élément | Rôle |
+| Script | Rôle |
 |---|---|
-| `profiles` | Profil créé automatiquement à l'inscription (trigger sur `auth.users`), rôle `learner` ou `admin`, XP, niveau, série, préférences d'onboarding |
-| `lesson_completions`, `quiz_results`, `challenge_completions`, `user_badges` | Progression, en lecture seule pour l'apprenant |
-| `published_courses`, `published_challenges` | Contenus publiés par l'équipe depuis la console |
-| `activity_events`, `learner_sessions` | Journal d'activité et présence, diffusés en temps réel aux administrateurs |
-| `contact_messages` | Messages du formulaire de contact, triés par l'équipe |
-| schéma `private` | Barème des quiz, réponses des challenges, limites de débit ; jamais exposé à l'API |
-
-Les XP ne sont jamais calculés par le navigateur. Les fonctions RPC
-`complete_lesson`, `submit_quiz` et `submit_challenge` corrigent côté serveur
-à partir du barème privé, créditent la différence en cas d'amélioration, mettent
-à jour la série et les badges, puis journalisent l'événement. Un quiz est validé
-à partir de 70 %.
-
-Autres fonctions : `complete_onboarding`, `record_login`, `heartbeat`
-(présence toutes les 60 s), `end_session`, `consume_mentor_quota`
-(40 messages par jour), `submit_contact_message` (ouvert aux visiteurs, limité
-par adresse IP hachée), `reset_my_progress`, `delete_my_account`, et pour les
-administrateurs `admin_overview`, `admin_learners`, `admin_set_role`.
-
-Les politiques RLS limitent chaque apprenant à ses propres données. Les
-administrateurs lisent l'ensemble, publient les contenus et traitent les
-messages. La réponse attendue d'un challenge publié est retirée de la table
-publique par un trigger et conservée dans le schéma privé.
-
-Le contenu pédagogique affiché (textes des leçons, questions) reste dans
-`data/`. Après toute modification des questions, réponses ou récompenses,
-régénère le barème :
-
-```bash
-node scripts/generate-content-seed.cjs
-```
-
-puis exécute à nouveau `20260928190100_catalog_content.sql`.
-
-## Espaces de l'application
-
-- **Public** : accueil, `/parcours`, `/ressources`, `/fonctionnalites`,
-  `/a-propos`, `/communaute`, `/faq`, `/contact`, `/confidentialite`,
-  `/conditions`. Le formulaire de contact enregistre le message dans Supabase.
-- **Comptes** : `/register`, `/login`, `/mot-de-passe-oublie`,
-  `/reinitialiser-mot-de-passe`, `/auth/callback`, puis `/onboarding`.
-- **Apprenant** : `/courses`, `/lessons/[id]`, `/quiz/[id]`, `/challenges`,
-  `/mentor`, `/progression`, `/profile`, `/parametres` (profil, objectif,
-  export JSON, remise à zéro et suppression du compte).
-- **Administration** (`/dashboard`, rôle `admin`) : vue d'ensemble, apprenants
-  en direct, activité en temps réel, gestion des rôles, boîte de réception des
-  messages et publication de cours ou de challenges à partir d'un PDF analysé
-  par Gemini.
-
-Le middleware protège les routes : les pages apprenant exigent une session,
-`/dashboard` exige le rôle administrateur, et les pages de connexion renvoient
-les utilisateurs déjà connectés vers leur espace.
-
-## Déployer sur Vercel
-
-1. Importe le dépôt dans Vercel (framework Next.js détecté automatiquement).
-2. Ajoute les variables d'environnement de `.env.example` pour Production et
-   Preview.
-3. Déploie, puis ajoute l'URL obtenue dans Supabase (Site URL et Redirect URLs).
-
-Avec la CLI :
-
-```bash
-npx vercel link
-npx vercel env add NEXT_PUBLIC_SUPABASE_URL production
-npx vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
-npx vercel env add GEMINI_API_KEY production
-npx vercel --prod
-```
+| `npm run dev` | Serveur de développement (Turbopack) |
+| `npm run build` / `npm start` | Build et serveur de production |
+| `npm run lint` | ESLint (config Next) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Tests de la base (PGlite, sans Docker) et des modules purs |
+| `npm run db:types` | Régénère `types/database.types.ts` à partir des migrations |
+| `npm run db:seed` | Régénère `supabase/seed/01_starter_content.sql` à partir de `supabase/seed/content/*.ts` |
 
 ## Structure
 
-- `app/` : pages, routes API (`/api/mentor`, `/api/publish/analyze`) et callback d'authentification
-- `components/` : interface (landing, apprentissage, publication, administration, temps réel)
-- `context/UserContext.tsx` : session Supabase, profil et actions de progression
-- `hooks/` : publication (`usePublishStore`) et supervision (`useAdminLive`)
-- `lib/supabase/` : clients navigateur et serveur, configuration
-- `lib/` : règles de progression, mapping des profils, publication, Gemini
-- `data/` : contenu pédagogique
-- `supabase/migrations/` : schéma, fonctions, RLS et barème
-- `tests/` : tests unitaires et tests SQL (PGlite)
-
-## Vérifications
-
-```bash
-node --test tests/learning.test.cjs tests/database.test.cjs
-npx tsc --noEmit
-npm run lint
-npm run build
+```
+app/                  Routes Next.js (publiques, auth, apprenant, /admin, /api)
+components/           UI : layout (AppShell), admin, courses, quiz, challenges, mentor,
+                      onboarding, landing, public, realtime, ui
+context/UserContext   Session, profil, actions et toasts de récompense
+hooks/                useAsync, useRealtime / useAdminLive
+lib/                  supabase/{client,server,public,config}, errors, levels, roles, navigation…
+services/             Accès aux données : auth, profile, courses, lessons, quiz, labs,
+                      gamification, notification, platform, mentor, admin
+types/                database.types.ts (généré), api.ts (formes des RPC), realtime.ts
+middleware.ts         Protection des routes (session, rôle staff pour /admin)
+supabase/
+  migrations/         Schéma complet, RLS, RPC, Storage (source de vérité)
+  functions/          Edge Functions : admin-actions, generate-certificate
+  seed/               Contenu pédagogique de départ (aucun utilisateur, aucune statistique)
+tests/                database.test.cjs (sécurité, anti-triche), learning.test.cjs
 ```
 
-`tests/database.test.cjs` exécute les migrations dans PGlite (Postgres en
-WebAssembly) avec une doublure du schéma `auth` de Supabase, puis vérifie les
-RLS, la correction côté serveur et les fonctions d'administration.
+## Rôles
 
-## Design
+| Rôle | Droits |
+|---|---|
+| `user` | Cours publiés, progression, quiz, labs, profil, certificats personnels |
+| `admin` | En plus : console `/admin`, contenus en brouillon, utilisateurs, statistiques, annonces |
+| `superadmin` | En plus : gestion des rôles, actions sur les comptes du staff |
 
-- Logo : `public/images/cyberpingo-transparent.png` (fond retiré par
-  `scripts/remove-logo-background.ps1`, l'original est conservé). L'animation de
-  démarrage dure moins de deux secondes, s'affiche une fois par onglet et
-  respecte `prefers-reduced-motion`.
-- Polices Inter, Space Grotesk et JetBrains Mono servies localement depuis
-  `public/fonts/` (licences SIL OFL).
-- Les animations peuvent être désactivées depuis la navigation publique.
-- Les badges de la plateforme ne sont pas des certifications.
+Les rôles sont vérifiés par PostgreSQL (`is_admin()`, `is_superadmin()` dans les politiques RLS et les RPC) et par le middleware ; l'interface ne fait que refléter ces droits.
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md) : couches, flux d'authentification, RPC contre Edge Functions, temps réel
+- [Base de données](docs/DATABASE.md) : tables, relations, RPC, XP, niveaux, séries, certificats, Storage
+- [Sécurité](docs/SECURITY.md) : RLS, anti-triche, limites de débit, secrets
+- [Déploiement](docs/DEPLOYMENT.md) : Supabase (migrations, fonctions, Auth), Vercel, premier administrateur
+
+Les polices de `public/fonts/` sont sous licence SIL OFL.
