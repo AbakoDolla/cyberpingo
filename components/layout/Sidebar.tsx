@@ -1,65 +1,56 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
 import { cn } from "@/lib/utils";
-import { lessons } from "@/data/lessons";
 import { useUser } from "@/context/UserContext";
 import {
-  IconDashboard, IconCourses, IconShield, IconAI, IconProfile, IconActivity,
+  IconDashboard, IconCourses, IconShield, IconAI, IconProfile, IconActivity, IconBell, IconSettings, IconUsers,
 } from "@/components/ui/Icon";
 
-// Leçons indexées par id — O(1) à la place de find() O(n)
-const lessonsArray = lessons;
+const NAV_ITEMS = [
+  { href: "/dashboard", label: "Tableau de bord", Icon: IconDashboard },
+  { href: "/courses", label: "Cours", Icon: IconCourses },
+  { href: "/challenges", label: "Labs", Icon: IconShield },
+  { href: "/progression", label: "Ma progression", Icon: IconActivity },
+  { href: "/mentor", label: "Mentor IA", Icon: IconAI },
+  { href: "/notifications", label: "Notifications", Icon: IconBell },
+  { href: "/profile", label: "Profil", Icon: IconProfile },
+  { href: "/parametres", label: "Paramètres", Icon: IconSettings },
+];
 
-function DailyMissionMini() {
-  const { user } = useUser();
+function isActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
-  // useMemo : recalcule uniquement quand completedLessons change
-  const nextLesson = useMemo(() => {
-    const completedSet = new Set(user.completedLessons);
-    return lessonsArray.find((l) => !completedSet.has(l.id)) ?? null;
-  }, [user.completedLessons]);
-
+function LevelMini() {
+  const { level, streak } = useUser();
+  if (!level) return null;
   return (
-    <>
-      <p className="text-xs text-slate-400 mb-2">Prochaine leçon</p>
-      {nextLesson ? (
-        <Link
-          href={`/lessons/${nextLesson.id}`}
-          className="block text-sm text-white/80 hover:text-cyber-blue transition-colors truncate leading-snug"
-        >
-          {nextLesson.title}
-        </Link>
-      ) : (
-        <p className="text-sm text-cyber-green">Toutes les leçons terminées ✓</p>
-      )}
-    </>
+    <div className="mt-auto rounded-xl border border-white/5 bg-cyber-black/60 px-3 py-4">
+      <p className="text-xs text-slate-400">Niveau {level.level} · {level.title}</p>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10" role="progressbar" aria-label="Progression vers le niveau suivant" aria-valuemin={0} aria-valuemax={100} aria-valuenow={level.progress_percentage}>
+        <div className="h-full rounded-full bg-cyber-gradient transition-[width] duration-700" style={{ width: `${level.progress_percentage}%` }} />
+      </div>
+      <p className="mt-2 text-xs text-slate-300">
+        {level.next_level_xp !== null ? `${level.next_level_xp - level.xp} XP avant le niveau ${level.next_level}` : "Niveau maximum atteint"}
+      </p>
+      <p className="mt-1 text-xs text-slate-400">{streak > 0 ? `Série de ${streak} jour${streak > 1 ? "s" : ""}` : "Aucune série en cours"}</p>
+    </div>
   );
 }
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user } = useUser();
-
-  // useMemo : navItems ne change que si isAdmin change (rarissime)
-  const navItems = useMemo(() => [
-    ...(user.isAdmin ? [{ href: "/dashboard", label: "Dashboard", Icon: IconDashboard }] : []),
-    { href: "/progression", label: "Ma progression", Icon: IconActivity },
-    { href: "/courses",    label: "Cours",       Icon: IconCourses },
-    { href: "/challenges", label: "Challenges",  Icon: IconShield  },
-    { href: "/mentor",     label: "Mentor IA",   Icon: IconAI      },
-    { href: "/profile",    label: "Profil",      Icon: IconProfile },
-  ], [user.isAdmin]);
+  const { isStaff } = useUser();
 
   return (
-    <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen sticky top-0 border-r border-white/5 bg-dark-navy/40 px-4 py-6">
+    <aside className="hidden md:flex flex-col w-64 shrink-0 h-screen sticky top-0 border-r border-white/5 bg-dark-navy/40 px-4 py-6 overflow-y-auto">
       <Logo className="px-2 mb-8" />
       <nav className="flex flex-col gap-1" aria-label="Navigation de l’espace apprenant">
-        {navItems.map(({ href, label, Icon }) => {
-          const active = pathname === href || pathname.startsWith(`${href}/`);
+        {NAV_ITEMS.map(({ href, label, Icon }) => {
+          const active = isActive(pathname, href);
           return (
             <Link
               key={href}
@@ -77,12 +68,17 @@ export default function Sidebar() {
             </Link>
           );
         })}
+        {isStaff && (
+          <Link
+            href="/admin"
+            className="mt-3 flex items-center gap-3 rounded-xl border border-neon-purple/30 px-3 py-2.5 text-sm text-[#d9c8ff] hover:bg-neon-purple/10"
+          >
+            <IconUsers size={16} />
+            Console admin
+          </Link>
+        )}
       </nav>
-      <Link href="/parametres" className="px-3 py-3 text-sm text-slate-300 hover:text-cyber-blue" aria-current={pathname === "/parametres" ? "page" : undefined}>Paramètres</Link>
-
-      <div className="mt-auto px-3 py-4 rounded-xl bg-cyber-black/60 border border-white/5">
-        <DailyMissionMini />
-      </div>
+      <LevelMini />
     </aside>
   );
 }

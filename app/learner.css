@@ -65,3 +65,22 @@
   .study-score-list > div { grid-template-columns: 1fr 1fr 1fr; gap: 8px 12px; }
   .study-score-list > div > span:first-child { grid-column: 1 / -1; }
 }
+.learner-stats { display: flex; align-items: center; gap: 22px; margin: 0; }
+.learner-stats > div { display: grid; gap: 2px; }
+.learner-stats dt { display: inline-flex; align-items: center; gap: 5px; color: #9fb4cf; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+.learner-stats dd { font-family: var(--font-space-grotesk), sans-serif; font-size: 17px; font-weight: 600; color: #f1f8ff; font-variant-numeric: tabular-nums; }
+.learner-stats .is-hot dd, .learner-stats .is-hot dt { color: #ffb86b; }
+.learner-toplinks { align-items: center; }
+.learner-admin-link { padding-inline: 12px; border: 1px solid #5b3f99; border-radius: 10px; color: #dccbff !important; }
+.learner-admin-link:hover { background: #21163d; }
+.learner-bell { position: relative; justify-content: center; min-width: 44px; border-radius: 10px; }
+.learner-bell:hover { background: #0e2440; }
+.learner-bell > span { position: absolute; top: 5px; right: 3px; min-width: 18px; height: 18px; padding-inline: 5px; border-radius: 999px; background: #ff5d73; color: #fff; font-size: 10px; font-weight: 700; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px #071426; }
+.learner-avatar-link { border-radius: 999px; }
+.learner-avatar-link:focus-visible, .learner-bell:focus-visible { outline: 2px solid #69dbff; outline-offset: 2px; }
+@media (max-width: 600px) { .learner-stats { order: 3; width: 100%; justify-content: space-between; gap: 12px; } .learner-toplinks { gap: 8px; } }
+@keyframes reward-toast-in { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes reward-toast-glow { 0%, 100% { box-shadow: 0 0 0 rgba(139, 92, 246, 0); } 50% { box-shadow: 0 0 30px rgba(139, 92, 246, .45); } }
+.reward-toast-in { animation: reward-toast-in .32s cubic-bezier(.2, .9, .3, 1.2) both; }
+.reward-toast-level { animation: reward-toast-in .38s cubic-bezier(.2, .9, .3, 1.2) both, reward-toast-glow 1.6s ease-in-out .38s 2; }
+@media (prefers-reduced-motion: reduce) { .reward-toast-in, .reward-toast-level { animation: none; } }

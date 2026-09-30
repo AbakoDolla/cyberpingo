@@ -1,141 +1,159 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
-import { courses } from "@/data/courses";
-import { useUser } from "@/context/UserContext";
-import { usePublishStore } from "@/hooks/usePublishStore";
-import { Course } from "@/types";
+import { IconBolt, IconCertificate, IconCheck, IconClock, IconLesson, IconLock, IconTrophy } from "@/components/ui/Icon";
+import { useLearner } from "@/context/UserContext";
+import { useAsync } from "@/hooks/useAsync";
+import { errorMessage } from "@/lib/errors";
+import { formatDuration, levelLabel } from "@/lib/format";
 import {
-  IconShield, IconNetwork, IconLinux, IconGlobe, IconCrosshair,
-  IconCheck, IconClock, IconLesson,
-} from "@/components/ui/Icon";
+  enrollInCourse, getCourseBySlug, getMyCourseProgress, listMyLessonProgress, listMyQuizResults, orderedLessons,
+} from "@/services/courses.service";
+import type { CourseProgress, CourseDetail, LessonStatus } from "@/types/api";
 
-const levelLabel: Record<string, string> = {
-  debutant: "Débutant",
-  intermediaire: "Intermédiaire",
-  avance: "Avancé",
+const statusCopy: Record<LessonStatus, { label: string; tone: "green" | "blue" | "neutral" }> = {
+  completed: { label: "Terminée", tone: "green" },
+  in_progress: { label: "En cours", tone: "blue" },
+  not_started: { label: "À faire", tone: "neutral" },
 };
 
-const courseIconMap: Record<string, React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>> = {
-  fondamentaux: IconShield,
-  reseaux: IconNetwork,
-  linux: IconLinux,
-  "securite-web": IconGlobe,
-  "pentest-intro": IconCrosshair,
+type QuizResults = Awaited<ReturnType<typeof listMyQuizResults>>;
+type CoursePageData = {
+  course: CourseDetail | null;
+  progress: CourseProgress | null;
+  lessons: Awaited<ReturnType<typeof listMyLessonProgress>>;
+  quizResults: QuizResults;
 };
 
-export default function CourseDetailPage() {
+function quizSummary(results: QuizResults, quizId: string) {
+  const result = results[quizId];
+  if (!result) return "Aucune tentative";
+  return `${result.best_percentage} % · ${result.passed ? "validé" : "à revoir"} · ${result.attempts} tentative${result.attempts > 1 ? "s" : ""}`;
+}
+
+function nextUncompletedLesson(course: CourseDetail, completed: Set<string>) {
+  return orderedLessons(course).find((lesson) => !completed.has(lesson.id)) ?? null;
+}
+
+function CourseDetailView() {
   const params = useParams<{ id: string }>();
-  const course = courses.find((c) => c.slug === params.id);
-  const { publishedCourses, hydrated } = usePublishStore();
-  const { user } = useUser();
+  const slug = params.id;
+  const { profile, isStaff } = useLearner();
+  const [enrolling, setEnrolling] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const { data, error, loading, reload, setData } = useAsync(async (): Promise<CoursePageData> => {
+    const course = await getCourseBySlug(slug);
+    if (!course) return { course: null, progress: null, lessons: [], quizResults: {} as QuizResults };
+    const [progress, lessons, quizResults] = await Promise.all([
+      getMyCourseProgress(profile.id, course.id),
+      listMyLessonProgress(profile.id, course.id),
+      listMyQuizResults(profile.id, course.id),
+    ]);
+    return { course, progress, lessons, quizResults };
+  }, [slug, profile.id]);
 
-  // Cherche dans les cours statiques puis publiés
-  const foundCourse: Course | undefined = course ?? (() => {
-    const pub = publishedCourses.find((c) => c.slug === params.id);
-    if (!pub) return undefined;
-    return {
-      id: pub.id, slug: pub.slug, title: pub.title, description: pub.description,
-      level: pub.level, durationMinutes: pub.durationMinutes,
-      lessonCount: pub.lessons.length, progress: 0, category: pub.category,
-      locked: false, icon: pub.slug, lessons: pub.lessons,
-    };
-  })();
+  const lessonProgress = useMemo(() => new Map((data?.lessons ?? []).map((item) => [item.lesson_id, item])), [data?.lessons]);
+  const completedLessons = useMemo(() => new Set((data?.lessons ?? []).filter((item) => item.status === "completed").map((item) => item.lesson_id)), [data?.lessons]);
 
-  if (!foundCourse) {
-    return (
-      <AppShell>
-        <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-          <p className="text-white/50" role="status">{hydrated ? "Cours introuvable." : "Chargement du cours…"}</p>
-        </div>
-      </AppShell>
-    );
+  async function enroll(courseId: string) {
+    setEnrolling(true);
+    setActionError(null);
+    try {
+      const progress = await enrollInCourse(courseId);
+      setData((current) => current ? { ...current, progress } : current);
+    } catch (cause) {
+      setActionError(errorMessage(cause, "L’inscription au parcours a échoué."));
+    } finally {
+      setEnrolling(false);
+    }
   }
 
-  const progress = foundCourse.lessons.length ? Math.round(foundCourse.lessons.filter((lesson) => user.completedLessons.includes(lesson.id)).length / foundCourse.lessons.length * 100) : 0;
-  const CourseIcon = courseIconMap[foundCourse.slug] ?? IconShield;
+  const course = data?.course ?? null;
+  const progressValue = Math.round(data?.progress?.progress_percentage ?? 0);
+  const nextLesson = course ? nextUncompletedLesson(course, completedLessons) : null;
+  const canPreview = course?.status === "draft" && isStaff;
+  const canContinue = Boolean(nextLesson && (data?.progress || canPreview));
 
   return (
-    <AppShell>
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-xl2 bg-cyber-blue/10 border border-cyber-blue/20 flex items-center justify-center shrink-0">
-            <CourseIcon size={28} strokeWidth={1.4} className="text-cyber-blue" />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-semibold">{foundCourse.title}</h1>
-            <p className="text-white/60 mt-1">{foundCourse.description}</p>
-          </div>
-        </div>
+    <>
+      <main className="study-page course-detail-page">
+        <Link href="/courses" className="study-link">← Tous les cours</Link>
+        {loading && <div className="study-empty" role="status"><h1>Chargement du parcours…</h1></div>}
+        {error && !loading && <div className="study-empty" role="alert"><h1>Impossible de charger ce parcours.</h1><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
+        {!loading && !error && data && !course && <div className="study-empty"><h1>Parcours introuvable.</h1><p>Il n’est peut-être pas publié ou tu n’y as pas accès.</p></div>}
+        {!loading && !error && data && course && (
+          <>
+            {course.status === "draft" && <div className="learning-banner learning-banner--preview">Aperçu brouillon : seuls les membres de l’équipe peuvent ouvrir ce parcours. Aucun XP ne sera accordé.</div>}
+            {course.status === "archived" && <div className="learning-banner">Ce parcours est archivé. Tu peux le consulter si tu étais déjà inscrit, mais il n’apparaît plus dans le catalogue public.</div>}
+            <header className="course-detail-hero">
+              <div>
+                <div className="course-detail-hero__badges">
+                  <Badge tone="blue">{levelLabel(course.level)}</Badge>
+                  <Badge tone="neutral">{course.category}</Badge>
+                  <Badge tone={course.access_level === "free" ? "green" : "purple"}>{course.access_level === "free" ? "Gratuit" : course.access_level}</Badge>
+                </div>
+                <h1>{course.title}</h1>
+                <p>{course.description}</p>
+              </div>
+              <aside className="course-detail-hero__panel">
+                <span><IconClock size={16} /> {formatDuration(course.estimated_duration)}</span>
+                <span><IconLesson size={16} /> {course.module_count} modules · {course.lesson_count} leçons</span>
+                <span><IconBolt size={16} /> {course.quiz_count} quiz · +{course.completion_xp} XP de fin</span>
+                <span><IconCertificate size={16} /> {course.certificate_enabled ? "Certificat activé" : "Sans certificat"}</span>
+              </aside>
+            </header>
 
-        <div className="mt-6 flex items-center gap-2 flex-wrap">
-          <Badge tone="blue">{levelLabel[foundCourse.level]}</Badge>
-          <Badge tone="neutral">{foundCourse.lessons.length} leçons</Badge>
-          <div className="flex items-center gap-1 text-xs text-white/40">
-            <IconClock size={13} />
-            <span>{foundCourse.durationMinutes} min</span>
-          </div>
-          {progress === 100 && <Badge tone="green">✓ Terminé</Badge>}
-        </div>
+            <section className="course-progress-card" aria-label="Progression du parcours">
+              <div><h2>{data.progress ? "Ta progression" : "Inscription"}</h2><p>{data.progress ? `${data.progress.completed_lessons} leçons terminées sur ${data.progress.total_lessons}.` : "Inscris-toi gratuitement pour enregistrer tes leçons, quiz et récompenses."}</p></div>
+              <div className="course-progress-card__bar"><strong>{progressValue} %</strong><ProgressBar value={progressValue} tone="green" /></div>
+              <div className="study-actions">
+                {!data.progress && course.status === "published" && course.access_level === "free" && <Button variant="success" onClick={() => void enroll(course.id)} loading={enrolling}>S’inscrire gratuitement</Button>}
+                {canContinue && <Link className="study-button" href={`/lessons/${nextLesson?.id}`}>Continuer</Link>}
+                {!nextLesson && data.progress && <Badge tone="green"><IconTrophy size={13} /> Parcours terminé</Badge>}
+              </div>
+              {actionError && <p className="settings-status is-error" role="alert">{actionError}</p>}
+            </section>
 
-        <div className="mt-6">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-white/50">Progression</span>
-            <span className="text-xs font-medium text-cyber-green">{progress}%</span>
-          </div>
-          <ProgressBar value={progress} tone="green" />
-        </div>
-
-        <div className="mt-10 bg-dark-navy border border-white/5 rounded-xl2 p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <IconLesson size={16} className="text-white/40" />
-            <h2 className="font-display font-semibold text-lg">Leçons</h2>
-          </div>
-
-          {foundCourse.lessons.length === 0 ? (
-            <p className="text-sm text-white/50">Les leçons de ce module arrivent bientôt.</p>
-          ) : (
-            <div className="space-y-2">
-              {foundCourse.lessons.map((lesson) => {
-                const done = user.completedLessons.includes(lesson.id);
-                return (
-                  <Link
-                    key={lesson.id}
-                    href={`/lessons/${lesson.id}`}
-                    className="flex items-center justify-between p-4 rounded-xl border border-white/5 hover:border-cyber-blue/30 hover:bg-white/[0.02] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${done ? "bg-cyber-green/10" : "bg-white/5"}`}>
-                        {done
-                          ? <IconCheck size={14} strokeWidth={2.5} className="text-cyber-green" />
-                          : <span className="text-xs text-white/30 font-mono">{lesson.order}</span>
-                        }
-                      </div>
-                      <div>
-                        <p className={`font-medium text-sm ${done ? "text-white/50" : "text-white"}`}>
-                          {lesson.title}
-                        </p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <IconClock size={11} className="text-white/30" />
-                          <span className="text-xs text-white/30">{lesson.durationMinutes} min</span>
-                          <span className="text-xs text-cyber-green/60">+{lesson.xpReward} XP</span>
-                        </div>
-                      </div>
-                    </div>
-                    <span className="shrink-0 ml-3 text-sm text-cyber-blue">
-                      {done ? "Revoir" : "Ouvrir"}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-    </AppShell>
+            <section className="module-outline" aria-labelledby="modules-title">
+              <h2 id="modules-title">Programme du parcours</h2>
+              {course.modules.length === 0 ? <div className="study-empty"><p>Aucune leçon disponible pour le moment.</p></div> : course.modules.map((module) => (
+                <article key={module.id} className="module-outline__module">
+                  <div className="module-outline__module-head"><h3>{module.title}</h3>{module.description && <p>{module.description}</p>}</div>
+                  <ol>
+                    {module.lessons.map((lesson) => {
+                      const progress = lessonProgress.get(lesson.id);
+                      const state = progress?.status ?? "not_started";
+                      const quiz = course.lesson_quizzes[lesson.id];
+                      return (
+                        <li key={lesson.id}>
+                          <Link href={`/lessons/${lesson.id}`} className="module-outline__lesson">
+                            <span className={`module-outline__status is-${state}`}>{state === "completed" ? <IconCheck size={14} /> : <IconLock size={13} />}</span>
+                            <span><strong>{lesson.title}</strong><small>{lesson.summary || `${formatDuration(lesson.duration_minutes)} · +${lesson.xp_reward} XP`}</small></span>
+                            <Badge tone={statusCopy[state].tone}>{statusCopy[state].label}</Badge>
+                          </Link>
+                          {quiz && <Link href={`/quiz/${quiz.id}`} className="module-outline__quiz">Quiz de leçon : {quiz.title}<span>{quizSummary(data.quizResults, quiz.id)}</span></Link>}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  {module.quizzes.length > 0 && <div className="module-outline__reviews"><h4>Quiz de révision</h4>{module.quizzes.map((quiz) => <Link key={quiz.id} href={`/quiz/${quiz.id}`}>{quiz.title}<span>{quizSummary(data.quizResults, quiz.id)}</span></Link>)}</div>}
+                </article>
+              ))}
+            </section>
+          </>
+        )}
+      </main>
+    </>
   );
+}
+
+/** AppShell gates rendering on a loaded profile, so the view can call useLearner() safely. */
+export default function CourseDetailPage() {
+  return <AppShell><CourseDetailView /></AppShell>;
 }

@@ -1,86 +1,70 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import AppShell from "@/components/layout/AppShell";
 import CourseCard from "@/components/courses/CourseCard";
-import { courses } from "@/data/courses";
-import { usePublishStore } from "@/hooks/usePublishStore";
-import { Course } from "@/types";
-import { IconBolt } from "@/components/ui/Icon";
-import { useState } from "react";
-import { levelLabels } from "@/lib/catalog";
+import Button from "@/components/ui/Button";
+import { useLearner } from "@/context/UserContext";
+import { useAsync } from "@/hooks/useAsync";
+import { LEVEL_LABELS } from "@/lib/format";
+import { listMyCourseProgress, listPublishedCourses } from "@/services/courses.service";
 
-export default function CoursesPage() {
-  const { publishedCourses, hydrated } = usePublishStore();
+function CoursesView() {
+  const { profile } = useLearner();
   const [query, setQuery] = useState("");
   const [level, setLevel] = useState("");
+  const [category, setCategory] = useState("");
+  const { data, error, loading, reload } = useAsync(async () => {
+    const [courses, progress] = await Promise.all([listPublishedCourses(), listMyCourseProgress(profile.id)]);
+    return { courses, progress };
+  }, [profile.id]);
 
-  // Convertit les cours publiés en format Course pour CourseCard
-  const publishedAsCourses: Course[] = publishedCourses.map((pc) => ({
-    id: pc.id,
-    slug: pc.slug,
-    title: pc.title,
-    description: pc.description,
-    level: pc.level,
-    durationMinutes: pc.durationMinutes,
-    lessonCount: pc.lessons.length,
-    progress: 0,
-    category: pc.category,
-    locked: false,
-    icon: pc.icon ?? pc.slug,
-    lessons: pc.lessons,
-  }));
-
-  const matches = (course: Course) => (!level || course.level === level) && `${course.title} ${course.description} ${course.category}`.toLocaleLowerCase("fr").includes(query.trim().toLocaleLowerCase("fr"));
-  const filteredCourses = courses.filter(matches);
-  const filteredPublished = publishedAsCourses.filter(matches);
+  const progressByCourse = useMemo(() => new Map((data?.progress ?? []).map((item) => [item.course_id, item])), [data?.progress]);
+  const categories = useMemo(() => Array.from(new Set((data?.courses ?? []).map((course) => course.category))).sort((a, b) => a.localeCompare(b, "fr")), [data?.courses]);
+  const normalizedQuery = query.trim().toLocaleLowerCase("fr");
+  const filtered = useMemo(() => (data?.courses ?? []).filter((course) => {
+    const matchesQuery = !normalizedQuery || `${course.title} ${course.short_description} ${course.description} ${course.category}`.toLocaleLowerCase("fr").includes(normalizedQuery);
+    return matchesQuery && (!level || course.level === level) && (!category || course.category === category);
+  }), [data?.courses, normalizedQuery, level, category]);
 
   return (
-    <AppShell>
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="flex items-center justify-between">
+    <>
+      <main className="study-page">
+        <header className="study-heading learning-hero">
           <div>
-            <h1 className="font-display text-2xl font-semibold">Cours</h1>
-            <p className="text-white/50 text-sm mt-1">
-              Progresse module par module, à ton propre rythme.
-            </p>
+            <h1>Choisis ton prochain parcours.</h1>
+            <p>Des modules courts, des quiz de validation et une progression synchronisée avec ton compte CyberPingo.</p>
           </div>
-          {hydrated && publishedAsCourses.length > 0 && (
-            <div className="flex items-center gap-1.5 text-xs text-cyber-green bg-cyber-green/10 border border-cyber-green/20 px-3 py-1.5 rounded-full">
-              <IconBolt size={12} />
-              {publishedAsCourses.length} cours publié{publishedAsCourses.length > 1 ? "s" : ""}
-            </div>
-          )}
-        </div>
+          <p className="learning-hero__badge" aria-live="polite">{data?.courses.length ?? 0} parcours publiés</p>
+        </header>
 
-        <div className="study-filters">
-          <label>Rechercher<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Un sujet, un parcours…" /></label>
-          <label>Niveau<select value={level} onChange={(event) => setLevel(event.target.value)}><option value="">Tous les niveaux</option>{Object.entries(levelLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-        </div>
-        <p role="status" className="mt-5 text-sm text-slate-300">{filteredCourses.length + filteredPublished.length} parcours trouvé(s)</p>
-        <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+        <section className="study-filters learning-filters" aria-label="Filtres des parcours">
+          <label>Rechercher<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Réseaux, Linux, phishing…" /></label>
+          <label>Niveau<select value={level} onChange={(event) => setLevel(event.target.value)}><option value="">Tous les niveaux</option>{Object.entries(LEVEL_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+          <label>Catégorie<select value={category} onChange={(event) => setCategory(event.target.value)}><option value="">Toutes les catégories</option>{categories.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+        </section>
 
-        {/* Cours publiés */}
-        {hydrated && filteredPublished.length > 0 && (
-          <div className="mt-10">
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="font-display font-semibold text-lg">Cours publiés par l’équipe</h2>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-cyber-green/10 text-cyber-green border border-cyber-green/20">
-                Nouveau
-              </span>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPublished.map((course) => (
-                <CourseCard key={course.id} course={course} />
-              ))}
-            </div>
-          </div>
+        {loading && <div className="study-empty" role="status"><h2>Chargement des cours…</h2><p>On prépare le catalogue publié.</p></div>}
+        {error && !loading && <div className="study-empty" role="alert"><h2>Impossible de charger les cours.</h2><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
+        {!loading && !error && data && data.courses.length === 0 && <div className="study-empty"><h2>Aucun cours disponible pour le moment.</h2></div>}
+        {!loading && !error && data && data.courses.length > 0 && (
+          <>
+            <p className="result-count" role="status">{filtered.length} parcours trouvé{filtered.length > 1 ? "s" : ""}</p>
+            {filtered.length ? (
+              <div className="learning-card-grid">
+                {filtered.map((course) => <CourseCard key={course.id} course={course} href={`/courses/${course.slug}`} progress={progressByCourse.get(course.id)} />)}
+              </div>
+            ) : (
+              <div className="study-empty"><h2>Aucun parcours ne correspond à tes filtres.</h2><button type="button" className="study-link" onClick={() => { setQuery(""); setLevel(""); setCategory(""); }}>Effacer les filtres</button></div>
+            )}
+          </>
         )}
-        {!filteredCourses.length && !filteredPublished.length && <div className="study-empty"><p>Aucun parcours ne correspond à tes filtres.</p><button className="study-link" onClick={() => { setQuery(""); setLevel(""); }}>Effacer les filtres</button></div>}
-      </div>
-    </AppShell>
+      </main>
+    </>
   );
+}
+
+/** AppShell gates rendering on a loaded profile, so the view can call useLearner() safely. */
+export default function CoursesPage() {
+  return <AppShell><CoursesView /></AppShell>;
 }

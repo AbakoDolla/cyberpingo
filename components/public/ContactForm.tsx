@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { friendlyError } from "@/lib/learner-mapping";
+import { errorMessage } from "@/lib/errors";
+import { CONTACT_SUBJECTS as SUBJECTS, submitContactMessage, type ContactSubject } from "@/services/platform.service";
 
-const SUBJECTS = ["Signaler un problème", "Proposer un contenu", "Améliorer une explication", "Autre"] as const;
 const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 type State = { kind: "idle" | "sending" | "sent" | "error"; message: string };
@@ -25,16 +24,17 @@ export default function ContactForm() {
     const subject = String(form.get("subject") ?? "");
     const email = String(form.get("email") ?? "").trim();
     const message = String(form.get("message") ?? "").trim();
-    if (!SUBJECTS.includes(subject as (typeof SUBJECTS)[number])) { setState({ kind: "error", message: "Choisis un sujet dans la liste." }); return; }
+    if (!SUBJECTS.includes(subject as ContactSubject)) { setState({ kind: "error", message: "Choisis un sujet dans la liste." }); return; }
     if (email && !EMAIL_PATTERN.test(email)) { setState({ kind: "error", message: "L’adresse e-mail semble incomplète." }); return; }
     if (message.length < 20) { setState({ kind: "error", message: "Décris ta demande en au moins 20 caractères." }); return; }
     if (message.length > 5000) { setState({ kind: "error", message: "Ton message dépasse 5 000 caractères." }); return; }
     if (!isSupabaseConfigured) { setState({ kind: "error", message: "L’envoi de messages n’est pas encore activé sur ce site." }); return; }
 
     setState({ kind: "sending", message: "Envoi en cours…" });
-    const { error } = await getSupabaseBrowserClient().rpc("submit_contact_message", { p_subject: subject, p_email: email, p_message: message });
-    if (error) {
-      setState({ kind: "error", message: friendlyError(error, "Le message n’a pas pu être envoyé. Réessaie dans un instant.") });
+    try {
+      await submitContactMessage(subject as ContactSubject, email, message);
+    } catch (error) {
+      setState({ kind: "error", message: errorMessage(error, "Le message n’a pas pu être envoyé. Réessaie dans un instant.") });
       return;
     }
     formElement.reset();

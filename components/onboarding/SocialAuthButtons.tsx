@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Button from "@/components/ui/Button";
-import { oauthProviders, type OAuthProvider } from "@/lib/supabase/config";
-import { signInWithProvider } from "@/lib/auth-client";
+import { isSupabaseConfigured, missingConfigMessage, oauthProviders, type OAuthProvider } from "@/lib/supabase/config";
+import { errorMessage } from "@/lib/errors";
+import { signInWithProvider } from "@/services/auth.service";
 
 const providerDetails: Record<OAuthProvider, { label: string; icon: React.ReactNode }> = {
   google: {
@@ -27,20 +28,20 @@ const providerDetails: Record<OAuthProvider, { label: string; icon: React.ReactN
   },
 };
 
-/** Renders only the OAuth providers enabled in Supabase (NEXT_PUBLIC_SUPABASE_OAUTH_PROVIDERS). */
 export default function SocialAuthButtons({ next = null }: { next?: string | null }) {
   const [pending, setPending] = useState<OAuthProvider | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(isSupabaseConfigured ? null : missingConfigMessage);
   if (oauthProviders.length === 0) return null;
 
   async function start(provider: OAuthProvider) {
+    if (!isSupabaseConfigured) { setError(missingConfigMessage); return; }
     setPending(provider);
     setError(null);
     try {
       await signInWithProvider(provider, next);
     } catch (cause) {
       setPending(null);
-      setError(cause instanceof Error ? cause.message : "La connexion avec ce fournisseur a échoué.");
+      setError(errorMessage(cause, "La connexion avec ce fournisseur a échoué."));
     }
   }
 
@@ -48,26 +49,14 @@ export default function SocialAuthButtons({ next = null }: { next?: string | nul
     <>
       <div className={oauthProviders.length > 1 ? "grid grid-cols-2 gap-3" : "grid gap-3"}>
         {oauthProviders.map((provider) => (
-          <Button
-            key={provider}
-            variant="secondary"
-            type="button"
-            className="w-full"
-            loading={pending === provider}
-            disabled={pending !== null}
-            onClick={() => void start(provider)}
-          >
+          <Button key={provider} variant="secondary" type="button" className="w-full" loading={pending === provider} disabled={pending !== null || !isSupabaseConfigured} onClick={() => void start(provider)}>
             {providerDetails[provider].icon}
             {providerDetails[provider].label}
           </Button>
         ))}
       </div>
       {error && <p role="alert" className="mt-3 text-sm text-cyber-red">{error}</p>}
-      <div className="flex items-center gap-4 my-6">
-        <div className="h-px bg-white/10 flex-1" />
-        <span className="text-xs text-white/50">ou avec ton e-mail</span>
-        <div className="h-px bg-white/10 flex-1" />
-      </div>
+      <div className="flex items-center gap-4 my-6"><div className="h-px bg-white/10 flex-1" /><span className="text-xs text-white/50">ou avec ton e-mail</span><div className="h-px bg-white/10 flex-1" /></div>
     </>
   );
 }

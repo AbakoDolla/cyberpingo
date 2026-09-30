@@ -1,16 +1,11 @@
 import Link from "next/link";
-import { Challenge } from "@/types";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { cn } from "@/lib/utils";
+import { IconCheck, IconTerminal } from "@/components/ui/Icon";
+import { levelLabel } from "@/lib/format";
+import type { Lab, LabCategory } from "@/types/api";
 
-const difficultyLabel: Record<string, string> = {
-  debutant: "Débutant",
-  intermediaire: "Intermédiaire",
-  avance: "Avancé",
-};
-
-const categoryLabel: Record<string, string> = {
+export const LAB_CATEGORY_LABELS: Record<LabCategory, string> = {
   reseau: "Réseau",
   linux: "Linux",
   web: "Web",
@@ -19,31 +14,19 @@ const categoryLabel: Record<string, string> = {
   securite: "Sécurité",
 };
 
-const statusLabel: Record<string, { label: string; tone: "blue" | "green" | "neutral" }> = {
-  disponible: { label: "Disponible", tone: "blue" },
-  termine: { label: "Terminé", tone: "green" },
-  verrouille: { label: "Verrouillé", tone: "neutral" },
-};
-
-export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
-  const locked = challenge.status === "verrouille";
-  const status = statusLabel[challenge.status];
-
-  const content = (
-    <Card glow={locked ? "none" : "green"} className={cn("h-full", locked && "opacity-60")}>
-      <div className="flex items-center justify-between">
-        <Badge tone="purple">{categoryLabel[challenge.category]}</Badge>
-        <Badge tone={status.tone}>{status.label}</Badge>
-      </div>
-      <h3 className="mt-4 font-display font-semibold text-lg">{challenge.title}</h3>
-      <p className="mt-1.5 text-sm text-white/60 line-clamp-2">{challenge.description}</p>
-      <div className="mt-4 flex items-center justify-between">
-        <Badge tone="blue">{difficultyLabel[challenge.difficulty]}</Badge>
-        <span className="text-cyber-green text-sm font-medium">+{challenge.xpReward} XP</span>
-      </div>
-    </Card>
+export default function ChallengeCard({ lab, href = `/challenges/${lab.slug}` }: { lab: Lab; href?: string }) {
+  return (
+    <Link href={href} className="lab-card-link" aria-label={`Ouvrir le lab ${lab.title}`}>
+      <Card glow={lab.solved ? "green" : "purple"} className="lab-card h-full">
+        <div className="lab-card__topline">
+          <Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge>
+          {lab.solved ? <Badge tone="green"><IconCheck size={12} /> Résolu</Badge> : <Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>}
+        </div>
+        <div className="lab-card__icon" aria-hidden="true"><IconTerminal size={26} /></div>
+        <h2>{lab.title}</h2>
+        <p>{lab.description}</p>
+        <div className="lab-card__footer"><span>+{lab.xp_reward} XP</span><span>{lab.objectives.length} objectif{lab.objectives.length > 1 ? "s" : ""}</span></div>
+      </Card>
+    </Link>
   );
-
-  if (locked) return <div>{content}</div>;
-  return <Link href={`/challenges/${challenge.slug}`}>{content}</Link>;
 }

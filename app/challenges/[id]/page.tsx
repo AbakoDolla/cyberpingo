@@ -1,144 +1,87 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
-import MockTerminal from "@/components/challenges/MockTerminal";
+import LabTerminal from "@/components/challenges/LabTerminal";
+import { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { challenges } from "@/data/challenges";
-import { useUserFull } from "@/context/UserContext";
-import { usePublishStore } from "@/hooks/usePublishStore";
-import { IconHint } from "@/components/ui/Icon";
+import { IconCheck, IconHint, IconTrophy } from "@/components/ui/Icon";
+import { useLearner, useUserActions } from "@/context/UserContext";
+import { useAsync } from "@/hooks/useAsync";
+import { errorMessage } from "@/lib/errors";
+import { levelLabel } from "@/lib/format";
+import { getLab } from "@/services/labs.service";
+import type { LabSubmission } from "@/types/api";
 
-const difficultyLabel: Record<string, string> = {
-  debutant: "Débutant",
-  intermediaire: "Intermédiaire",
-  avance: "Avancé",
-};
-
-export default function ChallengeDetailPage() {
+function ChallengeDetailView() {
   const params = useParams<{ id: string }>();
-  const { publishedChallenges, hydrated } = usePublishStore();
-  const challenge = [...challenges, ...publishedChallenges].find((c) => c.slug === params.id);
+  const slug = params.id;
+  const { profile } = useLearner();
+  const { submitLab } = useUserActions();
   const [answer, setAnswer] = useState("");
-  const [showHints, setShowHints] = useState(false);
-  const [result, setResult] = useState<"idle" | "checking" | "correct" | "incorrect">("idle");
-  const [awarded, setAwarded] = useState(0);
-  const [error, setError] = useState<string | null>(null);
-  const { completeChallenge, user } = useUserFull();
+  const [visibleHints, setVisibleHints] = useState(0);
+  const [result, setResult] = useState<LabSubmission | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+  const { data, error, loading, reload, setData } = useAsync(async () => ({ lab: await getLab(slug, profile.id) }), [slug, profile.id]);
+  const lab = data?.lab ?? null;
+  const solved = Boolean(lab?.solved || (result?.correct ?? false));
+  const wrong = result && !result.correct ? result : null;
+  const correct = result && result.correct ? result : null;
 
-  if (!challenge) {
-    return (
-      <AppShell>
-        <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-          <p className="text-white/50" role="status">{hydrated ? "Challenge introuvable." : "Chargement du challenge…"}</p>
-        </div>
-      </AppShell>
-    );
-  }
-
-  const alreadyCompleted = user.completedChallenges.includes(challenge.id);
-  const locked = result === "correct" || result === "checking" || alreadyCompleted;
-
-  // The flag is checked by the database; the page never receives the expected answer.
-  async function handleValidate() {
-    const trimmed = answer.trim();
-    if (!trimmed || result === "checking") return;
-    setResult("checking");
-    setError(null);
+  async function validate() {
+    if (!lab || checking || solved) return;
+    const value = answer.trim();
+    if (!value) { setFormError("Saisis une réponse avant de valider."); return; }
+    if (value.length > 300) { setFormError("Ta réponse doit faire 300 caractères maximum."); return; }
+    setChecking(true);
+    setFormError(null);
     try {
-      const outcome = await completeChallenge(challenge!.id, trimmed);
-      setAwarded(outcome.awarded);
-      setResult(outcome.correct ? "correct" : "incorrect");
-    } catch (err) {
-      setResult("idle");
-      setError(err instanceof Error ? err.message : "Ta réponse n’a pas pu être vérifiée.");
+      const submission = await submitLab(lab.id, value);
+      setResult(submission);
+      if (submission.correct) setData((current) => current?.lab ? { lab: { ...current.lab, solved: true, solved_at: new Date().toISOString() } } : current);
+    } catch (cause) {
+      setFormError(errorMessage(cause, "Ta réponse n’a pas pu être vérifiée."));
+    } finally {
+      setChecking(false);
     }
   }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") void handleValidate();
-  }
-
   return (
-    <AppShell>
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Badge tone="blue">{difficultyLabel[challenge.difficulty]}</Badge>
-          {alreadyCompleted && <Badge tone="green">✓ Résolu</Badge>}
-          <span className="text-cyber-green text-sm font-medium">+{challenge.xpReward} XP</span>
-        </div>
-        <h1 className="font-display text-2xl md:text-3xl font-semibold mt-3">{challenge.title}</h1>
-        <p className="text-white/60 mt-2">{challenge.description}</p>
-
-        <div className="mt-8 bg-dark-navy border border-white/5 rounded-xl2 p-6">
-          <h2 className="font-display font-semibold mb-3">Objectifs</h2>
-          <ul className="space-y-2">
-            {challenge.objectives.map((obj) => (
-              <li key={obj} className="flex items-start gap-2 text-sm text-white/70">
-                <span className="text-cyber-blue mt-0.5">›</span>
-                {obj}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="mt-6">
-          <MockTerminal lines={challenge.terminalLines} />
-        </div>
-
-        <div className="mt-6 bg-dark-navy border border-white/5 rounded-xl2 p-6">
-          <h2 className="font-display font-semibold mb-3">Ta réponse</h2>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Input
-              placeholder={challenge.flagPlaceholder}
-              value={answer}
-              onChange={(e) => {
-                setAnswer(e.target.value);
-                if (result === "incorrect") setResult("idle");
-              }}
-              onKeyDown={handleKeyDown}
-              disabled={locked}
-              error={result === "incorrect" ? "Réponse incorrecte, réessaie." : error ?? undefined}
-            />
-            <Button
-              variant="success"
-              onClick={() => void handleValidate()}
-              disabled={locked}
-              aria-busy={result === "checking"}
-              className="shrink-0"
-            >
-              {result === "checking" ? "Vérification…" : "Valider"}
-            </Button>
-          </div>
-
-          {(result === "correct" || alreadyCompleted) && (
-            <p className="mt-4 text-sm text-cyber-green">
-              ✅ Bravo, challenge résolu !{awarded > 0 && ` +${awarded} XP ajoutés à ton profil.`}
-            </p>
-          )}
-
-          <button
-            type="button"
-            onClick={() => setShowHints((v) => !v)}
-            className="mt-4 text-sm text-cyber-blue hover:underline"
-          >
-            {showHints ? "Masquer les indices" : "Afficher les indices"}
-          </button>
-          {showHints && (
-            <ul className="mt-3 space-y-2">
-              {challenge.hints.map((hint) => (
-                <li key={hint} className="flex items-start gap-2 text-sm text-white/60 bg-white/5 rounded-lg px-4 py-2.5">
-                  <IconHint size={14} strokeWidth={1.6} className="text-cyber-yellow shrink-0 mt-0.5" />
-                  {hint}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
-    </AppShell>
+    <>
+      <main className="study-page lab-detail-page">
+        <Link className="study-link" href="/challenges">← Tous les labs</Link>
+        {loading && <div className="study-empty" role="status"><h1>Chargement du lab…</h1></div>}
+        {error && !loading && <div className="study-empty" role="alert"><h1>Impossible de charger ce lab.</h1><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
+        {!loading && !error && !lab && <div className="study-empty"><h1>Lab introuvable.</h1></div>}
+        {lab && (
+          <>
+            {lab.status === "draft" && <div className="learning-banner learning-banner--preview">Aperçu brouillon : le lab peut être testé par l’équipe, sans XP.</div>}
+            <header className="lab-hero">
+              <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone="green">+{lab.xp_reward} XP</Badge></div>
+              <h1>{lab.title}</h1>
+              <p>{lab.description}</p>
+            </header>
+            <section className="lab-layout">
+              <div className="lab-layout__main">
+                <section className="lab-panel"><h2>Objectifs</h2><ul>{lab.objectives.map((objective) => <li key={objective}><IconCheck size={15} />{objective}</li>)}</ul></section>
+                <LabTerminal lines={lab.terminal_lines} />
+                <section className="lab-panel"><h2>Ta réponse</h2><div className="lab-answer"><Input label="Flag ou réponse" placeholder={lab.flag_placeholder} maxLength={300} value={answer} disabled={checking || solved} onChange={(event) => { setAnswer(event.target.value); setFormError(null); if (wrong) setResult(null); }} onKeyDown={(event) => { if (event.key === "Enter") void validate(); }} error={formError ?? (wrong ? `Réponse incorrecte. ${wrong.remaining_attempts} tentative${wrong.remaining_attempts > 1 ? "s" : ""} restante${wrong.remaining_attempts > 1 ? "s" : ""}.` : undefined)} /><Button variant="success" loading={checking} disabled={checking || solved} onClick={() => void validate()}>Valider</Button></div>{solved && <p className="settings-status" role="status"><IconTrophy size={16} /> Bravo, lab résolu ! {correct && "xp_awarded" in correct && correct.xp_awarded > 0 ? `+${correct.xp_awarded} XP.` : "Tu peux le relire à tout moment."}</p>}</section>
+              </div>
+              <aside className="lab-hints"><h2>Indices progressifs</h2>{lab.hints.length === 0 ? <p>Aucun indice n’est nécessaire pour ce lab.</p> : <><ol>{lab.hints.slice(0, visibleHints).map((hint, index) => <li key={hint}><IconHint size={15} /> <span>Indice {index + 1} : {hint}</span></li>)}</ol>{visibleHints < lab.hints.length ? <Button variant="secondary" size="sm" onClick={() => setVisibleHints((count) => Math.min(lab.hints.length, count + 1))}>Révéler un indice</Button> : <p>Tous les indices sont affichés.</p>}</>}</aside>
+            </section>
+          </>
+        )}
+      </main>
+    </>
   );
+}
+
+/** AppShell gates rendering on a loaded profile, so the view can call useLearner() safely. */
+export default function ChallengeDetailPage() {
+  return <AppShell><ChallengeDetailView /></AppShell>;
 }

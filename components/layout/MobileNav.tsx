@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  IconActivity,
+  IconDashboard,
   IconCourses,
   IconShield,
   IconAI,
@@ -15,9 +15,9 @@ export default function MobileNav() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/progression", label: "Progrès", Icon: IconActivity },
+    { href: "/dashboard", label: "Accueil", Icon: IconDashboard },
     { href: "/courses", label: "Cours", Icon: IconCourses },
-    { href: "/challenges", label: "Défis", Icon: IconShield },
+    { href: "/challenges", label: "Labs", Icon: IconShield },
     { href: "/mentor", label: "Mentor", Icon: IconAI },
     { href: "/profile", label: "Profil", Icon: IconProfile },
   ];

@@ -1,40 +1,20 @@
-import { challenges } from "@/data/challenges";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
+import { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
+import { levelLabel } from "@/lib/format";
+import type { Lab } from "@/types/api";
 
-const preview = challenges.slice(0, 3);
-
-const difficultyLabel: Record<string, string> = {
-  debutant: "Débutant",
-  intermediaire: "Intermédiaire",
-  avance: "Avancé",
-};
-
-export default function ChallengesSection() {
+export default function ChallengesSection({ labs }: { labs: Lab[] }) {
+  const preview = labs.slice(0, 3);
   return (
     <section id="challenges" className="max-w-7xl mx-auto px-6 py-20">
       <div className="max-w-2xl mb-12">
-        <h2 className="font-display text-3xl md:text-4xl font-semibold">
-          Mets tes compétences à l&apos;épreuve dans des challenges réels
-        </h2>
-        <p className="mt-4 text-white/60">
-          Des mini-laboratoires guidés, dans un environnement pédagogique
-          contrôlé, pour pratiquer sans risque.
-        </p>
+        <h2 className="font-display text-3xl md:text-4xl font-semibold">Mets tes compétences à l’épreuve dans des labs guidés</h2>
+        <p className="mt-4 text-white/60">Des mini-laboratoires pédagogiques, alimentés par le catalogue publié, pour pratiquer sans inventer de résultats.</p>
       </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        {preview.map((challenge) => (
-          <Card key={challenge.id} glow="green">
-            <div className="flex items-center justify-between">
-              <Badge tone="blue">{difficultyLabel[challenge.difficulty]}</Badge>
-              <span className="text-cyber-green text-sm font-medium">+{challenge.xpReward} XP</span>
-            </div>
-            <h3 className="mt-4 font-display font-semibold text-lg">{challenge.title}</h3>
-            <p className="mt-2 text-sm text-white/60">{challenge.description}</p>
-          </Card>
-        ))}
-      </div>
+      {preview.length ? <div className="grid md:grid-cols-3 gap-6">{preview.map((lab) => (
+        <Card key={lab.id} glow="green"><div className="flex items-center justify-between"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge></div><h3 className="mt-4 font-display font-semibold text-lg">{lab.title}</h3><p className="mt-2 text-sm text-white/60">{lab.description}</p><p className="mt-4 text-cyber-green text-sm font-medium">+{lab.xp_reward} XP</p></Card>
+      ))}</div> : <div className="library-empty"><h2>Aucun lab publié pour le moment.</h2><p>La section apparaîtra dès que l’équipe publiera des exercices.</p></div>}
     </section>
   );
 }

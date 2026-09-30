@@ -3,6 +3,9 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "./intro.css";
 import "./learner.css";
+import "./learner-account.css";
+import "./learner-study.css";
+import "./admin.css";
 import Providers from "./providers";
 
 const spaceGrotesk = localFont({
