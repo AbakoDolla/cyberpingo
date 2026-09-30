@@ -1,5 +1,3 @@
-import { courses } from "./courses";
-
 export interface PublicPath {
   id: string;
   title: string;
@@ -73,10 +71,6 @@ export const publicPaths: PublicPath[] = [
   },
 ];
 
-export function getPublicCourse(path: PublicPath) {
-  return courses.find((course) => course.slug === path.courseSlug);
-}
-
 // Replace this explicitly labelled example with consented, verified testimonials.
 export const publicTestimonial = {
   quote: "CyberPingo m’a aidé à comprendre la cybersécurité de manière simple et concrète. On apprend un réflexe à la fois !",
@@ -88,7 +82,7 @@ export const publicTestimonial = {
 export const publicFaq = [
   {
     question: "Je n’y connais rien en cybersécurité. Je peux commencer ?",
-    answer: "Oui ! Le parcours « Les bases de la cybersécurité » commence sans prérequis. Tu avances à ton rythme avec des leçons courtes, puis des quiz pour vérifier ce que tu as compris.",
+    answer: "Oui ! Les parcours débutants commencent sans prérequis. Tu avances à ton rythme avec des leçons courtes, puis des quiz pour vérifier ce que tu as compris.",
   },
   {
     question: "Comment fonctionnent les XP et les badges ?",
@@ -96,7 +90,7 @@ export const publicFaq = [
   },
   {
     question: "Tous les parcours sont-ils déjà disponibles ?",
-    answer: "Six parcours sont disponibles : fondamentaux, réseaux, Linux, sécurité Web, analyse de logs et initiation au pentest. Chaque fiche présente les leçons réellement accessibles. Les contenus avancés restent une initiation, pas une certification professionnelle. Aucun certificat accrédité n’est délivré.",
+    answer: "Le catalogue affiche uniquement les parcours réellement publiés. Les contenus avancés restent une initiation, pas une certification professionnelle accréditée.",
   },
   {
     question: "Mes données sont-elles synchronisées entre mes appareils ?",

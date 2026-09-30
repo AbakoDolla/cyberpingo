@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { safeReturnPath } from "@/lib/learning-progress";
+import { safeReturnPath } from "@/lib/navigation";
+import { isStaff } from "@/lib/roles";
 
 const RESET_PATH = "/reinitialiser-mot-de-passe";
 const OTP_TYPES: EmailOtpType[] = ["signup", "invite", "magiclink", "recovery", "email_change", "email"];
@@ -37,7 +38,6 @@ export async function GET(request: NextRequest) {
 
   await supabase.rpc("record_login");
   const { data: profile } = await supabase.from("profiles").select("role, onboarding_completed").eq("id", userId).maybeSingle();
-  const isAdmin = profile?.role === "admin";
-  if (profile && !isAdmin && !profile.onboarding_completed) return redirect("/onboarding");
-  return redirect(safeReturnPath(next, isAdmin));
+  if (profile && !isStaff(profile.role) && !profile.onboarding_completed) return redirect("/onboarding");
+  return redirect(safeReturnPath(next, profile?.role));
 }

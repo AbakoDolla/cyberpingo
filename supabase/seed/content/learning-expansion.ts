@@ -1,4 +1,4 @@
-import type { Lesson, Question, Quiz } from "@/types";
+import type { Lesson, Question, Quiz } from "./types";
 
 interface LearningModule {
   id: string;

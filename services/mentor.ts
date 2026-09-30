@@ -139,11 +139,16 @@ function localFallback(message: string): string {
  * pour que Gemini garde le contexte. Si l'appel échoue, utilise la base
  * de connaissances locale comme fallback.
  */
+export interface MentorResponse extends MentorMessage { remaining?: number; limit?: number; rateLimited?: boolean }
+
 export async function sendMessageToMentor(
   message: string,
   history: { role: "user" | "mentor"; content: string }[] = []
-): Promise<MentorMessage> {
+): Promise<MentorResponse> {
   let content: string;
+  let remaining: number | undefined;
+  let limit: number | undefined;
+  let rateLimited = false;
 
   try {
     const res = await fetch("/api/mentor", {
@@ -154,7 +159,10 @@ export async function sendMessageToMentor(
 
     const data = await res.json().catch(() => ({}));
     // Quota, session and validation messages are meant for the learner; other failures use local answers.
+    if (typeof data.remaining === "number") remaining = data.remaining;
+    if (typeof data.limit === "number") limit = data.limit;
     if (res.status === 429 || res.status === 401 || res.status === 400) {
+      rateLimited = res.status === 429;
       content = typeof data.error === "string" ? data.error : localFallback(message);
     } else if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
@@ -171,5 +179,8 @@ export async function sendMessageToMentor(
     role: "mentor",
     content,
     createdAt: new Date().toISOString(),
+    remaining,
+    limit,
+    rateLimited,
   };
 }

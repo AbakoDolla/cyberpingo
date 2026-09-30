@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       content: text || "Je n’ai pas pu formuler de réponse à cette question. Essaie de la reformuler.",
       remaining: allowance.remaining,
+      limit: allowance.limit,
     });
   } catch (error) {
     if (error instanceof GeminiError && error.status === 429) return failure("Le mentor reçoit beaucoup de questions. Réessaie dans une minute.", 503);

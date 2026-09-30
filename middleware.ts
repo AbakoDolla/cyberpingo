@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
-import { safeReturnPath } from "@/lib/learning-progress";
+import { safeReturnPath } from "@/lib/navigation";
+import { isStaff } from "@/lib/roles";
+import type { Database } from "@/types/database.types";
 
 const AUTH_PATHS = ["/login", "/register", "/mot-de-passe-oublie"];
 
+/**
+ * First line of defence only: it keeps visitors out of the app and learners out of /admin.
+ * Every read and write is still enforced by Row Level Security and the SQL functions.
+ */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthPage = AUTH_PATHS.some((path) => pathname.startsWith(path));
@@ -17,7 +23,7 @@ export async function middleware(request: NextRequest) {
   }
 
   let response = NextResponse.next({ request });
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+  const supabase = createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet, headers) {
@@ -29,11 +35,10 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // getClaims() verifies the JWT locally (cached JWKS) instead of a network round-trip
-  // to Supabase Auth on every navigation; it falls back to getUser() automatically for
-  // projects still on legacy shared-secret signing, so this is safe either way.
+  // getClaims() verifies the JWT locally (cached JWKS) instead of a network round-trip to Supabase
+  // Auth on every navigation, and falls back to getUser() for legacy shared-secret projects.
   const { data: claimsData } = await supabase.auth.getClaims();
-  const user = claimsData?.claims ? { id: claimsData.claims.sub } : null;
+  const userId = claimsData?.claims?.sub ?? null;
 
   const redirectTo = (path: string, next?: string) => {
     const url = new URL(path, request.url);
@@ -47,19 +52,22 @@ export async function middleware(request: NextRequest) {
     return redirect;
   };
 
+  const loadProfile = async (id: string) =>
+    (await supabase.from("profiles").select("role, onboarding_completed").eq("id", id).maybeSingle()).data;
+
   if (isAuthPage) {
-    if (!user) return response;
-    const { data: profile } = await supabase.from("profiles").select("role, onboarding_completed").eq("id", user.id).maybeSingle();
-    const isAdmin = profile?.role === "admin";
-    if (profile && !profile.onboarding_completed && !isAdmin) return redirectTo("/onboarding");
-    return redirectTo(safeReturnPath(request.nextUrl.searchParams.get("next"), isAdmin));
+    if (!userId) return response;
+    const profile = await loadProfile(userId);
+    const staff = isStaff(profile?.role);
+    if (profile && !profile.onboarding_completed && !staff) return redirectTo("/onboarding");
+    return redirectTo(safeReturnPath(request.nextUrl.searchParams.get("next"), profile?.role));
   }
 
-  if (!user) return redirectTo("/login", pathname);
+  if (!userId) return redirectTo("/login", pathname);
 
-  if (pathname.startsWith("/dashboard")) {
-    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-    if (profile?.role !== "admin") return redirectTo("/courses");
+  if (pathname.startsWith("/admin")) {
+    const profile = await loadProfile(userId);
+    if (!isStaff(profile?.role)) return redirectTo("/dashboard");
   }
 
   return response;
@@ -71,6 +79,7 @@ export const config = {
     "/register",
     "/mot-de-passe-oublie",
     "/reinitialiser-mot-de-passe",
+    "/admin/:path*",
     "/dashboard/:path*",
     "/courses/:path*",
     "/challenges/:path*",
@@ -80,6 +89,7 @@ export const config = {
     "/quiz/:path*",
     "/progression/:path*",
     "/parametres/:path*",
+    "/notifications/:path*",
     "/onboarding/:path*",
   ],
 };

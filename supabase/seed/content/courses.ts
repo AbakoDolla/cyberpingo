@@ -1,4 +1,4 @@
-import { Course } from "@/types";
+import { Course } from "./types";
 import { lessons } from "./lessons";
 
 const courseDefinitions: Course[] = [

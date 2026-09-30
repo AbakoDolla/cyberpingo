@@ -1,11 +1,14 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import { isSupabaseConfigured, missingConfigMessage, supabaseAnonKey, supabaseUrl } from "./config";
+import { AppError } from "@/lib/errors";
+import { asRole, isStaff } from "@/lib/roles";
+import type { Database } from "@/types/database.types";
+import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "./config";
 
 export async function createSupabaseServerClient() {
-  if (!isSupabaseConfigured) throw new Error(missingConfigMessage);
+  if (!isSupabaseConfigured) throw new AppError("not_configured");
   const cookieStore = await cookies();
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll: () => cookieStore.getAll(),
       setAll(cookiesToSet) {
@@ -26,7 +29,8 @@ export async function getRequestUser() {
   // to Supabase Auth, falling back to getUser() automatically when unavailable.
   const { data: claimsData } = await supabase.auth.getClaims();
   const userId = claimsData?.claims?.sub ?? null;
-  if (!userId) return { supabase, user: null, isAdmin: false };
+  if (!userId) return { supabase, user: null, role: null, isAdmin: false };
   const { data } = await supabase.from("profiles").select("role").eq("id", userId).maybeSingle();
-  return { supabase, user: { id: userId }, isAdmin: data?.role === "admin" };
+  const role = data ? asRole(data.role) : null;
+  return { supabase, user: { id: userId }, role, isAdmin: isStaff(role) };
 }
