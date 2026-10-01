@@ -1,83 +1,91 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
-import Button from "@/components/ui/Button";
+import { IconBolt, IconMenu, IconX } from "@/components/ui/Icon";
 
 const links = [
-  { href: "/#accueil", label: "Accueil" },
-  { href: "/#parcours", label: "Parcours" },
-  { href: "/#challenges", label: "Challenges" },
-  { href: "/#a-propos", label: "À propos" },
+  { href: "/", label: "Accueil" },
+  { href: "/parcours", label: "Cours" },
+  { href: "/fonctionnalites", label: "Fonctionnalités" },
+  { href: "/ressources", label: "Ressources" },
+  { href: "/a-propos", label: "À propos" },
 ];
 
-export default function Navbar() {
+interface NavbarProps {
+  motionEnabled: boolean;
+  onToggleMotion: () => void;
+}
+
+export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-cyber-black/80 backdrop-blur-md border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Logo />
-
-        <nav className="hidden md:flex items-center gap-8">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-sm text-white/70 hover:text-white transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-
-        <div className="hidden md:flex items-center gap-3">
-          <Link href="/login">
-            <Button variant="ghost" size="sm">
-              Connexion
-            </Button>
-          </Link>
-          <Link href="/register">
-            <Button variant="primary" size="sm">
-              Commencer gratuitement
-            </Button>
-          </Link>
-        </div>
-
+    <header
+      className={`public-nav ${scrolled ? "is-scrolled" : ""}`}
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          setOpen(false);
+          menuButton.current?.focus();
+        }
+      }}
+    >
+      <div className="public-container nav-inner">
+        <Logo className="public-logo" />
         <button
-          className="md:hidden text-white/80"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Ouvrir le menu"
+          ref={menuButton}
+          type="button"
+          className="nav-menu-toggle"
+          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={open}
+          aria-controls="public-navigation"
+          onClick={() => setOpen(!open)}
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          {open ? <IconX size={24} /> : <IconMenu size={24} />}
         </button>
-      </div>
-
-      {open && (
-        <div className="md:hidden border-t border-white/5 px-6 py-4 flex flex-col gap-4">
-          {links.map((link) => (
-            <a key={link.href} href={link.href} className="text-white/80" onClick={() => setOpen(false)}>
-              {link.label}
-            </a>
-          ))}
-          <div className="flex flex-col gap-2 pt-2">
-            <Link href="/login">
-              <Button variant="secondary" className="w-full">
-                Connexion
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button variant="primary" className="w-full">
-                Commencer gratuitement
-              </Button>
-            </Link>
+        <div id="public-navigation" className={`nav-content ${open ? "is-open" : ""}`}>
+          <nav aria-label="Navigation principale">
+            {links.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={pathname === link.href || (link.href !== "/" && pathname.startsWith(`${link.href}/`)) ? "page" : undefined}
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="nav-actions">
+            <button
+              type="button"
+              className="motion-toggle"
+              aria-label="Activer les animations"
+              aria-pressed={motionEnabled}
+              title={motionEnabled ? "Désactiver les animations" : "Activer les animations"}
+              onClick={onToggleMotion}
+            >
+              <IconBolt size={20} />
+            </button>
+            <Link href="/login" className="public-button button-outline">Se connecter</Link>
+            <Link href="/register" className="public-button button-primary">S&apos;inscrire</Link>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }

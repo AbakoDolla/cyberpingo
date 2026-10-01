@@ -1,34 +1,64 @@
-import { LessonBlock } from "@/types";
+"use client";
+
+import { useState } from "react";
+import { videoEmbed } from "@/lib/lesson-content";
+import type { LessonBlock } from "@/types/api";
+
+function TextBlock({ content }: { content: string }) {
+  const paragraphs = content.split(/\n{2,}/).map((part) => part.trim()).filter(Boolean);
+  return <>{paragraphs.map((paragraph, index) => <p key={index} className="lesson-block-text">{paragraph}</p>)}</>;
+}
+
+function CodeBlock({ content, language }: { content: string; language?: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  };
+  return (
+    <figure className="lesson-code-block">
+      <figcaption>
+        <span>{language ? language.toUpperCase() : "CODE"}</span>
+        <button type="button" onClick={copy}>{copied ? "Copié" : "Copier"}</button>
+      </figcaption>
+      <pre><code>{content}</code></pre>
+    </figure>
+  );
+}
+
+function VideoBlock({ url, title }: { url: string; title?: string }) {
+  const embed = videoEmbed(url);
+  if (embed.kind === "iframe") {
+    return <div className="lesson-media lesson-media--video"><iframe src={embed.src} title={title || "Vidéo de la leçon"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen loading="lazy" /></div>;
+  }
+  return <div className="lesson-media lesson-media--video"><video src={embed.src} controls preload="metadata">Ton navigateur ne peut pas lire cette vidéo.</video></div>;
+}
 
 export default function LessonBlockRenderer({ block }: { block: LessonBlock }) {
   switch (block.type) {
     case "text":
-      return <p className="text-white/80 leading-relaxed">{block.content}</p>;
+      return <TextBlock content={block.content} />;
+    case "heading":
+      return <h2 className="lesson-block-heading">{block.content}</h2>;
     case "schema":
-      return (
-        <div className="bg-cyber-black border border-cyber-blue/20 rounded-xl p-5 text-center text-sm text-cyber-blue font-medium overflow-x-auto whitespace-nowrap">
-          {block.content}
-        </div>
-      );
-    case "video":
-      return (
-        <div className="aspect-video bg-cyber-black border border-white/10 rounded-xl flex items-center justify-center text-white/40 text-sm">
-          ▶ Vidéo — {block.content}
-        </div>
-      );
-    case "code":
-      return (
-        <pre className="bg-cyber-black border border-white/10 rounded-xl p-5 overflow-x-auto">
-          <code className="font-mono text-sm text-cyber-green whitespace-pre">{block.content}</code>
-        </pre>
-      );
+      return <pre className="lesson-schema"><code>{block.content}</code></pre>;
     case "example":
-      return (
-        <div className="bg-neon-purple/10 border border-neon-purple/20 rounded-xl p-5 text-sm text-white/80">
-          <span className="text-neon-purple font-medium">Exemple — </span>
-          {block.content}
-        </div>
-      );
+      return <aside className="lesson-callout lesson-callout--example"><strong>Exemple</strong><p>{block.content}</p></aside>;
+    case "callout":
+      return <aside className="lesson-callout"><strong>À retenir</strong><p>{block.content}</p></aside>;
+    case "code":
+      return <CodeBlock content={block.content} language={block.language} />;
+    case "video":
+      return <VideoBlock url={block.url} title={block.content} />;
+    case "image":
+      return <figure className="lesson-media"><img src={block.url} alt={block.content || "Illustration de la leçon"} loading="lazy" />{block.content && <figcaption>{block.content}</figcaption>}</figure>;
+    case "resource":
+      return <p className="lesson-resource"><a href={block.url} target="_blank" rel="noopener noreferrer">{block.content || block.url} ↗</a></p>;
     default:
       return null;
   }

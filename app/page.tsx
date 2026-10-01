@@ -1,23 +1,19 @@
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import Hero from "@/components/landing/Hero";
-import Features from "@/components/landing/Features";
-import ProgressionSection from "@/components/landing/ProgressionSection";
-import ChallengesSection from "@/components/landing/ChallengesSection";
-import MentorSection from "@/components/landing/MentorSection";
-import CareerSection from "@/components/landing/CareerSection";
+import LandingPage from "@/components/landing/LandingPage";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
+import { listPublishedCourses } from "@/services/courses.service";
+import { listLabs } from "@/services/labs.service";
+import "./landing.css";
+import "./public-pages.css";
 
-export default function LandingPage() {
-  return (
-    <>
-      <Navbar />
-      <Hero />
-      <Features />
-      <ProgressionSection />
-      <ChallengesSection />
-      <MentorSection />
-      <CareerSection />
-      <Footer />
-    </>
-  );
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const client = createSupabasePublicClient();
+  if (!client) return <LandingPage courses={[]} labs={[]} catalogUnavailable />;
+  try {
+    const [courses, labs] = await Promise.all([listPublishedCourses(client), listLabs(null, client)]);
+    return <LandingPage courses={courses} labs={labs} />;
+  } catch {
+    return <LandingPage courses={[]} labs={[]} catalogUnavailable />;
+  }
 }

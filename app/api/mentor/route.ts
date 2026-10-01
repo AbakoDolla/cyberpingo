@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+import { getRequestUser } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { GeminiError, generateContent, isGeminiConfigured } from "@/lib/gemini";
 
 const SYSTEM_PROMPT = `Tu es le Mentor Cyberpingo, un expert en cybersécurité qui accompagne des apprenants francophones.
 
@@ -27,88 +27,70 @@ interface ConversationTurn {
 }
 
 interface RequestBody {
-  message?: string;
-  history?: { role: "user" | "mentor"; content: string }[];
+  message?: unknown;
+  history?: unknown;
 }
 
-export async function POST(request: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
+const MAX_MESSAGE_LENGTH = 2000;
+const failure = (error: string, status: number) => NextResponse.json({ error }, { status });
 
-  if (!apiKey) {
-    return NextResponse.json(
-      { error: "Clé API Gemini non configurée côté serveur." },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  if (!isSupabaseConfigured) return failure("Le service de comptes n’est pas configuré.", 503);
+  const { supabase, user } = await getRequestUser();
+  if (!user) return failure("Connecte-toi pour discuter avec le mentor.", 401);
+  if (!isGeminiConfigured()) return failure("Le mentor IA n’est pas configuré sur ce serveur.", 503);
 
   let body: RequestBody;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Corps de requête invalide." }, { status: 400 });
+    return failure("Corps de requête invalide.", 400);
   }
 
-  const userMessage = body.message?.trim();
-  if (!userMessage) {
-    return NextResponse.json({ error: "Message manquant." }, { status: 400 });
+  const userMessage = typeof body.message === "string" ? body.message.trim() : "";
+  if (!userMessage) return failure("Message manquant.", 400);
+  if (userMessage.length > MAX_MESSAGE_LENGTH) return failure(`Ton message est trop long (${MAX_MESSAGE_LENGTH} caractères maximum).`, 400);
+
+  const { data: quota, error: quotaError } = await supabase.rpc("consume_mentor_quota");
+  if (quotaError) {
+    console.error("Mentor quota error", quotaError.code);
+    return failure("Le mentor est momentanément indisponible. Réessaie dans un instant.", 503);
+  }
+  const allowance = quota as { allowed: boolean; remaining: number; limit: number } | null;
+  if (!allowance?.allowed) {
+    return NextResponse.json(
+      { error: `Tu as utilisé tes ${allowance?.limit ?? 40} questions du jour. Le mentor sera de nouveau disponible demain.`, remaining: 0 },
+      { status: 429 },
+    );
   }
 
-  // Convertit l'historique frontend (role: "mentor") vers le format Gemini (role: "model")
-  // On limite à 10 derniers échanges pour éviter de dépasser le contexte
-  const rawHistory = body.history ?? [];
-  const trimmedHistory = rawHistory.slice(-20); // 20 messages = 10 échanges
-  const conversationHistory: ConversationTurn[] = trimmedHistory
-    .filter((m) => m.role !== "mentor" || m.content) // exclure les messages vides
-    .map((m) => ({
-      role: m.role === "mentor" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
-
-  // Ajout du message courant
-  conversationHistory.push({ role: "user", parts: [{ text: userMessage }] });
+  // Keep the last 10 exchanges and only well-formed turns.
+  const history = (Array.isArray(body.history) ? body.history : []).slice(-20).flatMap((entry): ConversationTurn[] => {
+    const turn = entry as { role?: unknown; content?: unknown };
+    if ((turn.role !== "user" && turn.role !== "mentor") || typeof turn.content !== "string" || !turn.content.trim()) return [];
+    return [{ role: turn.role === "mentor" ? "model" : "user", parts: [{ text: turn.content.slice(0, 4000) }] }];
+  });
+  history.push({ role: "user", parts: [{ text: userMessage }] });
 
   try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        system_instruction: {
-          parts: [{ text: SYSTEM_PROMPT }],
-        },
-        contents: conversationHistory,
-        generationConfig: {
-          temperature: 0.65,
-          maxOutputTokens: 768,
-          topP: 0.9,
-        },
-        safetySettings: [
-          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
-        ],
-      }),
+    const text = await generateContent({
+      system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents: history,
+      generationConfig: { temperature: 0.65, maxOutputTokens: 1024, topP: 0.9 },
+      safetySettings: [
+        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" },
+      ],
+    }, 30_000);
+    return NextResponse.json({
+      content: text || "Je n’ai pas pu formuler de réponse à cette question. Essaie de la reformuler.",
+      remaining: allowance.remaining,
+      limit: allowance.limit,
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error("Gemini API error:", response.status, errorData);
-      return NextResponse.json(
-        { error: "L'API Gemini a retourné une erreur.", details: errorData },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    const text: string =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ??
-      "Je n'ai pas pu générer de réponse. Réessaie dans un instant.";
-
-    return NextResponse.json({ content: text });
-  } catch (err) {
-    console.error("Mentor route error:", err);
-    return NextResponse.json(
-      { error: "Erreur interne du serveur." },
-      { status: 500 }
-    );
+  } catch (error) {
+    if (error instanceof GeminiError && error.status === 429) return failure("Le mentor reçoit beaucoup de questions. Réessaie dans une minute.", 503);
+    console.error("Mentor route error", error instanceof GeminiError ? error.status : error);
+    return failure("Le mentor n’a pas pu répondre. Réessaie dans un instant.", 502);
   }
 }

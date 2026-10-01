@@ -1,65 +1,65 @@
 "use client";
 
-import { Question } from "@/types";
 import { cn } from "@/lib/utils";
+import type { QuizQuestion, QuizQuestionResult } from "@/types/api";
 
 interface QuestionCardProps {
-  question: Question;
-  selected: string | null;
-  answered: boolean;
-  onSelect: (option: string) => void;
+  question: QuizQuestion;
+  selected: string[];
+  onSelect?: (answerId: string) => void;
+  disabled?: boolean;
+  result?: QuizQuestionResult;
 }
 
-export default function QuestionCard({ question, selected, answered, onSelect }: QuestionCardProps) {
+const typeLabel = {
+  single_choice: "Choix unique",
+  multiple_choice: "Choix multiples",
+  true_false: "Vrai / faux",
+} as const;
+
+const difficultyLabel = {
+  facile: "Facile",
+  moyen: "Moyen",
+  difficile: "Difficile",
+} as const;
+
+export default function QuestionCard({ question, selected, onSelect, disabled = false, result }: QuestionCardProps) {
   return (
-    <div>
-      <h2 className="font-display text-xl font-semibold">{question.prompt}</h2>
-
-      <div className="mt-6 grid gap-3">
-        {question.options.map((option) => {
-          const isCorrect = option === question.correctAnswer;
-          const isSelected = option === selected;
-
-          let stateClasses = "border-white/10 hover:border-white/25";
-          if (answered) {
-            if (isCorrect) stateClasses = "border-cyber-green bg-cyber-green/10 text-cyber-green";
-            else if (isSelected) stateClasses = "border-cyber-red bg-cyber-red/10 text-cyber-red";
-          } else if (isSelected) {
-            stateClasses = "border-cyber-blue bg-cyber-blue/10";
-          }
-
+    <article className="question-card" aria-labelledby={`question-${question.id}`}>
+      <div className="question-card__meta"><span>{typeLabel[question.question_type]}</span><span>{difficultyLabel[question.difficulty]}</span><span>+{question.xp_reward} XP</span></div>
+      <h2 id={`question-${question.id}`}>{question.prompt}</h2>
+      {question.image_url && <img className="question-card__image" src={question.image_url} alt="Illustration de la question" loading="lazy" />}
+      <div className="question-card__answers">
+        {question.answers.map((answer) => {
+          const isSelected = (result?.selected ?? selected).includes(answer.id);
+          const isCorrect = result?.correct_answer_ids.includes(answer.id) ?? false;
+          const isWrongSelection = Boolean(result && isSelected && !isCorrect);
           return (
             <button
-              key={option}
+              key={answer.id}
               type="button"
-              disabled={answered}
-              onClick={() => onSelect(option)}
+              disabled={disabled || Boolean(result)}
+              aria-pressed={isSelected}
+              onClick={() => onSelect?.(answer.id)}
               className={cn(
-                "text-left px-5 py-3.5 rounded-xl border bg-cyber-black transition-colors disabled:cursor-default",
-                stateClasses
+                "question-card__answer",
+                isSelected && !result && "is-selected",
+                isCorrect && "is-correct",
+                isWrongSelection && "is-wrong",
               )}
             >
-              {option}
+              <span aria-hidden="true">{isCorrect ? "✓" : isWrongSelection ? "×" : isSelected ? "●" : "○"}</span>
+              {answer.label}
             </button>
           );
         })}
       </div>
-
-      {answered && (
-        <div
-          className={cn(
-            "mt-6 p-4 rounded-xl text-sm",
-            selected === question.correctAnswer
-              ? "bg-cyber-green/10 border border-cyber-green/30 text-cyber-green"
-              : "bg-cyber-red/10 border border-cyber-red/30 text-white/80"
-          )}
-        >
-          <p className="font-medium mb-1">
-            {selected === question.correctAnswer ? "Bonne réponse !" : "Pas tout à fait."}
-          </p>
-          {question.explanation}
+      {result && (
+        <div className={cn("question-card__feedback", result.correct ? "is-correct" : "is-wrong")} role="status">
+          <strong>{result.correct ? "Bonne réponse." : "À revoir."}</strong>
+          {result.explanation && <p>{result.explanation}</p>}
         </div>
       )}
-    </div>
+    </article>
   );
 }
