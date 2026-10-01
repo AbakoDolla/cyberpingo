@@ -4,6 +4,8 @@ Plateforme francophone d'apprentissage de la cybersécurité, gamifiée à la ma
 
 Le frontend est une application **Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS**. Le backend est **Supabase** : Auth, PostgreSQL avec Row Level Security, Storage, Realtime et Edge Functions.
 
+En production : **https://cyberpingo.vercel.app** (Vercel, déployé automatiquement à chaque push sur `main`).
+
 > **Pourquoi Next.js et pas Vite ?** Le projet existait déjà en Next.js. Next apporte le rendu serveur des pages publiques (SEO, partage des certificats), un middleware qui protège les routes avant tout rendu, et des routes API serveur pour les clés secrètes (Gemini). Les conventions du cahier des charges sont conservées : `VITE_SUPABASE_*` devient `NEXT_PUBLIC_SUPABASE_*`, et `src/services` devient `services/`.
 
 ## Fonctionnalités
