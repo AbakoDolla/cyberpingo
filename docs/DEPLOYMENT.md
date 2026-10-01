@@ -196,9 +196,11 @@ Sans cette variable, les boutons OAuth ne s'affichent pas. Un premier passage pa
    | `GEMINI_MODEL` | Facultatif, `gemini-2.5-flash` par défaut |
 
    Les variables `NEXT_PUBLIC_*` sont intégrées au bundle au moment du build : après une modification, redéployez.
-3. Lancez le déploiement.
+3. Lancez le déploiement. Si l'import n'en déclenche aucun, ouvrez *Deployments*, menu « ... » > *Create Deployment*, saisissez la branche `main` puis *Deploy to Production*. Les push suivants sur `main` sont déployés automatiquement.
 4. Reportez le domaine obtenu (ou votre domaine personnalisé) dans la *Site URL* et les *Redirect URLs* de Supabase (`https://<domaine>/**`), ainsi que dans les secrets `SITE_URL` et `ALLOWED_ORIGINS` des fonctions.
 5. Mettez aussi à jour les fournisseurs OAuth : *Homepage URL* de l'OAuth App GitHub, et chez Google l'origine JavaScript autorisée, la page d'accueil, les liens de confidentialité et de conditions et le domaine autorisé.
+
+Déploiement actuel : `https://cyberpingo.vercel.app`, relié au projet Supabase `gajmauudbffiqrhtpqjj`. Pour un domaine personnalisé, répétez les étapes 4 et 5 avec le nouveau domaine.
 
 Conseil : choisissez pour les fonctions Vercel (*Settings > Functions > Region*) une région proche de celle du projet Supabase pour réduire la latence du middleware et des pages serveur.
 
