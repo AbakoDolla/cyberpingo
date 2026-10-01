@@ -51,8 +51,11 @@ enable_confirmations = true
 secure_password_change = true
 max_frequency = "1m0s"
 
+# The gateway JWT check only understands legacy HS256 tokens, while new projects sign
+# sessions with asymmetric ES256 keys. Each function authenticates the caller itself
+# through auth.getUser() (see functions/_shared/http.ts) before any privileged query.
 [functions.admin-actions]
-verify_jwt = true
+verify_jwt = false
 
 [functions.generate-certificate]
-verify_jwt = true
+verify_jwt = false

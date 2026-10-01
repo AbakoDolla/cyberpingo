@@ -111,13 +111,9 @@ npx supabase secrets set SITE_URL=https://cyberpingo.example ALLOWED_ORIGINS=htt
 
 ### Vérification du JWT
 
-`config.toml` active `verify_jwt = true` pour les deux fonctions, et chaque fonction revérifie elle-même l'appelant (`auth.getUser()`) puis ses droits en base. Si le projet utilise les nouvelles clés de signature JWT asymétriques et que les appels répondent 401 alors que l'utilisateur est connecté, redéployez avec :
+`config.toml` déclare `verify_jwt = false` pour les deux fonctions. La vérification de la passerelle Supabase ne comprend que les anciens jetons HS256 ; un projet récent signe ses sessions en ES256 et la passerelle répondrait 401 à un utilisateur pourtant connecté. Chaque fonction authentifie donc elle-même l'appelant (`requireCaller()` puis `auth.getUser()`), puis contrôle ses droits en base. Un appel sans jeton valide reçoit toujours 401.
 
-```bash
-npx supabase functions deploy admin-actions generate-certificate --no-verify-jwt
-```
-
-La sécurité n'en dépend pas : la vérification applicative reste active.
+`npx supabase functions deploy` lit ce réglage dans `config.toml` : aucune option supplémentaire n'est nécessaire.
 
 > Si vous désactivez les anciennes clés `anon` / `service_role` au profit des clés `publishable` / `secret`, vérifiez après coup que les fonctions reçoivent bien les nouvelles valeurs (un appel admin réussi suffit).
 
@@ -135,6 +131,8 @@ Dans *Authentication* du Studio.
 
 Tous les liens (confirmation d'inscription, récupération de mot de passe, changement d'e-mail, OAuth) reviennent sur `/auth/callback`, qui accepte un `code` PKCE ou un couple `token_hash` + `type`. Les modèles d'e-mail par défaut fonctionnent tels quels.
 
+> En développement, ouvrez le site sur `http://localhost:3000` et non sur `http://127.0.0.1:3000`. Next.js réécrit les adresses de bouclage en `localhost` dans ses redirections : les cookies de session posés sur `127.0.0.1` seraient perdus et vous reviendriez sur `/login` après une connexion OAuth réussie. Ce cas ne se produit pas en production.
+
 ### Politique des comptes
 
 Reproduisez les réglages de `config.toml` :
@@ -149,15 +147,40 @@ Reproduisez les réglages de `config.toml` :
 
 Le service d'e-mail intégré à Supabase est réservé aux essais : débit très faible et envoi limité aux membres de l'équipe du projet. Configurez un SMTP (Resend, Brevo, Postmark, Amazon SES…) dans *Authentication > Emails > SMTP Settings* avant d'ouvrir les inscriptions.
 
-### OAuth (optionnel)
+### OAuth Google et GitHub
 
-Activez GitHub ou Google dans *Authentication > Providers* (URL de rappel fournie par Supabase à déclarer chez le fournisseur), puis listez-les côté frontend :
+Les deux fournisseurs utilisent la même URL de rappel, celle de Supabase (pas celle du site) :
 
 ```
-NEXT_PUBLIC_SUPABASE_OAUTH_PROVIDERS=github,google
+https://<project-ref>.supabase.co/auth/v1/callback
 ```
 
-Sans cette variable, les boutons OAuth ne s'affichent pas.
+**GitHub**
+
+1. Sur GitHub : *Settings > Developer settings > OAuth Apps > New OAuth App*.
+2. *Homepage URL* : l'URL du site. *Authorization callback URL* : l'URL de rappel Supabase ci-dessus.
+3. Générez un *client secret*.
+4. Dans Supabase, *Authentication > Providers > GitHub* : activez, collez le *Client ID* et le *Client Secret*.
+
+**Google**
+
+1. Dans [Google Cloud Console](https://console.cloud.google.com), créez (ou choisissez) un projet.
+2. *Google Auth Platform > Branding* : nom de l'application, e-mail d'assistance, page d'accueil (`https://<domaine>`), règles de confidentialité (`https://<domaine>/confidentialite`), conditions d'utilisation (`https://<domaine>/conditions`) et domaines autorisés (`<domaine>` et `supabase.co`).
+3. *Audience* : type *External*. Tant que l'application est en mode *Testing*, seuls les utilisateurs de test listés peuvent se connecter ; cliquez sur *Publish app* pour l'ouvrir à tous. Les portées demandées (`openid`, `email`, `profile`) ne nécessitent pas de validation par Google.
+4. *Clients > Create client* : type *Web application*.
+   - *Authorized JavaScript origins* : `https://<domaine>` et `http://localhost:3000`.
+   - *Authorized redirect URIs* : l'URL de rappel Supabase.
+5. Dans Supabase, *Authentication > Providers > Google* : activez, collez l'ID client et le code secret.
+
+**Frontend**
+
+Listez les fournisseurs actifs, dans l'ordre d'affichage des boutons :
+
+```
+NEXT_PUBLIC_SUPABASE_OAUTH_PROVIDERS=google,github
+```
+
+Sans cette variable, les boutons OAuth ne s'affichent pas. Un premier passage par OAuth crée le compte et son profil (`handle_new_user`), puis `/auth/callback` envoie l'apprenant sur `/onboarding`. Les secrets client restent dans Supabase : ne les mettez ni dans Vercel ni dans le dépôt.
 
 ## 7. Déployer le frontend sur Vercel
 
@@ -168,13 +191,14 @@ Sans cette variable, les boutons OAuth ne s'affichent pas.
    |---|---|
    | `NEXT_PUBLIC_SUPABASE_URL` | URL du projet Supabase |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé `anon`, ou à la place `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` |
-   | `NEXT_PUBLIC_SUPABASE_OAUTH_PROVIDERS` | Facultatif, par exemple `github,google` |
+   | `NEXT_PUBLIC_SUPABASE_OAUTH_PROVIDERS` | Facultatif, par exemple `google,github` |
    | `GEMINI_API_KEY` | Facultatif, active le mentor IA et l'analyse de PDF ; sans elle ces routes répondent 503 avec un message clair |
    | `GEMINI_MODEL` | Facultatif, `gemini-2.5-flash` par défaut |
 
    Les variables `NEXT_PUBLIC_*` sont intégrées au bundle au moment du build : après une modification, redéployez.
 3. Lancez le déploiement.
-4. Reportez le domaine obtenu (ou votre domaine personnalisé) dans la *Site URL* et les *Redirect URLs* de Supabase, ainsi que dans les secrets `SITE_URL` et `ALLOWED_ORIGINS` des fonctions.
+4. Reportez le domaine obtenu (ou votre domaine personnalisé) dans la *Site URL* et les *Redirect URLs* de Supabase (`https://<domaine>/**`), ainsi que dans les secrets `SITE_URL` et `ALLOWED_ORIGINS` des fonctions.
+5. Mettez aussi à jour les fournisseurs OAuth : *Homepage URL* de l'OAuth App GitHub, et chez Google l'origine JavaScript autorisée, la page d'accueil, les liens de confidentialité et de conditions et le domaine autorisé.
 
 Conseil : choisissez pour les fonctions Vercel (*Settings > Functions > Region*) une région proche de celle du projet Supabase pour réduire la latence du middleware et des pages serveur.
 
@@ -231,7 +255,11 @@ Puis `npm run typecheck` pour repérer le code à adapter.
 | Un lien d'e-mail mène à `/login?lien=expire` | URL absente des *Redirect URLs*, lien déjà utilisé ou expiré, ou ouvert dans un autre navigateur que celui de l'inscription (PKCE) | Ajouter `https://<domaine>/auth/callback**`, redemander un lien |
 | Aucun e-mail reçu | SMTP par défaut limité | Configurer un SMTP personnalisé |
 | Les cours n'apparaissent pas sur `/parcours` | Seed non chargé ou cours en brouillon | Exécuter `01_starter_content.sql`, ou publier depuis `/admin/cours` |
-| Les actions admin ou le PDF répondent 401 | Vérification JWT de la passerelle incompatible avec les clés asymétriques | Redéployer avec `--no-verify-jwt` (voir étape 5) |
+| Les actions admin ou le PDF répondent 401 | Session expirée, ou fonction déployée avec `verify_jwt = true` alors que le projet signe en ES256 | Se reconnecter ; vérifier `verify_jwt = false` dans `config.toml` puis redéployer (voir étape 5) |
+| Retour sur `/login` juste après une connexion Google ou GitHub, en local | Site ouvert sur `127.0.0.1` | Utiliser `http://localhost:3000` |
+| Google affiche « Accès bloqué » ou « app non validée » | Application Google en mode *Testing* et compte absent des utilisateurs de test | Ajouter le compte aux utilisateurs de test, ou publier l'application (*Audience > Publish app*) |
+| `redirect_uri_mismatch` chez Google ou GitHub | URL de rappel déclarée chez le fournisseur différente de `https://<project-ref>.supabase.co/auth/v1/callback` | Corriger l'URL chez le fournisseur |
+| Variables de `.env.local` ignorées sous Windows | Fichier enregistré en UTF-8 avec BOM | Réenregistrer en UTF-8 sans BOM, puis relancer `npm run dev` |
 | Erreur CORS depuis le navigateur | Domaine absent de `ALLOWED_ORIGINS` | Mettre à jour le secret ; aucun redéploiement nécessaire |
 | Le mentor IA répond « pas configuré » | `GEMINI_API_KEY` absente | L'ajouter dans Vercel puis redéployer |
 | Le temps réel n'arrive pas | Tables absentes de la publication `supabase_realtime` | Vérifier que la migration `_190400_admin` est appliquée |

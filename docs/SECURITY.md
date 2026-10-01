@@ -99,6 +99,7 @@ Supabase Auth applique en plus ses propres limites (connexion, inscription, e-ma
 
 - La clé `service_role` n'existe que dans l'environnement des Edge Functions (injectée par Supabase). Le frontend Next.js ne la connaît pas et n'en a pas besoin.
 - Chaque fonction exige un jeton `Bearer` valide (`getUser`), limite la taille du corps, valide les identifiants (UUID) et renvoie des erreurs HTTP propres.
+- `verify_jwt = false` dans `config.toml` : la vérification de la passerelle ne comprend que les anciens jetons HS256, alors que les projets récents signent les sessions en ES256. L'authentification n'est pas affaiblie pour autant : `requireCaller()` (`functions/_shared/http.ts`) appelle `auth.getUser()`, qui valide le jeton auprès de Supabase Auth avant toute requête privilégiée, et rejette tout appel sans session valide (401).
 - `generate-certificate` lit d'abord le certificat avec le client de l'utilisateur : si le RLS ne le laisse pas le voir, la génération est refusée. Un certificat révoqué ne produit pas de PDF.
 - CORS : en production, seules les origines listées dans le secret `ALLOWED_ORIGINS` sont renvoyées. Si ce secret est vide, toutes les origines sont acceptées (le jeton reste obligatoire) : renseigne-le toujours hors du développement local.
 
@@ -108,6 +109,8 @@ Supabase Auth applique en plus ses propres limites (connexion, inscription, e-ma
 - Mot de passe : 8 caractères minimum avec lettres et chiffres (`supabase/config.toml`, à reproduire dans le tableau de bord en production).
 - Confirmation d'e-mail activée, rotation des jetons de rafraîchissement activée.
 - Flux PKCE : `/auth/callback` échange le code côté serveur ; les sessions sont stockées dans des cookies gérés par `@supabase/ssr`.
+- OAuth Google et GitHub : les identifiants client vivent uniquement dans Supabase (*Authentication > Providers*). Les secrets client ne sont ni dans le dépôt ni dans Vercel. Le frontend ne connaît que la liste publique des fournisseurs (`NEXT_PUBLIC_SUPABASE_OAUTH_PROVIDERS`). Un compte OAuth reçoit le rôle `user` comme tout autre inscrit.
+- Les URL de retour acceptées sont limitées par la *Site URL* et les *Redirect URLs* de Supabase : un `redirectTo` vers un domaine non listé est ignoré.
 - Le middleware vérifie la session avec `getClaims()` (signature du JWT) et non avec les données non vérifiées du cookie.
 - Les liens de retour (`?next=`) sont filtrés pour rester dans l'application et ne jamais pointer vers `/admin` pour un apprenant.
 
@@ -123,7 +126,8 @@ Supabase Auth applique en plus ses propres limites (connexion, inscription, e-ma
 
 | Secret | Où | Jamais |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Vercel, `.env.local` | Publiques par nature, protégées par le RLS |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` ou `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Vercel, `.env.local` | Publiques par nature, protégées par le RLS |
+| Secrets client OAuth Google et GitHub | Supabase, *Authentication > Providers* | Vercel, `.env.local`, dépôt Git |
 | `GEMINI_API_KEY` | Vercel (serveur) | Préfixe `NEXT_PUBLIC_` |
 | `SUPABASE_SERVICE_ROLE_KEY` | Injectée automatiquement dans les Edge Functions | Vercel, `.env.local`, dépôt Git |
 | `SITE_URL`, `ALLOWED_ORIGINS` | `supabase secrets set` | Dépôt Git |
