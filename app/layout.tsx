@@ -10,6 +10,7 @@ import "./auth.css";
 import "./pingo.css";
 import "./system.css";
 import "./admin.css";
+import "./art.css";
 import Providers from "./providers";
 
 const spaceGrotesk = localFont({

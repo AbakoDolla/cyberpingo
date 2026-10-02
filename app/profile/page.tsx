@@ -2,6 +2,10 @@
 
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
+import BadgeMedal from "@/components/art/BadgeMedal";
+import EmptyArt from "@/components/art/EmptyArt";
+import SceneBanner from "@/components/art/SceneBanner";
+import { badgeTierFromXp } from "@/components/art/shared";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import Avatar from "@/components/ui/Avatar";
@@ -20,7 +24,6 @@ import {
   IconLogout,
   IconUpload,
 } from "@/components/ui/Icon";
-import SlugIcon from "@/components/ui/SlugIcon";
 import { useUserActions, useLearner } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
@@ -125,12 +128,12 @@ function BadgeGallery({ badges }: { badges: BadgeWithState[] }) {
         <IconAward size={22} aria-hidden="true" />
       </div>
       {badges.length === 0 ? (
-        <p className="study-empty">Aucun badge disponible pour le moment.</p>
+        <div className="study-empty"><EmptyArt kind="badges" /><p>Aucun badge disponible pour le moment.</p></div>
       ) : (
         <ul className="prof-badge-list">
           {badges.map((badge) => (
             <li key={badge.id} className={`prof-badge ${badge.earned ? "is-earned" : ""}`}>
-              <span className="prof-badge__icon"><SlugIcon name={badge.icon} size={22} /></span>
+              <span className="prof-badge__icon"><BadgeMedal icon={badge.icon} earned={badge.earned} tier={badgeTierFromXp(badge.xp_reward)} size={64} /></span>
               <span className="prof-badge__body">
                 <strong>{badge.name}</strong>
                 <span>{badge.description}</span>
@@ -351,48 +354,57 @@ function ProfileContent() {
   return (
     <div className="study-page acct-page prof-page">
       <div className="prof-shell">
-        <section className="prof-hero" aria-labelledby="prof-title">
-          <div className="prof-avatar-stage">
-            <Avatar name={profile.display_name} src={avatarPreview} size="xl" ringTone={avatarDraft ? "green" : "blue"} className="prof-avatar" />
-            {avatarDraft && <Badge tone="green" className="prof-avatar-badge">Aperçu</Badge>}
-          </div>
+        <div className="prof-profile-cover">
+          <SceneBanner variant="profile" className="prof-hero__banner">
+            <div className="prof-hero__banner-copy">
+              <h1>Profil CyberPingo</h1>
+              <p>Retrouve ton identité publique, tes récompenses et la trace visible de tes progrès dans la plateforme.</p>
+            </div>
+          </SceneBanner>
 
-          <div className="prof-identity">
-            <div className="prof-title-row">
-              <div>
-                <h1 id="prof-title">{profile.display_name}</h1>
-                <p>@{profile.username} · membre depuis le {formatDate(profile.created_at)}</p>
-              </div>
-              <div className="prof-actions">
-                <Button type="button" variant="secondary" icon={<IconEdit size={15} />} onClick={() => setEditing((current) => !current)}>
-                  {editing ? "Fermer l’édition" : "Modifier le profil"}
-                </Button>
-                <Button type="button" variant="ghost" loading={leaving} icon={<IconLogout size={15} />} onClick={() => void handleLogout()}>
-                  Déconnexion
-                </Button>
-              </div>
+          <section className="prof-hero" aria-labelledby="prof-title">
+            <div className="prof-avatar-stage">
+              <Avatar name={profile.display_name} src={avatarPreview} size="xl" ringTone={avatarDraft ? "green" : "blue"} className="prof-avatar" />
+              {avatarDraft && <Badge tone="green" className="prof-avatar-badge">Aperçu</Badge>}
             </div>
 
-            <p className="prof-bio">{profile.bio || "Ajoute une bio pour expliquer ce que tu apprends, ce que tu pratiques et le prochain défi que tu veux réussir."}</p>
-
-            <div className="prof-meta-row" aria-label="Informations du profil">
-              <span><IconAward size={16} /> {level?.title ?? "CyberPingo"}</span>
-              <span><IconClock size={16} /> Objectif {profile.daily_minutes} min/jour</span>
-              <span><IconFlame size={16} /> {streak} jour{streak > 1 ? "s" : ""} de série</span>
-              <span><IconCheck size={16} /> {levelLabel(profile.skill_level)}</span>
-            </div>
-
-            {level && (
-              <div className="prof-level-progress">
+            <div className="prof-identity">
+              <div className="prof-title-row">
                 <div>
-                  <strong>Niveau {level.level}</strong>
-                  <span>{level.next_title ? `Prochain titre : ${level.next_title}` : "Dernier palier débloqué"}</span>
+                  <h1 id="prof-title">{profile.display_name}</h1>
+                  <p>@{profile.username} · membre depuis le {formatDate(profile.created_at)}</p>
                 </div>
-                <ProgressBar value={level.progress_percentage} tone="brand" height="sm" label="Progression vers le niveau suivant" />
+                <div className="prof-actions">
+                  <Button type="button" variant="secondary" icon={<IconEdit size={15} />} onClick={() => setEditing((current) => !current)}>
+                    {editing ? "Fermer l’édition" : "Modifier le profil"}
+                  </Button>
+                  <Button type="button" variant="ghost" loading={leaving} icon={<IconLogout size={15} />} onClick={() => void handleLogout()}>
+                    Déconnexion
+                  </Button>
+                </div>
               </div>
-            )}
-          </div>
-        </section>
+
+              <p className="prof-bio">{profile.bio || "Ajoute une bio pour expliquer ce que tu apprends, ce que tu pratiques et le prochain défi que tu veux réussir."}</p>
+
+              <div className="prof-meta-row" aria-label="Informations du profil">
+                <span><IconAward size={16} /> {level?.title ?? "CyberPingo"}</span>
+                <span><IconClock size={16} /> Objectif {profile.daily_minutes} min/jour</span>
+                <span><IconFlame size={16} /> {streak} jour{streak > 1 ? "s" : ""} de série</span>
+                <span><IconCheck size={16} /> {levelLabel(profile.skill_level)}</span>
+              </div>
+
+              {level && (
+                <div className="prof-level-progress">
+                  <div>
+                    <strong>Niveau {level.level}</strong>
+                    <span>{level.next_title ? `Prochain titre : ${level.next_title}` : "Dernier palier débloqué"}</span>
+                  </div>
+                  <ProgressBar value={level.progress_percentage} tone="brand" height="sm" label="Progression vers le niveau suivant" />
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
 
         <section className="prof-edit-panel" aria-label="Avatar et édition du profil">
           <div className="prof-avatar-tools">

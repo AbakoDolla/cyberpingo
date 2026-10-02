@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import EmptyArt from "@/components/art/EmptyArt";
+import SceneBanner from "@/components/art/SceneBanner";
 import AppShell from "@/components/layout/AppShell";
 import CourseCard from "@/components/courses/CourseCard";
 import Button from "@/components/ui/Button";
@@ -41,16 +43,18 @@ function CoursesView() {
 
   return (
     <div className="study-page course-catalogue-page">
-        <header className="study-heading study-hero course-catalogue-hero">
-          <div>
-            <h1>Choisis ton prochain parcours.</h1>
-            <p>Des modules courts, des quiz de validation et une progression synchronisée avec ton compte CyberPingo.{!userId && " Parcours le catalogue librement, ton compte ne sert qu’à enregistrer ta progression."}</p>
-          </div>
-          <div className="study-hero__panel" aria-live="polite">
-            <strong>{data?.courses.length ?? 0}</strong>
-            <span>parcours publiés</span>
-            {userId && <small>{completedCount} terminé{completedCount > 1 ? "s" : ""} · {enrolledCount} démarré{enrolledCount > 1 ? "s" : ""}</small>}
-          </div>
+        <header>
+          <SceneBanner variant="courses" className="study-heading study-hero course-catalogue-hero">
+            <div>
+              <h1>Choisis ton prochain parcours.</h1>
+              <p>Des modules courts, des quiz de validation et une progression synchronisée avec ton compte CyberPingo.{!userId && " Parcours le catalogue librement, ton compte ne sert qu’à enregistrer ta progression."}</p>
+            </div>
+            <div className="study-hero__panel" aria-live="polite">
+              <strong>{data?.courses.length ?? 0}</strong>
+              <span>parcours publiés</span>
+              {userId && <small>{completedCount} terminé{completedCount > 1 ? "s" : ""} · {enrolledCount} démarré{enrolledCount > 1 ? "s" : ""}</small>}
+            </div>
+          </SceneBanner>
         </header>
 
         <section className="study-filters course-filters" aria-label="Filtres des parcours">
@@ -62,7 +66,7 @@ function CoursesView() {
 
         {loading && <div className="course-card-grid" role="status" aria-label="Chargement des cours">{Array.from({ length: 6 }, (_, index) => <div key={index} className="course-card-skeleton"><span /><strong /><p /><p /></div>)}</div>}
         {error && !loading && <div className="study-empty" role="alert"><h2>Impossible de charger les cours.</h2><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
-        {!loading && !error && data && data.courses.length === 0 && <div className="study-empty"><h2>Aucun cours disponible pour le moment.</h2></div>}
+        {!loading && !error && data && data.courses.length === 0 && <div className="study-empty"><EmptyArt kind="courses" /><h2>Aucun cours disponible pour le moment.</h2></div>}
         {!loading && !error && data && data.courses.length > 0 && (
           <>
             <p className="study-result-count" role="status">{filtered.length} parcours trouvé{filtered.length > 1 ? "s" : ""}</p>
@@ -71,7 +75,7 @@ function CoursesView() {
                 {filtered.map((course) => <CourseCard key={course.id} course={course} href={`/courses/${course.slug}`} progress={progressByCourse.get(course.id)} publicView={!userId} />)}
               </div>
             ) : (
-              <div className="study-empty"><h2>Aucun parcours ne correspond à tes filtres.</h2><button type="button" className="study-link" onClick={() => { setQuery(""); setLevel(""); setCategory(""); setProgressState(""); }}>Effacer les filtres</button></div>
+              <div className="study-empty"><EmptyArt kind="search" /><h2>Aucun parcours ne correspond à tes filtres.</h2><button type="button" className="study-link" onClick={() => { setQuery(""); setLevel(""); setCategory(""); setProgressState(""); }}>Effacer les filtres</button></div>
             )}
           </>
         )}

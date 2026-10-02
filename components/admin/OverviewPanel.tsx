@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import SceneBanner from "@/components/art/SceneBanner";
 import { formatNumber, plural } from "@/lib/format";
 import type { AdminOverview } from "@/types/api";
 import { IconActivity, IconAward, IconBolt, IconCertificate, IconCourses, IconMail, IconProfile, IconUsers } from "@/components/ui/Icon";
@@ -36,6 +37,17 @@ export default function OverviewPanel({ overview }: { overview: AdminOverview | 
     { href: "/admin/import", label: "Importer un parcours", detail: "Créer un brouillon depuis un contenu" },
   ];
   return <div className="space-y-6">
+    <SceneBanner variant="admin" className="adm-overview-hero">
+      <div>
+        <h2 className="adm-page-title">Pilotage en direct</h2>
+        <p className="adm-page-description">Surveille la cadence des inscriptions, les contenus publiés et les signaux d’exploitation depuis une vue unique pensée pour l’équipe.</p>
+      </div>
+      <div className="adm-overview-hero__stats" aria-label="Résumé opérationnel">
+        <div className="adm-overview-hero__stat"><strong>{formatNumber(overview.users_total)}</strong><span>comptes</span></div>
+        <div className="adm-overview-hero__stat"><strong>{formatNumber(overview.courses.published)}</strong><span>cours publiés</span></div>
+        <div className="adm-overview-hero__stat"><strong>{formatNumber(overview.messages_new)}</strong><span>messages neufs</span></div>
+      </div>
+    </SceneBanner>
     <div className="adm-metric-grid">
       <Metric label="Comptes" value={formatNumber(overview.users_total)} detail={`+${formatNumber(overview.new_users_7d)} sur 7 j · ${formatNumber(overview.staff_total)} staff`} Icon={IconUsers} href="/admin/utilisateurs" />
       <Metric label="En ligne" value={formatNumber(overview.online_now)} detail={`${formatNumber(overview.active_24h)} actifs sur 24 h`} Icon={IconActivity} tone="adm-tone-green" />

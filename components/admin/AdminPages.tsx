@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import CourseArt from "@/components/art/CourseArt";
 import { errorMessage } from "@/lib/errors";
 import { formatDateTime, formatDuration, formatNumber, formatRelative, levelLabel, plural } from "@/lib/format";
 import { isSuperadmin, ROLE_LABELS, type Role } from "@/lib/roles";
@@ -414,8 +416,24 @@ function CourseRowCard({ course, onDeleted }: { course: AdminCourseListItem; onD
   }
   return (
     <article className="adm-list-row p-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="min-w-0">
+      <div className="adm-course-row">
+        <div className="adm-row-art" aria-hidden="true">
+          <div className="adm-row-art__media">
+            {course.thumbnail_url ? (
+              <Image
+                src={course.thumbnail_url}
+                alt=""
+                fill
+                unoptimized
+                sizes="(max-width: 720px) 100vw, 104px"
+                className="adm-row-art__image"
+              />
+            ) : (
+              <CourseArt slug={course.slug} category={course.category} className="adm-row-art__art" />
+            )}
+          </div>
+        </div>
+        <div className="adm-course-row__copy min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Link href={`/admin/cours/${course.id}`} className="font-display text-lg font-semibold text-white hover:text-cyan-100">{course.title}</Link>
             <StatusBadge status={course.status} />

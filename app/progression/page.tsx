@@ -2,6 +2,10 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
+import BadgeMedal from "@/components/art/BadgeMedal";
+import EmptyArt from "@/components/art/EmptyArt";
+import SceneBanner from "@/components/art/SceneBanner";
+import { badgeTierFromXp } from "@/components/art/shared";
 import AppShell from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -138,7 +142,7 @@ function ActivityChart({ activity }: { activity: LearnerStats["activity"] }) {
         <IconActivity size={18} />
       </div>
       {activity.length === 0 ? (
-        <p className="prog-empty">Aucune activité enregistrée pour le moment.</p>
+        <div className="prog-empty prog-empty--art"><EmptyArt kind="activity" /><p>Aucune activité enregistrée pour le moment.</p></div>
       ) : (
         <div className="prog-activity-grid" aria-label="Activité quotidienne">
           {activity.map((day) => {
@@ -165,6 +169,7 @@ function CourseProgressList({ courses, catalog }: { courses: CourseProgress[]; c
   if (courses.length === 0) {
     return (
       <section className="prog-empty-card">
+        <EmptyArt kind="courses" />
         <IconLesson size={28} />
         <h2>Aucun parcours démarré.</h2>
         <p>Commence ton premier parcours pour suivre tes leçons, quiz et certificats ici.</p>
@@ -253,13 +258,13 @@ function BadgeGallery({ badges }: { badges: BadgeWithState[] }) {
         <IconAward size={18} />
       </div>
       {badges.length === 0 ? (
-        <p className="prog-empty">Aucun badge disponible pour le moment.</p>
+        <div className="prog-empty prog-empty--art"><EmptyArt kind="badges" /><p>Aucun badge disponible pour le moment.</p></div>
       ) : (
         <div className="prog-badge-grid">
           {badges.map((badge) => (
             <article key={badge.id} className={`prog-badge ${badge.earned ? "is-earned" : "is-locked"}`}>
               <span className="prog-badge-icon">
-                <SlugIcon name={badge.icon} size={22} />
+                <BadgeMedal icon={badge.icon} earned={badge.earned} tier={badgeTierFromXp(badge.xp_reward)} size={64} />
               </span>
               <div>
                 <div className="prog-badge-head">
@@ -420,14 +425,16 @@ function ProgressionContent() {
 
   return (
     <div className="prog-page">
-      <header className="prog-hero">
-        <div>
-          <h1>Ta progression, {profile.display_name}</h1>
-          <p>
-            Tout ce que tu as gagné sur CyberPingo&nbsp;: niveaux, XP, rythme, badges, certificats et parcours actifs.
-          </p>
-        </div>
-        <Link href="/parametres" className="study-button study-button--ghost">Objectif&nbsp;: {profile.daily_minutes} min / jour</Link>
+      <header>
+        <SceneBanner variant="progression" className="prog-hero">
+          <div>
+            <h1>Ta progression, {profile.display_name}</h1>
+            <p>
+              Tout ce que tu as gagné sur CyberPingo&nbsp;: niveaux, XP, rythme, badges, certificats et parcours actifs.
+            </p>
+          </div>
+          <Link href="/parametres" className="study-button study-button--ghost">Objectif&nbsp;: {profile.daily_minutes} min / jour</Link>
+        </SceneBanner>
       </header>
 
       <section className="prog-overview" aria-label="Résumé du niveau">

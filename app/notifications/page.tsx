@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import EmptyArt from "@/components/art/EmptyArt";
+import SceneBanner from "@/components/art/SceneBanner";
 import AppShell from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -279,17 +281,19 @@ function NotificationsContent() {
 
   return (
     <div className="study-page acct-page notif-page">
-      <header className="notif-hero">
-        <div>
-          <h1>Centre de notifications</h1>
-          <p>Récompenses, rappels de série, certificats et annonces arrivent ici en temps réel.</p>
-        </div>
-        <div className="notif-summary" aria-label="Résumé des notifications">
-          <IconBell size={24} aria-hidden="true" />
-          <strong>{unread}</strong>
-          <span>non lue{unread > 1 ? "s" : ""}</span>
-          <small>{notifications.length} au total</small>
-        </div>
+      <header>
+        <SceneBanner variant="notifications" className="notif-hero">
+          <div>
+            <h1>Centre de notifications</h1>
+            <p>Récompenses, rappels de série, certificats et annonces arrivent ici en temps réel.</p>
+          </div>
+          <div className="notif-summary" aria-label="Résumé des notifications">
+            <IconBell size={24} aria-hidden="true" />
+            <strong>{unread}</strong>
+            <span>non lue{unread > 1 ? "s" : ""}</span>
+            <small>{notifications.length} au total</small>
+          </div>
+        </SceneBanner>
       </header>
 
       <section className="notif-toolbar" aria-label="Actions sur les notifications">
@@ -322,13 +326,13 @@ function NotificationsContent() {
 
       {notifications.length === 0 ? (
         <section className="notif-empty">
-          <IconBell size={30} aria-hidden="true" />
+          <EmptyArt kind="notifications" />
           <h2>Aucune notification pour le moment.</h2>
           <p>Tes récompenses, rappels et certificats apparaîtront ici dès qu’ils seront disponibles.</p>
         </section>
       ) : groups.length === 0 ? (
         <section className="notif-empty">
-          <IconBell size={30} aria-hidden="true" />
+          <EmptyArt kind="search" />
           <h2>Aucun résultat avec ce filtre.</h2>
           <p>Change de filtre ou marque les notifications comme lues pour clarifier la liste.</p>
         </section>

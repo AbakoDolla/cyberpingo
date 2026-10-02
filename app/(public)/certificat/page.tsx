@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import SceneBanner from "@/components/art/SceneBanner";
 import CertificateLookupForm from "./CertificateLookupForm";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ export default async function CertificateLookupPage({ searchParams }: { searchPa
 
   return (
     <div className="public-container inner-page">
-      <header className="page-heading page-heading--split">
+      <SceneBanner variant="certificate" anchor="end" className="page-heading page-heading--split">
         <div>
           <h1>Vérifier un certificat CyberPingo.</h1>
           <p>Saisis le code imprimé sur le certificat, ou scanne son QR code. Le résultat est lu en direct dans la base CyberPingo.</p>
@@ -28,7 +29,7 @@ export default async function CertificateLookupPage({ searchParams }: { searchPa
             <li>Révocation visible immédiatement.</li>
           </ul>
         </aside>
-      </header>
+      </SceneBanner>
       <CertificateLookupForm />
     </div>
   );

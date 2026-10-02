@@ -1,0 +1,614 @@
+/* CyberPingo art layer: SVG illustrations, scene banners, medals, empty states. */
+
+/* ---------- Core canvas ---------- */
+.cp-art {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #040d1f;
+}
+.cp-art__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.cp-art__pulse,
+.cp-art__scan,
+.cp-art__float {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-play-state: paused;
+}
+.cp-art__pulse { animation: cp-pulse 3.6s ease-in-out infinite; }
+.cp-art__pulse--alt { animation-duration: 4.8s; animation-direction: reverse; }
+.cp-art__pulse:nth-child(3n) { animation-delay: -1.1s; }
+.cp-art__pulse:nth-child(3n + 1) { animation-delay: -2.3s; }
+.cp-art__pulse:nth-child(5n) { animation-delay: -0.4s; }
+.cp-art__pulse:nth-child(7n) { animation-delay: -2.9s; }
+.cp-art__scan { animation: cp-scan 5.2s var(--cp-ease) infinite; }
+.cp-art__float { animation: cp-float 7s ease-in-out infinite; }
+.cp-art__float--alt { animation-duration: 9s; animation-delay: -3s; }
+
+/* Motion runs where the art is a hero, or on hover for cards. */
+.cp-scene-banner .cp-art__pulse,
+.cp-scene-banner .cp-art__scan,
+.cp-scene-banner .cp-art__float,
+.course-detail-hero__art .cp-art__pulse,
+.course-detail-hero__art .cp-art__scan,
+.course-detail-hero__art .cp-art__float,
+.lab-hero__art .cp-art__pulse,
+.lab-hero__art .cp-art__scan,
+.lab-hero__art .cp-art__float,
+.cp-empty-art .cp-art__pulse,
+.cp-empty-art .cp-art__float,
+.course-card-link:hover .cp-art__pulse,
+.course-card-link:hover .cp-art__scan,
+.course-card-link:hover .cp-art__float,
+.lab-card:hover .cp-art__pulse,
+.lab-card:hover .cp-art__scan,
+.lab-card:hover .cp-art__float,
+.lab-card:focus-within .cp-art__pulse,
+.lab-card:focus-within .cp-art__scan,
+.course-card-link:focus-visible .cp-art__pulse {
+  animation-play-state: running;
+}
+
+@keyframes cp-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+@keyframes cp-scan {
+  0% { opacity: 0.15; transform: translateX(-10px); }
+  45% { opacity: 0.9; transform: translateX(10px); }
+  100% { opacity: 0.15; transform: translateX(-10px); }
+}
+@keyframes cp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+/* ---------- Scene banners ---------- */
+.cp-scene-banner {
+  --banner-accent: var(--cp-cyan);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-width: 0;
+  padding: clamp(22px, 3.6vw, 34px);
+  border: 1px solid color-mix(in srgb, var(--banner-accent) 30%, var(--cp-line));
+  border-radius: 26px;
+  background: #040d1f;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+.cp-scene-banner--dashboard { --banner-accent: var(--cp-cyan); }
+.cp-scene-banner--courses { --banner-accent: #3b8bff; }
+.cp-scene-banner--challenges { --banner-accent: var(--cp-violet); }
+.cp-scene-banner--progression { --banner-accent: var(--cp-green); }
+.cp-scene-banner--profile { --banner-accent: var(--cp-violet); }
+.cp-scene-banner--settings { --banner-accent: #6aa7ff; }
+.cp-scene-banner--notifications { --banner-accent: var(--cp-amber); }
+.cp-scene-banner--admin { --banner-accent: var(--cp-cyan); }
+.cp-scene-banner--library { --banner-accent: #3b8bff; }
+.cp-scene-banner--certificate { --banner-accent: var(--cp-amber); }
+
+.cp-scene-banner__visual,
+.cp-scene-banner__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.cp-scene-banner__art {
+  width: 100%;
+  height: 100%;
+}
+.cp-scene-banner__veil {
+  background:
+    radial-gradient(520px 220px at 100% 0%, color-mix(in srgb, var(--banner-accent) 18%, transparent), transparent 72%),
+    linear-gradient(90deg, rgba(2, 8, 23, 0.95) 0%, rgba(2, 8, 23, 0.8) 40%, rgba(2, 8, 23, 0.2) 80%, rgba(2, 8, 23, 0) 100%),
+    linear-gradient(0deg, rgba(2, 8, 23, 0.5), transparent 45%);
+}
+.cp-scene-banner > :not(.cp-scene-banner__visual):not(.cp-scene-banner__veil) {
+  position: relative;
+  z-index: 1;
+}
+.cp-scene-banner h1,
+.cp-scene-banner h2 { text-shadow: 0 2px 18px rgba(2, 8, 23, 0.7); }
+
+.study-hero.cp-scene-banner {
+  gap: clamp(18px, 3vw, 32px);
+}
+.study-hero.cp-scene-banner::after { z-index: 1; }
+.study-hero.cp-scene-banner .study-hero__panel {
+  background: rgba(3, 12, 28, 0.78);
+  border-color: color-mix(in srgb, var(--banner-accent) 28%, var(--cp-line));
+}
+
+.set-hero.cp-scene-banner,
+.notif-hero.cp-scene-banner,
+.prog-hero.cp-scene-banner {
+  margin-bottom: 24px;
+}
+.prog-hero.cp-scene-banner { align-items: flex-end; flex-wrap: wrap; }
+.notif-hero.cp-scene-banner,
+.set-hero.cp-scene-banner { flex-wrap: wrap; }
+
+/* ---------- Profile cover ---------- */
+.prof-profile-cover {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+.prof-hero__banner {
+  min-height: clamp(190px, 26vw, 250px);
+  padding-bottom: clamp(70px, 9vw, 88px);
+  border-radius: 28px;
+}
+.prof-hero__banner-copy { max-width: 56ch; }
+.prof-hero__banner-copy h1 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: clamp(30px, 4.6vw, 54px);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.prof-hero__banner-copy p {
+  margin-top: 12px;
+  color: var(--cp-muted);
+  line-height: 1.7;
+}
+.prof-profile-cover > .prof-hero {
+  position: relative;
+  z-index: 2;
+  margin: clamp(-64px, -6vw, -44px) clamp(10px, 2.4vw, 26px) 0;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.42);
+}
+
+/* ---------- Course and lab cards ---------- */
+.course-card__cover,
+.lab-card__cover {
+  position: relative;
+  z-index: 0;
+  flex: 0 0 auto;
+  margin: -22px -22px 0;
+  aspect-ratio: 16 / 9;
+  min-width: 0;
+}
+.course-card__cover-media,
+.lab-card__cover-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: calc(var(--cp-radius) - 1px) calc(var(--cp-radius) - 1px) 0 0;
+  background: #040d1f;
+}
+.course-card__cover-media > *,
+.lab-card__cover-media > * {
+  transition: transform 520ms var(--cp-ease);
+}
+.course-card-link:hover .course-card__cover-media > *,
+.lab-card:hover .lab-card__cover-media > * {
+  transform: scale(1.055);
+}
+.course-card__cover-art,
+.lab-card__cover-art,
+.course-card__cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.course-card__cover-media::after,
+.lab-card__cover-media::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(2, 8, 23, 0.6) 0%, transparent 40%, transparent 60%, rgba(7, 20, 38, 0.9) 100%);
+  content: "";
+  pointer-events: none;
+}
+.course-card__cover-top,
+.lab-card__cover-top {
+  position: absolute;
+  inset: 12px 12px auto;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.course-card__cover-badges,
+.lab-card__cover-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.course-card__cover-top .ui-badge,
+.lab-card__cover-top .ui-badge {
+  background: linear-gradient(rgba(3, 12, 28, 0.8), rgba(3, 12, 28, 0.8));
+}
+.course-card__medal {
+  position: absolute;
+  bottom: -30px;
+  left: 20px;
+  z-index: 2;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.5));
+  transition: transform 220ms var(--cp-ease);
+}
+.course-card-link:hover .course-card__medal { transform: translateY(-3px) rotate(-4deg); }
+.course-card__cover + .course-card__body { margin-top: 14px; }
+
+/* ---------- Detail heroes ---------- */
+.course-detail-hero__visual,
+.lab-hero__visual {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  min-height: clamp(300px, 36vw, 380px);
+  overflow: hidden;
+  padding: clamp(22px, 3.4vw, 38px);
+  border: 1px solid var(--cp-line-strong);
+  border-radius: 26px;
+  background: #040d1f;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.34);
+}
+.lab-hero--visual {
+  padding: 0;
+  overflow: hidden;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.course-detail-hero__media,
+.lab-hero__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.course-detail-hero__media::after,
+.lab-hero__media::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(2, 8, 23, 0.95) 0%, rgba(2, 8, 23, 0.72) 48%, rgba(2, 8, 23, 0.18) 100%),
+    linear-gradient(0deg, rgba(2, 8, 23, 0.7), transparent 55%);
+  content: "";
+  pointer-events: none;
+}
+.course-detail-hero__art,
+.lab-hero__art,
+.course-detail-hero__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.course-detail-hero__content,
+.lab-hero__content {
+  position: relative;
+  z-index: 1;
+  max-width: 64ch;
+  min-width: 0;
+}
+.course-detail-hero__facts,
+.lab-hero__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+.course-detail-hero__facts span,
+.lab-hero__facts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid var(--cp-line);
+  border-radius: 999px;
+  background: rgba(3, 12, 28, 0.74);
+  color: #d7e8fb;
+  font-size: 13px;
+  font-weight: 600;
+}
+.course-detail-hero__progress-inline {
+  display: grid;
+  gap: 8px;
+  max-width: 360px;
+  margin-top: 18px;
+}
+.course-detail-hero__progress-inline > div:first-child {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--cp-muted);
+  font-size: 13px;
+}
+.course-detail-hero__progress-inline strong { color: var(--cp-text); font-size: 15px; }
+
+/* ---------- Badge medals ---------- */
+.cp-badge-medal {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: var(--badge-size, 72px);
+  height: var(--badge-size, 72px);
+}
+.cp-badge-medal__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.cp-badge-medal.is-earned .cp-badge-medal__svg {
+  filter: drop-shadow(0 8px 12px color-mix(in srgb, var(--badge-glow) 38%, transparent));
+}
+.cp-badge-medal__glyph {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  color: var(--badge-glyph);
+  margin-top: -2px;
+}
+.cp-badge-medal__shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  clip-path: polygon(50% 7%, 82% 25%, 82% 62.5%, 50% 93%, 18% 62.5%, 18% 25%);
+  pointer-events: none;
+}
+.cp-badge-medal__shine::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  content: "";
+  animation: cp-medal-shine 5.4s var(--cp-ease) infinite;
+}
+@keyframes cp-medal-shine {
+  0% { transform: translateX(0); }
+  38%, 100% { transform: translateX(520%); }
+}
+.cp-badge-medal.is-locked .cp-badge-medal__svg {
+  filter: grayscale(1) brightness(0.6);
+  opacity: 0.8;
+}
+.cp-badge-medal.is-locked .cp-badge-medal__glyph { color: rgba(176, 193, 223, 0.5); }
+.cp-badge-medal__lock {
+  position: absolute;
+  right: 6%;
+  bottom: 6%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 36%;
+  aspect-ratio: 1;
+  border: 1px solid var(--cp-line-strong);
+  border-radius: 50%;
+  background: var(--cp-surface);
+  color: var(--cp-muted);
+}
+
+.prof-badge .prof-badge__icon,
+.prog-badge .prog-badge-icon,
+.prog-badge.is-earned .prog-badge-icon {
+  display: grid;
+  width: auto;
+  height: auto;
+  place-items: center;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.prog-badge { grid-template-columns: 64px minmax(0, 1fr); }
+
+/* ---------- Empty states ---------- */
+.cp-empty-art {
+  flex: 0 0 auto;
+  width: clamp(112px, 22vw, 156px);
+  margin-inline: auto;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--cp-line);
+  border-radius: 28px;
+}
+.study-empty {
+  justify-items: center;
+  text-align: center;
+}
+.study-empty h2,
+.study-empty p { max-width: 46ch; }
+.prog-empty--art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+.notif-empty .cp-empty-art { color: inherit; }
+
+/* ---------- Admin ---------- */
+.adm-page-header.cp-scene-banner {
+  flex-wrap: wrap;
+  min-height: 124px;
+  align-items: flex-end;
+}
+.adm-overview-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+.adm-overview-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: 10px;
+}
+.adm-overview-hero__stat {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--cp-line);
+  border-radius: 14px;
+  background: rgba(3, 12, 28, 0.76);
+}
+.adm-overview-hero__stat strong {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: clamp(1.3rem, 2.4vw, 1.75rem);
+  line-height: 1.1;
+}
+.adm-overview-hero__stat span { color: var(--cp-muted); font-size: 12px; }
+
+.adm-list-icon.is-art {
+  position: relative;
+  width: 76px;
+  height: 46px;
+  overflow: hidden;
+  border: 1px solid var(--cp-line);
+  border-radius: 12px;
+  background: #040d1f;
+}
+.adm-list-icon.is-medal {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+}
+.adm-list-icon__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.adm-course-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+}
+.adm-row-art {
+  position: relative;
+  flex: 0 0 auto;
+  width: 108px;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--cp-line);
+  border-radius: 14px;
+  background: #040d1f;
+}
+.adm-row-art__media { position: absolute; inset: 0; }
+.adm-row-art__art,
+.adm-row-art__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.adm-course-row__copy { flex: 1 1 220px; min-width: 0; }
+.adm-course-row .adm-row-actions { margin-left: auto; }
+
+/* ---------- Mascot placements ---------- */
+.dash-hero-pingo {
+  position: absolute;
+  right: clamp(4px, 2vw, 28px);
+  bottom: 0;
+  z-index: 0;
+  width: clamp(190px, 30%, 320px);
+  height: 100%;
+  min-height: 250px;
+}
+.dash-hero-copy .dash-profile-line { max-width: calc(100% - clamp(200px, 32%, 340px)); }
+.mentor-pingo {
+  flex: 0 0 auto;
+  width: 88px;
+  height: 104px;
+  margin: -8px -4px -10px 0;
+}
+
+@media (max-width: 860px) {
+  .dash-hero-pingo {
+    position: relative;
+    right: auto;
+    width: min(100%, 320px);
+    height: 230px;
+    min-height: 0;
+    margin: 12px auto 0;
+  }
+  .dash-hero-copy .dash-profile-line { max-width: none; }
+}
+@media (max-width: 700px) {
+  .mentor-pingo { width: 96px; height: 108px; margin: -4px 0 0; }
+}
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .course-detail-hero--visual { grid-template-columns: minmax(0, 1fr); }
+  .adm-overview-hero { grid-template-columns: minmax(0, 1fr); }
+  .cp-scene-banner__veil {
+    background:
+      linear-gradient(180deg, rgba(2, 8, 23, 0.86), rgba(2, 8, 23, 0.78)),
+      radial-gradient(420px 200px at 100% 0%, color-mix(in srgb, var(--banner-accent) 16%, transparent), transparent 72%);
+  }
+  .course-detail-hero__media::after,
+  .lab-hero__media::after {
+    background: linear-gradient(180deg, rgba(2, 8, 23, 0.7), rgba(2, 8, 23, 0.9));
+  }
+}
+@media (max-width: 560px) {
+  .cp-scene-banner { border-radius: 22px; }
+  .course-detail-hero__visual,
+  .lab-hero__visual { min-height: 0; border-radius: 22px; }
+  .adm-course-row { align-items: flex-start; }
+  .adm-row-art { width: 100%; max-width: 220px; }
+  .adm-course-row .adm-row-actions { margin-left: 0; }
+  .prof-profile-cover > .prof-hero { margin-inline: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-art__pulse,
+  .cp-art__scan,
+  .cp-art__float,
+  .cp-badge-medal__shine::before { animation: none; }
+  .course-card__cover-media > *,
+  .lab-card__cover-media > *,
+  .course-card__medal { transition: none; }
+  .course-card-link:hover .course-card__cover-media > *,
+  .lab-card:hover .lab-card__cover-media > *,
+  .course-card-link:hover .course-card__medal { transform: none; }
+}
+
+/* ---------- Public page headings ---------- */
+.page-heading.cp-scene-banner {
+  max-width: none;
+  background: #040d1f;
+  box-shadow: 0 24px 70px rgba(0, 10, 36, 0.34);
+}
+.page-heading.cp-scene-banner::after { display: none; }
+.page-heading.cp-scene-banner .page-heading-panel {
+  background: #051325;
+  border-color: color-mix(in srgb, var(--banner-accent) 30%, var(--cp-line));
+}
+.page-heading.cp-scene-banner .cp-scene-banner__veil {
+  background:
+    linear-gradient(90deg, rgba(2, 8, 23, 0.95) 0%, rgba(2, 8, 23, 0.72) 48%, rgba(2, 8, 23, 0.16) 100%),
+    linear-gradient(0deg, rgba(2, 8, 23, 0.45), transparent 50%);
+}
+
+@media (max-width: 767px) {
+  .page-heading.cp-scene-banner .cp-scene-banner__visual { opacity: 0.32; }
+  .page-heading.cp-scene-banner .cp-scene-banner__veil {
+    background: linear-gradient(180deg, rgba(2, 8, 23, 0.82), rgba(2, 8, 23, 0.9));
+  }
+}

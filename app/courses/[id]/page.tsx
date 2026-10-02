@@ -1,8 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import CourseArt from "@/components/art/CourseArt";
+import EmptyArt from "@/components/art/EmptyArt";
 import AppShell, { loginHref } from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -108,16 +111,43 @@ function CourseDetailView() {
           <>
             {course.status === "draft" && <div className="learning-banner learning-banner--preview">Aperçu brouillon : seuls les membres de l’équipe peuvent ouvrir ce parcours. Aucun XP ne sera accordé.</div>}
             {course.status === "archived" && <div className="learning-banner">Ce parcours est archivé. Tu peux le consulter si tu étais déjà inscrit, mais il n’apparaît plus dans le catalogue public.</div>}
-            <header className="course-detail-hero">
-              <div>
-                <div className="course-detail-hero__badges">
-                  <Badge tone="blue">{levelLabel(course.level)}</Badge>
-                  <Badge tone="neutral">{course.category}</Badge>
-                  <Badge tone={course.access_level === "free" ? "green" : "purple"}>{course.access_level === "free" ? "Gratuit" : course.access_level}</Badge>
+            <header className="course-detail-hero course-detail-hero--visual">
+              <div className="course-detail-hero__visual">
+                <div className="course-detail-hero__media" aria-hidden="true">
+                  {course.thumbnail_url ? (
+                    <Image
+                      src={course.thumbnail_url}
+                      alt=""
+                      fill
+                      unoptimized
+                      sizes="(max-width: 1100px) 100vw, 66vw"
+                      className="course-detail-hero__image"
+                    />
+                  ) : (
+                    <CourseArt slug={course.slug} category={course.category} className="course-detail-hero__art" />
+                  )}
                 </div>
-                <h1>{course.title}</h1>
-                <p>{course.description}</p>
-                {data.progress?.last_activity_at && <p className="course-detail-hero__activity">Dernière activité {formatRelative(data.progress.last_activity_at)}</p>}
+                <div className="course-detail-hero__content">
+                  <div className="course-detail-hero__badges">
+                    <Badge tone="blue">{levelLabel(course.level)}</Badge>
+                    <Badge tone="neutral">{course.category}</Badge>
+                    <Badge tone={course.access_level === "free" ? "green" : "purple"}>{course.access_level === "free" ? "Gratuit" : course.access_level}</Badge>
+                  </div>
+                  <h1>{course.title}</h1>
+                  <p>{course.description}</p>
+                  <div className="course-detail-hero__facts" aria-label="Informations clés">
+                    <span><IconClock size={15} /> {formatDuration(course.estimated_duration)}</span>
+                    <span><IconLesson size={15} /> {course.module_count} {plural(course.module_count, "module")} · {course.lesson_count} {plural(course.lesson_count, "leçon")}</span>
+                    <span><IconBolt size={15} /> {course.quiz_count} quiz · +{course.completion_xp} XP</span>
+                  </div>
+                  {data.progress && (
+                    <div className="course-detail-hero__progress-inline" aria-label="Progression du parcours">
+                      <div><span>Progression</span><strong>{progressValue} %</strong></div>
+                      <ProgressBar value={progressValue} tone={data.progress.status === "completed" ? "green" : "blue"} height="sm" />
+                    </div>
+                  )}
+                  {data.progress?.last_activity_at && <p className="course-detail-hero__activity">Dernière activité {formatRelative(data.progress.last_activity_at)}</p>}
+                </div>
               </div>
               <aside className="course-detail-hero__panel">
                 <span><IconClock size={16} /> {formatDuration(course.estimated_duration)}</span>
@@ -152,7 +182,7 @@ function CourseDetailView() {
 
             <section className="course-outline" aria-labelledby="modules-title">
               <h2 id="modules-title">Programme du parcours</h2>
-              {course.modules.length === 0 ? <div className="study-empty"><p>Aucune leçon disponible pour le moment.</p></div> : course.modules.map((module) => {
+              {course.modules.length === 0 ? <div className="study-empty"><EmptyArt kind="courses" /><p>Aucune leçon disponible pour le moment.</p></div> : course.modules.map((module) => {
                 const moduleStats = moduleProgress(module, completedLessons);
                 return (
                 <article key={module.id} className="course-outline__module">

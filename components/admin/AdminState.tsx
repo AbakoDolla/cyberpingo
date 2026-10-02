@@ -1,17 +1,20 @@
 "use client";
 
+import SceneBanner from "@/components/art/SceneBanner";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 
 /** `eyebrow` is accepted for older callers but intentionally not rendered: the heading carries the page. */
 export function AdminPageHeader({ title, description, action }: { eyebrow?: string; title: string; description?: string; action?: React.ReactNode }) {
   return (
-    <header className="adm-page-header">
-      <div className="min-w-0">
-        <h1 className="adm-page-title">{title}</h1>
-        {description && <p className="adm-page-description">{description}</p>}
-      </div>
-      {action && <div className="adm-page-action">{action}</div>}
+    <header>
+      <SceneBanner variant="admin" className="adm-page-header">
+        <div className="min-w-0">
+          <h1 className="adm-page-title">{title}</h1>
+          {description && <p className="adm-page-description">{description}</p>}
+        </div>
+        {action && <div className="adm-page-action">{action}</div>}
+      </SceneBanner>
     </header>
   );
 }

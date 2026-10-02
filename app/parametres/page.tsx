@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import SceneBanner from "@/components/art/SceneBanner";
 import AppShell from "@/components/layout/AppShell";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
@@ -325,19 +326,21 @@ function SettingsContent() {
 
   return (
     <div className="study-page acct-page set-page">
-      <header className="set-hero">
-        <div>
-          <h1>Paramètres du compte</h1>
-          <p>Règle ton rythme d’apprentissage, tes préférences de notification, tes données et les actions sensibles depuis des sections indépendantes.</p>
-        </div>
-        <div className="set-profile-card">
-          <Avatar name={profile.display_name} src={profile.avatar_url} size="lg" />
+      <header>
+        <SceneBanner variant="settings" className="set-hero">
           <div>
-            <strong>{profile.display_name}</strong>
-            <span>@{profile.username}</span>
-            <Link href="/profile" className="study-link">Modifier l’identité publique</Link>
+            <h1>Paramètres du compte</h1>
+            <p>Règle ton rythme d’apprentissage, tes préférences de notification, tes données et les actions sensibles depuis des sections indépendantes.</p>
           </div>
-        </div>
+          <div className="set-profile-card">
+            <Avatar name={profile.display_name} src={profile.avatar_url} size="lg" />
+            <div>
+              <strong>{profile.display_name}</strong>
+              <span>@{profile.username}</span>
+              <Link href="/profile" className="study-link">Modifier l’identité publique</Link>
+            </div>
+          </div>
+        </SceneBanner>
       </header>
 
       <div className="set-layout">
