@@ -11,10 +11,10 @@ import { errorMessage } from "@/lib/errors";
 import { isSupabaseConfigured, missingConfigMessage } from "@/lib/supabase/config";
 import { signInWithEmail } from "@/services/auth.service";
 
-const notices: Record<string, { tone: "info" | "error"; text: string }> = {
+const notices: Record<string, { tone: "info" | "success" | "error"; text: string }> = {
   expire: { tone: "error", text: "Ce lien n’est plus valide ou a déjà été utilisé. Si tu viens de confirmer ton adresse, connecte-toi simplement ; sinon, demande un nouveau lien." },
-  confirme: { tone: "info", text: "Adresse confirmée ! Connecte-toi pour commencer." },
-  "mot-de-passe": { tone: "info", text: "Mot de passe modifié. Connecte-toi avec ton nouveau mot de passe." },
+  confirme: { tone: "success", text: "Adresse confirmée ! Connecte-toi pour commencer." },
+  "mot-de-passe": { tone: "success", text: "Mot de passe modifié. Connecte-toi avec ton nouveau mot de passe." },
   deconnexion: { tone: "info", text: "Tu es déconnecté. À bientôt !" },
   supprime: { tone: "info", text: "Ton compte et ta progression ont été supprimés." },
 };
@@ -45,16 +45,31 @@ function LoginForm() {
     }
   }
 
-  return <AuthLayout title="Content de te revoir" subtitle="Connecte-toi pour reprendre ta progression, sur n’importe quel appareil." footer={<>Pas encore de compte ? <Link href="/register" className="text-cyber-blue hover:underline">S’inscrire gratuitement</Link></>}>
-    {notice && <p role={notice.tone === "error" ? "alert" : "status"} className={`mb-5 rounded-xl border px-4 py-3 text-sm ${notice.tone === "error" ? "border-cyber-red/30 bg-cyber-red/10 text-red-100" : "border-cyber-green/30 bg-cyber-green/10 text-emerald-100"}`}>{notice.text}</p>}
-    <SocialAuthButtons next={next} />
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <Input label="Adresse e-mail" type="email" name="email" placeholder="toi@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
-      <div><Input label="Mot de passe" type="password" name="password" placeholder="Ton mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required /><Link href="/mot-de-passe-oublie" className="mt-2 inline-block text-sm text-cyber-blue hover:underline">Mot de passe oublié ?</Link></div>
-      {error && <p role="alert" className="text-sm text-cyber-red">{error}</p>}
-      <Button type="submit" variant="primary" className="w-full" loading={loading} disabled={!isSupabaseConfigured}>Se connecter</Button>
-    </form>
-  </AuthLayout>;
+  return (
+    <AuthLayout
+      scene="login"
+      title="Content de te revoir"
+      subtitle="Connecte-toi pour reprendre ta progression, sur n’importe quel appareil."
+      footer={<>Pas encore de compte ? <Link href="/register" className="auth-link">S’inscrire gratuitement</Link></>}
+    >
+      <div className="auth-stack">
+        {notice && <p role={notice.tone === "error" ? "alert" : "status"} className={notice.tone === "error" ? "auth-notice" : `auth-notice auth-notice--${notice.tone}`}>{notice.text}</p>}
+        <div>
+          <SocialAuthButtons next={next} />
+          <form onSubmit={handleSubmit} className="auth-form" noValidate>
+            <Input label="Adresse e-mail" type="email" name="email" placeholder="toi@exemple.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+            <div>
+              <Input label="Mot de passe" type="password" name="password" placeholder="Ton mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+              <div className="auth-forgot"><Link href="/mot-de-passe-oublie" className="auth-link">Mot de passe oublié ?</Link></div>
+            </div>
+            {error && <p role="alert" className="auth-alert">{error}</p>}
+            <Button type="submit" variant="primary" size="lg" className="auth-submit" loading={loading} disabled={!isSupabaseConfigured}>Se connecter</Button>
+            <p className="auth-keep">Tu resteras connecté sur cet appareil.</p>
+          </form>
+        </div>
+      </div>
+    </AuthLayout>
+  );
 }
 
 export default function LoginPage() {

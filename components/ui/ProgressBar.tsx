@@ -3,43 +3,34 @@ import { clamp, cn } from "@/lib/utils";
 interface ProgressBarProps {
   value: number;
   className?: string;
-  tone?: "blue" | "green" | "purple";
+  tone?: "brand" | "blue" | "green" | "purple";
   showLabel?: boolean;
   height?: "sm" | "md";
+  label?: string;
 }
-
-const toneClasses = {
-  blue: "bg-cyber-blue",
-  green: "bg-cyber-green",
-  purple: "bg-neon-purple",
-};
 
 export default function ProgressBar({
   value,
   className,
-  tone = "blue",
+  tone = "brand",
   showLabel = false,
   height = "md",
+  label = "Progression",
 }: ProgressBarProps) {
   const safeValue = clamp(value);
   return (
     <div className={cn("w-full", className)}>
       <div
         role="progressbar"
+        aria-label={label}
         aria-valuenow={safeValue}
         aria-valuemin={0}
         aria-valuemax={100}
-        className={cn(
-          "w-full bg-white/5 rounded-full overflow-hidden",
-          height === "sm" ? "h-1.5" : "h-2.5"
-        )}
+        className={cn("ui-progress", height === "sm" && "ui-progress--sm")}
       >
-        <div
-          className={cn("h-full rounded-full transition-all duration-500", toneClasses[tone])}
-          style={{ width: `${safeValue}%` }}
-        />
+        <span className={`ui-progress__fill is-${tone}`} style={{ transform: `scaleX(${safeValue / 100})` }} />
       </div>
-      {showLabel && <p className="mt-1 text-xs text-white/60">{safeValue}%</p>}
+      {showLabel && <p className="mt-1.5 text-xs text-[#b5c5df] tabular-nums">{safeValue} %</p>}
     </div>
   );
 }

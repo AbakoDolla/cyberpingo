@@ -401,9 +401,11 @@ export async function listActivityEvents(limit = 120): Promise<LiveEvent[]> {
   });
 }
 
+let adminChannelSeq = 0;
+
 export function subscribeToLearnerSessions(onChange: (row: LearnerSessionRow) => void, onDelete?: (userId: string) => void): () => void {
   const client = supabase();
-  const channel: RealtimeChannel = client.channel("admin-learner-sessions")
+  const channel: RealtimeChannel = client.channel(`admin-learner-sessions:${++adminChannelSeq}`)
     .on("postgres_changes", { event: "*", schema: "public", table: "learner_sessions" }, (payload) => {
       if (payload.eventType === "DELETE") {
         const old = payload.old as Partial<LearnerSessionRow>;
@@ -418,7 +420,7 @@ export function subscribeToLearnerSessions(onChange: (row: LearnerSessionRow) =>
 
 export function subscribeToActivityEvents(onInsert: (row: ActivityEventRow) => void): () => void {
   const client = supabase();
-  const channel: RealtimeChannel = client.channel("admin-activity-events")
+  const channel: RealtimeChannel = client.channel(`admin-activity-events:${++adminChannelSeq}`)
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "activity_events" }, (payload) => onInsert(payload.new as ActivityEventRow))
     .subscribe();
   return () => { void client.removeChannel(channel); };

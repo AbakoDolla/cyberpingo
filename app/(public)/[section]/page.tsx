@@ -3,13 +3,18 @@ import { notFound } from "next/navigation";
 import { informationPages } from "@/data/public-content";
 import { publicFaq } from "@/data/landing";
 import ContactForm from "@/components/public/ContactForm";
+import { IconChevronDown } from "@/components/ui/Icon";
 
 const specialTitles: Record<string, string> = { faq: "Les réponses avant de commencer.", contact: "Un retour peut tout améliorer." };
+const specialDescriptions: Record<string, string> = {
+  faq: "Parcours, comptes, XP et données : voici comment fonctionne CyberPingo.",
+  contact: "Signale un problème ou propose une idée : ton message arrive directement à l’équipe.",
+};
 export const dynamicParams = false;
 export function generateStaticParams() { return [...Object.keys(informationPages), "faq", "contact"].map((section) => ({ section })); }
 export async function generateMetadata({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;
-  return { title: informationPages[section]?.title ?? specialTitles[section] ?? "Page introuvable" };
+  return { title: informationPages[section]?.title ?? specialTitles[section] ?? "Page introuvable", description: informationPages[section]?.introduction ?? specialDescriptions[section] };
 }
 
 const faqExtras = [
@@ -25,10 +30,10 @@ export default async function InformationPage({ params }: { params: Promise<{ se
   const title = page?.title ?? (Object.hasOwn(specialTitles, slug) ? specialTitles[slug] : undefined);
   if (!title) notFound();
   return <div className="public-container inner-page">
-    <header className="page-heading"><h1>{title}</h1><p>{page?.introduction ?? (slug === "faq" ? "Parcours, comptes, XP et données : voici comment fonctionne CyberPingo." : "Signale un problème ou propose une idée : ton message arrive directement à l’équipe.")}</p></header>
+    <header className="page-heading"><h1>{title}</h1><p>{page?.introduction ?? specialDescriptions[slug]}</p></header>
     {page && <div className="info-sections">{page.sections.map((section) => <section key={section.title}><h2>{section.title}</h2><div><p>{section.text}</p>{section.href && <Link className="inline-link" href={section.href}>{section.link} →</Link>}</div></section>)}</div>}
-    {slug === "faq" && <div className="standalone-faq faq-questions">{[...publicFaq, ...faqExtras].map((item) => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}</div>}
+    {slug === "faq" && <section className="standalone-faq faq-questions" aria-label="Questions fréquentes">{[...publicFaq, ...faqExtras].map((item) => <details key={item.question}><summary>{item.question}<IconChevronDown size={18} /></summary><p>{item.answer}</p></details>)}</section>}
     {slug === "contact" && <div className="reading-layout"><ContactForm /><aside className="reading-aside"><h2>Un retour public ?</h2><p>Les problèmes du projet peuvent aussi être décrits dans les issues GitHub. Un compte GitHub est requis.</p><a className="inline-link" href="https://github.com/AbakoDolla/cyberpingo/issues" target="_blank" rel="noreferrer">Ouvrir les issues GitHub ↗</a><p>Pour une urgence ou un incident réel, contacte le support de ton organisation. Cette page n’est pas un service de réponse à incident.</p></aside></div>}
-    <div className="page-next"><h2>Un petit pas aujourd’hui.</h2><Link className="public-button button-primary" href="/parcours">Trouver mon parcours</Link></div>
+    <div className="page-next"><div><h2>Un petit pas aujourd’hui.</h2><p>Crée ton compte pour enregistrer tes leçons, tes quiz et tes badges.</p></div><div className="page-actions"><Link className="public-button button-primary" href="/register">Créer mon compte</Link><Link className="public-button button-outline" href="/parcours">Voir les parcours</Link></div></div>
   </div>;
 }

@@ -1,0 +1,396 @@
+/* Pingo, the CyberPingo mascot. Poses are driven by [data-state] on the root svg. */
+
+.pingo {
+  display: block;
+  overflow: visible;
+  --pingo-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pingo * {
+  transform-box: view-box;
+}
+
+.pingo__shadow {
+  fill: rgba(0, 0, 0, 0.45);
+  transform-origin: 100px 229px;
+  transition: transform 320ms var(--pingo-ease), opacity 320ms var(--pingo-ease);
+}
+
+.pingo__rig {
+  transform-origin: 100px 220px;
+  transition: transform 360ms var(--pingo-ease);
+}
+
+.pingo__body {
+  transform-origin: 100px 214px;
+  animation: pingo-breathe 3.2s ease-in-out infinite;
+}
+
+.pingo__head {
+  transform-origin: 100px 132px;
+  transition: transform 420ms var(--pingo-ease);
+}
+
+.pingo__head-bob {
+  transform-origin: 100px 132px;
+}
+
+.pingo__eyes {
+  transform-origin: 100px 88px;
+  animation: pingo-blink 4.6s ease-in-out infinite;
+  transition: opacity 160ms ease;
+}
+
+.pingo__pupils {
+  transition: transform 260ms var(--pingo-ease);
+}
+
+.pingo__eyes-happy,
+.pingo__eyes-closed,
+.pingo__brows,
+.pingo__fx {
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.pingo__glow {
+  filter: drop-shadow(0 0 2.5px rgba(0, 229, 255, 0.85));
+}
+
+.pingo__shield {
+  filter: drop-shadow(0 0 4px rgba(0, 229, 255, 0.55));
+}
+
+.pingo__arm {
+  transition: transform 420ms var(--pingo-ease);
+}
+
+.pingo__arm--left {
+  transform-origin: 64px 142px;
+}
+
+.pingo__arm--right {
+  transform-origin: 136px 142px;
+}
+
+.pingo__fx--question {
+  fill: #00e5ff;
+  font: 700 34px/1 var(--font-space-grotesk, system-ui), system-ui, sans-serif;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.7));
+}
+
+.pingo__fx--zzz {
+  fill: #b5c5df;
+  font: 700 18px/1 var(--font-space-grotesk, system-ui), system-ui, sans-serif;
+}
+
+.pingo__fx--zzz text:last-child {
+  font-size: 24px;
+}
+
+/* welcome: friendly wave */
+.pingo[data-state="welcome"] .pingo__arm--right {
+  animation: pingo-wave 0.9s ease-in-out infinite alternate;
+}
+
+.pingo[data-state="welcome"] .pingo__head {
+  transform: rotate(4deg);
+}
+
+/* typing: left flipper on the keyboard, eyes on the screen */
+.pingo[data-state="typing"] .pingo__arm--left {
+  animation: pingo-type-left 0.18s ease-in-out infinite alternate;
+}
+
+.pingo[data-state="typing"] .pingo__arm--right {
+  animation: pingo-type-right 0.22s ease-in-out infinite alternate;
+}
+
+.pingo[data-state="typing"] .pingo__pupils {
+  transform: translate(-3px, 3px);
+}
+
+.pingo[data-state="typing"] .pingo__head {
+  transform: rotate(-4deg);
+}
+
+.pingo[data-state="typing"] .pingo__head-bob {
+  animation: pingo-nod 0.44s ease-in-out infinite alternate;
+}
+
+/* happy: closed smile eyes, small hop */
+.pingo[data-state="happy"] .pingo__eyes,
+.pingo[data-state="celebrate"] .pingo__eyes {
+  opacity: 0;
+}
+
+.pingo[data-state="happy"] .pingo__eyes-happy,
+.pingo[data-state="celebrate"] .pingo__eyes-happy {
+  opacity: 1;
+}
+
+.pingo[data-state="happy"] .pingo__rig {
+  animation: pingo-hop 0.7s var(--pingo-ease) 2;
+}
+
+.pingo[data-state="happy"] .pingo__arm--left {
+  transform: rotate(32deg);
+}
+
+.pingo[data-state="happy"] .pingo__arm--right {
+  transform: rotate(-32deg);
+}
+
+/* celebrate: jump, both flippers up, stars */
+.pingo[data-state="celebrate"] .pingo__rig {
+  animation: pingo-jump 0.8s var(--pingo-ease) infinite;
+}
+
+.pingo[data-state="celebrate"] .pingo__shadow {
+  animation: pingo-shadow 0.8s var(--pingo-ease) infinite;
+}
+
+.pingo[data-state="celebrate"] .pingo__arm--left {
+  animation: pingo-cheer-left 0.4s ease-in-out infinite alternate;
+}
+
+.pingo[data-state="celebrate"] .pingo__arm--right {
+  animation: pingo-cheer-right 0.4s ease-in-out infinite alternate;
+}
+
+.pingo[data-state="celebrate"] .pingo__fx--stars {
+  opacity: 1;
+  animation: pingo-twinkle 1.2s ease-in-out infinite;
+}
+
+/* sad: worried brows, looking down */
+.pingo[data-state="sad"] .pingo__brows {
+  opacity: 1;
+}
+
+.pingo[data-state="sad"] .pingo__pupils {
+  transform: translateY(4px);
+}
+
+.pingo[data-state="sad"] .pingo__head {
+  transform: translateY(3px) rotate(-3deg);
+}
+
+.pingo[data-state="sad"] .pingo__arm--left {
+  transform: rotate(-6deg);
+}
+
+.pingo[data-state="sad"] .pingo__arm--right {
+  transform: rotate(6deg);
+}
+
+/* thinking: flipper on chin, eyes up, question mark */
+.pingo[data-state="thinking"] .pingo__head {
+  transform: rotate(-7deg);
+}
+
+.pingo[data-state="thinking"] .pingo__pupils {
+  transform: translate(3px, -4px);
+}
+
+.pingo[data-state="thinking"] .pingo__arm--right {
+  transform: rotate(140deg);
+}
+
+.pingo[data-state="thinking"] .pingo__fx--question {
+  opacity: 1;
+  animation: pingo-float 1.6s ease-in-out infinite;
+}
+
+/* explain: pointing to the content on the right */
+.pingo[data-state="explain"] .pingo__arm--right {
+  transform: rotate(-118deg);
+}
+
+.pingo[data-state="explain"] .pingo__pupils {
+  transform: translate(3px, -1px);
+}
+
+.pingo[data-state="explain"] .pingo__head {
+  transform: rotate(5deg);
+}
+
+/* sleep */
+.pingo[data-state="sleep"] .pingo__eyes {
+  opacity: 0;
+  animation: none;
+}
+
+.pingo[data-state="sleep"] .pingo__eyes-closed {
+  opacity: 1;
+}
+
+.pingo[data-state="sleep"] .pingo__head {
+  transform: rotate(8deg) translateY(2px);
+}
+
+.pingo[data-state="sleep"] .pingo__fx--zzz {
+  opacity: 1;
+  animation: pingo-float 2.4s ease-in-out infinite;
+}
+
+/* shy: eyes closed, flippers cover the face */
+.pingo[data-state="shy"] .pingo__eyes {
+  opacity: 0;
+  animation: none;
+}
+
+.pingo[data-state="shy"] .pingo__eyes-closed {
+  opacity: 1;
+}
+
+.pingo[data-state="shy"] .pingo__arm--left {
+  transform: rotate(178deg);
+}
+
+.pingo[data-state="shy"] .pingo__arm--right {
+  transform: rotate(-178deg);
+}
+
+.pingo[data-state="shy"] .pingo__head {
+  transform: translateY(2px);
+}
+
+@keyframes pingo-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.02);
+  }
+}
+
+@keyframes pingo-blink {
+  0%,
+  91%,
+  96%,
+  100% {
+    transform: scaleY(1);
+  }
+  93% {
+    transform: scaleY(0.08);
+  }
+}
+
+@keyframes pingo-wave {
+  from {
+    transform: rotate(-108deg);
+  }
+  to {
+    transform: rotate(-142deg);
+  }
+}
+
+@keyframes pingo-type-left {
+  from {
+    transform: rotate(28deg);
+  }
+  to {
+    transform: rotate(40deg);
+  }
+}
+
+@keyframes pingo-type-right {
+  from {
+    transform: rotate(4deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes pingo-nod {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(1.5px);
+  }
+}
+
+@keyframes pingo-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes pingo-jump {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  15% {
+    transform: translateY(0) scaleY(0.94);
+  }
+  45% {
+    transform: translateY(-22px) scaleY(1.03);
+  }
+}
+
+@keyframes pingo-shadow {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  45% {
+    transform: scaleX(0.7);
+    opacity: 0.5;
+  }
+}
+
+@keyframes pingo-cheer-left {
+  from {
+    transform: rotate(140deg);
+  }
+  to {
+    transform: rotate(160deg);
+  }
+}
+
+@keyframes pingo-cheer-right {
+  from {
+    transform: rotate(-140deg);
+  }
+  to {
+    transform: rotate(-160deg);
+  }
+}
+
+@keyframes pingo-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes pingo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pingo *,
+  .pingo[data-state] * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

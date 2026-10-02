@@ -23,8 +23,20 @@ export default function StartupAnimation() {
       shouldPlay.current = !seen && !reducedMotion.matches;
     }
     if (!shouldPlay.current) return;
+    const root = document.documentElement;
+    const release = () => {
+      if (root.dataset.intro !== "playing") return;
+      delete root.dataset.intro;
+      window.dispatchEvent(new Event("cyberpingo:intro-done"));
+    };
+    root.dataset.intro = "playing";
     setVisible(true);
-    const dismiss = () => { shownThisLoad = true; shouldPlay.current = false; setVisible(false); };
+    const dismiss = () => {
+      shownThisLoad = true;
+      shouldPlay.current = false;
+      setVisible(false);
+      release();
+    };
     const timeout = window.setTimeout(dismiss, 1700);
     window.addEventListener("pointerdown", dismiss, { once: true, capture: true });
     window.addEventListener("keydown", dismiss, { once: true, capture: true });
@@ -34,6 +46,7 @@ export default function StartupAnimation() {
       window.removeEventListener("pointerdown", dismiss, true);
       window.removeEventListener("keydown", dismiss, true);
       reducedMotion.removeEventListener("change", dismiss);
+      release();
     };
   }, []);
 

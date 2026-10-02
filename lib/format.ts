@@ -10,6 +10,8 @@ export const LEVEL_LABELS: Record<SkillLevel, string> = { debutant: "Débutant",
 export const levelLabel = (level: string) => LEVEL_LABELS[level as SkillLevel] ?? level;
 
 export const formatNumber = (value: number) => numberFormat.format(value);
+/** French plural: 0 and 1 take the singular. */
+export const plural = (count: number, singular: string, pluralForm = `${singular}s`) => (Math.abs(count) < 2 ? singular : pluralForm);
 export const formatDate = (value: string | Date) => dateFormat.format(new Date(value));
 export const formatShortDate = (value: string | Date) => shortDateFormat.format(new Date(value));
 export const formatDateTime = (value: string | Date) => dateTimeFormat.format(new Date(value));

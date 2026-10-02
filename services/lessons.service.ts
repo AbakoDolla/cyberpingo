@@ -31,13 +31,13 @@ export async function getLesson(lessonId: string): Promise<LessonDetail | null> 
   const sequence = [...lessonRows]
     .sort((a, b) => (modulePosition.get(a.module_id) ?? 0) - (modulePosition.get(b.module_id) ?? 0) || a.position - b.position)
     .map(({ id, title }) => ({ id, title }));
-  const module = moduleRows.find((item) => item.id === lesson.module_id) ?? { id: lesson.module_id, title: "", position: 0 };
+  const lessonModule = moduleRows.find((item) => item.id === lesson.module_id) ?? { id: lesson.module_id, title: "", position: 0 };
   const { content, ...outline } = lesson;
   return {
     ...outline,
     blocks: parseLessonBlocks(content),
     course: { ...courseRow, status: courseRow.status as CourseStatus },
-    module,
+    module: lessonModule,
     quiz: (unwrap(quiz, "Impossible de charger le quiz de cette leçon.") as QuizOutline | null) ?? null,
     sequence,
   };

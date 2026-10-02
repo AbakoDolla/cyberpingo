@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
+import { ROLE_LABELS } from "@/lib/roles";
+import Avatar from "@/components/ui/Avatar";
 import {
   IconActivity, IconAward, IconBell, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconProfile, IconShield, IconTerminal,
 } from "@/components/ui/Icon";
@@ -27,36 +29,64 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const { hydrated, configured, isAuthenticated, isStaff, profile, syncError } = useUser();
 
   if (!configured) {
-    return <main className="min-h-screen grid place-items-center px-6"><GuardCard title="Service non configuré" detail="Ajoute la configuration Supabase pour ouvrir la console." /></main>;
+    return <GuardFrame><GuardCard title="Service non configuré" detail="Ajoute la configuration Supabase pour ouvrir la console." /></GuardFrame>;
   }
   if (!hydrated) {
-    return <main className="min-h-screen grid place-items-center px-6" aria-busy="true"><div className="h-24 w-80 rounded-xl2 bg-white/[0.04] animate-pulse" /></main>;
+    return <GuardFrame busy><div className="adm-guard-card"><div className="adm-skeleton mx-auto h-20 w-full max-w-80" /><span className="sr-only">Chargement de la console admin…</span></div></GuardFrame>;
   }
   if (!isAuthenticated || !isStaff) {
-    return <main className="min-h-screen grid place-items-center px-6"><GuardCard title="Accès réservé" detail="Cette console est réservée à l’équipe CyberPingo." /></main>;
+    return <GuardFrame><GuardCard title="Accès réservé" detail="Cette console est réservée à l’équipe CyberPingo." /></GuardFrame>;
   }
 
+  const staffName = profile?.display_name ?? "Staff CyberPingo";
+  const staffRole = profile?.role ? ROLE_LABELS[profile.role] : "Équipe";
+
   return (
-    <div className="admin-shell min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(0,168,255,0.12),transparent_36rem)]">
-      <aside className="admin-sidebar border-r border-white/10 bg-cyber-black/80 backdrop-blur-xl">
-        <Link href="/admin" className="flex items-center gap-3 px-5 py-5 border-b border-white/10">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-cyber-blue/15 text-cyber-blue font-display font-bold">CP</span>
-          <span><span className="block font-display font-semibold">Console admin</span><span className="block text-[11px] text-white/45">Mode Operate</span></span>
+    <div className="adm-shell">
+      <a className="adm-skip-link" href="#contenu-admin">Aller au contenu admin</a>
+      <aside className="adm-sidebar" aria-label="Console admin">
+        <Link href="/admin" className="adm-brand">
+          <span className="adm-brand__mark">CP</span>
+          <span>
+            <span className="adm-brand__title">Console admin</span>
+            <span className="adm-brand__meta">Opérations CyberPingo</span>
+          </span>
         </Link>
-        <nav className="p-3 space-y-1" aria-label="Navigation admin">
+        <nav className="adm-nav" aria-label="Navigation admin">
           {NAV.map(({ href, label, Icon }) => {
             const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
-            return <Link key={href} href={href} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors", active ? "bg-cyber-blue/15 text-cyber-blue" : "text-white/58 hover:bg-white/[0.04] hover:text-white")}><Icon size={16} />{label}</Link>;
+            return (
+              <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("adm-nav-link", active && "is-active")}>
+                <span className="adm-nav-link__icon"><Icon size={16} /></span>
+                <span>{label}</span>
+              </Link>
+            );
           })}
         </nav>
-        <div className="mt-auto p-4 border-t border-white/10 text-xs text-white/45">
-          <p className="font-medium text-white/75 truncate">{profile?.display_name ?? "Staff"}</p>
-          <p className="mt-1">{profile?.role === "superadmin" ? "Super-administrateur" : "Administrateur"}</p>
-          <Link href="/dashboard" className="mt-3 inline-flex text-cyber-blue hover:underline">Retour espace apprenant</Link>
+        <div className="adm-staff-card">
+          <div className="adm-staff">
+            <Avatar name={staffName} src={profile?.avatar_url} size="sm" ringTone="none" />
+            <p className="min-w-0">
+              <span className="adm-staff__name">{staffName}</span>
+              <span className="adm-staff__role">{staffRole}</span>
+            </p>
+          </div>
+          <Link href="/dashboard" className="adm-learner-link">Retour espace apprenant</Link>
         </div>
       </aside>
-      <main className="admin-main min-w-0 px-4 py-6 md:px-8 lg:px-10">
-        {syncError && <p role="alert" className="mb-4 rounded-xl border border-cyber-red/30 bg-cyber-red/10 px-4 py-3 text-sm text-red-100">{syncError}</p>}
+      <main id="contenu-admin" className="adm-main" tabIndex={-1}>
+        {syncError && <p role="alert" className="adm-notice adm-notice--error adm-sync-alert">{syncError}</p>}
+        {children}
+      </main>
+    </div>
+  );
+}
+
+function GuardFrame({ children, busy = false }: { children: React.ReactNode; busy?: boolean }) {
+  return (
+    <div className="adm-guard-frame">
+      <a className="adm-skip-link" href="#contenu-admin">Aller au contenu admin</a>
+      <main id="contenu-admin" aria-busy={busy || undefined}>
         {children}
       </main>
     </div>
@@ -64,5 +94,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 }
 
 function GuardCard({ title, detail }: { title: string; detail: string }) {
-  return <section className="max-w-md rounded-xl2 border border-white/10 bg-dark-navy p-8 text-center shadow-soft"><h1 className="font-display text-2xl font-semibold">{title}</h1><p className="mt-3 text-white/60">{detail}</p><Link href="/dashboard" className="mt-6 inline-flex rounded-xl bg-cyber-blue px-4 py-2 font-display text-sm font-semibold text-white">Retour au tableau de bord</Link></section>;
+  return (
+    <section className="adm-guard-card">
+      <h1>{title}</h1>
+      <p>{detail}</p>
+      <Link href="/dashboard" className="adm-learner-link mt-6">Retour au tableau de bord</Link>
+    </section>
+  );
 }

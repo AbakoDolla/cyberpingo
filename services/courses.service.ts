@@ -29,13 +29,18 @@ export function toCourseSummary(row: CourseRow, counts: { modules: number; lesso
 }
 
 const countOf = (value: unknown) => (Array.isArray(value) && typeof value[0]?.count === "number" ? value[0].count as number : 0);
+const lengthOf = (value: unknown) => (Array.isArray(value) ? value.length : 0);
 
-/** Published catalog, in editorial order, with module / lesson / quiz counts computed by PostgREST. */
+/**
+ * Published catalog, in editorial order, with module / lesson / quiz counts.
+ * Visitors only hold column-level SELECT on lessons, which PostgREST's `count` aggregate rejects,
+ * so lessons are counted from their ids instead.
+ */
 export async function listPublishedCourses(client?: TypedSupabaseClient): Promise<CourseSummary[]> {
   const supabase = client ?? getSupabaseBrowserClient();
   const rows = unwrap(
     await supabase.from("courses")
-      .select(`${COURSE_COLUMNS}, course_modules(count), lessons(count), quizzes(count)`)
+      .select(`${COURSE_COLUMNS}, course_modules(count), lessons(id), quizzes(count)`)
       .eq("status", "published")
       .order("position")
       .order("title"),
@@ -43,7 +48,7 @@ export async function listPublishedCourses(client?: TypedSupabaseClient): Promis
   );
   return (rows ?? []).map((row) => {
     const { course_modules, lessons, quizzes, ...course } = row as CourseRow & { course_modules: unknown; lessons: unknown; quizzes: unknown };
-    return toCourseSummary(course, { modules: countOf(course_modules), lessons: countOf(lessons), quizzes: countOf(quizzes) });
+    return toCourseSummary(course, { modules: countOf(course_modules), lessons: lengthOf(lessons), quizzes: countOf(quizzes) });
   });
 }
 

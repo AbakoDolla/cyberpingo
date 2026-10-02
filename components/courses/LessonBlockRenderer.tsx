@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { videoEmbed } from "@/lib/lesson-content";
 import type { LessonBlock } from "@/types/api";
 
@@ -11,12 +12,15 @@ function TextBlock({ content }: { content: string }) {
 
 function CodeBlock({ content, language }: { content: string; language?: string }) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(content);
       setCopied(true);
+      setCopyError(false);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
+      setCopyError(true);
       setCopied(false);
     }
   };
@@ -24,9 +28,10 @@ function CodeBlock({ content, language }: { content: string; language?: string }
     <figure className="lesson-code-block">
       <figcaption>
         <span>{language ? language.toUpperCase() : "CODE"}</span>
-        <button type="button" onClick={copy}>{copied ? "Copié" : "Copier"}</button>
+        <button type="button" onClick={copy} aria-live="polite">{copied ? "Copié" : "Copier"}</button>
       </figcaption>
       <pre><code>{content}</code></pre>
+      {copyError && <p className="lesson-code-block__status" role="alert">Copie indisponible dans ce navigateur.</p>}
     </figure>
   );
 }
@@ -56,7 +61,7 @@ export default function LessonBlockRenderer({ block }: { block: LessonBlock }) {
     case "video":
       return <VideoBlock url={block.url} title={block.content} />;
     case "image":
-      return <figure className="lesson-media"><img src={block.url} alt={block.content || "Illustration de la leçon"} loading="lazy" />{block.content && <figcaption>{block.content}</figcaption>}</figure>;
+      return <figure className="lesson-media"><Image src={block.url} alt={block.content || "Illustration de la leçon"} width={960} height={540} sizes="(max-width: 900px) 100vw, 720px" unoptimized />{block.content && <figcaption>{block.content}</figcaption>}</figure>;
     case "resource":
       return <p className="lesson-resource"><a href={block.url} target="_blank" rel="noopener noreferrer">{block.content || block.url} ↗</a></p>;
     default:

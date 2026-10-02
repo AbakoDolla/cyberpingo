@@ -42,11 +42,11 @@ export const LAB_CATEGORY_LABELS: Record<string, string> = {
 export const toOptions = (labels: Record<string, string>) => Object.entries(labels).map(([value, label]) => ({ value, label }));
 
 export function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="block text-sm text-white/70"><span className="mb-1.5 block">{label}</span>{children}</label>;
+  return <label className="adm-field"><span>{label}</span>{children}</label>;
 }
 
 export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea {...props} className={`w-full rounded-xl border border-white/10 bg-cyber-black px-4 py-3 text-white outline-none focus:border-cyber-blue ${props.className ?? ""}`} />;
+  return <textarea {...props} className={`adm-textarea ${props.className ?? ""}`} />;
 }
 
 export function StateMsg({ error, message }: { error?: string | null; message?: string | null }) {
@@ -62,8 +62,8 @@ export function StatusBadge({ status }: { status: string }) {
 
 export function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (value: boolean) => void }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 text-sm text-white/75">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 accent-cyber-blue" />
+    <label className="adm-toggle cursor-pointer">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       {label}
     </label>
   );

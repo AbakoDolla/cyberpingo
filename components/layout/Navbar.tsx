@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
-import { IconBolt, IconMenu, IconX } from "@/components/ui/Icon";
+import Avatar from "@/components/ui/Avatar";
+import { IconArrowRight, IconBolt, IconMenu, IconX } from "@/components/ui/Icon";
+import { useUser } from "@/context/UserContext";
 
 const links = [
   { href: "/", label: "Accueil" },
@@ -24,6 +26,8 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const { hydrated, isAuthenticated, isStaff, profile } = useUser();
+  const spaceHref = isStaff ? "/admin" : "/dashboard";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -81,8 +85,25 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
             >
               <IconBolt size={20} />
             </button>
-            <Link href="/login" className="public-button button-outline">Se connecter</Link>
-            <Link href="/register" className="public-button button-primary">S&apos;inscrire</Link>
+            {!hydrated ? (
+              <span className="nav-session-placeholder" aria-hidden="true" />
+            ) : isAuthenticated ? (
+              <>
+                <Link href={spaceHref} className="public-button button-primary" onClick={() => setOpen(false)}>
+                  {isStaff ? "Console admin" : "Mon espace"} <IconArrowRight size={16} />
+                </Link>
+                {profile && (
+                  <Link href="/profile" className="nav-avatar" aria-label={`Mon profil (${profile.display_name})`} onClick={() => setOpen(false)}>
+                    <Avatar name={profile.display_name} src={profile.avatar_url} size="sm" ringTone="none" />
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="public-button button-outline">Se connecter</Link>
+                <Link href="/register" className="public-button button-primary">S&apos;inscrire</Link>
+              </>
+            )}
           </div>
         </div>
       </div>

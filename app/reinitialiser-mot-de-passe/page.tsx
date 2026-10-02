@@ -11,6 +11,12 @@ import { errorMessage } from "@/lib/errors";
 import { isSupabaseConfigured, missingConfigMessage } from "@/lib/supabase/config";
 import { passwordProblem, updatePassword } from "@/services/auth.service";
 
+const CheckIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </svg>
+);
+
 export default function ResetPasswordPage() {
   const router = useRouter();
   const { hydrated, isAuthenticated } = useUser();
@@ -36,11 +42,43 @@ export default function ResetPasswordPage() {
     finally { setLoading(false); }
   }
 
-  if (!isSupabaseConfigured) return <AuthLayout title="Service non configuré" subtitle="La réinitialisation est indisponible."><p role="alert" className="text-sm text-cyber-red">{missingConfigMessage}</p></AuthLayout>;
-  if (!hydrated) return <AuthLayout title="Vérification du lien…" subtitle="Nous validons la session de réinitialisation."><div className="mx-auto h-10 w-10 rounded-full border-4 border-white/10 border-t-cyber-blue animate-spin" /></AuthLayout>;
-  if (!isAuthenticated) return <AuthLayout title="Lien expiré" subtitle="La session de réinitialisation n’est plus active."><div className="space-y-4 text-sm text-slate-300"><p>Demande un nouveau lien puis ouvre-le dans ce navigateur.</p><Link href="/mot-de-passe-oublie" className="study-button">Recevoir un nouveau lien</Link></div></AuthLayout>;
+  if (!isSupabaseConfigured) {
+    return <AuthLayout scene="reset" title="Service non configuré" subtitle="La réinitialisation est indisponible."><p role="alert" className="auth-alert">{missingConfigMessage}</p></AuthLayout>;
+  }
+  if (!hydrated) {
+    return <AuthLayout scene="reset" title="Vérification du lien…" subtitle="Nous validons la session de réinitialisation."><div className="auth-spinner" role="status" aria-label="Vérification en cours" /></AuthLayout>;
+  }
+  if (!isAuthenticated) {
+    return (
+      <AuthLayout scene="reset" title="Lien expiré" subtitle="La session de réinitialisation n’est plus active.">
+        <div className="auth-stack">
+          <p className="auth-notice">Demande un nouveau lien puis ouvre-le dans ce navigateur.</p>
+          <Link href="/mot-de-passe-oublie" className="ui-btn ui-btn--primary ui-btn--lg auth-submit">Recevoir un nouveau lien</Link>
+        </div>
+      </AuthLayout>
+    );
+  }
 
-  return <AuthLayout title={done ? "C’est tout bon !" : "Choisis un nouveau mot de passe"} subtitle={done ? "Ton nouveau mot de passe est actif." : "Au moins 8 caractères, avec une lettre et un chiffre. Évite un mot de passe déjà utilisé ailleurs."}>
-    {done ? <div role="status" className="space-y-4 text-sm text-slate-300"><p>Utilise-le dès ta prochaine connexion, sur tous tes appareils.</p><Button type="button" variant="primary" className="w-full" onClick={() => router.replace("/dashboard")}>Reprendre mon apprentissage</Button></div> : <form onSubmit={handleSubmit} className="space-y-4" noValidate><Input label="Nouveau mot de passe" type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} autoComplete="new-password" required /><Input label="Confirmer le mot de passe" type="password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} error={errors.confirmPassword} autoComplete="new-password" required />{error && <p role="alert" className="text-sm text-cyber-red">{error}</p>}<Button type="submit" variant="primary" className="w-full" loading={loading}>Enregistrer le mot de passe</Button></form>}
-  </AuthLayout>;
+  return (
+    <AuthLayout
+      scene="reset"
+      title={done ? "C’est tout bon !" : "Choisis un nouveau mot de passe"}
+      subtitle={done ? "Ton nouveau mot de passe est actif." : "Au moins 8 caractères, avec une lettre et un chiffre. Évite un mot de passe déjà utilisé ailleurs."}
+    >
+      {done ? (
+        <div role="status" className="auth-result">
+          <span className="auth-result__icon"><CheckIcon /></span>
+          <p>Utilise-le dès ta prochaine connexion, sur tous tes appareils.</p>
+          <Button type="button" variant="primary" size="lg" className="auth-submit" onClick={() => router.replace("/dashboard")}>Reprendre mon apprentissage</Button>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="auth-form" noValidate>
+          <Input label="Nouveau mot de passe" type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} autoComplete="new-password" required />
+          <Input label="Confirmer le mot de passe" type="password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} error={errors.confirmPassword} autoComplete="new-password" required />
+          {error && <p role="alert" className="auth-alert">{error}</p>}
+          <Button type="submit" variant="primary" size="lg" className="auth-submit" loading={loading}>Enregistrer le mot de passe</Button>
+        </form>
+      )}
+    </AuthLayout>
+  );
 }

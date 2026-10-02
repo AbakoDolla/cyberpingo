@@ -19,7 +19,7 @@ export const articles: Article[] = [
       { title: "Ajoute une deuxième preuve", text: "Active l’authentification multifacteur. Une clé de sécurité ou une passkey résiste mieux au phishing qu’un code à recopier. Si ces options ne sont pas disponibles, une application d’authentification reste utile. Ne communique jamais un code reçu à une personne qui te contacte.", checklist: ["Activer le MFA sur la messagerie principale.", "Conserver les codes de secours hors du téléphone.", "Supprimer les appareils et applications que tu ne reconnais pas."] },
       { title: "Prépare la récupération", text: "Vérifie que l’adresse et le numéro de récupération t’appartiennent encore. Garde une copie des codes de secours dans un endroit protégé. Si un compte est compromis, change son mot de passe depuis un appareil fiable, révoque les sessions et préviens les contacts concernés." },
     ],
-    source: { label: "ANSSI — recommandations de sécurité", url: "https://cyber.gouv.fr/bonnes-pratiques-protegez-vous" },
+    source: { label: "ANSSI, recommandations de sécurité", url: "https://cyber.gouv.fr/bonnes-pratiques-protegez-vous" },
   },
   {
     slug: "reperer-phishing", title: "Un message urgent ? Prends trente secondes",
@@ -30,7 +30,7 @@ export const articles: Article[] = [
       { title: "Vérifie par un autre chemin", text: "Ouvre le service avec ton favori ou son application officielle, sans utiliser le lien du message. Pour une facture inhabituelle, appelle le contact avec un numéro déjà connu. Le cadenas HTTPS chiffre la connexion ; il ne garantit pas que l’organisation est honnête.", checklist: ["Comparer le domaine exact, pas seulement le nom affiché.", "Refuser les demandes de mots de passe ou codes MFA.", "Confirmer tout changement de coordonnées bancaires par un canal indépendant."] },
       { title: "Si tu as déjà cliqué", text: "Un clic ne signifie pas automatiquement une compromission. Note ce que tu as fait. Si tu as saisi un mot de passe, change-le depuis le site officiel et ferme les sessions actives. Si tu as exécuté un fichier, contacte le support de ton organisation et conserve le message pour l’analyse." },
     ],
-    source: { label: "Cybermalveillance.gouv.fr — assistance et prévention", url: "https://www.cybermalveillance.gouv.fr/" },
+    source: { label: "Cybermalveillance.gouv.fr, assistance et prévention", url: "https://www.cybermalveillance.gouv.fr/" },
   },
   {
     slug: "premiers-logs", title: "Lire un journal sans tirer de conclusion trop vite",
@@ -41,7 +41,7 @@ export const articles: Article[] = [
       { title: "Construis une chronologie", text: "Relève l’heure, l’acteur, l’action, la cible et le résultat. Plusieurs échecs de connexion suivis d’un succès peuvent justifier une investigation, mais aussi correspondre à un utilisateur qui a oublié son mot de passe. Compare les appareils, les habitudes et les événements d’autres sources.", checklist: ["Normaliser les heures et noter le fuseau.", "Conserver les journaux originaux, travailler sur une copie.", "Documenter les éléments manquants et le degré d’incertitude."] },
       { title: "Rends ton analyse exploitable", text: "Résume les faits observés, leur impact possible et la prochaine vérification recommandée. Masque les données personnelles inutiles avant de partager un extrait. N’attribue pas une attaque à quelqu’un sur la seule base d’une adresse IP." },
     ],
-    source: { label: "OWASP — Logging Cheat Sheet", url: "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html" },
+    source: { label: "OWASP, Logging Cheat Sheet", url: "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html" },
   },
   {
     slug: "laboratoire-ethique", title: "Ton premier labo : apprendre sans toucher aux autres",
@@ -52,7 +52,7 @@ export const articles: Article[] = [
       { title: "Isole et prépare", text: "Utilise une machine virtuelle de test, un réseau isolé et des données synthétiques. Prends un instantané avant les manipulations. N’utilise pas de mots de passe personnels, de documents professionnels ou de services exposés sur Internet.", checklist: ["Écrire les cibles et les actions autorisées.", "Définir les conditions d’arrêt et la restauration.", "Noter les versions, observations et limites du test."] },
       { title: "Explique plutôt que collectionner", text: "Un bon compte rendu décrit ce qui a été observé, pourquoi cela importe et comment réduire le risque. Garde uniquement la preuve minimale nécessaire, sans extraire de données supplémentaires. Les défis CyberPingo sont des simulations pédagogiques, pas un terminal connecté à une cible réelle." },
     ],
-    source: { label: "OWASP — Web Security Testing Guide", url: "https://owasp.org/www-project-web-security-testing-guide/" },
+    source: { label: "OWASP, Web Security Testing Guide", url: "https://owasp.org/www-project-web-security-testing-guide/" },
   },
   {
     slug: "sauvegardes-utiles", title: "Une sauvegarde n’existe vraiment que si tu peux la restaurer",
@@ -63,7 +63,7 @@ export const articles: Article[] = [
       { title: "Sépare les copies", text: "Conserve plusieurs copies sur des supports distincts, dont une séparée de l’appareil habituel. Protège les sauvegardes sensibles par chiffrement et conserve la clé de récupération en sécurité. Un disque toujours branché peut être affecté par le même incident que ton ordinateur." },
       { title: "Teste avec un petit fichier", text: "Restaure régulièrement un document dans un dossier temporaire et vérifie son contenu. Note la date du test et les étapes nécessaires. CyberPingo propose un export JSON de ta progression dans les paramètres : il s’agit d’une copie lisible, sans réimport automatique.", checklist: ["Planifier une fréquence adaptée aux changements.", "Vérifier l’espace disponible et les erreurs.", "Documenter une restauration que tu sais réellement refaire."] },
     ],
-    source: { label: "ANSSI — bonnes pratiques", url: "https://cyber.gouv.fr/bonnes-pratiques-protegez-vous" },
+    source: { label: "ANSSI, bonnes pratiques", url: "https://cyber.gouv.fr/bonnes-pratiques-protegez-vous" },
   },
 ];
 

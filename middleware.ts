@@ -6,17 +6,22 @@ import { isStaff } from "@/lib/roles";
 import type { Database } from "@/types/database.types";
 
 const AUTH_PATHS = ["/login", "/register", "/mot-de-passe-oublie"];
+/** Catalogue pages visitors may browse before creating an account (RLS only exposes published content). */
+const GUEST_PATHS = ["/courses", "/challenges"];
+
+const matchesPath = (pathname: string, base: string) => pathname === base || pathname.startsWith(`${base}/`);
 
 /**
- * First line of defence only: it keeps visitors out of the app and learners out of /admin.
+ * First line of defence only: it keeps visitors out of the private app and learners out of /admin.
  * Every read and write is still enforced by Row Level Security and the SQL functions.
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthPage = AUTH_PATHS.some((path) => pathname.startsWith(path));
+  const isGuestPage = GUEST_PATHS.some((path) => matchesPath(pathname, path));
 
   if (!isSupabaseConfigured) {
-    if (isAuthPage) return NextResponse.next();
+    if (pathname === "/" || isAuthPage || isGuestPage) return NextResponse.next();
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
@@ -55,6 +60,18 @@ export async function middleware(request: NextRequest) {
   const loadProfile = async (id: string) =>
     (await supabase.from("profiles").select("role, onboarding_completed").eq("id", id).maybeSingle()).data;
 
+  // A returning learner who opens the site directly (typed URL, bookmark, external link) lands in
+  // their space; in-app navigation to "Accueil" (same-origin) still shows the public landing page.
+  if (pathname === "/") {
+    const fetchSite = request.headers.get("sec-fetch-site");
+    const directEntry = fetchSite === "none" || fetchSite === "cross-site";
+    if (!userId || !directEntry) return response;
+    const profile = await loadProfile(userId);
+    if (!profile) return response;
+    if (!profile.onboarding_completed && !isStaff(profile.role)) return redirectTo("/onboarding");
+    return redirectTo(safeReturnPath(null, profile.role));
+  }
+
   if (isAuthPage) {
     if (!userId) return response;
     const profile = await loadProfile(userId);
@@ -63,7 +80,7 @@ export async function middleware(request: NextRequest) {
     return redirectTo(safeReturnPath(request.nextUrl.searchParams.get("next"), profile?.role));
   }
 
-  if (!userId) return redirectTo("/login", pathname);
+  if (!userId) return isGuestPage ? response : redirectTo("/login", pathname);
 
   if (pathname.startsWith("/admin")) {
     const profile = await loadProfile(userId);
@@ -75,6 +92,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
     "/login",
     "/register",
     "/mot-de-passe-oublie",

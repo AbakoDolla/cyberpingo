@@ -16,7 +16,7 @@ import {
   listAdminCourses, listBadges, listChallenges, listLabs, updateBadge, updateChallenge, updateLab,
   type AdminCourseListItem, type BadgeChanges, type BadgeRow, type ChallengeChanges, type ChallengeRow, type LabChanges, type LabRow,
 } from "@/services/admin.service";
-import { AdminEmpty, AdminError, AdminLoading, AdminPageHeader, Notice } from "./AdminState";
+import { AdminEmpty, AdminError, AdminLoading, AdminPageHeader, ConfirmModal, Notice } from "./AdminState";
 import {
   Field, LAB_CATEGORY_LABELS, LEVEL_LABELS, STATUS_LABELS, StatusBadge, Textarea, Toggle, asInt, isoToLocalInput, joinLines, lines,
   localInputToIso, toOptions,
@@ -26,6 +26,7 @@ import {
 
 type Flash = { kind: "success" | "error"; text: string } | null;
 type CatalogItem = { id: string; position: number };
+type CatalogSort = "position" | "title" | "updated";
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const ICON_PATTERN = /^[a-z0-9-]{2,40}$/;
@@ -36,11 +37,24 @@ const matches = (needle: string, ...values: (string | null | undefined)[]) => {
   return !folded || values.some((value) => value && fold(value).includes(folded));
 };
 const plural = (count: number, one: string, many: string) => `${formatNumber(count)} ${count > 1 ? many : one}`;
+const CATALOG_SORT_OPTIONS = [
+  { value: "position", label: "Position" },
+  { value: "title", label: "Titre A-Z" },
+  { value: "updated", label: "Mis à jour récemment" },
+];
 
 function upsertSorted<T extends CatalogItem>(rows: T[] | undefined, row: T, label: (row: T) => string): T[] {
   const list = rows ?? [];
   const next = list.some((item) => item.id === row.id) ? list.map((item) => (item.id === row.id ? row : item)) : [...list, row];
   return next.sort((a, b) => a.position - b.position || label(a).localeCompare(label(b), "fr"));
+}
+
+function sortCatalogRows<T extends CatalogItem>(rows: T[], sort: CatalogSort, label: (row: T) => string): T[] {
+  return [...rows].sort((a, b) => {
+    if (sort === "title") return label(a).localeCompare(label(b), "fr");
+    if (sort === "updated") return new Date((b as { updated_at?: string }).updated_at ?? 0).getTime() - new Date((a as { updated_at?: string }).updated_at ?? 0).getTime();
+    return a.position - b.position || label(a).localeCompare(label(b), "fr");
+  });
 }
 
 /** Loads a catalog and tracks which row is in the editor (`undefined` = closed, `null` = new row). */
@@ -80,17 +94,17 @@ function CatalogLayout({ editor, children }: { editor: ReactNode | null; childre
 function EditorCard({ title, subtitle, flash, onClose, children }: { title: string; subtitle?: string; flash: Flash; onClose: () => void; children: ReactNode }) {
   const headingId = useId();
   return (
-    <section aria-labelledby={headingId} className="rounded-xl2 border border-white/10 bg-dark-navy p-5 sm:p-6">
+    <section aria-labelledby={headingId} className="adm-editor-panel">
       <div className="mb-5 flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 id={headingId} className="font-display text-lg font-semibold text-white">{title}</h2>
-          {subtitle && <p className="mt-1 text-sm text-white/60">{subtitle}</p>}
+          <h2 id={headingId} className="adm-section-title">{title}</h2>
+          {subtitle && <p className="adm-muted mt-1 text-sm">{subtitle}</p>}
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Fermer l’éditeur"
-          className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyber-blue"
+          className="adm-action-link"
         >
           <IconX size={18} />
         </button>
@@ -101,24 +115,31 @@ function EditorCard({ title, subtitle, flash, onClose, children }: { title: stri
   );
 }
 
-function Toolbar({ search, onSearch, placeholder, filterLabel, filter, onFilter, filterOptions, summary }: {
+function Toolbar({ search, onSearch, placeholder, filterLabel, filter, onFilter, filterOptions, sort, onSort, sortOptions = CATALOG_SORT_OPTIONS, summary }: {
   search: string; onSearch: (value: string) => void; placeholder: string;
   filterLabel: string; filter: string; onFilter: (value: string) => void; filterOptions: { value: string; label: string }[];
+  sort?: string; onSort?: (value: CatalogSort) => void; sortOptions?: { value: string; label: string }[];
   summary: string;
 }) {
   const searchId = useId();
   const filterId = useId();
+  const sortId = useId();
   return (
-    <div className="mb-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-        <div className="min-w-0 flex-1">
+    <div>
+      <div className="adm-toolbar">
+        <div className="adm-toolbar__grow">
           <Input id={searchId} type="search" label="Rechercher" value={search} onChange={(e) => onSearch(e.target.value)} placeholder={placeholder} autoComplete="off" />
         </div>
-        <div className="sm:w-56">
+        <div>
           <Select id={filterId} label={filterLabel} value={filter} onChange={(e) => onFilter(e.target.value)} options={filterOptions} />
         </div>
+        {sort && onSort && (
+          <div>
+            <Select id={sortId} label="Tri" value={sort} onChange={(e) => onSort(e.target.value as CatalogSort)} options={sortOptions} />
+          </div>
+        )}
       </div>
-      <p className="mt-3 text-sm text-white/60" aria-live="polite">{summary}</p>
+      <p className="adm-summary" aria-live="polite">{summary}</p>
     </div>
   );
 }
@@ -130,12 +151,12 @@ function CatalogRow({ active, icon, title, meta, aside, onSelect }: { active: bo
         type="button"
         aria-pressed={active}
         onClick={onSelect}
-        className={`flex w-full items-center gap-4 rounded-xl border px-4 py-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyber-blue ${active ? "border-cyber-blue/60 bg-cyber-blue/[0.06]" : "border-white/5 bg-dark-navy hover:border-white/15"}`}
+        className={`adm-list-button ${active ? "adm-list-row border-[var(--cp-line-strong)] bg-cyan-400/5" : "adm-list-row"}`}
       >
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white/5 text-cyber-blue" aria-hidden="true">{icon}</span>
+        <span className="adm-list-icon" aria-hidden="true">{icon}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate font-medium text-white">{title}</span>
-          <span className="mt-0.5 block truncate text-sm text-white/60">{meta}</span>
+          <span className="adm-muted mt-0.5 block truncate text-sm">{meta}</span>
         </span>
         <span className="flex shrink-0 flex-wrap items-center justify-end gap-2">{aside}</span>
       </button>
@@ -144,11 +165,24 @@ function CatalogRow({ active, icon, title, meta, aside, onSelect }: { active: bo
 }
 
 function EditorActions({ busy, isNew, createLabel, onDelete }: { busy: boolean; isNew: boolean; createLabel: string; onDelete: () => void }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-5">
-      <Button type="submit" size="sm" loading={busy}>{isNew ? createLabel : "Enregistrer"}</Button>
-      {!isNew && <Button type="button" size="sm" variant="danger" icon={<IconTrash size={16} />} onClick={onDelete} disabled={busy}>Supprimer</Button>}
-    </div>
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--cp-line)] pt-5">
+        <Button type="submit" size="sm" loading={busy}>{isNew ? createLabel : "Enregistrer"}</Button>
+        {!isNew && <Button type="button" size="sm" variant="danger" icon={<IconTrash size={16} />} onClick={() => setConfirmOpen(true)} disabled={busy}>Supprimer</Button>}
+      </div>
+      <ConfirmModal
+        open={confirmOpen}
+        title="Confirmer la suppression"
+        description="Cette suppression est définitive. Archive ou désactive plutôt l’élément si des apprenants peuvent déjà y être liés."
+        danger
+        confirmLabel="Supprimer"
+        loading={busy}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => { setConfirmOpen(false); onDelete(); }}
+      />
+    </>
   );
 }
 
@@ -159,7 +193,7 @@ function CatalogBody<T extends CatalogItem>({ catalog, loadingLabel, emptyAll, e
   if (catalog.error && !catalog.data) return <AdminError message={catalog.error.message} onRetry={() => void catalog.reload()} />;
   if (!catalog.data?.length) return <AdminEmpty>{emptyAll}</AdminEmpty>;
   if (!rows.length) return <AdminEmpty>{emptyFiltered}</AdminEmpty>;
-  return <ul className="space-y-2">{rows.map(renderRow)}</ul>;
+  return <ul className="adm-list">{rows.map(renderRow)}</ul>;
 }
 
 /** Title input whose value seeds the slug until the slug is edited by hand. */
@@ -200,9 +234,10 @@ export function AdminLabsPage() {
   const catalog = useCatalog<LabRow>(listLabs, (lab) => lab.title);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
+  const [sort, setSort] = useState<CatalogSort>("position");
   const rows = useMemo(
-    () => (catalog.data ?? []).filter((lab) => (status === "all" || lab.status === status) && matches(search, lab.title, lab.slug, LAB_CATEGORY_LABELS[lab.category])),
-    [catalog.data, search, status],
+    () => sortCatalogRows((catalog.data ?? []).filter((lab) => (status === "all" || lab.status === status) && matches(search, lab.title, lab.slug, LAB_CATEGORY_LABELS[lab.category])), sort, (lab) => lab.title),
+    [catalog.data, search, sort, status],
   );
   const total = catalog.data?.length ?? 0;
   const published = catalog.data?.filter((lab) => lab.status === "published").length ?? 0;
@@ -230,6 +265,7 @@ export function AdminLabsPage() {
         <Toolbar
           search={search} onSearch={setSearch} placeholder="Titre, slug ou catégorie"
           filterLabel="Statut" filter={status} onFilter={setStatus} filterOptions={LAB_STATUS_FILTER}
+          sort={sort} onSort={setSort}
           summary={`${plural(rows.length, "lab affiché", "labs affichés")} sur ${formatNumber(total)} · ${plural(published, "publié", "publiés")}`}
         />
         <CatalogBody
@@ -333,7 +369,7 @@ function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
   }
 
   async function remove() {
-    if (!lab || !window.confirm(`Supprimer définitivement « ${lab.title} » ? La progression des apprenants sur ce lab sera perdue. Pour le retirer sans perte, archive-le plutôt.`)) return;
+    if (!lab) return;
     setBusy(true);
     setErr(null);
     try {
@@ -432,12 +468,12 @@ function LabFlagPanel({ labId }: { labId: string }) {
   }
 
   return (
-    <section aria-labelledby={`${inputId}-heading`} className="mt-6 space-y-3 border-t border-white/5 pt-5">
+    <section aria-labelledby={`${inputId}-heading`} className="adm-divider mt-6 space-y-3 pt-5">
       <div className="flex items-center gap-2">
-        <IconLock size={16} className="text-cyber-blue" />
+        <IconLock size={16} className="adm-accent-icon" />
         <h3 id={`${inputId}-heading`} className="font-display text-sm font-semibold text-white">Réponse attendue</h3>
       </div>
-      <p className="text-sm text-white/60">Stockée dans un schéma privé : les apprenants ne la reçoivent jamais, la vérification se fait côté serveur.</p>
+      <p className="adm-muted text-sm">Stockée dans un schéma privé : les apprenants ne la reçoivent jamais, la vérification se fait côté serveur.</p>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
         <div className="min-w-0 flex-1">
           <Input
@@ -458,8 +494,8 @@ function LabFlagPanel({ labId }: { labId: string }) {
       </Button>
       {revealed !== null && (
         revealed
-          ? <p className="break-all rounded-lg bg-cyber-black px-3 py-2 font-mono text-sm text-cyber-green">{revealed}</p>
-          : <p className="text-sm text-white/60">Aucune réponse définie.</p>
+          ? <p className="adm-code-preview break-all px-3 py-2 font-mono text-sm">{revealed}</p>
+          : <p className="adm-muted text-sm">Aucune réponse définie.</p>
       )}
       {notice && <Notice kind={notice.kind}>{notice.text}</Notice>}
     </section>
@@ -492,9 +528,10 @@ export function AdminBadgesPage() {
   const courses = useAsync(listAdminCourses, []);
   const [search, setSearch] = useState("");
   const [active, setActive] = useState("all");
+  const [sort, setSort] = useState<CatalogSort>("position");
   const rows = useMemo(
-    () => (catalog.data ?? []).filter((badge) => (active === "all" || badge.is_active === (active === "active")) && matches(search, badge.name, badge.slug, badge.description)),
-    [catalog.data, search, active],
+    () => sortCatalogRows((catalog.data ?? []).filter((badge) => (active === "all" || badge.is_active === (active === "active")) && matches(search, badge.name, badge.slug, badge.description)), sort, (badge) => badge.name),
+    [catalog.data, search, active, sort],
   );
   const total = catalog.data?.length ?? 0;
   const activeCount = catalog.data?.filter((badge) => badge.is_active).length ?? 0;
@@ -524,6 +561,7 @@ export function AdminBadgesPage() {
         <Toolbar
           search={search} onSearch={setSearch} placeholder="Nom, slug ou description"
           filterLabel="État" filter={active} onFilter={setActive} filterOptions={ACTIVE_FILTER}
+          sort={sort} onSort={setSort}
           summary={`${plural(rows.length, "badge affiché", "badges affichés")} sur ${formatNumber(total)} · ${plural(activeCount, "actif", "actifs")}`}
         />
         <CatalogBody
@@ -614,7 +652,7 @@ function BadgeEditor({ badge, courses, coursesError, flash, onClose, onSaved, on
   }
 
   async function remove() {
-    if (!badge || !window.confirm(`Supprimer définitivement « ${badge.name} » ? Les apprenants qui l’ont obtenu le perdront. Pour ne plus l’attribuer, désactive-le plutôt.`)) return;
+    if (!badge) return;
     setBusy(true);
     setErr(null);
     try {
@@ -629,13 +667,13 @@ function BadgeEditor({ badge, courses, coursesError, flash, onClose, onSaved, on
   return (
     <EditorCard title={isNew ? "Nouveau badge" : "Modifier le badge"} flash={flash} onClose={onClose}>
       <form onSubmit={submit} className="space-y-4" noValidate>
-        <div className="flex items-center gap-4 rounded-xl bg-cyber-black/60 px-4 py-3">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-cyber-blue/15 text-cyber-blue" aria-hidden="true">
+        <div className="flex items-center gap-4 rounded-xl border border-[var(--cp-line)] bg-black/20 px-4 py-3">
+          <span className="adm-list-icon" aria-hidden="true">
             <SlugIcon name={icon} size={24} />
           </span>
           <div className="min-w-0">
             <p className="truncate font-medium text-white">{names.title.trim() || "Nom du badge"}</p>
-            <p className="truncate text-sm text-white/60">{description.trim() || "Aperçu tel que les apprenants le verront."}</p>
+            <p className="adm-muted truncate text-sm">{description.trim() || "Aperçu tel que les apprenants le verront."}</p>
           </div>
         </div>
         <Input id={`${id}-name`} label="Nom" value={names.title} onChange={(e) => names.setTitle(e.target.value)} maxLength={80} required />
@@ -698,10 +736,11 @@ export function AdminChallengesPage() {
   const catalog = useCatalog<ChallengeRow>(listChallenges, (challenge) => challenge.title);
   const [search, setSearch] = useState("");
   const [active, setActive] = useState("all");
+  const [sort, setSort] = useState<CatalogSort>("position");
   const [now] = useState(() => Date.now());
   const rows = useMemo(
-    () => (catalog.data ?? []).filter((challenge) => (active === "all" || challenge.is_active === (active === "active")) && matches(search, challenge.title, challenge.slug, challenge.description)),
-    [catalog.data, search, active],
+    () => sortCatalogRows((catalog.data ?? []).filter((challenge) => (active === "all" || challenge.is_active === (active === "active")) && matches(search, challenge.title, challenge.slug, challenge.description)), sort, (challenge) => challenge.title),
+    [catalog.data, search, active, sort],
   );
   const total = catalog.data?.length ?? 0;
   const activeCount = catalog.data?.filter((challenge) => challenge.is_active).length ?? 0;
@@ -729,6 +768,7 @@ export function AdminChallengesPage() {
         <Toolbar
           search={search} onSearch={setSearch} placeholder="Titre, slug ou description"
           filterLabel="État" filter={active} onFilter={setActive} filterOptions={ACTIVE_FILTER}
+          sort={sort} onSort={setSort}
           summary={`${plural(rows.length, "défi affiché", "défis affichés")} sur ${formatNumber(total)} · ${plural(activeCount, "actif", "actifs")}`}
         />
         <CatalogBody
@@ -833,7 +873,7 @@ function ChallengeEditor({ challenge, flash, onClose, onSaved, onDeleted }: {
   }
 
   async function remove() {
-    if (!challenge || !window.confirm(`Supprimer définitivement « ${challenge.title} » ? La progression des apprenants sur ce défi sera perdue. Pour l’arrêter sans perte, désactive-le plutôt.`)) return;
+    if (!challenge) return;
     setBusy(true);
     setErr(null);
     try {
@@ -859,7 +899,7 @@ function ChallengeEditor({ challenge, flash, onClose, onSaved, onDeleted }: {
           <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={500} />
         </Field>
         <div className="flex items-end gap-3">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-cyber-blue/15 text-cyber-blue" aria-hidden="true">
+          <span className="adm-list-icon" aria-hidden="true">
             <SlugIcon name={icon} size={22} />
           </span>
           <div className="min-w-0 flex-1">

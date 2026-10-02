@@ -2,9 +2,9 @@ import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
-import { IconBolt, IconCheck, IconClock, IconCourses } from "@/components/ui/Icon";
+import { IconArrowRight, IconBolt, IconCheck, IconClock, IconCourses } from "@/components/ui/Icon";
 import { resolveSlugIcon } from "@/components/ui/SlugIcon";
-import { formatDuration, levelLabel } from "@/lib/format";
+import { formatDuration, formatRelative, levelLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { CourseProgress, CourseSummary } from "@/types/api";
 
@@ -25,10 +25,12 @@ export default function CourseCard({ course, href, progress, className, publicVi
   const hasProgress = Boolean(progress);
   const progressValue = Math.round(progress?.progress_percentage ?? 0);
   const completed = progress?.status === "completed" || progressValue >= 100;
+  const actionLabel = completed ? "Revoir le parcours" : hasProgress ? "Continuer" : publicView ? "Voir le programme" : "Découvrir le parcours";
+  const progressLabel = completed ? "Parcours terminé" : hasProgress ? "Progression en cours" : "Non commencé";
 
   return (
     <Link href={href} className={cn("course-card-link", className)} aria-label={`${publicView ? "Découvrir" : "Ouvrir"} le parcours ${course.title}`}>
-      <Card glow={completed ? "green" : "blue"} className="course-card h-full">
+      <Card glow={completed ? "green" : hasProgress ? "blue" : "purple"} className="course-card h-full">
         <div className="course-card__topline">
           <div className="course-card__icon" aria-hidden="true"><CourseIcon size={24} strokeWidth={1.55} /></div>
           <div className="course-card__status">
@@ -48,12 +50,14 @@ export default function CourseCard({ course, href, progress, className, publicVi
         </div>
         {hasProgress ? (
           <div className="course-card__progress">
-            <div><span>Ta progression</span><strong>{progressValue} %</strong></div>
+            <div><span>{progressLabel}</span><strong>{progressValue} %</strong></div>
             <ProgressBar value={progressValue} tone={completed ? "green" : "blue"} height="sm" />
+            {progress?.last_activity_at && <small>Dernière activité {formatRelative(progress.last_activity_at)}</small>}
           </div>
         ) : (
-          <p className="course-card__cta">{publicView ? "Voir le programme" : "Découvrir le parcours"}</p>
+          <p className="course-card__progress course-card__progress--empty"><span>{progressLabel}</span></p>
         )}
+        <p className="course-card__cta">{actionLabel}<IconArrowRight size={14} /></p>
       </Card>
     </Link>
   );
