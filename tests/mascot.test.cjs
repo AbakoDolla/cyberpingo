@@ -105,14 +105,14 @@ test("recording time and the voice limits are readable and bounded", () => {
   assert.ok(MAX_VOICE_SECONDS <= 45);
 });
 
-test("voice coverage counts only active lines and reports what is left to record", () => {
-  assert.deepEqual(voiceCoverage([]), { total: 0, voiced: 0, percent: 0, missing: 0 });
+test("voice coverage counts only active lines and splits human from synthetic voices", () => {
+  assert.deepEqual(voiceCoverage([]), { total: 0, voiced: 0, synthetic: 0, human: 0, percent: 0, missing: 0 });
   const result = voiceCoverage([
-    { audio_url: "https://x.test/a.webm", is_active: true },
-    { audio_url: null, is_active: true },
+    { audio_url: "https://x.test/a.webm", is_active: true, voice_credit: "Awa Diop" },
+    { audio_url: "/audio/mascot/b.mp3", is_active: true, voice_credit: "Voix de synthèse neuronale" },
     { audio_url: null, is_active: true },
     { audio_url: "https://x.test/old.webm", is_active: false },
     { audio_url: null, is_active: false },
   ]);
-  assert.deepEqual(result, { total: 3, voiced: 1, percent: 33, missing: 2 });
+  assert.deepEqual(result, { total: 3, voiced: 2, synthetic: 1, human: 1, percent: 67, missing: 1 });
 });

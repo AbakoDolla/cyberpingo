@@ -70,7 +70,7 @@ npx supabase migration new nom_de_la_modification
 
 Pour vérifier l'état : `npx supabase migration list`.
 
-La migration `20261002010000_staff_roles_voice.sql` réserve le journal d'audit au superadmin et crée le bucket `mascot-voice`. Les visuels de `public/images/` sont versionnés ; pour les régénérer : `node scripts/generate-images.cjs`.
+La migration `20261002010000_staff_roles_voice.sql` réserve le journal d'audit au superadmin et crée le bucket `mascot-voice`. Les visuels de `public/images/` (dont `features`, `about`, `resources` et `brand`) et les voix de `public/audio/` sont versionnés ; pour les régénérer : `node scripts/generate-images.cjs` et `node scripts/generate-voices.cjs`.
 
 > Le fichier `supabase/config.toml` déclare PostgreSQL 15 pour la stack locale. Si votre projet cloud utilise une version plus récente, `link` vous le signale ; alignez `major_version` pour que le local reflète la production.
 
@@ -87,13 +87,14 @@ Le fichier est généré : modifiez `supabase/seed/content/*.ts`, puis `npm run 
 
 Chargez ensuite `supabase/seed/02_reseaux_path.sql` (même méthode, idempotent) : il complète le parcours Réseaux avec 24 leçons, 43 questions, 10 labs, 8 ressources, 6 domaines, 6 compétences et 22 répliques de mascotte. Il suppose que la migration `20261002000000_academy_engine.sql` est déjà appliquée (elle crée les 9 grades). Ce fichier est généré par `node scripts/generate-reseaux-seed.cjs` à partir de `supabase/seed/content/reseaux-path.ts`.
 
-Chargez enfin `supabase/seed/03_soc_path.sql` (idempotent, après le 02) : il ajoute le parcours Linux et investigation SOC, soit 5 leçons, 5 quiz, 4 labs de journaux (36 étapes vérifiées), 5 compétences, 5 badges et 8 répliques de mascotte, répartis sur les cours `linux` et `analyse-logs`. Il est généré par `node scripts/generate-soc-seed.cjs` à partir de `supabase/seed/content/soc-path.ts`. Les trois seeds ne sont pas des migrations : appliquez-les une fois par environnement, dans l'ordre 01, 02, 03. Après chargement en production, 14 labs, 29 leçons, 23 quiz, 11 compétences et 22 badges sont publiés.
+Chargez enfin `supabase/seed/03_soc_path.sql` (idempotent, après le 02) : il ajoute le parcours Linux et investigation SOC, soit 5 leçons, 5 quiz, 4 labs de journaux (36 étapes vérifiées), 5 compétences, 5 badges et 8 répliques de mascotte, répartis sur les cours `linux` et `analyse-logs`. Il est généré par `node scripts/generate-soc-seed.cjs` à partir de `supabase/seed/content/soc-path.ts`. Les quatre seeds ne sont pas des migrations : appliquez-les une fois par environnement, dans l'ordre 01, 02, 03, 04. Le 04 (supabase/seed/04_mascot_voices.sql, généré par 
+ode scripts/generate-voices.cjs) rattache aux 30 répliques de la mascotte les fichiers de public/audio/mascot/ ; il ne touche jamais une réplique qui a déjà un audio. Après chargement en production, 14 labs, 29 leçons, 23 quiz, 11 compétences et 22 badges sont publiés.
 
 ### Ce que l'équipe doit fournir
 
 La plateforme a les emplacements et affiche un état vide honnête tant que ces éléments manquent. Rien n'est simulé :
 
-- **Voix humaines** : enregistrements courts d'un comédien ou d'une comédienne, à enregistrer ou importer directement depuis le studio de `/admin/mascotte` (envoi dans le bucket `mascot-voice`, crédit de la voix obligatoire) ou à rattacher par URL `https://` ou chemin `/audio/…`. Aucune voix de synthèse n'est générée ;
+- **Voix** : enregistrements courts d'un comédien ou d'une comédienne, à enregistrer ou importer directement depuis le studio de `/admin/mascotte` (envoi dans le bucket `mascot-voice`, crédit de la voix obligatoire) ou à rattacher par URL `https://` ou chemin `/audio/…`. Les 30 répliques de départ ont une voix de synthèse neuronale créditée comme telle, à remplacer par une voix humaine quand elle existe ;
 - **Vidéos pédagogiques** : à ajouter dans les leçons par un bloc vidéo (lien YouTube, Vimeo ou fichier), depuis l'éditeur de cours. Les encadrés « Vidéo à venir : titre » déjà présents sont affichés comme tels, sans faux lecteur ;
 - **Fichier Packet Tracer réel** (`.pkt`) : à ajouter comme ressource du lab `packet-tracer-sous-reseaux` ; la plateforme fournit la consigne, le rendu et la relecture, pas l'exécution du logiciel.
 

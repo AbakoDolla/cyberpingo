@@ -42,19 +42,31 @@ export function formatVoiceTime(seconds: number): string {
 export interface VoiceCoverage {
   total: number;
   voiced: number;
+  /** Voiced lines whose credit says the voice is synthetic: placeholders until a human take replaces them. */
+  synthetic: number;
+  /** Voiced lines read by a credited human voice. */
+  human: number;
   percent: number;
   /** Active lines still read as text only: the work left for the voice talent. */
   missing: number;
 }
 
-/** How much of the active script has a recorded, credited human voice. */
-export function voiceCoverage(lines: ReadonlyArray<{ audio_url: string | null; is_active: boolean }>): VoiceCoverage {
+/** True when a credit declares a synthetic voice, so it is never presented as a human recording. */
+export function isSyntheticVoice(credit: string | null | undefined): boolean {
+  return /synth[eè]se|synthetic|\bTTS\b/i.test(credit ?? "");
+}
+
+/** How much of the active script is voiced, split between human takes and clearly labelled synthetic voices. */
+export function voiceCoverage(lines: ReadonlyArray<{ audio_url: string | null; is_active: boolean; voice_credit?: string | null }>): VoiceCoverage {
   const active = lines.filter((line) => line.is_active);
-  const voiced = active.filter((line) => line.audio_url).length;
+  const voicedLines = active.filter((line) => line.audio_url);
+  const synthetic = voicedLines.filter((line) => isSyntheticVoice(line.voice_credit)).length;
   return {
     total: active.length,
-    voiced,
-    percent: active.length ? Math.round((voiced / active.length) * 100) : 0,
-    missing: active.length - voiced,
+    voiced: voicedLines.length,
+    synthetic,
+    human: voicedLines.length - synthetic,
+    percent: active.length ? Math.round((voicedLines.length / active.length) * 100) : 0,
+    missing: active.length - voicedLines.length,
   };
 }

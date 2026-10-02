@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { articles } from "@/data/public-content";
+import { articleCover, articles } from "@/data/public-content";
 import { IconArrowRight } from "@/components/ui/Icon";
 
 export default function ResourceLibrary() {
@@ -26,8 +27,13 @@ export default function ResourceLibrary() {
       </div>
       <div className="resource-list">{filtered.map((article) => (
         <Link href={`/ressources/${article.slug}`} className="resource-row" key={article.slug}>
-          <span className="resource-meta">{article.category}<span>{article.minutes} min de lecture</span></span>
-          <div><h2>{article.title}</h2><p>{article.description}</p></div><IconArrowRight size={22} />
+          <span className="resource-thumb" aria-hidden="true"><Image src={articleCover(article.slug).src} alt="" width={400} height={250} sizes="(max-width: 760px) 100vw, 220px" /></span>
+          <div className="resource-body">
+            <span className="resource-meta">{article.category}<span>{article.minutes} min de lecture</span></span>
+            <h2>{article.title}</h2>
+            <p>{article.description}</p>
+          </div>
+          <IconArrowRight size={22} />
         </Link>
       ))}</div>
       {!filtered.length && <div className="library-empty"><h2>Aucun guide trouvé.</h2><p>Essaie un autre thème ou un mot plus court.</p><button className="public-button button-outline" onClick={() => { setQuery(""); setCategory(""); }}>Effacer les filtres</button></div>}

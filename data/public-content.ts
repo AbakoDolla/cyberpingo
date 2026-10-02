@@ -67,28 +67,40 @@ export const articles: Article[] = [
   },
 ];
 
+export interface PageImage { src: string; alt: string }
+
+export const articleCover = (slug: string): PageImage => ({
+  src: `/images/resources/article-${slug}.webp`,
+  alt: "",
+});
+
 export const informationPages: Record<string, {
   title: string; introduction: string;
-  sections: { title: string; text: string; href?: string; link?: string }[];
+  hero?: PageImage;
+  sections: { title: string; text: string; href?: string; link?: string; image?: PageImage; points?: string[] }[];
 }> = {
   fonctionnalites: {
     title: "Comprendre. Essayer. Progresser.",
     introduction: "Un espace d’apprentissage en français qui transforme les notions de sécurité en décisions concrètes, à ton rythme.",
+    hero: { src: "/images/features/hero.webp", alt: "Pingo, la mascotte, présente des parcours, un bouclier validé et un terminal." },
     sections: [
-      { title: "Des parcours qui ont un fil conducteur", text: "Pars des fondamentaux, explore les réseaux et Linux, puis apprends à protéger le web, lire les logs et cadrer un test autorisé. Le programme détaillé reste consultable avant de créer un profil.", href: "/parcours", link: "Explorer les programmes" },
-      { title: "Des quiz avec une explication", text: "Chaque réponse est expliquée. Tu peux recommencer sans limite pour comprendre tes erreurs. Les XP d’un quiz ne sont attribués qu’à la première tentative et aux améliorations de ton meilleur score : répéter la même note ne rapporte rien de plus." },
-      { title: "Des défis, pas de vraies cibles", text: "Les exercices proposent des indices, des traces et une réponse à retrouver. Tout se passe dans une simulation pédagogique : aucune commande n’est exécutée sur un serveur distant.", href: "/challenges", link: "Essayer les défis" },
-      { title: "Un suivi personnel", text: "Leçons terminées, meilleurs scores et badges se retrouvent dans ta progression. Le profil et l’objectif quotidien sont modifiables. Tout est enregistré sur ton compte et se retrouve sur chacun de tes appareils.", href: "/progression", link: "Voir ma progression" },
-      { title: "Un mentor optionnel", text: "L’interface du mentor est disponible. Ses réponses nécessitent une clé Gemini configurée côté serveur. N’y saisis ni secret, ni donnée personnelle, ni information professionnelle confidentielle. Les réponses générées doivent toujours être vérifiées.", href: "/mentor", link: "Ouvrir le mentor" },
+      { title: "Des parcours qui ont un fil conducteur", text: "Pars des fondamentaux, explore les réseaux et Linux, puis apprends à protéger le web, lire les logs et cadrer un test autorisé. Le programme détaillé reste consultable avant de créer un profil.", href: "/parcours", link: "Explorer les programmes", image: { src: "/images/features/parcours.webp", alt: "Un schéma de réseau relié à des livres et à un serveur." }, points: ["Leçons courtes, une idée à la fois", "Des laboratoires simulés pour pratiquer", "Programme visible avant l’inscription"] },
+      { title: "Des quiz avec une explication", text: "Chaque réponse est expliquée. Tu peux recommencer sans limite pour comprendre tes erreurs. Les XP d’un quiz ne sont attribués qu’à la première tentative et aux améliorations de ton meilleur score : répéter la même note ne rapporte rien de plus.", image: { src: "/images/features/quiz.webp", alt: "Un bouclier validé entouré d’une médaille et de livres." }, points: ["Correction côté serveur", "Validation à partir de 70 %", "Meilleur score conservé"] },
+      { title: "Des défis, pas de vraies cibles", text: "Les exercices proposent des indices, des traces et une réponse à retrouver. Tout se passe dans une simulation pédagogique : aucune commande n’est exécutée sur un serveur distant.", href: "/challenges", link: "Essayer les défis", image: { src: "/images/features/defis.webp", alt: "Un radar, un terminal et un insecte symbolisant l’investigation." }, points: ["Indices pour avancer", "Journaux et captures réseau simulés", "Aucun risque pour de vrais systèmes"] },
+      { title: "Un suivi personnel", text: "Leçons terminées, meilleurs scores et badges se retrouvent dans ta progression. Le profil et l’objectif quotidien sont modifiables. Tout est enregistré sur ton compte et se retrouve sur chacun de tes appareils.", href: "/progression", link: "Voir ma progression", image: { src: "/images/features/suivi.webp", alt: "Un trophée, une médaille et un profil qui célèbrent la progression." }, points: ["XP, niveaux et badges", "Objectif quotidien modifiable", "Synchronisé entre tes appareils"] },
+      { title: "Un mentor optionnel", text: "L’interface du mentor est disponible. Ses réponses nécessitent une clé Gemini configurée côté serveur. N’y saisis ni secret, ni donnée personnelle, ni information professionnelle confidentielle. Les réponses générées doivent toujours être vérifiées.", href: "/mentor", link: "Ouvrir le mentor", image: { src: "/images/features/mentor.webp", alt: "Une puce d’intelligence artificielle, un terminal et une cloche d’alerte." }, points: ["Facultatif, jamais indispensable", "Réponses à vérifier", "Aucune donnée sensible à saisir"] },
     ],
   },
   "a-propos": {
     title: "La cybersécurité commence par un réflexe.",
     introduction: "CyberPingo veut rendre les premiers pas plus accessibles, en Afrique et partout dans le monde. Pas besoin de tout savoir pour commencer à mieux se protéger.",
+    hero: { src: "/images/about/hero.webp", alt: "Pingo devant un globe, un cadenas et un réseau, pour une cybersécurité accessible à tous." },
     sections: [
-      { title: "Apprendre avec des situations compréhensibles", text: "Un e-mail suspect, une permission trop large, une connexion inhabituelle : nous partons de situations concrètes avant d’introduire le vocabulaire. Les exemples relient chaque concept à une décision et à ses conséquences." },
-      { title: "Pratiquer avec responsabilité", text: "Savoir faire implique de savoir où s’arrêter. L’autorisation, la protection des données et la restitution des résultats font partie des parcours au même titre que les outils." },
-      { title: "Un projet en construction, sans promesses cachées", text: "Les comptes, la progression synchronisée, les quiz corrigés côté serveur et les défis sont disponibles. Le forum et les certificats accrédités ne le sont pas encore : nous préférons te dire ce qui existe vraiment.", href: "/fonctionnalites", link: "Voir ce qui est disponible" },
+      { title: "Apprendre avec des situations compréhensibles", text: "Un e-mail suspect, une permission trop large, une connexion inhabituelle : nous partons de situations concrètes avant d’introduire le vocabulaire. Les exemples relient chaque concept à une décision et à ses conséquences.", image: { src: "/images/about/situations.webp", alt: "Une cloche d’alerte, une fenêtre de navigateur et un cadenas." }, points: ["Situation d’abord, vocabulaire ensuite", "Chaque notion mène à une décision"] },
+      { title: "Pratiquer avec responsabilité", text: "Savoir faire implique de savoir où s’arrêter. L’autorisation, la protection des données et la restitution des résultats font partie des parcours au même titre que les outils.", image: { src: "/images/about/responsabilite.webp", alt: "Un bouclier, un certificat et une clé pour l’éthique et l’autorisation." }, points: ["Autorisation avant toute action", "Données protégées", "Résultats restitués avec clarté"] },
+      { title: "Pensé pour tous les contextes", text: "Les laboratoires sont des simulations qui tournent dans le navigateur : pas besoin d’un ordinateur puissant ni d’une infrastructure coûteuse pour s’entraîner. Le contenu est rédigé en français, avec des exemples proches de ceux que rencontrent les apprenants en Afrique francophone.", image: { src: "/images/about/monde.webp", alt: "Un globe relié à un réseau et à un téléphone." }, points: ["Rédigé en français", "Simulations dans le navigateur", "Accessible depuis un téléphone"] },
+      { title: "Une mascotte qui accompagne", text: "Pingo réagit à tes réussites et te guide pendant les parcours. Sa voix est pour l’instant une voix de synthèse neuronale, indiquée comme telle : elle sera remplacée par des enregistrements humains dès qu’ils seront prêts. Tu peux couper le son à tout moment, le texte reste toujours affiché.", image: { src: "/images/about/voix.webp", alt: "Un microphone, une puce et Pingo qui sourit." }, points: ["Voix de synthèse indiquée clairement", "Texte toujours affiché", "Son facultatif"] },
+      { title: "Un projet en construction, sans promesses cachées", text: "Les comptes, la progression synchronisée, les quiz corrigés côté serveur et les défis sont disponibles. Le forum et les certificats accrédités ne le sont pas encore : nous préférons te dire ce qui existe vraiment.", href: "/fonctionnalites", link: "Voir ce qui est disponible", image: { src: "/images/about/construction.webp", alt: "Un cube en construction avec un engrenage et un terminal." }, points: ["Disponible : comptes, quiz, défis", "À venir : forum, certificats accrédités"] },
     ],
   },
   communaute: {

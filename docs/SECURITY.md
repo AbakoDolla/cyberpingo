@@ -47,7 +47,7 @@ Les tables exposées ont des `grant` explicites colonne par colonne :
 - **Compétences, grades et badges** : `user_skills`, `user_ranks` et `user_badges` n'ont aucun droit d'écriture pour `authenticated`. Ils sont recalculés par `private.sync_skills`, `private.evaluate_rank` et `private.evaluate_badges` dans la transaction qui valide l'activité.
 - **Rendus Packet Tracer** : un lien n'est accepté que s'il est en `https://` (508 caractères au plus), et il n'est affiché dans l'administration que sous cette forme, avec `rel="noopener noreferrer"`. `admin_review_submission` est réservé au staff, journalisé et notifie l'apprenant. Seul un administrateur peut valider tant qu'un rôle Formateur n'existe pas.
 - **Contenu éditorial** : domaines, compétences, ressources, grades et répliques sont modifiables par le staff via RLS et droits par colonne, avec des contraintes de format (identifiants, longueurs, URL audio en `https://` ou chemin `/audio/…`).
-- **Mascotte** : une réplique audio exige un crédit de voix. L'application n'embarque aucune voix synthétique ; sans enregistrement actif, seul le sous-titre s'affiche.
+- **Mascotte** : une réplique audio exige un crédit de voix. Les 30 répliques de départ sont jouées avec une voix de synthèse neuronale, créditée comme telle dans oice_credit et remplaçable ligne par ligne par un enregistrement humain ; sans audio actif, seul le sous-titre s'affiche.
 
 ## Anti-triche
 
@@ -103,7 +103,7 @@ Supabase Auth applique en plus ses propres limites (connexion, inscription, e-ma
 - Buckets séparés, chacun avec une taille maximale et une liste blanche de types MIME appliquées par Supabase.
 - `avatars` (2 Mo, PNG/JPEG/WebP) : lecture publique, écriture limitée au dossier `<uid>/` du propriétaire ; `profiles.avatar_path` doit commencer par l'identifiant du profil.
 - `course-images` (5 Mo) et `lesson-assets` (20 Mo, images, PDF, MP4) : lecture publique, écriture réservée au staff.
-- `mascot-voice` (5 Mo, audio) : lecture publique (les voix sont jouées pour les apprenants), liste, envoi, remplacement et suppression réservés au staff. Voix humaines uniquement, avec crédit obligatoire.
+- `mascot-voice` (5 Mo, audio) : lecture publique (les voix sont jouées pour les apprenants), liste, envoi, remplacement et suppression réservés au staff. Voix humaines ou voix de synthèse, avec crédit obligatoire (une synthèse doit être déclarée comme telle).
 - `certificates` (5 Mo, PDF) : bucket privé. Seule la clé `service_role` y écrit (Edge Function `generate-certificate`) ; le propriétaire et le staff y lisent via des URL signées de 120 secondes.
 
 ## Edge Functions
@@ -127,7 +127,7 @@ Supabase Auth applique en plus ses propres limites (connexion, inscription, e-ma
 
 ## Application web
 
-- En-têtes : `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (caméra, micro, géolocalisation désactivés).
+- En-têtes : `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (caméra et géolocalisation désactivées ; micro limité à l'origine `self`, pour l'enregistrement du studio de voix de `/admin/mascotte`).
 - Les erreurs PostgreSQL ne sont jamais affichées : `lib/errors.ts` les traduit en messages français à partir du code SQLSTATE et du marqueur `hint = 'cyberpingo'`.
 - Les contenus de leçon sont rendus bloc par bloc sans HTML brut ; les médias doivent être en `https://`. Les réponses du mentor IA passent par un rendu Markdown minimal qui échappe tout le HTML avant mise en forme.
 - Les notifications n'acceptent que des liens relatifs, ce qui empêche une redirection vers un site externe.

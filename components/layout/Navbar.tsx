@@ -49,7 +49,7 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
       }}
     >
       <div className="public-container nav-inner">
-        <Logo className="public-logo" />
+        <Logo variant="badge" />
         <button
           ref={menuButton}
           type="button"
