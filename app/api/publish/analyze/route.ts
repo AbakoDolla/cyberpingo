@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
   if (!user) return failure("Connecte-toi pour analyser un document.", 401);
   const { data: rpcAdmin, error: rpcError } = await supabase.rpc("is_admin");
   if (rpcError || !isAdmin || !rpcAdmin) return failure("Accès réservé à l’équipe CyberPingo.", 403);
-  if (!isGeminiConfigured()) return failure("L’analyse automatique n’est pas configurée : ajoute GEMINI_API_KEY côté serveur.", 503);
+  if (!isGeminiConfigured()) return failure("L’analyse automatique est indisponible pour le moment.", 503);
 
   let body: AnalyzeBody;
   try { body = await request.json() as AnalyzeBody; } catch { return failure("Corps de requête invalide.", 400); }
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof GeminiError && error.status === 429) return failure("Le service d’analyse est saturé. Réessaie dans une minute.", 429);
     console.error("Admin import analyze error", error instanceof GeminiError ? error.status : error);
-    return failure("Gemini n’a pas pu analyser le fichier. Réessaie dans un instant.", 502);
+    return failure("L’analyse du fichier a échoué. Réessaie dans un instant.", 502);
   }
 
   try {
