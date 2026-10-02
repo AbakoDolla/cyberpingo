@@ -15,7 +15,7 @@ Le schéma complet est défini par les migrations de `supabase/migrations/`. Ell
 | `20261002000000_academy_engine.sql` | Moteur pédagogique : domaines, compétences, labs structurés (étapes, ressources, rendus), grades, répliques de la mascotte, badges à condition vérifiable. Additive, sans suppression de données |
 | `20261002010000_staff_roles_voice.sql` | Journal d'audit réservé au superadmin (politique `Superadmins read the audit log` sur `admin_logs`), bucket `mascot-voice` et ses quatre politiques staff |
 
-Les données de référence indispensables (20 niveaux, 10 badges, 4 défis, 9 grades) sont insérées par les migrations. Le contenu pédagogique de départ est dans `supabase/seed/01_starter_content.sql`, puis `supabase/seed/02_reseaux_path.sql` pour le parcours Réseaux complet.
+Les données de référence indispensables (20 niveaux, 10 badges, 4 défis, 9 grades) sont insérées par les migrations. Le contenu pédagogique de départ est dans `supabase/seed/01_starter_content.sql`, puis `supabase/seed/02_reseaux_path.sql` pour le parcours Réseaux complet et `supabase/seed/03_soc_path.sql` pour le parcours Linux et investigation SOC.
 
 ## Relations
 
@@ -162,6 +162,8 @@ Un lab ne peut être publié que s'il a un drapeau ou au moins une étape. `rese
 
 Le contenu du parcours Réseaux (cours `reseaux`) est dans `supabase/seed/content/reseaux-path.ts`, converti par `node scripts/generate-reseaux-seed.cjs` en `supabase/seed/02_reseaux_path.sql` (à charger après `01_starter_content.sql`, idempotent) : 24 leçons, 43 questions de quiz, 10 labs (dont `reseau-instable` en PCAP, `incident-pare-feu` en journaux, `packet-tracer-sous-reseaux` et `evaluation-reseaux`), 8 ressources, 6 compétences, 22 répliques de mascotte. Les fichiers de `public/labs/` sont produits par `scripts/generate-lab-assets.cjs`. Le badge existant `expert-reseau` exige désormais aussi les nouvelles leçons et les nouveaux quiz du parcours.
 
+Le parcours Linux et investigation SOC (cours `linux` et `analyse-logs`) est dans `supabase/seed/content/soc-path.ts`, converti par `node scripts/generate-soc-seed.cjs` en `supabase/seed/03_soc_path.sql` (à charger après le 02, idempotent) : 2 modules, 5 leçons, 5 quiz, 4 labs au format journaux (`audit-linux-droits`, `brute-force-ssh`, `intrusion-web`, `investigation-soc` qui sert d'évaluation), 36 étapes vérifiées, 9 ressources, 5 compétences, 5 badges (dont deux épiques) et 8 répliques de mascotte. Les 02 et 03 partagent le constructeur `scripts/seed-path-builder.cjs`. Les journaux de `public/labs/` sont générés par `scripts/generate-lab-assets.cjs` à partir de `scripts/lab-scenarios-soc.cjs`, et les clés de correction des étapes viennent des mêmes faits (`facts.soc`), jamais écrites à la main. Chaque lab a son propre attaquant (adresse IP distincte), pour qu'une réponse ne serve pas à un autre lab.
+
 ## Storage
 
 | Bucket | Accès | Taille max | Types | Écriture |
@@ -186,11 +188,11 @@ npx supabase gen types typescript --linked --schema public > types/database.type
 
 ## Contenu de départ
 
-`supabase/seed/content/*.ts` contient les parcours, leçons, quiz et labs rédigés. `npm run db:seed` les convertit en `supabase/seed/01_starter_content.sql`. Ce fichier ne crée aucun utilisateur ni aucune statistique ; il est chargé par `supabase db reset` en local, ou une fois dans l'éditeur SQL en production. `supabase/seed/02_reseaux_path.sql` complète le parcours Réseaux (voir « Moteur pédagogique ») et se charge ensuite.
+`supabase/seed/content/*.ts` contient les parcours, leçons, quiz et labs rédigés. `npm run db:seed` les convertit en `supabase/seed/01_starter_content.sql`. Ce fichier ne crée aucun utilisateur ni aucune statistique ; il est chargé par `supabase db reset` en local, ou une fois dans l'éditeur SQL en production. `supabase/seed/02_reseaux_path.sql` complète le parcours Réseaux (voir « Moteur pédagogique ») et `03_soc_path.sql` le parcours SOC ; ils se chargent ensuite, dans cet ordre.
 
 ## Tests
 
-`npm test` lance sept fichiers avec le runner natif de Node (75 tests).
+`npm test` lance huit fichiers avec le runner natif de Node (86 tests).
 
 `tests/database.test.cjs` (20 tests) applique les migrations et le contenu de départ dans PGlite, avec une émulation minimale des rôles Supabase (`anon`, `authenticated`, `auth.uid()`). Il couvre notamment :
 
@@ -205,4 +207,4 @@ npx supabase gen types typescript --linked --schema public > types/database.type
 
 `tests/learning.test.cjs` (11 tests) couvre la logique TypeScript partagée : calcul de niveau, série, redirections sûres, traduction des erreurs, validation des imports de cours et des quiz, rendu des blocs de leçon.
 
-`tests/academy.test.cjs` (14 tests) rejoue le moteur pédagogique dans PGlite : seed et fichiers de labs identiques à leurs générateurs, parcours Réseaux complet et publié, réponses des étapes invisibles pour le client, progression non falsifiable, correction serveur avec budget d'erreurs, XP et badge uniques à la fin d'un lab, aperçu administrateur sans gain, états de compétence, grades et prochain palier, rendus validés puis relus par le staff, édition des étapes sans casser la progression, règles de publication et réinitialisation. `tests/pcap.test.cjs` (5 tests) vérifie l'analyseur de fichiers PCAP, `tests/mascot.test.cjs` (8), `tests/labview.test.cjs` (8) et `tests/academyview.test.cjs` (9) la logique pure de la mascotte, des labs et des vues pédagogiques.
+`tests/academy.test.cjs` (16 tests) rejoue le moteur pédagogique dans PGlite : seed et fichiers de labs identiques à leurs générateurs, parcours Réseaux et parcours SOC complets et publiés (un apprenant les termine de bout en bout), réponses des étapes invisibles pour le client, progression non falsifiable, correction serveur avec budget d'erreurs, XP et badge uniques à la fin d'un lab, aperçu administrateur sans gain, états de compétence, grades et prochain palier, rendus validés puis relus par le staff, édition des étapes sans casser la progression, règles de publication et réinitialisation. `tests/pcap.test.cjs` (5 tests) vérifie l'analyseur de fichiers PCAP, `tests/mascot.test.cjs` (8), `tests/labview.test.cjs` (8) et `tests/academyview.test.cjs` (9) la logique pure de la mascotte, des labs et des vues pédagogiques.

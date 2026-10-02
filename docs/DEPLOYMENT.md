@@ -87,6 +87,8 @@ Le fichier est généré : modifiez `supabase/seed/content/*.ts`, puis `npm run 
 
 Chargez ensuite `supabase/seed/02_reseaux_path.sql` (même méthode, idempotent) : il complète le parcours Réseaux avec 24 leçons, 43 questions, 10 labs, 8 ressources, 6 domaines, 6 compétences et 22 répliques de mascotte. Il suppose que la migration `20261002000000_academy_engine.sql` est déjà appliquée (elle crée les 9 grades). Ce fichier est généré par `node scripts/generate-reseaux-seed.cjs` à partir de `supabase/seed/content/reseaux-path.ts`.
 
+Chargez enfin `supabase/seed/03_soc_path.sql` (idempotent, après le 02) : il ajoute le parcours Linux et investigation SOC, soit 5 leçons, 5 quiz, 4 labs de journaux (36 étapes vérifiées), 5 compétences, 5 badges et 8 répliques de mascotte, répartis sur les cours `linux` et `analyse-logs`. Il est généré par `node scripts/generate-soc-seed.cjs` à partir de `supabase/seed/content/soc-path.ts`. Les trois seeds ne sont pas des migrations : appliquez-les une fois par environnement, dans l'ordre 01, 02, 03. Après chargement en production, 14 labs, 29 leçons, 23 quiz, 11 compétences et 22 badges sont publiés.
+
 ### Ce que l'équipe doit fournir
 
 La plateforme a les emplacements et affiche un état vide honnête tant que ces éléments manquent. Rien n'est simulé :
