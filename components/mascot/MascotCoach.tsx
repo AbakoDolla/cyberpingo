@@ -9,6 +9,7 @@ import { IconPlay, IconSettings, IconX } from "@/components/ui/Icon";
 import { useUser } from "@/context/UserContext";
 import { onMascot, emitMascot } from "@/lib/mascot/bus";
 import { EVENT_PRIORITY, EXPRESSION_STATE } from "@/lib/mascot/events";
+import { isSyntheticVoice } from "@/lib/mascot/voice";
 import { IDLE_STATE, decide, displayDuration, pickLine, type SchedulerState } from "@/lib/mascot/scheduler";
 import { listMascotLines } from "@/services/academy.service";
 import type { MascotEvent, MascotLine } from "@/types/api";
@@ -178,7 +179,7 @@ export default function MascotCoach() {
             <IconPlay size={14} /> Écouter la voix
           </button>
         )}
-        {line.audio_url && line.voice_credit && spoken && <p className="mascot-coach__credit">Voix : {line.voice_credit}</p>}
+        {line.audio_url && line.voice_credit && !isSyntheticVoice(line.voice_credit) && spoken && <p className="mascot-coach__credit">Voix : {line.voice_credit}</p>}
         {panel && <MascotSettings idPrefix="coach" />}
         <div className="mascot-coach__actions">
           <button type="button" className="mascot-coach__button" onClick={() => setPanel((value) => !value)} aria-expanded={panel} aria-label="Régler Pingo"><IconSettings size={15} /></button>
