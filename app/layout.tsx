@@ -5,6 +5,10 @@ import "./intro.css";
 import "./learner.css";
 import "./learner-account.css";
 import "./learner-study.css";
+import "./learner-dashboard.css";
+import "./auth.css";
+import "./pingo.css";
+import "./system.css";
 import "./admin.css";
 import Providers from "./providers";
 
@@ -46,7 +50,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="fr" data-scroll-behavior="smooth" className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="font-body bg-cyber-black text-white antialiased min-h-screen">
         <Providers>{children}</Providers>
       </body>

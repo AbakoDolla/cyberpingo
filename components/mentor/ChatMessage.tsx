@@ -1,11 +1,30 @@
 import { MentorMessage } from "@/types";
 import { cn } from "@/lib/utils";
-import { IconAI } from "@/components/ui/Icon";
+import { IconAI, IconProfile } from "@/components/ui/Icon";
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function parseInline(text: string): string {
+  return escapeHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="mentor-md-strong">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em class="mentor-md-em">$1</em>')
+    .replace(/`([^`]+)`/g, '<code class="mentor-md-inline-code">$1</code>');
+}
+
+function codeBlockHtml(lines: string[], language: string) {
+  const langLabel = language ? `<span class="mentor-md-code-lang">${escapeHtml(language)}</span>` : "";
+  return `<div class="mentor-md-code">${langLabel}<code>${escapeHtml(lines.join("\n"))}</code></div>`;
+}
 
 /**
- * Transforme le Markdown basique de Gemini en HTML sécurisé.
- * On parse manuellement pour éviter une dépendance externe (react-markdown).
- * Supporte : **gras**, `code inline`, ```blocs de code```, listes, titres.
+ * Converts the mentor's constrained Markdown subset to escaped HTML.
+ * Supported syntax: headings, bullet/numbered lists, inline emphasis and fenced code.
  */
 function renderMarkdown(text: string): string {
   const lines = text.split("\n");
@@ -14,10 +33,7 @@ function renderMarkdown(text: string): string {
   let codeLang = "";
   let codeLines: string[] = [];
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-
-    // Blocs de code ```
+  for (const line of lines) {
     if (line.startsWith("```")) {
       if (!inCodeBlock) {
         inCodeBlock = true;
@@ -25,12 +41,7 @@ function renderMarkdown(text: string): string {
         codeLines = [];
       } else {
         inCodeBlock = false;
-        const langLabel = codeLang
-          ? `<span class="text-white/30 text-xs font-mono mb-1 block">${escapeHtml(codeLang)}</span>`
-          : "";
-        result.push(
-          `<div class="bg-cyber-black/80 border border-white/10 rounded-lg p-3 my-2 overflow-x-auto">${langLabel}<code class="font-mono text-xs text-cyber-green whitespace-pre">${escapeHtml(codeLines.join("\n"))}</code></div>`
-        );
+        result.push(codeBlockHtml(codeLines, codeLang));
         codeLines = [];
         codeLang = "";
       }
@@ -42,102 +53,65 @@ function renderMarkdown(text: string): string {
       continue;
     }
 
-    // Titres
     if (line.startsWith("### ")) {
-      result.push(`<p class="font-semibold text-white mt-3 mb-1">${parseInline(line.slice(4))}</p>`);
+      result.push(`<p class="mentor-md-heading">${parseInline(line.slice(4))}</p>`);
       continue;
     }
     if (line.startsWith("## ")) {
-      result.push(`<p class="font-semibold text-white mt-3 mb-1">${parseInline(line.slice(3))}</p>`);
+      result.push(`<p class="mentor-md-heading">${parseInline(line.slice(3))}</p>`);
       continue;
     }
     if (line.startsWith("# ")) {
-      result.push(`<p class="font-semibold text-white mt-2 mb-1">${parseInline(line.slice(2))}</p>`);
+      result.push(`<p class="mentor-md-heading">${parseInline(line.slice(2))}</p>`);
       continue;
     }
-
-    // Listes à puces
     if (line.startsWith("- ") || line.startsWith("* ")) {
-      result.push(`<div class="flex gap-2 my-0.5"><span class="text-cyber-blue shrink-0 mt-0.5">›</span><span>${parseInline(line.slice(2))}</span></div>`);
+      result.push(`<div class="mentor-md-list"><span>›</span><span>${parseInline(line.slice(2))}</span></div>`);
       continue;
     }
 
-    // Listes numérotées
     const numberedMatch = line.match(/^(\d+)\.\s(.+)/);
     if (numberedMatch) {
-      result.push(`<div class="flex gap-2 my-0.5"><span class="text-cyber-blue shrink-0 font-mono text-xs mt-0.5">${numberedMatch[1]}.</span><span>${parseInline(numberedMatch[2])}</span></div>`);
+      result.push(`<div class="mentor-md-list"><span>${numberedMatch[1]}.</span><span>${parseInline(numberedMatch[2])}</span></div>`);
       continue;
     }
 
-    // Ligne vide
     if (line.trim() === "") {
-      result.push(`<div class="h-1" />`);
+      result.push('<div class="mentor-md-spacer"></div>');
       continue;
     }
 
-    // Paragraphe normal
-    result.push(`<p class="leading-relaxed">${parseInline(line)}</p>`);
+    result.push(`<p>${parseInline(line)}</p>`);
   }
 
+  if (inCodeBlock) result.push(codeBlockHtml(codeLines, codeLang));
   return result.join("");
-}
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function parseInline(text: string): string {
-  return (
-    escapeHtml(text)
-      // **gras**
-      .replace(/\*\*(.+?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
-      // *italique*
-      .replace(/\*(.+?)\*/g, '<em class="text-white/80 italic">$1</em>')
-      // `code inline`
-      .replace(
-        /`([^`]+)`/g,
-        '<code class="bg-cyber-black/60 border border-white/10 rounded px-1 py-0.5 font-mono text-xs text-cyber-green">$1</code>'
-      )
-  );
 }
 
 export default function ChatMessage({ message }: { message: MentorMessage }) {
   const isMentor = message.role === "mentor";
 
   return (
-    <div className={cn("flex gap-3", isMentor ? "justify-start" : "justify-end")}>
-      {isMentor && (
-        <div className="w-8 h-8 rounded-xl bg-neon-purple/15 border border-neon-purple/25 flex items-center justify-center shrink-0 mt-1">
-          <IconAI size={15} strokeWidth={1.5} className="text-neon-purple" />
-        </div>
-      )}
+    <div className={cn("mentor-message", isMentor ? "is-mentor" : "is-user")}>
+      <div className="mentor-message-avatar" aria-hidden="true">
+        {isMentor ? <IconAI size={15} strokeWidth={1.5} /> : <IconProfile size={15} strokeWidth={1.5} />}
+      </div>
 
-      <div
-        className={cn(
-          "max-w-[82%] px-4 py-3 rounded-xl text-sm",
-          isMentor
-            ? "bg-white/5 border border-white/8 rounded-tl-none text-white/90"
-            : "bg-cyber-blue/20 border border-cyber-blue/20 rounded-tr-none text-white/90"
-        )}
-      >
+      <div className="mentor-message-bubble">
         {isMentor ? (
           <div
-            className="space-y-1"
+            className="mentor-markdown"
             dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
           />
         ) : (
-          <p className="leading-relaxed">{message.content}</p>
+          <p>{message.content}</p>
         )}
-        <p className="text-white/25 text-xs mt-2 text-right">
+        <time dateTime={message.createdAt}>
           {new Date(message.createdAt).toLocaleTimeString("fr-FR", {
             hour: "2-digit",
             minute: "2-digit",
           })}
-        </p>
+        </time>
       </div>
     </div>
   );

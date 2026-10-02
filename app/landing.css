@@ -45,6 +45,12 @@
 .public-button:hover svg { transform: translateX(3px); }
 .nav-actions .public-button { min-width: 140px; min-height: 42px; padding-block: 9px; border-radius: 14px; }
 .nav-actions .button-primary { border-radius: 100px; }
+.nav-session-placeholder { display: block; width: 140px; height: 42px; border-radius: 100px; background: linear-gradient(90deg, #0b1a2f, #10284a, #0b1a2f); background-size: 200% 100%; animation: nav-shimmer 1.4s linear infinite; }
+.nav-avatar { display: inline-flex; padding: 2px; border-radius: 50%; background: linear-gradient(135deg, #03cfff, #6727f8); transition: transform 180ms var(--public-ease); }
+.nav-avatar:hover { transform: scale(1.06); }
+.nav-avatar:focus-visible { outline: 2px solid var(--public-cyan); outline-offset: 3px; }
+@keyframes nav-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .nav-session-placeholder { animation: none; } }
 .motion-toggle, .nav-menu-toggle { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; color: #76baff; border-radius: 50%; }
 .motion-toggle:hover { background: #143353; }
 .motion-toggle[aria-pressed="false"] { color: #9ca8ba; }
@@ -417,7 +423,7 @@
   .hero-benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
   .hero-benefits li { flex-direction: row; align-items: center; gap: 10px; font-size: 10px; }
   .hero-visual { padding-top: 61px; margin-top: 10px; }
-  .hero-mascot { width: 75%; top: 0; left: -7%; max-height: 340px; opacity: .72; mask-image: linear-gradient(180deg, #000 60%, transparent); }
+  .hero-mascot { width: 75%; top: 0; left: -7%; max-height: 340px; opacity: .72; mask-image: linear-gradient(180deg, #000 55%, transparent), linear-gradient(90deg, #000 62%, transparent); mask-composite: intersect; -webkit-mask-composite: source-in; }
   .progress-demo { margin-right: 0; width: min(280px, 89%); transform: none; animation-name: dialog-arrive; }
   .companion-caption { left: auto; right: 7px; bottom: 5px; font-size: 9px; }
   .course-copy { padding-inline: 11px; }

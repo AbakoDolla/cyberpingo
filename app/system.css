@@ -1,0 +1,62 @@
+/* System screens: 404, runtime error, route loading. */
+.sys-screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 32px 20px;
+  overflow: hidden;
+  background:
+    radial-gradient(760px 420px at 80% -10%, rgba(103, 39, 248, 0.2), transparent 60%),
+    radial-gradient(640px 380px at 10% 100%, rgba(0, 157, 255, 0.16), transparent 60%),
+    var(--cp-bg);
+  color: var(--cp-text);
+}
+.sys-orbit {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: min(720px, 120vw);
+  aspect-ratio: 1;
+  border: 1px solid var(--cp-line);
+  border-radius: 50%;
+  translate: -50% -50%;
+  opacity: 0.55;
+  pointer-events: none;
+  animation: sys-orbit-spin 60s linear infinite;
+  mask-image: radial-gradient(circle, transparent 52%, #000 53%, #000 54%, transparent 55%);
+}
+.sys-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 520px;
+  text-align: center;
+  animation: cp-content-in 520ms var(--cp-ease) both;
+}
+.sys-code {
+  margin: 4px 0 0;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-size: clamp(3.5rem, 12vw, 6rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--cp-cyan);
+  text-shadow: 0 0 40px rgba(0, 213, 255, 0.35);
+}
+.sys-title {
+  margin: 0;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.sys-text { margin: 0; color: var(--cp-muted); line-height: 1.6; text-wrap: pretty; }
+.sys-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 18px; }
+
+@keyframes sys-orbit-spin { to { rotate: 360deg; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .sys-orbit { animation: none; }
+}

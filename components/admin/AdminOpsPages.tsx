@@ -9,14 +9,14 @@ import Badge from "@/components/ui/Badge";
 import { IconBell, IconCertificate } from "@/components/ui/Icon";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
-import { formatDate, formatDateTime, formatNumber, formatRelative } from "@/lib/format";
+import { formatDate, formatDateTime, formatNumber, formatRelative, plural } from "@/lib/format";
 import {
   adminBroadcastNotification, adminRestoreCertificate, adminRevokeCertificate, listAdminLogs, listCertificates,
   type AdminCertificate, type AdminLogRow,
 } from "@/services/admin.service";
 import type { Json } from "@/types/database.types";
 import ContactInbox from "./ContactInbox";
-import { AdminEmpty, AdminError, AdminLoading, AdminPageHeader, Notice } from "./AdminState";
+import { AdminEmpty, AdminError, AdminLoading, AdminPageHeader, ConfirmModal, Notice } from "./AdminState";
 import { Field, Textarea } from "./AdminFields";
 
 type Flash = { kind: "success" | "error"; text: string } | null;
@@ -29,11 +29,27 @@ export function AdminCertificatesPage() {
   const searchId = useId();
   const [draft, setDraft] = useState("");
   const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [sort, setSort] = useState("issued");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [flash, setFlash] = useState<Flash>(null);
+  const [revoking, setRevoking] = useState<AdminCertificate | null>(null);
+  const [restoring, setRestoring] = useState<AdminCertificate | null>(null);
+  const [revokeReason, setRevokeReason] = useState("");
   const certificates = useAsync(() => listCertificates({ search, limit }), [search, limit]);
-  const rows = certificates.data ?? [];
+  const rows = useMemo(() => {
+    const filtered = (certificates.data ?? []).filter((certificate) => {
+      if (status === "valid") return !certificate.revoked_at;
+      if (status === "revoked") return Boolean(certificate.revoked_at);
+      return true;
+    });
+    return filtered.sort((a, b) => {
+      if (sort === "name") return a.recipient_name.localeCompare(b.recipient_name, "fr");
+      if (sort === "course") return (a.course?.title ?? a.course_title).localeCompare(b.course?.title ?? b.course_title, "fr");
+      return new Date(b.issued_at).getTime() - new Date(a.issued_at).getTime();
+    });
+  }, [certificates.data, sort, status]);
   const revoked = rows.filter((row) => row.revoked_at).length;
 
   function applySearch(event: FormEvent) {
@@ -46,10 +62,8 @@ export function AdminCertificatesPage() {
     certificates.setData((current) => current?.map((row) => (row.id === id ? { ...row, ...changes } : row)));
   }
 
-  async function revoke(certificate: AdminCertificate) {
-    const answer = window.prompt(`Révoquer le certificat ${certificate.certificate_number} de ${certificate.recipient_name} ?\nIndique le motif (5 à 300 caractères). Il sera envoyé au titulaire et affiché sur la page de vérification.`);
-    if (answer === null) return;
-    const reason = answer.trim();
+  async function revoke(certificate: AdminCertificate, inputReason: string) {
+    const reason = inputReason.trim();
     if (reason.length < 5 || reason.length > 300) {
       setFlash({ kind: "error", text: "Le motif doit contenir entre 5 et 300 caractères. Rien n’a été modifié." });
       return;
@@ -60,6 +74,8 @@ export function AdminCertificatesPage() {
       await adminRevokeCertificate(certificate.id, reason);
       patch(certificate.id, { revoked_at: new Date().toISOString(), revoked_reason: reason });
       setFlash({ kind: "success", text: `Certificat ${certificate.certificate_number} révoqué. Le titulaire a été notifié.` });
+      setRevoking(null);
+      setRevokeReason("");
     } catch (cause) {
       setFlash({ kind: "error", text: errorMessage(cause, "Le certificat n’a pas pu être révoqué.") });
     } finally {
@@ -68,13 +84,13 @@ export function AdminCertificatesPage() {
   }
 
   async function restore(certificate: AdminCertificate) {
-    if (!window.confirm(`Rétablir le certificat ${certificate.certificate_number} de ${certificate.recipient_name} ? Il redeviendra valide sur la page de vérification.`)) return;
     setBusyId(certificate.id);
     setFlash(null);
     try {
       await adminRestoreCertificate(certificate.id);
       patch(certificate.id, { revoked_at: null, revoked_reason: null });
       setFlash({ kind: "success", text: `Certificat ${certificate.certificate_number} rétabli.` });
+      setRestoring(null);
     } catch (cause) {
       setFlash({ kind: "error", text: errorMessage(cause, "Le certificat n’a pas pu être rétabli.") });
     } finally {
@@ -88,10 +104,12 @@ export function AdminCertificatesPage() {
         title="Certificats"
         description="Certificats délivrés automatiquement à la fin d’un parcours. Une révocation est immédiatement visible sur la page publique de vérification."
       />
-      <form onSubmit={applySearch} className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end" role="search">
-        <div className="min-w-0 flex-1">
+      <form onSubmit={applySearch} className="adm-toolbar" role="search">
+        <div className="adm-toolbar__grow">
           <Input id={searchId} type="search" label="Rechercher" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Numéro, code de vérification, titulaire ou cours" autoComplete="off" />
         </div>
+        <Select label="Statut" value={status} onChange={(event) => setStatus(event.target.value)} options={[{ value: "all", label: "Tous" }, { value: "valid", label: "Valides" }, { value: "revoked", label: "Révoqués" }]} />
+        <Select label="Tri" value={sort} onChange={(event) => setSort(event.target.value)} options={[{ value: "issued", label: "Délivrance récente" }, { value: "name", label: "Titulaire A-Z" }, { value: "course", label: "Cours A-Z" }]} />
         <Button type="submit" variant="secondary" size="md">Rechercher</Button>
       </form>
       {flash && <div className="mb-4"><Notice kind={flash.kind}>{flash.text}</Notice></div>}
@@ -108,10 +126,10 @@ export function AdminCertificatesPage() {
             {formatNumber(rows.length)} certificat{rows.length > 1 ? "s" : ""} affiché{rows.length > 1 ? "s" : ""}
             {revoked > 0 && ` · ${formatNumber(revoked)} révoqué${revoked > 1 ? "s" : ""}`}
           </p>
-          <div className="overflow-x-auto rounded-xl2 border border-white/10">
-            <table className="w-full min-w-[56rem] text-left text-sm">
+          <div className="adm-table-wrap">
+            <table className="adm-table">
               <caption className="sr-only">Certificats délivrés, du plus récent au plus ancien</caption>
-              <thead className="bg-white/[0.03] text-white/60">
+              <thead>
                 <tr>
                   <th scope="col" className="px-4 py-3 font-medium">Titulaire</th>
                   <th scope="col" className="px-4 py-3 font-medium">Cours</th>
@@ -129,7 +147,7 @@ export function AdminCertificatesPage() {
                     <tr key={certificate.id} className="align-top">
                       <td className="px-4 py-3">
                         {certificate.profile?.id ? (
-                          <Link href={`/admin/utilisateurs/${certificate.profile.id}`} className="font-medium text-white hover:text-cyber-blue">{certificate.recipient_name}</Link>
+                          <Link href={`/admin/utilisateurs/${certificate.profile.id}`} className="font-medium text-white hover:text-cyan-100">{certificate.recipient_name}</Link>
                         ) : (
                           <span className="font-medium text-white">{certificate.recipient_name}</span>
                         )}
@@ -154,14 +172,14 @@ export function AdminCertificatesPage() {
                             href={`/certificat/${encodeURIComponent(certificate.verification_code)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center rounded-lg px-3 py-1.5 text-white/75 transition-colors hover:bg-white/5 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyber-blue"
+                            className="adm-action-link"
                           >
                             Vérifier<span className="sr-only"> le certificat {certificate.certificate_number} (nouvel onglet)</span>
                           </a>
                           {certificate.revoked_at ? (
-                            <Button type="button" size="sm" variant="secondary" loading={busy} disabled={busyId !== null} onClick={() => void restore(certificate)}>Rétablir</Button>
+                            <Button type="button" size="sm" variant="secondary" loading={busy} disabled={busyId !== null} onClick={() => setRestoring(certificate)}>Rétablir</Button>
                           ) : (
-                            <Button type="button" size="sm" variant="danger" loading={busy} disabled={busyId !== null} onClick={() => void revoke(certificate)}>Révoquer</Button>
+                            <Button type="button" size="sm" variant="danger" loading={busy} disabled={busyId !== null} onClick={() => { setRevoking(certificate); setRevokeReason(""); }}>Révoquer</Button>
                           )}
                         </div>
                       </td>
@@ -179,6 +197,29 @@ export function AdminCertificatesPage() {
           {certificates.error && <div className="mt-4"><Notice kind="error">{certificates.error.message}</Notice></div>}
         </>
       )}
+      <ConfirmModal
+        open={Boolean(revoking)}
+        title="Révoquer le certificat"
+        description={revoking ? `Le certificat ${revoking.certificate_number} de ${revoking.recipient_name} sera invalidé publiquement.` : ""}
+        danger
+        confirmLabel="Révoquer"
+        loading={busyId === revoking?.id}
+        onCancel={() => { setRevoking(null); setRevokeReason(""); }}
+        onConfirm={() => { if (revoking) void revoke(revoking, revokeReason); }}
+      >
+        <Field label="Motif visible par le titulaire (5 à 300 caractères)">
+          <Textarea rows={4} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} autoFocus />
+        </Field>
+      </ConfirmModal>
+      <ConfirmModal
+        open={Boolean(restoring)}
+        title="Rétablir le certificat"
+        description={restoring ? `Le certificat ${restoring.certificate_number} redeviendra valide sur la page de vérification.` : ""}
+        confirmLabel="Rétablir"
+        loading={busyId === restoring?.id}
+        onCancel={() => setRestoring(null)}
+        onConfirm={() => { if (restoring) void restore(restoring); }}
+      />
     </div>
   );
 }
@@ -260,7 +301,7 @@ function describeLog(log: AdminLogRow): { category: LogCategory; label: string; 
       return {
         category: "contenu",
         label,
-        summary: [text(details.slug), `${formatNumber(count(details.modules))} module(s), ${formatNumber(count(details.lessons))} leçon(s), ${formatNumber(count(details.quizzes))} quiz`].filter(Boolean).join(" · "),
+        summary: [text(details.slug), `${formatNumber(count(details.modules))} ${plural(count(details.modules), "module")}, ${formatNumber(count(details.lessons))} ${plural(count(details.lessons), "leçon")}, ${formatNumber(count(details.quizzes))} quiz`].filter(Boolean).join(" · "),
       };
     case "revoke_certificate":
     case "restore_certificate":
@@ -306,11 +347,11 @@ export function AdminLogsPage() {
         title="Journal d’audit"
         description="Chaque modification de contenu, de rôle, d’XP ou de certificat est enregistrée par la base de données. Le journal est en lecture seule."
       />
-      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-        <div className="min-w-0 flex-1">
+      <div className="adm-toolbar">
+        <div className="adm-toolbar__grow">
           <Input id={searchId} type="search" label="Filtrer les entrées chargées" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Action, titre, auteur…" autoComplete="off" />
         </div>
-        <div className="sm:w-60">
+        <div>
           <Select id={filterId} label="Catégorie" value={category} onChange={(e) => setCategory(e.target.value)} options={LOG_FILTERS} />
         </div>
       </div>
@@ -327,10 +368,10 @@ export function AdminLogsPage() {
           {!visible.length ? (
             <AdminEmpty>Aucune entrée ne correspond à ces filtres.</AdminEmpty>
           ) : (
-            <ol className="divide-y divide-white/5 overflow-hidden rounded-xl2 border border-white/10 bg-dark-navy">
+            <ol className="adm-panel divide-y divide-[rgba(0,191,255,0.08)] !p-0">
               {visible.map(({ log, category: kind, label, summary }) => (
                 <li key={log.id} className="grid gap-2 px-4 py-4 sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:gap-4">
-                  <time dateTime={log.created_at} title={formatDateTime(log.created_at)} className="text-sm text-white/60">
+                  <time dateTime={log.created_at} title={formatDateTime(log.created_at)} className="adm-muted text-sm">
                     {formatRelative(log.created_at)}
                     <span className="block text-xs">{formatDateTime(log.created_at)}</span>
                   </time>
@@ -339,15 +380,15 @@ export function AdminLogsPage() {
                       <Badge tone={CATEGORY_TONES[kind]}>{CATEGORY_LABELS[kind]}</Badge>
                       <span className="font-medium text-white">{label}</span>
                     </div>
-                    {summary && <p className="mt-1 break-words text-sm text-white/75">{summary}</p>}
-                    <p className="mt-1 text-sm text-white/60">
+                    {summary && <p className="mt-1 break-words text-sm text-cyan-50/85">{summary}</p>}
+                    <p className="adm-muted mt-1 text-sm">
                       Par {log.actor ? `${log.actor.display_name} (@${log.actor.username})` : "Système"}
                       {log.target_type && ` · ${log.target_type}`}
                     </p>
                     {log.details && Object.keys(asDetails(log.details)).length > 0 && (
                       <details className="mt-2 text-sm">
-                        <summary className="cursor-pointer text-white/60 hover:text-white">Détails techniques</summary>
-                        <pre className="mt-2 overflow-x-auto rounded-lg bg-cyber-black p-3 font-mono text-xs text-white/75">{JSON.stringify({ target_id: log.target_id, ...asDetails(log.details) }, null, 2)}</pre>
+                        <summary className="adm-muted cursor-pointer hover:text-white">Détails techniques</summary>
+                        <pre className="adm-code-preview mt-2 p-3 font-mono text-xs">{JSON.stringify({ target_id: log.target_id, ...asDetails(log.details) }, null, 2)}</pre>
                       </details>
                     )}
                   </div>
@@ -395,6 +436,7 @@ export function AdminNotificationsPage() {
   const [audience, setAudience] = useState<"all" | "learners" | "staff">("all");
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState<Flash>(null);
+  const [confirmSend, setConfirmSend] = useState(false);
 
   function validate(): string | null {
     const cleanTitle = title.trim();
@@ -405,12 +447,14 @@ export function AdminNotificationsPage() {
     return null;
   }
 
-  async function submit(event: FormEvent) {
+  function submit(event: FormEvent) {
     event.preventDefault();
     const problem = validate();
     if (problem) { setFlash({ kind: "error", text: problem }); return; }
-    const audienceLabel = AUDIENCE_OPTIONS.find((option) => option.value === audience)?.label.toLowerCase() ?? audience;
-    if (!window.confirm(`Envoyer « ${title.trim()} » à : ${audienceLabel} ? L’annonce ne pourra pas être retirée des boîtes de réception.`)) return;
+    setConfirmSend(true);
+  }
+
+  async function send() {
     setBusy(true);
     setFlash(null);
     try {
@@ -419,6 +463,7 @@ export function AdminNotificationsPage() {
       setTitle("");
       setBody("");
       setLink("");
+      setConfirmSend(false);
     } catch (cause) {
       setFlash({ kind: "error", text: errorMessage(cause, "L’annonce n’a pas pu être envoyée.") });
     } finally {
@@ -433,7 +478,7 @@ export function AdminNotificationsPage() {
         description="Envoie une notification dans l’application à un groupe de comptes. Limite : 10 annonces par heure."
       />
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <form onSubmit={submit} className="space-y-4 rounded-xl2 border border-white/10 bg-dark-navy p-5 sm:p-6" noValidate>
+        <form onSubmit={submit} className="adm-panel space-y-4" noValidate>
           <Input id={`${id}-title`} label="Titre" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={160} required placeholder="Nouveau parcours disponible" />
           <Field label={`Message (${body.length}/1000)`}>
             <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} maxLength={1000} placeholder="Ce que les apprenants doivent savoir." />
@@ -441,25 +486,34 @@ export function AdminNotificationsPage() {
           <Input id={`${id}-link`} label="Lien interne (facultatif)" value={link} onChange={(e) => setLink(e.target.value)} maxLength={301} placeholder="/courses" spellCheck={false} autoCapitalize="off" />
           <Select id={`${id}-audience`} label="Destinataires" value={audience} onChange={(e) => setAudience(e.target.value as typeof audience)} options={AUDIENCE_OPTIONS} />
           {flash && <Notice kind={flash.kind}>{flash.text}</Notice>}
-          <div className="border-t border-white/5 pt-5">
+          <div className="adm-divider pt-5">
             <Button type="submit" size="sm" loading={busy} icon={<IconBell size={16} />}>Envoyer l’annonce</Button>
           </div>
         </form>
-        <section aria-labelledby={`${id}-preview`} className="rounded-xl2 border border-white/10 bg-cyber-black/60 p-5">
-          <h2 id={`${id}-preview`} className="mb-3 text-sm font-medium text-white/60">Aperçu dans la boîte de réception</h2>
-          <div className="flex gap-3 rounded-xl border border-white/10 bg-dark-navy p-4">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-cyber-blue/15 text-cyber-blue" aria-hidden="true">
+        <section aria-labelledby={`${id}-preview`} className="adm-panel">
+          <h2 id={`${id}-preview`} className="adm-section-title mb-3">Aperçu dans la boîte de réception</h2>
+          <div className="flex gap-3 rounded-xl border border-[var(--cp-line)] bg-black/20 p-4">
+            <span className="adm-list-icon h-9 w-9" aria-hidden="true">
               {audience === "staff" ? <IconCertificate size={18} /> : <IconBell size={18} />}
             </span>
             <div className="min-w-0">
               <p className="break-words font-medium text-white">{title.trim() || "Titre de l’annonce"}</p>
-              <p className="mt-1 whitespace-pre-line break-words text-sm text-white/70">{body.trim() || "Le message apparaîtra ici."}</p>
-              {link.trim() && <p className="mt-2 truncate text-sm text-cyber-blue">Ouvrir {link.trim()}</p>}
-              <p className="mt-2 text-xs text-white/60">À l’instant</p>
+              <p className="adm-muted mt-1 whitespace-pre-line break-words text-sm">{body.trim() || "Le message apparaîtra ici."}</p>
+              {link.trim() && <p className="mt-2 truncate text-sm text-cyan-100">Ouvrir {link.trim()}</p>}
+              <p className="adm-muted mt-2 text-xs">À l’instant</p>
             </div>
           </div>
         </section>
       </div>
+      <ConfirmModal
+        open={confirmSend}
+        title="Envoyer l’annonce"
+        description={`Envoyer « ${title.trim()} » à ${AUDIENCE_OPTIONS.find((option) => option.value === audience)?.label.toLowerCase() ?? audience} ? L’annonce ne pourra pas être retirée des boîtes de réception.`}
+        confirmLabel="Envoyer"
+        loading={busy}
+        onCancel={() => setConfirmSend(false)}
+        onConfirm={() => void send()}
+      />
     </div>
   );
 }

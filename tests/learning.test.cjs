@@ -200,7 +200,9 @@ test("startup animation re-registers dismissal during Strict Mode effect replay"
   const react = { useEffect: (effect) => effects.push(effect), useRef: (value) => ({ current: value }), useState: (value) => [value, (next) => visibility.push(next)] };
   const module = { exports: {} };
   const localRequire = (name) => name === "react" ? react : name === "react/jsx-runtime" ? { jsx() {}, jsxs() {} } : {};
-  global.window = { matchMedia: () => media, setTimeout: (callback) => { const id = Symbol(); timers.set(id, callback); return id; }, clearTimeout: (id) => timers.delete(id), addEventListener() {}, removeEventListener() {} };
+  const dispatched = [];
+  global.window = { matchMedia: () => media, setTimeout: (callback) => { const id = Symbol(); timers.set(id, callback); return id; }, clearTimeout: (id) => timers.delete(id), addEventListener() {}, removeEventListener() {}, dispatchEvent: (event) => dispatched.push(event.type) };
+  global.document = { documentElement: { dataset: {} } };
   global.sessionStorage = { getItem: (key) => storage.get(key), setItem: (key, value) => storage.set(key, value) };
   try {
     vm.runInThisContext(`(function(require,module,exports){${output}\n})`, { filename })(localRequire, module, module.exports);
@@ -211,8 +213,11 @@ test("startup animation re-registers dismissal during Strict Mode effect replay"
     assert.equal(timers.size, 0);
     const replayCleanup = effects[0]();
     assert.equal(timers.size, 1);
+    assert.equal(global.document.documentElement.dataset.intro, "playing");
     [...timers.values()][0]();
     assert.deepEqual(visibility, [true, true, false]);
+    assert.equal(global.document.documentElement.dataset.intro, undefined);
+    assert.equal(dispatched.at(-1), "cyberpingo:intro-done");
     replayCleanup();
-  } finally { delete global.window; delete global.sessionStorage; }
+  } finally { delete global.window; delete global.document; delete global.sessionStorage; }
 });

@@ -4,35 +4,26 @@ import { cn } from "@/lib/utils";
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  hint?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, id, ...props }, ref) => {
+  ({ label, error, hint, className, id, ...props }, ref) => {
     const inputId = id ?? props.name;
+    const describedBy = [error ? `${inputId}-error` : null, hint ? `${inputId}-hint` : null].filter(Boolean).join(" ") || undefined;
     return (
-      <div className="w-full">
-        {label && (
-          <label htmlFor={inputId} className="block text-sm text-white/70 mb-1.5">
-            {label}
-          </label>
-        )}
+      <div className="ui-field">
+        {label && <label htmlFor={inputId} className="ui-field__label">{label}</label>}
         <input
           ref={ref}
           id={inputId}
-          className={cn(
-            "w-full bg-cyber-black border rounded-xl px-4 py-3 text-white placeholder:text-white/30 outline-none transition-colors",
-            error ? "border-cyber-red" : "border-white/10 focus:border-cyber-blue",
-            className
-          )}
+          className={cn("ui-input", error && "is-invalid", className)}
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? `${inputId}-error` : undefined}
+          aria-describedby={describedBy}
           {...props}
         />
-        {error && (
-          <p id={`${inputId}-error`} className="mt-1.5 text-xs text-cyber-red">
-            {error}
-          </p>
-        )}
+        {hint && !error && <p id={`${inputId}-hint`} className="ui-field__hint">{hint}</p>}
+        {error && <p id={`${inputId}-error`} className="ui-field__error" role="alert">{error}</p>}
       </div>
     );
   }

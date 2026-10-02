@@ -45,7 +45,7 @@ export default async function CertificateVerificationPage({ params }: { params: 
         <section className="cert-verdict" data-state="unknown" aria-live="polite">
           <span className="cert-verdict-icon" aria-hidden="true"><IconAlert size={26} /></span>
           <div>
-            <p className="cert-verdict-kicker">Code {grouped(code) || "vide"}</p>
+            <p className="cert-verdict-kicker">Code vérifié : {grouped(code) || "vide"}</p>
             <h1>{outcome.kind === "unconfigured" ? "Vérification indisponible sur ce déploiement." : "La vérification n’a pas abouti."}</h1>
             <p>{outcome.kind === "unconfigured"
               ? "Ce site n’est pas relié à la base CyberPingo. Aucun résultat ne peut être affiché."
@@ -66,7 +66,7 @@ export default async function CertificateVerificationPage({ params }: { params: 
         <section className="cert-verdict" data-state="missing" aria-live="polite">
           <span className="cert-verdict-icon" aria-hidden="true"><IconX size={26} /></span>
           <div>
-            <p className="cert-verdict-kicker">Code {grouped(code) || "vide"}</p>
+            <p className="cert-verdict-kicker">Code vérifié : {grouped(code) || "vide"}</p>
             <h1>Aucun certificat ne correspond à ce code.</h1>
             <p>Vérifie chaque caractère : le code compte 16 lettres et chiffres. Si le code est exact, ce document n’a pas été délivré par CyberPingo.</p>
           </div>
@@ -81,6 +81,8 @@ export default async function CertificateVerificationPage({ params }: { params: 
 
   const revoked = !cert.valid;
   const verificationCode = cert.verification_code ?? code;
+  const recipientName = cert.recipient_name ?? "Titulaire non renseigné";
+  const courseTitle = cert.course_title ?? "Parcours non renseigné";
 
   return (
     <div className="public-container inner-page">
@@ -91,7 +93,7 @@ export default async function CertificateVerificationPage({ params }: { params: 
           <p className="cert-verdict-kicker">{revoked ? "Certificat révoqué" : "Certificat authentique"}</p>
           <h1>{revoked
             ? "Ce certificat n’est plus valide."
-            : <>{cert.recipient_name} a terminé <span>{cert.course_title}</span>.</>}</h1>
+            : <>{recipientName} a terminé <span>{courseTitle}</span>.</>}</h1>
           <p>{revoked
             ? `CyberPingo a révoqué ce certificat${cert.revoked_at ? ` le ${formatDate(cert.revoked_at)}` : ""}. Il ne doit plus être accepté comme preuve de formation.`
             : "Ce certificat a été délivré par CyberPingo et n’a pas été révoqué à ce jour."}</p>
@@ -100,13 +102,13 @@ export default async function CertificateVerificationPage({ params }: { params: 
       </section>
 
       <dl className="cert-facts">
-        <div className="cert-holder"><dt>Titulaire</dt><dd>{cert.recipient_name}</dd></div>
+        <div className="cert-holder"><dt>Titulaire</dt><dd>{recipientName}</dd></div>
         <div>
           <dt>Parcours</dt>
-          <dd>{cert.course_slug ? <Link href={`/parcours/${cert.course_slug}`}>{cert.course_title}</Link> : cert.course_title}</dd>
+          <dd>{cert.course_slug ? <Link href={`/parcours/${cert.course_slug}`}>{courseTitle}</Link> : courseTitle}</dd>
         </div>
         <div><dt>Délivré le</dt><dd>{cert.issued_at ? formatDate(cert.issued_at) : "Non renseigné"}</dd></div>
-        <div><dt>Numéro de certificat</dt><dd className="cert-code">{cert.certificate_number}</dd></div>
+        <div><dt>Numéro de certificat</dt><dd className="cert-code">{cert.certificate_number ?? "Non renseigné"}</dd></div>
         <div><dt>Code de vérification</dt><dd className="cert-code">{grouped(verificationCode)}</dd></div>
       </dl>
 

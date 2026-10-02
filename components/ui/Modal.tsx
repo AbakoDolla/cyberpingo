@@ -1,7 +1,8 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useId, useRef } from "react";
 import { cn } from "@/lib/utils";
+import { IconX } from "./Icon";
 
 interface ModalProps {
   open: boolean;
@@ -11,42 +12,57 @@ interface ModalProps {
   className?: string;
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export default function Modal({ open, onClose, title, children, className }: ModalProps) {
+  const titleId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+    if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const panel = panelRef.current;
+    (panel?.querySelector<HTMLElement>(FOCUSABLE) ?? panel)?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") { onCloseRef.current(); return; }
+      if (event.key !== "Tab" || !panel) return;
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
-    if (open) document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose]);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previous?.focus?.();
+    };
+  }, [open]);
 
   if (!open) return null;
 
-  const titleId = `modal-title-${title?.replace(/\s+/g, "-").toLowerCase() ?? "dialog"}`;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby={title ? titleId : undefined}
-      onClick={onClose}
-    >
+    <div className="ui-modal" onClick={onClose}>
       <div
-        className={cn(
-          "relative bg-dark-navy border border-white/10 rounded-xl2 p-6 max-w-md w-full shadow-soft",
-          className
-        )}
-        onClick={(e) => e.stopPropagation()}
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        tabIndex={-1}
+        className={cn("ui-modal__panel", className)}
+        onClick={(event) => event.stopPropagation()}
       >
-        {title && <h2 id={titleId} className="font-display text-xl font-semibold mb-4">{title}</h2>}
+        {title && <h2 id={titleId} className="ui-modal__title">{title}</h2>}
         {children}
-        <button
-          onClick={onClose}
-          aria-label="Fermer"
-          className="absolute top-4 right-4 text-white/50 hover:text-white"
-        >
-          ✕
+        <button type="button" onClick={onClose} aria-label="Fermer" className="ui-modal__close">
+          <IconX size={18} />
         </button>
       </div>
     </div>

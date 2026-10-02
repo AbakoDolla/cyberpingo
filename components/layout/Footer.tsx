@@ -13,8 +13,8 @@ export default function Footer() {
     <footer className="public-footer">
       <div className="public-container footer-inner">
         <div className="footer-brand">
-          <Link href="/" aria-label="CyberPingo — Accueil"><Image src={logo} width={112} height={112} alt="Logo CyberPingo sur fond transparent" /></Link>
-          <div><strong>Apprends · Pratique · Protège</strong><p>La cybersécurité commence<br />par un premier pas.</p></div>
+          <Link href="/" aria-label="CyberPingo, accueil"><Image src={logo} width={112} height={112} alt="Logo CyberPingo sur fond transparent" /></Link>
+          <div><strong>Apprends · Pratique · Protège</strong><p>La cybersécurité commence <br />par un premier pas.</p></div>
         </div>
         {groups.map((group) => <div key={group.title}><h2>{group.title}</h2>{group.links.map((link) => <Link key={link.href} href={link.href}>{link.label}</Link>)}</div>)}
       </div>

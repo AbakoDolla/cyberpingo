@@ -7,6 +7,7 @@ import {
   IconArrowRight, IconAward, IconBolt, IconCheck, IconCourses,
   IconLesson, IconLock, IconProfile, IconShield, IconTarget, IconX,
 } from "@/components/ui/Icon";
+import { useUser } from "@/context/UserContext";
 
 const benefits = [
   { Icon: IconLesson, title: "100 % en ligne", detail: "et accessible partout" },
@@ -69,6 +70,7 @@ function ProgressDemo() {
 }
 
 export default function Hero() {
+  const { isAuthenticated, isStaff } = useUser();
   return (
     <section id="accueil" className="public-hero" aria-labelledby="hero-title">
       <div className="hero-lab" aria-hidden="true" />
@@ -82,9 +84,15 @@ export default function Hero() {
             à travers des leçons courtes, des défis pratiques et un suivi de ta progression.
           </p>
           <div className="hero-actions">
-            <Link href="/register" className="public-button button-primary">
-              Commencer maintenant <IconArrowRight size={17} />
-            </Link>
+            {isAuthenticated ? (
+              <Link href={isStaff ? "/admin" : "/dashboard"} className="public-button button-primary">
+                Continuer mon parcours <IconArrowRight size={17} />
+              </Link>
+            ) : (
+              <Link href="/register" className="public-button button-primary">
+                Commencer maintenant <IconArrowRight size={17} />
+              </Link>
+            )}
             <a href="#fonctionnalites" className="public-button button-outline">
               <span className="button-play" aria-hidden="true">▶</span> Découvrir la plateforme
             </a>

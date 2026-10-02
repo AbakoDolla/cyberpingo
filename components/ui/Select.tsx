@@ -10,25 +10,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, options, className, id, ...props }, ref) => {
     const selectId = id ?? props.name;
     return (
-      <div className="w-full">
-        {label && (
-          <label htmlFor={selectId} className="block text-sm text-white/70 mb-1.5">
-            {label}
-          </label>
-        )}
-        <select
-          ref={ref}
-          id={selectId}
-          className={cn(
-            "w-full bg-cyber-black border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:border-cyber-blue transition-colors",
-            className
-          )}
-          {...props}
-        >
+      <div className="ui-field">
+        {label && <label htmlFor={selectId} className="ui-field__label">{label}</label>}
+        <select ref={ref} id={selectId} className={cn("ui-input ui-select", className)} {...props}>
           {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
       </div>

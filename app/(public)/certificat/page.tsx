@@ -15,9 +15,19 @@ export default async function CertificateLookupPage({ searchParams }: { searchPa
 
   return (
     <div className="public-container inner-page">
-      <header className="page-heading">
-        <h1>Vérifier un certificat CyberPingo.</h1>
-        <p>Saisis le code imprimé sur le certificat, ou scanne son QR code. Le résultat est lu en direct dans la base CyberPingo.</p>
+      <header className="page-heading page-heading--split">
+        <div>
+          <h1>Vérifier un certificat CyberPingo.</h1>
+          <p>Saisis le code imprimé sur le certificat, ou scanne son QR code. Le résultat est lu en direct dans la base CyberPingo.</p>
+        </div>
+        <aside className="page-heading-panel cert-trust-panel" aria-label="Garanties de vérification">
+          <p>Vérification publique</p>
+          <ul>
+            <li>Code de 16 caractères.</li>
+            <li>Résultat sans connexion.</li>
+            <li>Révocation visible immédiatement.</li>
+          </ul>
+        </aside>
       </header>
       <CertificateLookupForm />
     </div>

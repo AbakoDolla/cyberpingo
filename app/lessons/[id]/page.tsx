@@ -35,6 +35,7 @@ function LessonView() {
   const [startError, setStartError] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
   const [readingPct, setReadingPct] = useState(0);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [completion, setCompletion] = useState<LessonCompletion | null>(null);
   const [completionError, setCompletionError] = useState<string | null>(null);
@@ -63,13 +64,20 @@ function LessonView() {
     setStartInfo(null);
     setStartedAtMs(localStart);
     setStartError(null);
+    setSaveError(null);
+    setCompletion(null);
+    setCompletionError(null);
     setStarting(true);
+    const storedPct = data?.progress?.progress_percentage ?? 0;
+    setReadingPct(storedPct);
+    lastSavedPct.current = storedPct;
+    lastSaveAt.current = 0;
     void startLesson(lesson.id).then((info) => {
       if (!active) return;
       setStartInfo(info);
       setStartedAtMs(info.started_at ? new Date(info.started_at).getTime() : localStart);
-      setReadingPct(info.progress_percentage ?? data?.progress?.progress_percentage ?? 0);
-      lastSavedPct.current = info.progress_percentage ?? 0;
+      setReadingPct(info.progress_percentage ?? storedPct);
+      lastSavedPct.current = info.progress_percentage ?? storedPct;
     }).catch((cause) => {
       if (active) setStartError(errorMessage(cause, "La leçon n’a pas pu être ouverte."));
     }).finally(() => { if (active) setStarting(false); });
@@ -100,7 +108,9 @@ function LessonView() {
       if ((crossedQuarter || nearEnd) && spaced) {
         lastSavedPct.current = pct;
         lastSaveAt.current = Date.now();
-        void saveLessonProgress(lesson.id, pct).catch(() => undefined);
+        void saveLessonProgress(lesson.id, pct)
+          .then(() => setSaveError(null))
+          .catch((cause) => setSaveError(errorMessage(cause, "La progression de lecture n’a pas pu être enregistrée.")));
       }
     };
     update();
@@ -125,8 +135,7 @@ function LessonView() {
   }
 
   return (
-    <>
-      <main className="study-page lesson-page">
+    <div className="study-page lesson-page">
         {loading && <div className="study-empty" role="status"><h1>Chargement de la leçon…</h1></div>}
         {error && !loading && <div className="study-empty" role="alert"><h1>Impossible de charger cette leçon.</h1><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
         {!loading && !error && !lesson && <div className="study-empty"><h1>Leçon introuvable.</h1><Link className="study-link" href="/courses">Retour aux cours</Link></div>}
@@ -145,9 +154,22 @@ function LessonView() {
               <div className="lesson-hero__progress"><strong>{completed ? 100 : readingPct} %</strong><ProgressBar value={completed ? 100 : readingPct} tone="blue" /></div>
             </header>
 
-            <article ref={articleRef} className="lesson-content">
-              {lesson.blocks.length ? lesson.blocks.map((block, index) => <LessonBlockRenderer key={`${lesson.id}-${index}`} block={block} />) : <div className="study-empty"><p>Cette leçon ne contient pas encore de bloc de contenu.</p></div>}
-            </article>
+            <div className="lesson-reader-layout">
+              <aside className="lesson-progress-rail" aria-label="Progression de lecture">
+                <h2>Lecture</h2>
+                <strong>{completed ? "100" : readingPct} %</strong>
+                <ProgressBar value={completed ? 100 : readingPct} tone={completed ? "green" : "blue"} height="sm" label="Progression de lecture" />
+                <p>{completed ? "Leçon validée." : remaining > 0 ? `Validation disponible dans ${remaining} s.` : "Tu peux valider quand tu es prêt."}</p>
+                {saveError && <p className="lesson-progress-rail__error" role="alert">{saveError}</p>}
+                <nav aria-label="Leçons proches">
+                  {sequence.previous && <Link href={`/lessons/${sequence.previous.id}`}>Précédente</Link>}
+                  {sequence.next && <Link href={`/lessons/${sequence.next.id}`}>Suivante</Link>}
+                </nav>
+              </aside>
+              <article ref={articleRef} className="lesson-content">
+                {lesson.blocks.length ? lesson.blocks.map((block, index) => <LessonBlockRenderer key={`${lesson.id}-${index}`} block={block} />) : <div className="study-empty"><p>Cette leçon ne contient pas encore de bloc de contenu.</p></div>}
+              </article>
+            </div>
 
             <section className="study-completion lesson-completion" aria-live="polite">
               <div>
@@ -165,8 +187,7 @@ function LessonView() {
             </nav>
           </>
         )}
-      </main>
-    </>
+    </div>
   );
 }
 

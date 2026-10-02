@@ -1,4 +1,3 @@
-/** Plain GET form: works without JavaScript and lands on /certificat?code=…, which redirects. */
 export default function CertificateLookupForm({ defaultValue = "" }: { defaultValue?: string }) {
   return (
     <form className="public-form cert-lookup" action="/certificat" method="get" role="search">
@@ -10,6 +9,8 @@ export default function CertificateLookupForm({ defaultValue = "" }: { defaultVa
           required
           minLength={16}
           maxLength={24}
+          inputMode="text"
+          pattern="[A-Za-z0-9\\s-]{16,24}"
           autoComplete="off"
           autoCapitalize="characters"
           spellCheck={false}

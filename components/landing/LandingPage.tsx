@@ -13,7 +13,7 @@ import {
   IconClock, IconCourses, IconGlobe, IconLesson, IconProfile,
   IconShield, IconTarget, IconTerminal, IconTrophy, IconX,
 } from "@/components/ui/Icon";
-import { formatDuration, levelLabel } from "@/lib/format";
+import { formatDuration, levelLabel, plural } from "@/lib/format";
 import { publicFaq, publicPaths, publicTestimonial, type PublicPath } from "@/data/landing";
 import type { CourseSummary, Lab } from "@/types/api";
 
@@ -41,7 +41,7 @@ function toPreview(course: CourseSummary, index: number): CoursePreview {
     path,
     tone: path?.tone ?? fallbackTones[index % fallbackTones.length],
     image: path?.image,
-    topics: path?.topics ?? [`${course.module_count} modules`, `${course.lesson_count} leçons`, `${course.quiz_count} quiz`],
+    topics: path?.topics ?? [`${course.module_count} ${plural(course.module_count, "module")}`, `${course.lesson_count} ${plural(course.lesson_count, "leçon")}`, `${course.quiz_count} quiz`],
   };
 }
 
@@ -60,7 +60,7 @@ function CourseCard({ preview, onSelect }: { preview: CoursePreview; onSelect: (
         <h3>{course.title}</h3>
         <p>{course.short_description || path?.description || course.description}</p>
         <div className="course-meta">
-          <span><IconCourses size={13} />{course.lesson_count} leçons</span><span><IconClock size={13} />{formatDuration(course.estimated_duration)}</span>
+          <span><IconCourses size={13} />{course.lesson_count} {plural(course.lesson_count, "leçon")}</span><span><IconClock size={13} />{formatDuration(course.estimated_duration)}</span>
           <span className="course-arrow"><IconArrowRight size={16} /></span>
         </div>
       </div>
@@ -97,7 +97,7 @@ function CourseDialog({ preview, onClose, returnFocusTo }: { preview: CoursePrev
         <p>{course.description}</p>
         <h3>Ce que tu vas apprendre</h3>
         <ul>{topics.map((topic) => <li key={topic}><IconCheck size={18} />{topic}</li>)}</ul>
-        <div className="course-dialog-notice">{course.lesson_count} leçons · {course.quiz_count} quiz · {formatDuration(course.estimated_duration)}.</div>
+        <div className="course-dialog-notice">{course.lesson_count} {plural(course.lesson_count, "leçon")} · {course.quiz_count} quiz · {formatDuration(course.estimated_duration)}.</div>
         <div className="study-actions">
           <Link href={`/register?next=/courses/${course.slug}`} className="public-button button-primary">Commencer ce parcours<IconArrowRight size={17} /></Link>
           <Link href={`/login?next=/courses/${course.slug}`} className="back-link">J’ai déjà un compte</Link>

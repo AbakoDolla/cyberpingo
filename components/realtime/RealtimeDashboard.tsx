@@ -1,28 +1,143 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ComponentType } from "react";
 import { pageLabel } from "@/lib/page-labels";
-import { formatRelative } from "@/lib/format";
+import { formatNumber, formatRelative } from "@/lib/format";
 import type { AdminLive } from "@/hooks/useRealtime";
 import { sessionStatus, type LearnerStatus, type LiveEvent, type LiveSession } from "@/types/realtime";
-import Card from "@/components/ui/Card";
 import { IconActivity, IconBolt, IconCircle, IconClock, IconProfile } from "@/components/ui/Icon";
 
 const STATUS: Record<LearnerStatus, { label: string; cls: string }> = {
-  online: { label: "En ligne", cls: "text-cyber-green bg-cyber-green/10 border-cyber-green/25" },
-  idle: { label: "Inactif", cls: "text-cyber-yellow bg-cyber-yellow/10 border-cyber-yellow/25" },
-  offline: { label: "Hors ligne", cls: "text-white/40 bg-white/5 border-white/10" },
+  online: { label: "En ligne", cls: "is-online" },
+  idle: { label: "Inactif", cls: "is-idle" },
+  offline: { label: "Hors ligne", cls: "is-offline" },
 };
 const ORDER: Record<LearnerStatus, number> = { online: 0, idle: 1, offline: 2 };
 
-function StatusBadge({ status }: { status: LearnerStatus }) { const s = STATUS[status]; return <span className={`rounded-full border px-2 py-0.5 text-[11px] ${s.cls}`}>{s.label}</span>; }
-function EventRow({ event, now }: { event: LiveEvent; now: number }) { return <li className="rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2"><p className="text-sm"><span className="font-medium">{event.displayName}</span> <span className="text-white/60">{event.label}</span>{event.xpDelta > 0 && <span className="ml-2 text-cyber-green">+{event.xpDelta} XP</span>}</p><p className="mt-1 text-[11px] text-white/38">{event.page ? `${pageLabel(event.page)} · ` : ""}{formatRelative(event.createdAt, new Date(now))}</p></li>; }
-function SessionRow({ session, now }: { session: LiveSession; now: number }) { const status = sessionStatus(session, now); return <li className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3"><div className="grid h-9 w-9 place-items-center rounded-xl bg-neon-purple/15 text-xs font-bold text-neon-purple">{session.displayName.slice(0, 2).toUpperCase()}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate text-sm font-medium">{session.displayName}</p><StatusBadge status={status} /></div><p className="mt-0.5 truncate text-[11px] text-white/42">{pageLabel(session.currentPage)} · vu {formatRelative(session.lastSeenAt, new Date(now))}</p></div><span className="hidden text-xs text-cyber-yellow tabular-nums sm:block">{session.xp.toLocaleString("fr-FR")} XP</span></li>; }
+function StatusBadge({ status }: { status: LearnerStatus }) {
+  const state = STATUS[status];
+  return <span className={`dash-live-status ${state.cls}`}>{state.label}</span>;
+}
+
+function EventRow({ event, now }: { event: LiveEvent; now: number }) {
+  return (
+    <li className="dash-live-event">
+      <div>
+        <strong>{event.displayName}</strong>
+        <span>{event.label}</span>
+        {event.xpDelta > 0 && <em>+{formatNumber(event.xpDelta)} XP</em>}
+      </div>
+      <small>{event.page ? `${pageLabel(event.page)} · ` : ""}{formatRelative(event.createdAt, new Date(now))}</small>
+    </li>
+  );
+}
+
+function SessionRow({ session, now }: { session: LiveSession; now: number }) {
+  const status = sessionStatus(session, now);
+  return (
+    <li className="dash-live-session">
+      <div className="dash-live-avatar">{session.displayName.slice(0, 2).toUpperCase()}</div>
+      <div className="dash-live-session-copy">
+        <div>
+          <strong>{session.displayName}</strong>
+          <StatusBadge status={status} />
+        </div>
+        <small>{pageLabel(session.currentPage)} · vu {formatRelative(session.lastSeenAt, new Date(now))}</small>
+      </div>
+      <span>{formatNumber(session.xp)} XP</span>
+    </li>
+  );
+}
+
+function Mini({
+  label,
+  value,
+  Icon,
+  tone,
+}: {
+  label: string;
+  value: number;
+  Icon: ComponentType<{ size?: number; className?: string }>;
+  tone: "green" | "amber" | "blue" | "purple";
+}) {
+  return (
+    <div className={`dash-live-mini is-${tone}`}>
+      <Icon size={16} />
+      <strong>{formatNumber(value)}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
 
 export default function RealtimeDashboard({ live }: { live: AdminLive }) {
   const [tab, setTab] = useState<"sessions" | "feed">("sessions");
-  const withStatus = useMemo(() => live.sessions.map((session) => ({ session, status: sessionStatus(session, live.now) })).sort((a, b) => ORDER[a.status] - ORDER[b.status] || b.session.lastSeenAt.localeCompare(a.session.lastSeenAt)), [live.sessions, live.now]);
-  const counts = withStatus.reduce((acc, item) => ({ ...acc, [item.status]: acc[item.status] + 1 }), { online: 0, idle: 0, offline: 0 });
-  return <Card className="overflow-hidden p-0"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/5 px-6 py-4"><div><h2 className="font-display font-semibold">Supervision temps réel</h2><p className="mt-1 text-xs text-white/45"><span className={`mr-2 inline-block h-2 w-2 rounded-full ${live.connection === "live" ? "bg-cyber-green animate-pulse" : live.connection === "connecting" ? "bg-cyber-yellow animate-pulse" : "bg-cyber-red"}`} />{live.connection === "live" ? "En direct" : live.connection === "connecting" ? "Connexion…" : "Flux interrompu"}</p></div><button type="button" onClick={() => void live.refresh()} className="rounded-xl border border-white/10 px-3 py-2 text-sm text-white/60 hover:text-white">Actualiser</button></div>{live.error && <p role="alert" className="mx-6 mt-4 rounded-xl border border-cyber-red/30 bg-cyber-red/10 px-4 py-3 text-sm text-red-100">{live.error}</p>}<div className="grid grid-cols-2 gap-3 border-b border-white/5 p-6 lg:grid-cols-4"><Mini label="En ligne" value={counts.online} Icon={IconCircle} tone="text-cyber-green" /><Mini label="Inactifs" value={counts.idle} Icon={IconClock} tone="text-cyber-yellow" /><Mini label="Actifs 24 h" value={live.overview?.active_24h ?? 0} Icon={IconProfile} tone="text-cyber-blue" /><Mini label="Événements" value={live.events.length} Icon={IconActivity} tone="text-neon-purple" /></div><div className="flex border-b border-white/5 px-6"><button type="button" onClick={() => setTab("sessions")} className={`px-4 py-3 text-sm ${tab === "sessions" ? "text-cyber-blue" : "text-white/50"}`}>Sessions</button><button type="button" onClick={() => setTab("feed")} className={`px-4 py-3 text-sm ${tab === "feed" ? "text-cyber-blue" : "text-white/50"}`}>Activité</button></div><div className="p-6">{live.loading ? <div className="h-32 rounded-xl bg-white/[0.04] animate-pulse" /> : tab === "sessions" ? (withStatus.length ? <ul className="max-h-[32rem] space-y-2 overflow-y-auto pr-1">{withStatus.map(({ session }) => <SessionRow key={session.userId} session={session} now={live.now} />)}</ul> : <p className="py-10 text-center text-sm text-white/45">Aucune session pour l’instant.</p>) : (live.events.length ? <ul className="max-h-[32rem] space-y-2 overflow-y-auto pr-1">{live.events.map((event) => <EventRow key={event.id} event={event} now={live.now} />)}</ul> : <p className="py-10 text-center text-sm text-white/45">Aucune activité enregistrée pour le moment.</p>)}</div><div aria-live="polite" className="pointer-events-none fixed right-4 top-4 z-50 space-y-2">{live.freshEvents.map((event) => <div key={event.id} className="rounded-xl border border-cyber-blue/25 bg-dark-navy/95 px-4 py-3 text-sm shadow-soft"><IconBolt size={13} className="mr-2 inline text-cyber-green" />{event.displayName} · {event.label}</div>)}</div></Card>;
+  const withStatus = useMemo(
+    () => live.sessions
+      .map((session) => ({ session, status: sessionStatus(session, live.now) }))
+      .sort((a, b) => ORDER[a.status] - ORDER[b.status] || b.session.lastSeenAt.localeCompare(a.session.lastSeenAt)),
+    [live.sessions, live.now],
+  );
+  const counts = withStatus.reduce<Record<LearnerStatus, number>>((acc, item) => {
+    acc[item.status] += 1;
+    return acc;
+  }, { online: 0, idle: 0, offline: 0 });
+
+  return (
+    <section className="dash-live" aria-labelledby="dash-live-title">
+      <header className="dash-live-header">
+        <div>
+          <h2 id="dash-live-title">Supervision temps réel</h2>
+          <p className={`dash-live-connection is-${live.connection}`}>
+            <span />
+            {live.connection === "live" ? "En direct" : live.connection === "connecting" ? "Connexion…" : "Flux interrompu"}
+          </p>
+        </div>
+        <button type="button" onClick={() => void live.refresh()} className="dash-live-refresh">Actualiser</button>
+      </header>
+
+      {live.error && <p role="alert" className="dash-live-error">{live.error}</p>}
+
+      <div className="dash-live-minis" aria-label="Résumé temps réel">
+        <Mini label="En ligne" value={counts.online} Icon={IconCircle} tone="green" />
+        <Mini label="Inactifs" value={counts.idle} Icon={IconClock} tone="amber" />
+        <Mini label="Actifs 24 h" value={live.overview?.active_24h ?? 0} Icon={IconProfile} tone="blue" />
+        <Mini label="Événements" value={live.events.length} Icon={IconActivity} tone="purple" />
+      </div>
+
+      <div className="dash-live-tabs" role="tablist" aria-label="Flux temps réel">
+        <button type="button" role="tab" aria-selected={tab === "sessions"} onClick={() => setTab("sessions")}>Sessions</button>
+        <button type="button" role="tab" aria-selected={tab === "feed"} onClick={() => setTab("feed")}>Activité</button>
+      </div>
+
+      <div className="dash-live-body">
+        {live.loading ? (
+          <div className="dash-skeleton dash-live-skeleton" aria-busy="true" />
+        ) : tab === "sessions" ? (
+          withStatus.length ? (
+            <ul className="dash-live-list">
+              {withStatus.map(({ session }) => <SessionRow key={session.userId} session={session} now={live.now} />)}
+            </ul>
+          ) : (
+            <p className="dash-empty">Aucune session pour l’instant.</p>
+          )
+        ) : live.events.length ? (
+          <ul className="dash-live-list">
+            {live.events.map((event) => <EventRow key={event.id} event={event} now={live.now} />)}
+          </ul>
+        ) : (
+          <p className="dash-empty">Aucune activité enregistrée pour le moment.</p>
+        )}
+      </div>
+
+      <div aria-live="polite" className="dash-live-toasts">
+        {live.freshEvents.map((event) => (
+          <div key={event.id} className="dash-live-toast">
+            <IconBolt size={13} />
+            {event.displayName} · {event.label}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
-function Mini({ label, value, Icon, tone }: { label: string; value: number; Icon: React.ComponentType<{ size?: number; className?: string }>; tone: string }) { return <div className="rounded-xl border border-white/5 bg-cyber-black/35 p-4"><Icon size={16} className={tone} /><p className={`mt-2 font-display text-2xl font-bold tabular-nums ${tone}`}>{value.toLocaleString("fr-FR")}</p><p className="text-xs text-white/45">{label}</p></div>; }

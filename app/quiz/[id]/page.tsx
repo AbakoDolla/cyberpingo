@@ -8,7 +8,7 @@ import QuestionCard from "@/components/quiz/QuestionCard";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
-import { IconCheck, IconLesson, IconTrophy } from "@/components/ui/Icon";
+import { IconArrowRight, IconCheck, IconLesson, IconTrophy } from "@/components/ui/Icon";
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
@@ -51,6 +51,11 @@ function QuizView() {
   const allAnswered = Boolean(quiz?.questions.length && quiz.questions.every((question) => (answers[question.id] ?? []).length > 0));
   const answeredCount = quiz?.questions.filter((question) => (answers[question.id] ?? []).length > 0).length ?? 0;
   const nextLesson = useMemo(() => nextLessonId(quiz?.lesson?.id, data?.course ? orderedLessons(data.course) : []), [quiz?.lesson?.id, data?.course]);
+  const attemptCopy = data?.attempts
+    ? data.attempts.attempts
+      ? `Meilleur score : ${data.attempts.best_percentage ?? 0} % · ${data.attempts.attempts} tentative${data.attempts.attempts > 1 ? "s" : ""}`
+      : "Aucune tentative enregistrée."
+    : null;
 
   function selectAnswer(question: QuizQuestion, answerId: string) {
     setAnswers((current) => {
@@ -86,8 +91,7 @@ function QuizView() {
   }
 
   return (
-    <>
-      <main className="study-page quiz-page">
+    <div className="study-page quiz-page">
         {loading && <div className="study-empty" role="status"><h1>Chargement du quiz…</h1></div>}
         {error && !loading && <div className="study-empty" role="alert"><h1>Impossible de charger ce quiz.</h1><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
         {!loading && !error && !quiz && <div className="study-empty"><h1>Quiz introuvable.</h1><Link className="study-link" href="/courses">Retour aux cours</Link></div>}
@@ -100,7 +104,7 @@ function QuizView() {
                 <div className="course-detail-hero__badges"><Badge tone="purple">{quiz.questions.length} question{quiz.questions.length > 1 ? "s" : ""}</Badge><Badge tone="blue">Validation à {quiz.pass_percentage} %</Badge><Badge tone="green">+{quiz.total_xp} XP possibles</Badge></div>
                 <h1>{quiz.title}</h1>
                 <p>{quiz.description || "Teste ta compréhension avant de continuer."}</p>
-                {data?.attempts && <p className="quiz-hero__attempts">{data.attempts.attempts ? `Meilleur score : ${data.attempts.best_percentage} % · ${data.attempts.attempts} tentative${data.attempts.attempts > 1 ? "s" : ""}` : "Aucune tentative enregistrée."}</p>}
+                {attemptCopy && !result && <p className="quiz-hero__attempts">{attemptCopy}</p>}
               </div>
               {!result && <div className="lesson-hero__progress"><strong>{answeredCount} / {quiz.questions.length}</strong><ProgressBar value={quiz.questions.length ? (answeredCount / quiz.questions.length) * 100 : 0} tone="purple" /></div>}
             </header>
@@ -112,6 +116,7 @@ function QuizView() {
                   <h2>{result.passed ? "Quiz validé !" : "Encore un passage, et ça va rentrer."}</h2>
                   <p>Score : {result.score} / {result.total} · {result.percentage} % (seuil : {result.pass_percentage} %)</p>
                   <strong>{result.xp_awarded > 0 ? `+${result.xp_awarded} XP gagnés` : "Aucun XP supplémentaire sur cette tentative"}</strong>
+                  <small>Les récompenses sont aussi affichées dans les toasts CyberPingo.</small>
                 </div>
                 <div className="quiz-result__answers">
                   {quiz.questions.map((question) => {
@@ -119,10 +124,11 @@ function QuizView() {
                     return questionResult ? <div key={question.id} className="quiz-result__question"><QuestionCard question={question} selected={answers[question.id] ?? []} result={questionResult} /><p className="quiz-result__correct"><IconCheck size={14} /> Réponse correcte : {correctLabels(question, questionResult)}</p></div> : null;
                   })}
                 </div>
-                <div className="study-actions"><Button variant="secondary" onClick={() => void retry()}>Réessayer</Button><Link className="study-button" href={`/courses/${quiz.course.slug}`}>Retour au parcours</Link>{nextLesson && <Link className="study-link" href={`/lessons/${nextLesson}`}>Leçon suivante →</Link>}</div>
+                <div className="study-actions"><Button variant="secondary" onClick={() => void retry()}>Réessayer</Button><Link className="study-button" href={`/courses/${quiz.course.slug}`}>Retour au parcours</Link>{nextLesson && <Link className="study-link" href={`/lessons/${nextLesson}`}>Leçon suivante <IconArrowRight size={14} /></Link>}</div>
               </section>
             ) : (
               <section className="quiz-form" aria-label="Questions du quiz">
+                <p className="quiz-keyboard-hint">Astuce clavier : utilise Tab pour passer d’une réponse à l’autre, puis Entrée ou Espace pour sélectionner.</p>
                 {quiz.questions.map((question) => <QuestionCard key={question.id} question={question} selected={answers[question.id] ?? []} onSelect={(answerId) => selectAnswer(question, answerId)} disabled={submitting} />)}
                 {submitError && <p className="settings-status is-error" role="alert">{submitError}</p>}
                 <div className="quiz-submit"><Button variant="success" onClick={() => void submit()} loading={submitting} disabled={!allAnswered}>Corriger mon quiz</Button><p>{allAnswered ? "Prêt pour la correction." : "Sélectionne au moins une réponse par question."}</p></div>
@@ -130,8 +136,7 @@ function QuizView() {
             )}
           </>
         )}
-      </main>
-    </>
+    </div>
   );
 }
 

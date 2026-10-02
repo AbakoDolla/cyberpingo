@@ -36,10 +36,12 @@ export async function deleteNotification(id: string) {
 }
 
 /** Live delivery of new notifications (Realtime publication on public.notifications, filtered by RLS). */
+let notificationChannelSeq = 0;
+
 export function subscribeToNotifications(userId: string, onInsert: (notification: AppNotification) => void): () => void {
   const supabase = getSupabaseBrowserClient();
   const channel: RealtimeChannel = supabase
-    .channel(`notifications:${userId}`)
+    .channel(`notifications:${userId}:${++notificationChannelSeq}`)
     .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` }, (payload) => {
       onInsert(payload.new as AppNotification);
     })
