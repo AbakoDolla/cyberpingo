@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { ArtCanvas, createPalette } from "@/components/art/shared";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,7 @@ interface SceneBannerProps {
   variant: SceneBannerVariant;
   className?: string;
   anchor?: "center" | "end";
+  photo?: boolean;
   children: ReactNode;
 }
 
@@ -181,15 +183,26 @@ function variantScene(variant: SceneBannerVariant, panel: string, scan: string, 
   }
 }
 
-export default function SceneBanner({ variant, className, anchor = "center", children }: SceneBannerProps) {
+export default function SceneBanner({ variant, className, anchor = "center", photo = true, children }: SceneBannerProps) {
   const palette = paletteForVariant(variant);
 
   return (
-    <div className={cn("cp-scene-banner", `cp-scene-banner--${variant}`, className)}>
+    <div className={cn("cp-scene-banner", `cp-scene-banner--${variant}`, photo && "cp-scene-banner--photo", className)}>
       <div className="cp-scene-banner__visual" aria-hidden="true">
-        <ArtCanvas className="cp-scene-banner__art" palette={palette} viewBox="0 0 960 240" preserveAspectRatio={anchor === "end" ? "xMaxYMid slice" : undefined}>
-          {(ids) => variantScene(variant, `url(#${ids.panel})`, ids.scan, palette.accent, palette.accentAlt, palette.warm)}
-        </ArtCanvas>
+        {photo ? (
+          <Image
+            src={`/images/banners/banner-${variant}.webp`}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 1280px) 100vw, 1280px"
+            className="cp-scene-banner__photo"
+          />
+        ) : (
+          <ArtCanvas className="cp-scene-banner__art" palette={palette} viewBox="0 0 960 240" preserveAspectRatio={anchor === "end" ? "xMaxYMid slice" : undefined}>
+            {(ids) => variantScene(variant, `url(#${ids.panel})`, ids.scan, palette.accent, palette.accentAlt, palette.warm)}
+          </ArtCanvas>
+        )}
       </div>
       <div className="cp-scene-banner__veil" />
       {children}

@@ -12,6 +12,7 @@ import { errorMessage } from "@/lib/errors";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { linkKindLabel } from "@/lib/academy-view";
 import { MASCOT_EVENTS, MASCOT_EVENT_LABELS, MASCOT_EXPRESSIONS, MASCOT_EXPRESSION_LABELS } from "@/lib/mascot/events";
+import { voiceCoverage } from "@/lib/mascot/voice";
 import {
   adminReviewSubmission, createDomain, createMascotLine, createSkill, createSkillLink, deleteDomain, deleteMascotLine, deleteSkill,
   deleteSkillLink, listDomains, listLabSubmissions, listMascotLines, listSkillLinkTargets, listSkillLinks, listSkills, updateDomain,
@@ -26,6 +27,7 @@ import {
   sortCatalogRows, useCatalog, useTitleSlug, type CatalogSort, type Flash,
 } from "./AdminCatalogPages";
 import { Field, Textarea, Toggle, asInt } from "./AdminFields";
+import VoiceStudio from "./VoiceStudio";
 
 const nextPosition = (rows: { position: number }[] | undefined) => (rows?.length ? Math.max(...rows.map((row) => row.position)) + 1 : 0);
 
@@ -558,6 +560,7 @@ export function AdminMascottePage() {
     [catalog.data],
   );
   const total = catalog.data?.length ?? 0;
+  const coverage = useMemo(() => voiceCoverage(catalog.data ?? []), [catalog.data]);
   const voiced = catalog.data?.filter((line) => line.audio_url).length ?? 0;
 
   const editor = catalog.editing === undefined ? null : (
@@ -576,13 +579,25 @@ export function AdminMascottePage() {
   return (
     <div>
       <AdminPageHeader
-        title="Mascotte"
+        title="Mascotte et voix"
         description="Les répliques que Pingo prononce selon les événements de la formation. Aucune phrase n’est écrite en dur dans l’application : tout vient d’ici."
         action={<Button size="sm" icon={<IconPlus size={16} />} onClick={() => catalog.open(null)}>Nouvelle réplique</Button>}
       />
       <p className="mascot-admin-note">
-        La voix ne passe que par de vraies voix humaines enregistrées. Renseigne le fichier audio et le crédit de la personne qui l’a enregistré ; sans audio, la réplique s’affiche en sous-titre uniquement.
+        La voix ne passe que par de vraies voix humaines. Enregistre une prise depuis ton micro ou importe un fichier, puis crédite la personne qui parle ; sans audio, la réplique s’affiche en sous-titre uniquement.
       </p>
+      {catalog.data && coverage.total > 0 && (
+        <section className="voice-coverage" aria-label="Couverture vocale">
+          <div className="voice-coverage__head">
+            <strong>{coverage.voiced} sur {coverage.total} répliques actives ont une voix</strong>
+            <span>{coverage.percent} %</span>
+          </div>
+          <div className="voice-coverage__track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={coverage.percent} aria-label="Répliques avec voix">
+            <span style={{ transform: `scaleX(${Math.min(1, Math.max(0, coverage.percent / 100))})` }} />
+          </div>
+          <p>{coverage.missing === 0 ? "Toutes les répliques actives sont prononcées par une voix humaine." : `${plural(coverage.missing, "réplique reste", "répliques restent")} à enregistrer.`}</p>
+        </section>
+      )}
       {catalog.editing === undefined && catalog.flash && <div className="mb-4"><Notice kind={catalog.flash.kind}>{catalog.flash.text}</Notice></div>}
       {uncovered.length > 0 && (
         <div className="mb-4">
@@ -712,12 +727,12 @@ function MascotLineEditor({ line, defaultEvent, nextPosition: suggested, flash, 
           <Input id={`${id}-priority`} label="Priorité (1 à 10)" type="number" inputMode="numeric" min={1} max={10} value={priority} onChange={(e) => setPriority(e.target.value)} />
           <Input id={`${id}-position`} label="Position" type="number" inputMode="numeric" value={position} onChange={(e) => setPosition(e.target.value)} />
         </div>
-        <Input id={`${id}-audio`} label="Fichier audio (facultatif)" value={audioUrl} onChange={(e) => setAudioUrl(e.target.value)} placeholder="/audio/bienvenue.mp3 ou https://…" maxLength={508} spellCheck={false} autoCapitalize="off" />
+        <VoiceStudio lineKey={line?.id ?? `nouvelle-${event}`} value={audioUrl.trim()} onChange={setAudioUrl} />
         <Input id={`${id}-credit`} label="Crédit de la voix" value={credit} onChange={(e) => setCredit(e.target.value)} placeholder="Nom de la personne qui a enregistré" maxLength={120} />
-        {line?.audio_url && (
-          // eslint-disable-next-line jsx-a11y/media-has-caption -- the spoken sentence is the text field above
-          <audio controls preload="none" src={line.audio_url} className="w-full" />
-        )}
+        <details className="voice-studio__advanced">
+          <summary>Utiliser un lien audio existant</summary>
+          <Input id={`${id}-audio`} label="Lien du fichier audio" value={audioUrl} onChange={(e) => setAudioUrl(e.target.value)} placeholder="/audio/bienvenue.mp3 ou https://…" maxLength={508} spellCheck={false} autoCapitalize="off" />
+        </details>
         <Toggle label="Réplique active" checked={isActive} onChange={setIsActive} />
         {err && <Notice kind="error">{err}</Notice>}
         <EditorActions busy={busy} isNew={isNew} createLabel="Créer la réplique" onDelete={() => void remove()} />

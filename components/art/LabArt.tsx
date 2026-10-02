@@ -1,3 +1,4 @@
+import PhotoCover from "@/components/art/PhotoCover";
 import { ArtCanvas, createPalette, normalizeArtKey } from "@/components/art/shared";
 import { cn } from "@/lib/utils";
 import type { LabCategory } from "@/types/api";
@@ -5,7 +6,12 @@ import type { LabCategory } from "@/types/api";
 interface LabArtProps {
   category: LabCategory;
   className?: string;
+  photo?: boolean;
+  sizes?: string;
+  priority?: boolean;
 }
+
+const LAB_PHOTOS: readonly string[] = ["reseau", "linux", "web", "cryptographie", "osint", "securite"];
 
 function paletteForLab(category: LabCategory) {
   switch (category) {
@@ -131,9 +137,14 @@ function screenShell(panel: string, accent: string, highlight: string) {
   );
 }
 
-export default function LabArt({ category, className }: LabArtProps) {
+export default function LabArt({ category, className, photo = false, sizes, priority }: LabArtProps) {
   const palette = paletteForLab(category);
   const normalizedCategory = normalizeArtKey(category) as LabCategory;
+
+  if (photo) {
+    const key = LAB_PHOTOS.includes(normalizedCategory) ? normalizedCategory : "securite";
+    return <PhotoCover src={`/images/covers/lab-${key}.webp`} className={className} sizes={sizes} priority={priority} />;
+  }
 
   return (
     <ArtCanvas className={cn("cp-lab-art", className)} palette={palette}>

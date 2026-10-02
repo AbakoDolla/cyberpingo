@@ -124,7 +124,7 @@ function CourseDetailView() {
                       className="course-detail-hero__image"
                     />
                   ) : (
-                    <CourseArt slug={course.slug} category={course.category} className="course-detail-hero__art" />
+                    <CourseArt slug={course.slug} category={course.category} className="course-detail-hero__art" photo sizes="(max-width: 1100px) 100vw, 66vw" priority />
                   )}
                 </div>
                 <div className="course-detail-hero__content">

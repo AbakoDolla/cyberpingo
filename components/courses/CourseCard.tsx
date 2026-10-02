@@ -47,7 +47,7 @@ export default function CourseCard({ course, href, progress, className, publicVi
                 className="course-card__cover-image"
               />
             ) : (
-              <CourseArt slug={course.slug} category={course.category} className="course-card__cover-art" />
+              <CourseArt slug={course.slug} category={course.category} className="course-card__cover-art" photo />
             )}
           </div>
           <div className="course-card__cover-top">

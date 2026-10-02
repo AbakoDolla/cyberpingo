@@ -1,3 +1,4 @@
+import PhotoCover from "@/components/art/PhotoCover";
 import { ArtCanvas, createPalette, hashArtKey, normalizeArtKey, pointString } from "@/components/art/shared";
 import { cn } from "@/lib/utils";
 
@@ -5,6 +6,9 @@ interface CourseArtProps {
   slug?: string | null;
   category?: string | null;
   className?: string;
+  photo?: boolean;
+  sizes?: string;
+  priority?: boolean;
 }
 
 type CourseSceneKey =
@@ -473,8 +477,11 @@ function sceneMarkup(scene: CourseSceneKey, seed: number, panel: string, scan: s
   }
 }
 
-export default function CourseArt({ slug, category, className }: CourseArtProps) {
+export default function CourseArt({ slug, category, className, photo = false, sizes, priority }: CourseArtProps) {
   const scene = sceneKey(slug, category);
+  if (photo) {
+    return <PhotoCover src={`/images/covers/course-${scene}.webp`} className={className} sizes={sizes} priority={priority} />;
+  }
   const seedKey = normalizeArtKey(slug) || normalizeArtKey(category) || "course";
   const seed = hashArtKey(seedKey);
   const palette = paletteForScene(scene, seed);

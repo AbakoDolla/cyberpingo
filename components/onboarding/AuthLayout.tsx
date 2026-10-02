@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, type FocusEvent, type ReactNode } from "react";
+import Image from "next/image";
 import Logo from "@/components/layout/Logo";
 import Pingo, { type PingoState } from "@/components/mascot/Pingo";
 
@@ -225,7 +226,16 @@ export default function AuthLayout({
 
   return (
     <div className="auth-page" data-phase={phase} data-scene={scene}>
-      <div className="auth-backdrop" aria-hidden="true" />
+      <div className="auth-backdrop" aria-hidden="true">
+        <Image
+          src="/images/scenes/auth-backdrop.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="auth-backdrop__photo"
+        />
+      </div>
 
       <section className="auth-stage" aria-label="Pingo te prépare un accès sécurisé">
         <div className="auth-stage__brand">

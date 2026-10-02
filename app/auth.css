@@ -19,6 +19,21 @@
     radial-gradient(55% 50% at 24% 42%, rgba(0, 213, 255, 0.13), transparent 70%),
     radial-gradient(38% 42% at 82% 78%, rgba(154, 100, 255, 0.12), transparent 72%),
     radial-gradient(30% 30% at 70% 12%, rgba(23, 101, 245, 0.1), transparent 70%);
+  overflow: hidden;
+}
+
+.auth-backdrop__photo {
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+.auth-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(2, 8, 23, 0.5) 0%, rgba(2, 8, 23, 0.22) 50%, rgba(2, 8, 23, 0.55) 100%),
+    linear-gradient(180deg, rgba(2, 8, 23, 0.12), rgba(2, 8, 23, 0.5));
 }
 
 /* stage */

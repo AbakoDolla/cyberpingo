@@ -1,6 +1,7 @@
 import { FunctionsHttpError, type RealtimeChannel } from "@supabase/supabase-js";
 import { AppError, toAppError, unwrap } from "@/lib/errors";
 import { parseLessonBlocks } from "@/lib/lesson-content";
+import { MAX_VOICE_BYTES, VOICE_EXTENSIONS, normalizeVoiceType } from "@/lib/mascot/voice";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Role } from "@/lib/roles";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "@/types/database.types";
@@ -598,9 +599,14 @@ function extensionFor(file: File, allowed: Record<string, string>): string {
   return ext;
 }
 
-async function uploadPublic(bucket: "course-images" | "lesson-assets", path: string, file: File): Promise<string> {
+async function uploadPublic(
+  bucket: "course-images" | "lesson-assets" | "mascot-voice",
+  path: string,
+  file: Blob,
+  contentType: string,
+): Promise<string> {
   const client = supabase();
-  const uploaded = await client.storage.from(bucket).upload(path, file, { cacheControl: "3600", upsert: true, contentType: file.type });
+  const uploaded = await client.storage.from(bucket).upload(path, file, { cacheControl: "3600", upsert: true, contentType });
   if (uploaded.error) throw toAppError(uploaded.error, "Le téléversement a échoué.");
   return client.storage.from(bucket).getPublicUrl(uploaded.data.path).data.publicUrl;
 }
@@ -608,11 +614,21 @@ async function uploadPublic(bucket: "course-images" | "lesson-assets", path: str
 export async function uploadCourseThumbnail(courseId: string, file: File): Promise<string> {
   if (file.size > 5 * 1024 * 1024) throw new AppError("invalid", "L’image du cours doit peser 5 Mo maximum.");
   const ext = extensionFor(file, THUMBNAIL_TYPES);
-  return uploadPublic("course-images", `${courseId}/${Date.now()}.${ext}`, file);
+  return uploadPublic("course-images", `${courseId}/${Date.now()}.${ext}`, file, file.type);
 }
 
 export async function uploadLessonAsset(lessonId: string, file: File): Promise<string> {
   if (file.size > 20 * 1024 * 1024) throw new AppError("invalid", "La ressource de leçon doit peser 20 Mo maximum.");
   const ext = extensionFor(file, LESSON_ASSET_TYPES);
-  return uploadPublic("lesson-assets", `${lessonId}/${Date.now()}.${ext}`, file);
+  return uploadPublic("lesson-assets", `${lessonId}/${Date.now()}.${ext}`, file, file.type);
+}
+
+/** Uploads a recorded or picked voice take for a mascot line and returns its public URL. */
+export async function uploadMascotVoice(lineKey: string, audio: Blob): Promise<string> {
+  if (audio.size === 0) throw new AppError("invalid", "L’enregistrement est vide.");
+  if (audio.size > MAX_VOICE_BYTES) throw new AppError("invalid", "L’audio doit peser 5 Mo maximum.");
+  const type = normalizeVoiceType(audio.type);
+  if (!type) throw new AppError("invalid", "Format audio non pris en charge (webm, ogg, mp3, m4a ou wav).");
+  const folder = lineKey.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "ligne";
+  return uploadPublic("mascot-voice", `${folder}/${Date.now()}.${VOICE_EXTENSIONS[type]}`, audio, type);
 }

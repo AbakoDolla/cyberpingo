@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import SceneBanner from "@/components/art/SceneBanner";
+import { useUser } from "@/context/UserContext";
+import { isSuperadmin as roleIsSuperadmin } from "@/lib/roles";
 import { formatNumber, plural } from "@/lib/format";
 import type { AdminOverview } from "@/types/api";
 import { IconActivity, IconAward, IconBolt, IconCertificate, IconCourses, IconMail, IconProfile, IconUsers } from "@/components/ui/Icon";
@@ -22,6 +24,8 @@ function Metric({ label, value, detail, Icon, tone = "adm-tone-cyan", href }: { 
 const COURSE_STATUS_LABELS = { draft: "brouillon", review: "en relecture", published: "publié", archived: "archivé" } as const;
 
 export default function OverviewPanel({ overview }: { overview: AdminOverview | null }) {
+  const { profile } = useUser();
+  const isSuperadmin = roleIsSuperadmin(profile?.role);
   if (!overview) {
     return (
       <div className="adm-metric-grid" aria-busy="true">
@@ -61,7 +65,7 @@ export default function OverviewPanel({ overview }: { overview: AdminOverview | 
     <section className="adm-panel">
       <div className="adm-panel__head">
         <h2 className="adm-section-title">Actions rapides</h2>
-        <Link href="/admin/journal" className="adm-text-link">Ouvrir le journal</Link>
+        {isSuperadmin && <Link href="/admin/journal" className="adm-text-link">Ouvrir le journal</Link>}
       </div>
       <div className="grid gap-3 md:grid-cols-3">
         {quickActions.map((action) => (

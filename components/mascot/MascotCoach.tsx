@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import MascotSettings from "@/components/mascot/MascotSettings";
 import Pingo from "@/components/mascot/Pingo";
 import { useMascotPrefs } from "@/components/mascot/useMascotPrefs";
-import { IconSettings, IconX } from "@/components/ui/Icon";
+import { IconPlay, IconSettings, IconX } from "@/components/ui/Icon";
 import { useUser } from "@/context/UserContext";
 import { onMascot, emitMascot } from "@/lib/mascot/bus";
 import { EVENT_PRIORITY, EXPRESSION_STATE } from "@/lib/mascot/events";
@@ -30,7 +30,7 @@ function once(key: string) {
   } catch { return false; }
 }
 
-interface Active { line: MascotLine; event: MascotEvent; spoken: boolean }
+interface Active { line: MascotLine; event: MascotEvent; spoken: boolean; failed: boolean }
 
 /**
  * Pingo as a mentor. One voice at a time, a priority between events, and a text fallback: a missing or
@@ -52,6 +52,7 @@ export default function MascotCoach() {
   const token = useRef(0);
   const lastLine = useRef<string | null>(null);
   const hovering = useRef(false);
+  const arm = useRef<(ms: number) => void>(() => undefined);
 
   useEffect(() => { prefsRef.current = prefs; }, [prefs]);
   useEffect(() => { linesRef.current = lines; }, [lines]);
@@ -75,6 +76,29 @@ export default function MascotCoach() {
     setPanel(false);
   }, []);
 
+  const startVoice = useCallback((line: MascotLine, mine: number, volume: number) => {
+    if (!line.audio_url) return;
+    if (audio.current) { audio.current.pause(); audio.current = null; }
+    const element = new Audio(line.audio_url);
+    element.volume = volume;
+    audio.current = element;
+    const markFailed = () => {
+      if (mine !== token.current) return;
+      setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: false, failed: true } : value));
+    };
+    element.addEventListener("ended", () => finish(mine));
+    element.addEventListener("error", markFailed);
+    element.play().then(() => {
+      if (mine !== token.current) return;
+      scheduler.current = { ...scheduler.current, activeUntil: Date.now() + MAX_VOICE_MS };
+      arm.current(MAX_VOICE_MS);
+      setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: true, failed: false } : value));
+    }).catch((error: unknown) => {
+      // A blocked autoplay stays replayable; any other failure means the recording itself is unusable.
+      if ((error as { name?: string } | null)?.name !== "NotAllowedError") markFailed();
+    });
+  }, [finish]);
+
   const present = useCallback((line: MascotLine, event: MascotEvent) => {
     if (timer.current) window.clearTimeout(timer.current);
     if (audio.current) { audio.current.pause(); audio.current = null; }
@@ -83,31 +107,26 @@ export default function MascotCoach() {
     const duration = displayDuration(line.text_fr);
     scheduler.current = { activePriority: EVENT_PRIORITY[event], activeUntil: now + duration, lastEnd: scheduler.current.lastEnd };
     lastLine.current = line.id;
-    setActive({ line, event, spoken: false });
+    setActive({ line, event, spoken: false, failed: false });
     setPanel(false);
-    const arm = (ms: number) => {
+    const schedule = (ms: number) => {
       if (timer.current) window.clearTimeout(timer.current);
       timer.current = window.setTimeout(() => {
-        if (hovering.current) { arm(2000); return; }
+        if (hovering.current) { schedule(2000); return; }
         finish(mine);
       }, ms);
     };
-    arm(duration);
+    arm.current = schedule;
+    schedule(duration);
 
     const current = prefsRef.current;
-    if (line.audio_url && current.voice && current.volume > 0) {
-      const element = new Audio(line.audio_url);
-      element.volume = current.volume;
-      audio.current = element;
-      element.addEventListener("ended", () => finish(mine));
-      element.play().then(() => {
-        if (mine !== token.current) return;
-        scheduler.current = { ...scheduler.current, activeUntil: Date.now() + MAX_VOICE_MS };
-        arm(MAX_VOICE_MS);
-        setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: true } : value));
-      }).catch(() => undefined);
-    }
-  }, [finish]);
+    if (line.audio_url && current.voice && current.volume > 0) startVoice(line, mine, current.volume);
+  }, [finish, startVoice]);
+
+  const replay = useCallback((line: MascotLine) => {
+    const volume = prefsRef.current.volume;
+    startVoice(line, token.current, volume > 0 ? volume : 0.8);
+  }, [startVoice]);
 
   useEffect(() => onMascot((event) => {
     if (!prefsRef.current.auto) return;
@@ -139,8 +158,9 @@ export default function MascotCoach() {
   }, [ready, pathname]);
 
   if (!active) return null;
-  const { line, spoken } = active;
+  const { line, spoken, failed } = active;
   const showText = !spoken || prefs.subtitles;
+  const canReplay = Boolean(line.audio_url) && !spoken && !failed;
   return (
     <aside
       className="mascot-coach"
@@ -153,6 +173,11 @@ export default function MascotCoach() {
       <div className="mascot-coach__pingo" aria-hidden="true"><Pingo state={EXPRESSION_STATE[line.expression]} size={64} /></div>
       <div className="mascot-coach__bubble">
         {showText ? <p className="mascot-coach__text">{line.text_fr}</p> : <p className="mascot-coach__text mascot-coach__text--voice">Pingo te parle…</p>}
+        {canReplay && (
+          <button type="button" className="mascot-coach__replay" onClick={() => replay(line)}>
+            <IconPlay size={14} /> Écouter la voix
+          </button>
+        )}
         {line.audio_url && line.voice_credit && spoken && <p className="mascot-coach__credit">Voix : {line.voice_credit}</p>}
         {panel && <MascotSettings idPrefix="coach" />}
         <div className="mascot-coach__actions">

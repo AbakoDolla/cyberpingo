@@ -70,6 +70,8 @@ npx supabase migration new nom_de_la_modification
 
 Pour vérifier l'état : `npx supabase migration list`.
 
+La migration `20261002010000_staff_roles_voice.sql` réserve le journal d'audit au superadmin et crée le bucket `mascot-voice`. Les visuels de `public/images/` sont versionnés ; pour les régénérer : `node scripts/generate-images.cjs`.
+
 > Le fichier `supabase/config.toml` déclare PostgreSQL 15 pour la stack locale. Si votre projet cloud utilise une version plus récente, `link` vous le signale ; alignez `major_version` pour que le local reflète la production.
 
 ## 4. Charger le contenu pédagogique
@@ -89,7 +91,7 @@ Chargez ensuite `supabase/seed/02_reseaux_path.sql` (même méthode, idempotent)
 
 La plateforme a les emplacements et affiche un état vide honnête tant que ces éléments manquent. Rien n'est simulé :
 
-- **Voix humaines** : enregistrements courts d'un comédien ou d'une comédienne, à déposer puis à rattacher à une réplique depuis `/admin/mascotte` (URL `https://` ou chemin `/audio/…`, avec le crédit de la voix obligatoire) ;
+- **Voix humaines** : enregistrements courts d'un comédien ou d'une comédienne, à enregistrer ou importer directement depuis le studio de `/admin/mascotte` (envoi dans le bucket `mascot-voice`, crédit de la voix obligatoire) ou à rattacher par URL `https://` ou chemin `/audio/…`. Aucune voix de synthèse n'est générée ;
 - **Vidéos pédagogiques** : à ajouter dans les leçons par un bloc vidéo (lien YouTube, Vimeo ou fichier), depuis l'éditeur de cours. Les encadrés « Vidéo à venir : titre » déjà présents sont affichés comme tels, sans faux lecteur ;
 - **Fichier Packet Tracer réel** (`.pkt`) : à ajouter comme ressource du lab `packet-tracer-sous-reseaux` ; la plateforme fournit la consigne, le rendu et la relecture, pas l'exécution du logiciel.
 
