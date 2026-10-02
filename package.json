@@ -13,11 +13,14 @@
     "db:seed": "node scripts/generate-content-seed.cjs"
   },
   "dependencies": {
+    "@react-three/fiber": "^9.8.1",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.2",
+    "@types/three": "^0.186.0",
     "next": "^15.5.26",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",

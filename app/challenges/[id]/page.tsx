@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import LabArt from "@/components/art/LabArt";
 import AppShell, { loginHref } from "@/components/layout/AppShell";
 import LabTerminal from "@/components/challenges/LabTerminal";
 import { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
@@ -61,10 +62,20 @@ function ChallengeDetailView() {
         {lab && (
           <>
             {lab.status === "draft" && <div className="learning-banner learning-banner--preview">Aperçu brouillon : le lab peut être testé par l’équipe, sans XP.</div>}
-            <header className="lab-hero">
-              <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone="green">+{lab.xp_reward} XP</Badge></div>
-              <h1>{lab.title}</h1>
-              <p>{lab.description}</p>
+            <header className="lab-hero lab-hero--visual">
+              <div className="lab-hero__visual">
+                <div className="lab-hero__media" aria-hidden="true"><LabArt category={lab.category} className="lab-hero__art" /></div>
+                <div className="lab-hero__content">
+                  <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone="green">+{lab.xp_reward} XP</Badge></div>
+                  <h1>{lab.title}</h1>
+                  <p>{lab.description}</p>
+                  <div className="lab-hero__facts" aria-label="Informations clés du lab">
+                    <span>{lab.objectives.length} objectif{lab.objectives.length > 1 ? "s" : ""}</span>
+                    <span>{lab.hints.length} indice{lab.hints.length > 1 ? "s" : ""}</span>
+                    <span>{solved ? "Scénario résolu" : "Prêt à jouer"}</span>
+                  </div>
+                </div>
+              </div>
             </header>
             <section className="lab-layout">
               <div className="lab-layout__main">

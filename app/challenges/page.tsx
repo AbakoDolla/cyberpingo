@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import EmptyArt from "@/components/art/EmptyArt";
+import SceneBanner from "@/components/art/SceneBanner";
 import AppShell from "@/components/layout/AppShell";
 import ChallengeCard, { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
 import Button from "@/components/ui/Button";
@@ -26,12 +28,14 @@ function ChallengesView() {
 
   return (
     <div className="study-page lab-catalogue-page">
-        <header className="study-heading study-hero lab-catalogue-hero">
-          <div><h1>Labs pratiques</h1><p>Des exercices guidés où tu raisonnes sur des objectifs, des indices et un terminal de simulation.{!userId && " Explore les labs librement, connecte-toi pour soumettre tes flags et gagner de l’XP."}</p></div>
-          <div className="study-hero__panel" aria-live="polite">
-            <strong>{userId ? solvedCount : labs?.length ?? 0}</strong>
-            <span>{userId ? `lab${solvedCount > 1 ? "s" : ""} résolu${solvedCount > 1 ? "s" : ""}` : `lab${(labs?.length ?? 0) > 1 ? "s" : ""} disponible${(labs?.length ?? 0) > 1 ? "s" : ""}`}</span>
-          </div>
+        <header>
+          <SceneBanner variant="challenges" className="study-heading study-hero lab-catalogue-hero">
+            <div><h1>Labs pratiques</h1><p>Des exercices guidés où tu raisonnes sur des objectifs, des indices et un terminal de simulation.{!userId && " Explore les labs librement, connecte-toi pour soumettre tes flags et gagner de l’XP."}</p></div>
+            <div className="study-hero__panel" aria-live="polite">
+              <strong>{userId ? solvedCount : labs?.length ?? 0}</strong>
+              <span>{userId ? `lab${solvedCount > 1 ? "s" : ""} résolu${solvedCount > 1 ? "s" : ""}` : `lab${(labs?.length ?? 0) > 1 ? "s" : ""} disponible${(labs?.length ?? 0) > 1 ? "s" : ""}`}</span>
+            </div>
+          </SceneBanner>
         </header>
         <section className="study-filters lab-filters" aria-label="Filtres des labs">
           <label>Rechercher<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="OSINT, flag, terminal…" /></label>
@@ -40,11 +44,11 @@ function ChallengesView() {
         </section>
         {loading && <div className="lab-card-grid" role="status" aria-label="Chargement des labs">{Array.from({ length: 6 }, (_, index) => <div key={index} className="lab-card-skeleton"><span /><strong /><p /><p /></div>)}</div>}
         {error && !loading && <div className="study-empty" role="alert"><h2>Impossible de charger les labs.</h2><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
-        {!loading && !error && labs && labs.length === 0 && <div className="study-empty"><h2>Aucun lab disponible pour le moment.</h2></div>}
+        {!loading && !error && labs && labs.length === 0 && <div className="study-empty"><EmptyArt kind="labs" /><h2>Aucun lab disponible pour le moment.</h2></div>}
         {!loading && !error && labs && labs.length > 0 && (
           <>
             <p className="study-result-count" role="status">{filtered.length} lab{filtered.length > 1 ? "s" : ""} trouvé{filtered.length > 1 ? "s" : ""}</p>
-            {filtered.length ? <div className="lab-card-grid">{filtered.map((lab) => <ChallengeCard key={lab.id} lab={lab} />)}</div> : <div className="study-empty"><h2>Aucun lab ne correspond à tes filtres.</h2><button type="button" className="study-link" onClick={() => { setQuery(""); setCategory(""); setDifficulty(""); }}>Effacer les filtres</button></div>}
+            {filtered.length ? <div className="lab-card-grid">{filtered.map((lab) => <ChallengeCard key={lab.id} lab={lab} />)}</div> : <div className="study-empty"><EmptyArt kind="search" /><h2>Aucun lab ne correspond à tes filtres.</h2><button type="button" className="study-link" onClick={() => { setQuery(""); setCategory(""); setDifficulty(""); }}>Effacer les filtres</button></div>}
           </>
         )}
     </div>

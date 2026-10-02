@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import SceneBanner from "@/components/art/SceneBanner";
 import Catalog from "@/components/public/Catalog";
 import ReloadButton from "@/components/public/ReloadButton";
 import { errorMessage } from "@/lib/errors";
@@ -20,7 +21,7 @@ export default async function CatalogPage() {
     const lessonCount = courses.reduce((sum, course) => sum + course.lesson_count, 0);
     const quizCount = courses.reduce((sum, course) => sum + course.quiz_count, 0);
     return <div className="public-container inner-page">
-      <header className="page-heading page-heading--split">
+      <SceneBanner variant="library" anchor="end" className="page-heading page-heading--split">
         <div>
           <h1>Ton prochain réflexe<br /><span>commence ici.</span></h1>
           <p>Choisis un sujet, lis le programme complet, puis crée ton compte quand tu es prêt à enregistrer ta progression.</p>
@@ -35,7 +36,7 @@ export default async function CatalogPage() {
           </dl>
           <span>Programmes en français, visibles avant inscription.</span>
         </aside>
-      </header>
+      </SceneBanner>
       {courses.length ? <Catalog courses={courses} /> : <div className="library-empty"><h2>Aucun cours disponible pour le moment.</h2><p>Reviens bientôt : le catalogue se remplit uniquement avec les parcours publiés.</p></div>}
     </div>;
   } catch (error) {

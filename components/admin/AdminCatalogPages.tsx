@@ -1,6 +1,9 @@
 "use client";
 
 import { useId, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import BadgeMedal from "@/components/art/BadgeMedal";
+import LabArt from "@/components/art/LabArt";
+import { badgeTierFromXp } from "@/components/art/shared";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
@@ -11,6 +14,7 @@ import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { slugifyCourse } from "@/lib/course-import";
+import { cn } from "@/lib/utils";
 import {
   adminGetLabFlag, adminSetLabFlag, createBadge, createChallenge, createLab, deleteBadge, deleteChallenge, deleteLab,
   listAdminCourses, listBadges, listChallenges, listLabs, updateBadge, updateChallenge, updateLab,
@@ -144,7 +148,7 @@ function Toolbar({ search, onSearch, placeholder, filterLabel, filter, onFilter,
   );
 }
 
-function CatalogRow({ active, icon, title, meta, aside, onSelect }: { active: boolean; icon: ReactNode; title: string; meta: string; aside: ReactNode; onSelect: () => void }) {
+function CatalogRow({ active, icon, iconClassName, title, meta, aside, onSelect }: { active: boolean; icon: ReactNode; iconClassName?: string; title: string; meta: string; aside: ReactNode; onSelect: () => void }) {
   return (
     <li>
       <button
@@ -153,7 +157,7 @@ function CatalogRow({ active, icon, title, meta, aside, onSelect }: { active: bo
         onClick={onSelect}
         className={`adm-list-button ${active ? "adm-list-row border-[var(--cp-line-strong)] bg-cyan-400/5" : "adm-list-row"}`}
       >
-        <span className="adm-list-icon" aria-hidden="true">{icon}</span>
+        <span className={cn("adm-list-icon", iconClassName)} aria-hidden="true">{icon}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate font-medium text-white">{title}</span>
           <span className="adm-muted mt-0.5 block truncate text-sm">{meta}</span>
@@ -279,7 +283,8 @@ export function AdminLabsPage() {
               key={lab.id}
               active={catalog.editing?.id === lab.id}
               onSelect={() => catalog.open(lab)}
-              icon={<IconTerminal size={20} />}
+              icon={<LabArt category={lab.category} className="adm-list-icon__art" />}
+              iconClassName="is-art"
               title={lab.title}
               meta={`${LAB_CATEGORY_LABELS[lab.category] ?? lab.category} · ${LEVEL_LABELS[lab.difficulty] ?? lab.difficulty} · ${formatNumber(lab.xp_reward)} XP`}
               aside={<StatusBadge status={lab.status} />}
@@ -575,7 +580,8 @@ export function AdminBadgesPage() {
               key={badge.id}
               active={catalog.editing?.id === badge.id}
               onSelect={() => catalog.open(badge)}
-              icon={<SlugIcon name={badge.icon} size={20} />}
+              icon={<BadgeMedal icon={badge.icon} earned={badge.is_active} tier={badgeTierFromXp(badge.xp_reward)} size={54} />}
+              iconClassName="is-medal"
               title={badge.name}
               meta={`${criteriaSummary(badge, courses.data)} · ${formatNumber(badge.xp_reward)} XP`}
               aside={<Badge tone={badge.is_active ? "green" : "neutral"}>{badge.is_active ? "Actif" : "Inactif"}</Badge>}

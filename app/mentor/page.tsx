@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import AppShell from "@/components/layout/AppShell";
 import ChatMessage from "@/components/mentor/ChatMessage";
+import Pingo from "@/components/mascot/Pingo";
+import { Pingo3D } from "@/components/mascot/Pingo3D";
 import Button from "@/components/ui/Button";
 import { sendMessageToMentor, type MentorResponse } from "@/services/mentor";
 import { useLearner } from "@/context/UserContext";
@@ -117,7 +119,13 @@ function MentorView() {
       <section className="mentor-shell" aria-labelledby="mentor-title">
         <header className="mentor-header">
           <div className="mentor-title-block">
-            <span className="mentor-orb"><IconAI size={24} strokeWidth={1.5} /></span>
+            <div className="mentor-pingo">
+              <Pingo3D
+                pose={thinking ? "think" : "idle"}
+                label="Pingo, ton mentor"
+                fallback={<Pingo state={thinking ? "thinking" : "explain"} size={84} />}
+              />
+            </div>
             <div>
               <h1 id="mentor-title">Mentor CyberPingo</h1>
               <p>Un copilote pédagogique pour débloquer une notion, vérifier une intuition ou préparer ta prochaine leçon.</p>

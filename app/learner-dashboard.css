@@ -1174,17 +1174,6 @@
   align-items: flex-start;
 }
 
-.mentor-orb {
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  width: 58px;
-  height: 58px;
-  border: 1px solid rgba(154, 100, 255, 0.42);
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(154, 100, 255, 0.24), rgba(0, 213, 255, 0.10));
-  color: #d8c8ff;
-}
 
 .mentor-title-block h1 {
   font-size: clamp(26px, 3vw, 38px);

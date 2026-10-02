@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LabArt from "@/components/art/LabArt";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { IconArrowRight, IconCheck, IconClock, IconTerminal } from "@/components/ui/Icon";
@@ -18,9 +19,19 @@ export default function ChallengeCard({ lab, href = `/challenges/${lab.slug}` }:
   return (
     <Link href={href} className="lab-card-link" aria-label={`Ouvrir le lab ${lab.title}`}>
       <Card glow={lab.solved ? "green" : "purple"} className="lab-card h-full">
-        <div className="lab-card__topline">
-          <Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge>
-          {lab.solved ? <Badge tone="green"><IconCheck size={12} /> Résolu</Badge> : <Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>}
+        <div className="lab-card__cover">
+          <div className="lab-card__cover-media" aria-hidden="true">
+            <LabArt category={lab.category} className="lab-card__cover-art" />
+          </div>
+          <div className="lab-card__cover-top">
+            <div className="lab-card__cover-badges">
+              <Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge>
+              <Badge tone="green">+{lab.xp_reward} XP</Badge>
+            </div>
+            <div className="lab-card__status">
+              {lab.solved ? <Badge tone="green"><IconCheck size={12} /> Résolu</Badge> : <Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>}
+            </div>
+          </div>
         </div>
         <div className="lab-card__body">
           <div className="lab-card__icon" aria-hidden="true"><IconTerminal size={26} /></div>

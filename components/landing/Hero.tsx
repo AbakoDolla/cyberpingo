@@ -7,6 +7,7 @@ import {
   IconArrowRight, IconAward, IconBolt, IconCheck, IconCourses,
   IconLesson, IconLock, IconProfile, IconShield, IconTarget, IconX,
 } from "@/components/ui/Icon";
+import { Pingo3D } from "@/components/mascot/Pingo3D";
 import { useUser } from "@/context/UserContext";
 
 const benefits = [
@@ -104,14 +105,21 @@ export default function Hero() {
           </ul>
         </div>
         <div className="hero-visual" aria-label="CyberPingo, ton compagnon d’apprentissage, et un aperçu interactif de la progression">
-          <Image
-            src="/images/hero-mascot.png"
-            alt="La mascotte CyberPingo en veste à capuche, dans son laboratoire bleu lumineux."
-            width={371}
-            height={432}
-            priority
-            sizes="(max-width: 600px) 230px, (max-width: 1100px) 340px, 400px"
-            className="hero-mascot"
+          <Pingo3D
+            pose="wave"
+            className="hero-3d"
+            label="Pingo, la mascotte 3D de CyberPingo, en veste à capuche"
+            fallback={(
+              <Image
+                src="/images/hero-mascot.png"
+                alt=""
+                width={371}
+                height={432}
+                priority
+                sizes="(max-width: 600px) 230px, (max-width: 1100px) 340px, 400px"
+                className="hero-3d__still"
+              />
+            )}
           />
           <ProgressDemo />
           <p className="hero-note">Petits pas.<br /><span>Grands réflexes !</span><span aria-hidden="true">↙</span></p>

@@ -21,6 +21,8 @@ import {
   IconTarget,
   IconTrophy,
 } from "@/components/ui/Icon";
+import Pingo from "@/components/mascot/Pingo";
+import { Pingo3D } from "@/components/mascot/Pingo3D";
 import SlugIcon from "@/components/ui/SlugIcon";
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
@@ -225,6 +227,13 @@ function LearnerDashboard() {
                 Aujourd’hui, ton meilleur levier est clair&nbsp;: continuer le bon parcours, tenir ton objectif et transformer l’effort en XP utile.
               </p>
             </div>
+          </div>
+          <div className="dash-hero-pingo">
+            <Pingo3D
+              pose={activeToday ? "celebrate" : "wave"}
+              label="Pingo, ta mascotte 3D"
+              fallback={<Pingo state="welcome" size={190} />}
+            />
           </div>
           {!data.profile.onboarding_completed && (
             <Link href="/onboarding" className="study-button dash-onboarding-link">Finaliser mon onboarding</Link>
