@@ -62,7 +62,7 @@ export default function AppShell({ children, allowGuest = false }: { children: R
   let content: React.ReactNode;
   if (!configured) {
     content = <ShellStatus title="Connexion au serveur non configurée." tone="error">
-      <p>Les variables <code>NEXT_PUBLIC_SUPABASE_URL</code> et <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> sont absentes de ce déploiement. Consulte <code>docs/DEPLOYMENT.md</code> pour relier CyberPingo à Supabase.</p>
+      <p>Le service est momentanément indisponible. Réessaie dans quelques instants.</p>
     </ShellStatus>;
   } else if (!hydrated) {
     content = <ShellLoading />;

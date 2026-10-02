@@ -6,7 +6,7 @@ export default function ProgressionSection({ courses }: { courses: CourseSummary
     <section id="roadmap" className="max-w-7xl mx-auto px-6 py-20">
       <div className="max-w-2xl mb-14">
         <h2 className="font-display text-3xl md:text-4xl font-semibold">Une séquence publiée, pas une progression inventée</h2>
-        <p className="mt-4 text-white/60">Les parcours ci-dessous viennent du catalogue Supabase et gardent leur ordre éditorial.</p>
+        <p className="mt-4 text-white/60">Les parcours ci-dessous viennent du catalogue officiel et gardent leur ordre éditorial.</p>
       </div>
       {courses.length ? <div className="relative"><div className="hidden md:block absolute left-0 right-0 top-6 h-px bg-white/10" /><div className="grid md:grid-cols-6 gap-6 md:gap-4">{courses.map((course, index) => (
         <div key={course.id} className="relative flex flex-col items-center text-center">

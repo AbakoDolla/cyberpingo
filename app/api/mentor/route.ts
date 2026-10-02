@@ -35,10 +35,10 @@ const MAX_MESSAGE_LENGTH = 2000;
 const failure = (error: string, status: number) => NextResponse.json({ error }, { status });
 
 export async function POST(request: NextRequest) {
-  if (!isSupabaseConfigured) return failure("Le service de comptes n’est pas configuré.", 503);
+  if (!isSupabaseConfigured) return failure("Le service de comptes est indisponible pour le moment.", 503);
   const { supabase, user } = await getRequestUser();
   if (!user) return failure("Connecte-toi pour discuter avec le mentor.", 401);
-  if (!isGeminiConfigured()) return failure("Le mentor IA n’est pas configuré sur ce serveur.", 503);
+  if (!isGeminiConfigured()) return failure("Le mentor est indisponible pour le moment.", 503);
 
   let body: RequestBody;
   try {

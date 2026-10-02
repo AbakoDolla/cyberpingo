@@ -23,7 +23,7 @@ const WELCOME_MESSAGE: MentorMessage = {
   id: "welcome",
   role: "mentor",
   content:
-    "Salut ! Je suis ton Mentor CyberPingo, propulsé par Gemini IA.\n\nPose-moi une question sur la cybersécurité : réseaux, Linux, sécurité web, cryptographie, pentest éthique… Je garde le contexte de notre conversation pour des réponses plus précises.\n\nChoisis une suggestion ou écris directement ta question :",
+    "Salut ! Je suis ton Mentor CyberPingo, propulsé par l’IA.\n\nPose-moi une question sur la cybersécurité : réseaux, Linux, sécurité web, cryptographie, pentest éthique… Je garde le contexte de notre conversation pour des réponses plus précises.\n\nChoisis une suggestion ou écris directement ta question :",
   createdAt: new Date().toISOString(),
 };
 

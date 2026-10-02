@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function CatalogPage() {
   const client = createSupabasePublicClient();
-  if (!client) return <div className="public-container inner-page"><section className="public-state public-state--warning"><h1>Catalogue indisponible.</h1><p>Le service Supabase n’est pas configuré sur ce déploiement. Les parcours publiés ne peuvent pas être lus.</p></section></div>;
+  if (!client) return <div className="public-container inner-page"><section className="public-state public-state--warning"><h1>Catalogue indisponible.</h1><p>Le catalogue est momentanément indisponible. Réessaie dans quelques instants. Les parcours publiés ne peuvent pas être lus.</p></section></div>;
   try {
     const courses = await listPublishedCourses(client);
     const lessonCount = courses.reduce((sum, course) => sum + course.lesson_count, 0);

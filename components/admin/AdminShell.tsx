@@ -34,7 +34,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const { hydrated, configured, isAuthenticated, isStaff, profile, syncError } = useUser();
 
   if (!configured) {
-    return <GuardFrame><GuardCard title="Service non configuré" detail="Ajoute la configuration Supabase pour ouvrir la console." /></GuardFrame>;
+    return <GuardFrame><GuardCard title="Service non configuré" detail="La console est momentanément indisponible." /></GuardFrame>;
   }
   if (!hydrated) {
     return <GuardFrame busy><div className="adm-guard-card"><div className="adm-skeleton mx-auto h-20 w-full max-w-80" /><span className="sr-only">Chargement de la console admin…</span></div></GuardFrame>;

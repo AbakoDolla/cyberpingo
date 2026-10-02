@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function CourseProgram({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const client = createSupabasePublicClient();
-  if (!client) return <div className="public-container inner-page"><section className="public-state public-state--warning"><h1>Parcours indisponible.</h1><p>Le service Supabase n’est pas configuré sur ce déploiement. Le programme ne peut pas être lu.</p></section></div>;
+  if (!client) return <div className="public-container inner-page"><section className="public-state public-state--warning"><h1>Parcours indisponible.</h1><p>Le programme est momentanément indisponible. Réessaie dans quelques instants.</p></section></div>;
   let course: CourseDetail | null;
   try {
     course = await getCourseBySlug(slug, client);
