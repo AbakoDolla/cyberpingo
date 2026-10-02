@@ -109,6 +109,9 @@ export type Database = {
           position: number
           created_at: string
           updated_at: string
+          criteria_lab_id: string | null
+          criteria_skill_id: string | null
+          rarity: string
         }
         Insert: {
           id?: string
@@ -124,6 +127,9 @@ export type Database = {
           position?: number
           created_at?: string
           updated_at?: string
+          criteria_lab_id?: string | null
+          criteria_skill_id?: string | null
+          rarity?: string
         }
         Update: {
           id?: string
@@ -139,6 +145,9 @@ export type Database = {
           position?: number
           created_at?: string
           updated_at?: string
+          criteria_lab_id?: string | null
+          criteria_skill_id?: string | null
+          rarity?: string
         }
         Relationships: [
           {
@@ -146,6 +155,20 @@ export type Database = {
             columns: ["criteria_course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "badges_criteria_lab_id_fkey"
+            columns: ["criteria_lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "badges_criteria_skill_id_fkey"
+            columns: ["criteria_skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
             referencedColumns: ["id"]
           },
         ]
@@ -369,6 +392,7 @@ export type Database = {
           created_at: string
           updated_at: string
           published_at: string | null
+          domain_id: string | null
         }
         Insert: {
           id?: string
@@ -390,6 +414,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
           published_at?: string | null
+          domain_id?: string | null
         }
         Update: {
           id?: string
@@ -411,6 +436,7 @@ export type Database = {
           created_at?: string
           updated_at?: string
           published_at?: string | null
+          domain_id?: string | null
         }
         Relationships: [
           {
@@ -418,6 +444,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_domain_id_fkey"
+            columns: ["domain_id"]
+            isOneToOne: false
+            referencedRelation: "domains"
             referencedColumns: ["id"]
           },
         ]
@@ -459,6 +492,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      domains: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          description: string
+          icon: string
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          description?: string
+          icon?: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          description?: string
+          icon?: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       enrollments: {
         Row: {
@@ -515,6 +581,50 @@ export type Database = {
           },
         ]
       }
+      lab_assets: {
+        Row: {
+          id: string
+          lab_id: string
+          kind: string
+          title: string
+          description: string
+          url: string
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          lab_id: string
+          kind: string
+          title: string
+          description?: string
+          url: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          lab_id?: string
+          kind?: string
+          title?: string
+          description?: string
+          url?: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_assets_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_completions: {
         Row: {
           user_id: string
@@ -551,6 +661,154 @@ export type Database = {
           },
         ]
       }
+      lab_submissions: {
+        Row: {
+          id: string
+          user_id: string
+          lab_id: string
+          note: string
+          link: string | null
+          status: string
+          feedback: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          lab_id: string
+          note: string
+          link?: string | null
+          status?: string
+          feedback?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          lab_id?: string
+          note?: string
+          link?: string | null
+          status?: string
+          feedback?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_submissions_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_submissions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_task_completions: {
+        Row: {
+          user_id: string
+          task_id: string
+          lab_id: string
+          completed_at: string
+        }
+        Insert: {
+          user_id: string
+          task_id: string
+          lab_id: string
+          completed_at?: string
+        }
+        Update: {
+          user_id?: string
+          task_id?: string
+          lab_id?: string
+          completed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_task_completions_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_task_completions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_task_completions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_tasks: {
+        Row: {
+          id: string
+          lab_id: string
+          position: number
+          prompt: string
+          hint: string
+          answer_format: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          lab_id: string
+          position?: number
+          prompt: string
+          hint?: string
+          answer_format?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          lab_id?: string
+          position?: number
+          prompt?: string
+          hint?: string
+          answer_format?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_tasks_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       labs: {
         Row: {
           id: string
@@ -570,6 +828,14 @@ export type Database = {
           created_at: string
           updated_at: string
           published_at: string | null
+          course_id: string | null
+          format: string
+          briefing: string
+          constraints: string[]
+          tools: string[]
+          requires_computer: boolean
+          is_assessment: boolean
+          estimated_minutes: number
         }
         Insert: {
           id?: string
@@ -589,6 +855,14 @@ export type Database = {
           created_at?: string
           updated_at?: string
           published_at?: string | null
+          course_id?: string | null
+          format?: string
+          briefing?: string
+          constraints?: string[]
+          tools?: string[]
+          requires_computer?: boolean
+          is_assessment?: boolean
+          estimated_minutes?: number
         }
         Update: {
           id?: string
@@ -608,8 +882,23 @@ export type Database = {
           created_at?: string
           updated_at?: string
           published_at?: string | null
+          course_id?: string | null
+          format?: string
+          briefing?: string
+          constraints?: string[]
+          tools?: string[]
+          requires_computer?: boolean
+          is_assessment?: boolean
+          estimated_minutes?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "labs_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "labs_created_by_fkey"
             columns: ["created_by"]
@@ -787,6 +1076,48 @@ export type Database = {
           level?: number
           required_xp?: number
           title?: string
+        }
+        Relationships: []
+      }
+      mascot_lines: {
+        Row: {
+          id: string
+          event: string
+          expression: string
+          text_fr: string
+          audio_url: string | null
+          voice_credit: string | null
+          priority: number
+          is_active: boolean
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          event: string
+          expression: string
+          text_fr: string
+          audio_url?: string | null
+          voice_credit?: string | null
+          priority?: number
+          is_active?: boolean
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          event?: string
+          expression?: string
+          text_fr?: string
+          audio_url?: string | null
+          voice_credit?: string | null
+          priority?: number
+          is_active?: boolean
+          position?: number
+          created_at?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1110,6 +1441,139 @@ export type Database = {
           },
         ]
       }
+      ranks: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          description: string
+          position: number
+          criteria: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          description?: string
+          position: number
+          criteria?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          description?: string
+          position?: number
+          criteria?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      skill_links: {
+        Row: {
+          id: string
+          skill_id: string
+          kind: string
+          lesson_id: string | null
+          quiz_id: string | null
+          lab_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          skill_id: string
+          kind: string
+          lesson_id?: string | null
+          quiz_id?: string | null
+          lab_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          skill_id?: string
+          kind?: string
+          lesson_id?: string | null
+          quiz_id?: string | null
+          lab_id?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_links_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_links_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_links_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_links_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skills: {
+        Row: {
+          id: string
+          domain_id: string | null
+          slug: string
+          name: string
+          description: string
+          position: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          domain_id?: string | null
+          slug: string
+          name: string
+          description?: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          domain_id?: string | null
+          slug?: string
+          name?: string
+          description?: string
+          position?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skills_domain_id_fkey"
+            columns: ["domain_id"]
+            isOneToOne: false
+            referencedRelation: "domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_badges: {
         Row: {
           user_id: string
@@ -1188,6 +1652,39 @@ export type Database = {
           },
         ]
       }
+      user_ranks: {
+        Row: {
+          user_id: string
+          rank_id: string
+          achieved_at: string
+        }
+        Insert: {
+          user_id: string
+          rank_id: string
+          achieved_at?: string
+        }
+        Update: {
+          user_id?: string
+          rank_id?: string
+          achieved_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_ranks_rank_id_fkey"
+            columns: ["rank_id"]
+            isOneToOne: false
+            referencedRelation: "ranks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_ranks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_settings: {
         Row: {
           user_id: string
@@ -1221,6 +1718,42 @@ export type Database = {
             foreignKeyName: "user_settings_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_skills: {
+        Row: {
+          user_id: string
+          skill_id: string
+          state: string
+          changed_at: string
+        }
+        Insert: {
+          user_id: string
+          skill_id: string
+          state: string
+          changed_at?: string
+        }
+        Update: {
+          user_id?: string
+          skill_id?: string
+          state?: string
+          changed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_skills_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -1327,6 +1860,12 @@ export type Database = {
         }
         Returns: string
       }
+      admin_get_lab_tasks: {
+        Args: {
+          p_lab_id: string
+        }
+        Returns: Json
+      }
       admin_get_quiz: {
         Args: {
           p_quiz_id: string
@@ -1349,6 +1888,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_review_submission: {
+        Args: {
+          p_id: string
+          p_status: string
+          p_feedback?: string
+        }
+        Returns: undefined
+      }
       admin_revoke_certificate: {
         Args: {
           p_certificate_id: string
@@ -1367,6 +1914,13 @@ export type Database = {
         Args: {
           p_lab_id: string
           p_flag: string
+        }
+        Returns: undefined
+      }
+      admin_set_lab_tasks: {
+        Args: {
+          p_lab_id: string
+          p_tasks: Json
         }
         Returns: undefined
       }
@@ -1423,6 +1977,10 @@ export type Database = {
         Args: {
           p_course_id: string
         }
+        Returns: Json
+      }
+      get_my_academy: {
+        Args: never
         Returns: Json
       }
       get_my_dashboard: {
@@ -1484,6 +2042,21 @@ export type Database = {
       submit_lab: {
         Args: {
           p_lab_id: string
+          p_answer: string
+        }
+        Returns: Json
+      }
+      submit_lab_report: {
+        Args: {
+          p_lab_id: string
+          p_note: string
+          p_link?: string
+        }
+        Returns: undefined
+      }
+      submit_lab_task: {
+        Args: {
+          p_task_id: string
           p_answer: string
         }
         Returns: Json

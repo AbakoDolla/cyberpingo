@@ -15,10 +15,12 @@ import {
 import { listLevels } from "@/services/gamification.service";
 import { completeLesson as completeLessonRequest } from "@/services/lessons.service";
 import { submitQuiz as submitQuizRequest } from "@/services/quiz.service";
-import { submitLab as submitLabRequest } from "@/services/labs.service";
+import { submitLab as submitLabRequest, submitLabReport as submitLabReportRequest, submitLabTask as submitLabTaskRequest } from "@/services/labs.service";
+import { emitMascot } from "@/lib/mascot/bus";
+import { mascotEventsFromRewards } from "@/lib/mascot/events";
 import { countUnreadNotifications, subscribeToNotifications } from "@/services/notification.service";
 import { sendHeartbeat } from "@/services/platform.service";
-import { hasRewards, type LabSubmission, type LessonCompletion, type LevelInfo, type MyProfile, type OnboardingAnswers, type QuizSubmission, type RewardSummary } from "@/types/api";
+import { hasRewards, type LabSubmission, type LabTaskResult, type LessonCompletion, type MascotEvent, type LevelInfo, type MyProfile, type OnboardingAnswers, type QuizSubmission, type RewardSummary } from "@/types/api";
 
 type Level = Awaited<ReturnType<typeof listLevels>>[number];
 
@@ -47,10 +49,12 @@ interface UserStateValue {
 interface UserActionsValue {
   refresh: () => Promise<void>;
   /** Applies an RPC reward summary locally (XP, level, streak) and queues the matching toasts. */
-  applyRewards: (result: unknown) => void;
+  applyRewards: (result: unknown, fallback?: MascotEvent) => void;
   completeLesson: (lessonId: string) => Promise<LessonCompletion>;
   submitQuiz: (quizId: string, answers: Record<string, string[]>) => Promise<QuizSubmission>;
   submitLab: (labId: string, answer: string) => Promise<LabSubmission>;
+  submitLabTask: (taskId: string, answer: string) => Promise<LabTaskResult>;
+  submitLabReport: (labId: string, note: string, link: string) => Promise<void>;
   completeOnboarding: (answers: OnboardingAnswers) => Promise<void>;
   updateProfile: (changes: ProfileChanges) => Promise<void>;
   updateAvatar: (file: File | null) => Promise<void>;
@@ -83,6 +87,13 @@ function SessionHeartbeat() {
   return null;
 }
 
+const SKILL_STATE_TOAST: Record<string, string> = {
+  learning: "En cours d’apprentissage",
+  consolidating: "En cours de consolidation",
+  exercises_mastered: "Maîtrisée dans les exercices",
+  validated: "Validée par une évaluation pratique",
+};
+
 function rewardToasts(summary: RewardSummary): Omit<RewardToast, "id">[] {
   const toasts: Omit<RewardToast, "id">[] = [];
   if (summary.leveled_up) {
@@ -93,6 +104,8 @@ function rewardToasts(summary: RewardSummary): Omit<RewardToast, "id">[] {
   for (const badge of summary.new_badges) toasts.push({ tone: "badge", title: `Badge débloqué : ${badge.name}`, detail: badge.description });
   for (const challenge of summary.completed_challenges) toasts.push({ tone: "success", title: `Défi réussi : ${challenge.title}`, detail: `+${challenge.xp_reward} XP` });
   if (summary.course_completed) toasts.push({ tone: "level-up", title: "Parcours terminé !", detail: summary.course_completed.title });
+  for (const skill of summary.new_skills ?? []) toasts.push({ tone: "success", title: `Compétence : ${skill.name}`, detail: SKILL_STATE_TOAST[skill.state] });
+  if (summary.new_rank) toasts.push({ tone: "level-up", title: `Nouveau grade : ${summary.new_rank.name}`, detail: summary.new_rank.description });
   if (summary.certificate) toasts.push({ tone: "badge", title: "Certificat obtenu", detail: `N° ${summary.certificate.certificate_number}` });
   return toasts;
 }
@@ -208,8 +221,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (user) await loadRef.current(user.id); else { becomeGuest(); setHydrated(true); }
   }, [becomeGuest]);
 
-  const applyRewards = useCallback((result: unknown) => {
+  const applyRewards = useCallback((result: unknown, fallback?: MascotEvent) => {
     if (!hasRewards(result)) return;
+    const events = mascotEventsFromRewards(result);
+    emitMascot(events.length || !fallback ? events : [fallback]);
     setProfile((current) => current && {
       ...current,
       xp: result.level_info.xp,
@@ -225,14 +240,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const completeLesson = useCallback(async (lessonId: string) => {
     requireUser();
     const result = await completeLessonRequest(lessonId);
-    applyRewards(result);
+    applyRewards(result, "chapter_end");
     return result;
   }, [applyRewards, requireUser]);
 
   const submitQuiz = useCallback(async (quizId: string, answers: Record<string, string[]>) => {
     requireUser();
     const result = await submitQuizRequest(quizId, answers);
-    applyRewards(result);
+    applyRewards(result, result.passed ? "exercise_success" : undefined);
+    if (!result.passed) emitMascot(["exercise_fail"]);
     return result;
   }, [applyRewards, requireUser]);
 
@@ -242,6 +258,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     applyRewards(result);
     return result;
   }, [applyRewards, requireUser]);
+
+  const submitLabTask = useCallback(async (taskId: string, answer: string) => {
+    requireUser();
+    const result = await submitLabTaskRequest(taskId, answer);
+    if (!result.correct) emitMascot(["exercise_fail"]);
+    else if (!("preview" in result && result.preview)) applyRewards(result, result.lab_newly_completed ? "lab_complete" : "exercise_success");
+    return result;
+  }, [applyRewards, requireUser]);
+
+  const submitLabReport = useCallback(async (labId: string, note: string, link: string) => {
+    requireUser();
+    await submitLabReportRequest(labId, note, link);
+  }, [requireUser]);
 
   const completeOnboarding = useCallback(async (answers: OnboardingAnswers) => {
     const id = requireUser();
@@ -301,9 +330,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }), [hydrated, sessionUserId, profile, level, streak, timezone, unreadNotifications, syncError]);
 
   const actions = useMemo<UserActionsValue>(() => ({
-    refresh, applyRewards, completeLesson, submitQuiz, submitLab, completeOnboarding, updateProfile, updateAvatar, resetProgress, deleteAccount, logout,
+    refresh, applyRewards, completeLesson, submitQuiz, submitLab, submitLabTask, submitLabReport, completeOnboarding, updateProfile, updateAvatar, resetProgress, deleteAccount, logout,
     setUnreadNotifications,
-  }), [refresh, applyRewards, completeLesson, submitQuiz, submitLab, completeOnboarding, updateProfile, updateAvatar, resetProgress, deleteAccount, logout, setUnreadNotifications]);
+  }), [refresh, applyRewards, completeLesson, submitQuiz, submitLab, submitLabTask, submitLabReport, completeOnboarding, updateProfile, updateAvatar, resetProgress, deleteAccount, logout, setUnreadNotifications]);
 
   const toastValue = useMemo(() => ({ toasts, dismiss }), [toasts, dismiss]);
 

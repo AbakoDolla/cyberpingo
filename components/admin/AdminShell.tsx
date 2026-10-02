@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 import { ROLE_LABELS } from "@/lib/roles";
 import Avatar from "@/components/ui/Avatar";
 import {
-  IconActivity, IconAward, IconBell, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconProfile, IconShield, IconTerminal,
+  IconActivity, IconAward, IconBell, IconBrain, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconProfile, IconSend, IconShield,
+  IconStar, IconTerminal,
 } from "@/components/ui/Icon";
 
 const NAV = [
@@ -16,6 +17,9 @@ const NAV = [
   { href: "/admin/cours", label: "Cours", Icon: IconCourses },
   { href: "/admin/import", label: "Import IA", Icon: IconActivity },
   { href: "/admin/labs", label: "Labs", Icon: IconTerminal },
+  { href: "/admin/rendus", label: "Rendus", Icon: IconSend },
+  { href: "/admin/competences", label: "Compétences", Icon: IconBrain },
+  { href: "/admin/mascotte", label: "Mascotte", Icon: IconStar },
   { href: "/admin/badges", label: "Badges", Icon: IconAward },
   { href: "/admin/defis", label: "Défis", Icon: IconShield },
   { href: "/admin/certificats", label: "Certificats", Icon: IconCertificate },

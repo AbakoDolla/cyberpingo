@@ -41,6 +41,14 @@ Les tables exposées ont des `grant` explicites colonne par colonne :
 - Les droits `execute` sont retirés de `public` puis accordés fonction par fonction : `anon` ne peut appeler que `verify_certificate`, `submit_contact_message` et les tests de rôle `is_admin` / `is_superadmin` (qui renvoient `false` pour un visiteur).
 - Les RPC d'administration commencent par `private.require_admin()` ou `private.require_superadmin()` ; les RPC apprenant par `private.require_user()`.
 
+## Moteur pédagogique
+
+- **Réponses des étapes de lab** : elles vivent dans `private.lab_task_keys`, jamais lisibles par le client. `submit_lab_task` vérifie le budget d'erreurs (10 en 10 minutes par étape) avant de comparer, pour qu'une requête bloquée ne révèle rien.
+- **Compétences, grades et badges** : `user_skills`, `user_ranks` et `user_badges` n'ont aucun droit d'écriture pour `authenticated`. Ils sont recalculés par `private.sync_skills`, `private.evaluate_rank` et `private.evaluate_badges` dans la transaction qui valide l'activité.
+- **Rendus Packet Tracer** : un lien n'est accepté que s'il est en `https://` (508 caractères au plus), et il n'est affiché dans l'administration que sous cette forme, avec `rel="noopener noreferrer"`. `admin_review_submission` est réservé au staff, journalisé et notifie l'apprenant. Seul un administrateur peut valider tant qu'un rôle Formateur n'existe pas.
+- **Contenu éditorial** : domaines, compétences, ressources, grades et répliques sont modifiables par le staff via RLS et droits par colonne, avec des contraintes de format (identifiants, longueurs, URL audio en `https://` ou chemin `/audio/…`).
+- **Mascotte** : une réplique audio exige un crédit de voix. L'application n'embarque aucune voix synthétique ; sans enregistrement actif, seul le sous-titre s'affiche.
+
 ## Anti-triche
 
 Chaque récompense suit le même chemin, dans une seule transaction :

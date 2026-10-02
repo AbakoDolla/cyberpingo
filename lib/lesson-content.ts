@@ -35,3 +35,10 @@ export function videoEmbed(url: string): { kind: "iframe" | "file"; src: string 
   if (vimeo) return { kind: "iframe", src: `https://player.vimeo.com/video/${vimeo[1]}` };
   return { kind: "file", src: url };
 }
+
+const VIDEO_PENDING = /^Vidéo à venir\s*:\s*(.+)$/u;
+
+/** A callout written as "Vidéo à venir : titre" marks a video the team has not published yet. */
+export function pendingVideoTitle(content: string): string | null {
+  return VIDEO_PENDING.exec(content.trim())?.[1]?.trim() || null;
+}

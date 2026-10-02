@@ -43,6 +43,8 @@ const CRITERIA_LABELS: Record<BadgeCriteria, [string, string]> = {
   labs_solved: ["lab résolu", "labs résolus"],
   certificates_earned: ["certificat obtenu", "certificats obtenus"],
   course_completed: ["parcours ciblé terminé", "parcours ciblés terminés"],
+  lab_completed: ["lab ciblé résolu", "labs ciblés résolus"],
+  skill_validated: ["compétence ciblée validée", "compétences ciblées validées"],
 };
 
 function criteriaLabel(type: BadgeCriteria, value: number) {

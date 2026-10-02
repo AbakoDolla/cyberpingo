@@ -24,7 +24,7 @@ import { StatusBadge } from "./AdminFields";
 import { IconEdit, IconPlus, IconUpload } from "@/components/ui/Icon";
 
 const LEVEL_OPTIONS = [{ value: "debutant", label: "Débutant" }, { value: "intermediaire", label: "Intermédiaire" }, { value: "avance", label: "Avancé" }];
-const STATUS_OPTIONS = [{ value: "draft", label: "Brouillon" }, { value: "published", label: "Publié" }, { value: "archived", label: "Archivé" }];
+const STATUS_OPTIONS = [{ value: "draft", label: "Brouillon" }, { value: "review", label: "En relecture" }, { value: "published", label: "Publié" }, { value: "archived", label: "Archivé" }];
 const ACCESS_OPTIONS = [{ value: "free", label: "Gratuit" }, { value: "premium", label: "Premium" }, { value: "private", label: "Privé" }];
 const QUESTION_OPTIONS = [{ value: "single_choice", label: "Choix unique" }, { value: "multiple_choice", label: "Choix multiples" }, { value: "true_false", label: "Vrai / faux" }];
 const DIFFICULTY_OPTIONS = [{ value: "facile", label: "Facile" }, { value: "moyen", label: "Moyen" }, { value: "difficile", label: "Difficile" }];

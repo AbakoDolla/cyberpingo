@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SceneBanner from "@/components/art/SceneBanner";
 import AppShell from "@/components/layout/AppShell";
+import MascotSettings from "@/components/mascot/MascotSettings";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -12,6 +13,7 @@ import Modal from "@/components/ui/Modal";
 import Select from "@/components/ui/Select";
 import {
   IconAlert,
+  IconAward,
   IconBell,
   IconClock,
   IconDownload,
@@ -51,6 +53,7 @@ const SECTIONS = [
   { id: "profil-public", label: "Profil public" },
   { id: "apprentissage", label: "Apprentissage" },
   { id: "preferences", label: "Préférences" },
+  { id: "pingo", label: "Pingo" },
   { id: "compte", label: "Compte" },
   { id: "donnees", label: "Données" },
   { id: "danger", label: "Zone sensible" },
@@ -430,6 +433,17 @@ function SettingsContent() {
               <Button type="submit" loading={busy === "preferences"} disabled={busy !== null || settingsLoading}>Enregistrer les préférences</Button>
             </form>
             <StatusMessage status={statuses.preferences} />
+          </section>
+
+          <section id="pingo" className="set-section" aria-labelledby="set-pingo-title">
+            <div className="set-section-head">
+              <span className="set-section-icon"><IconAward size={20} /></span>
+              <div>
+                <h2 id="set-pingo-title">Pingo, ton coach</h2>
+                <p>Choisis quand Pingo intervient. Ces réglages restent sur cet appareil et n’affectent jamais ta progression.</p>
+              </div>
+            </div>
+            <MascotSettings idPrefix="settings" />
           </section>
 
           <section id="compte" className="set-section" aria-labelledby="set-account-title">

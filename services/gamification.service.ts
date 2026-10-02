@@ -1,6 +1,6 @@
 import { getSupabaseBrowserClient, type TypedSupabaseClient } from "@/lib/supabase/client";
 import { AppError, toAppError, unwrap } from "@/lib/errors";
-import type { BadgeCriteria, BadgeWithState, Certificate, CertificateVerification, Dashboard, LearnerStats, XpTransaction } from "@/types/api";
+import type { BadgeCriteria, BadgeWithState, Rarity, Certificate, CertificateVerification, Dashboard, LearnerStats, XpTransaction } from "@/types/api";
 
 /** Everything the learner dashboard shows, computed in one SQL call in the learner's timezone. */
 export async function getMyDashboard(): Promise<Dashboard> {
@@ -21,13 +21,14 @@ export async function listLevels(client?: TypedSupabaseClient) {
 export async function listBadgesWithState(userId: string | null, client?: TypedSupabaseClient): Promise<BadgeWithState[]> {
   const supabase = client ?? getSupabaseBrowserClient();
   const [badges, earned] = await Promise.all([
-    supabase.from("badges").select("id, slug, name, description, icon, xp_reward, criteria_type, criteria_value").eq("is_active", true).order("position"),
+    supabase.from("badges").select("id, slug, name, description, icon, xp_reward, criteria_type, criteria_value, criteria_lab_id, criteria_skill_id, rarity").eq("is_active", true).order("position"),
     userId ? supabase.from("user_badges").select("badge_id, earned_at").eq("user_id", userId) : Promise.resolve({ data: [], error: null }),
   ]);
   const earnedAt = new Map((unwrap(earned, "Impossible de charger tes badges.") ?? []).map((row) => [row.badge_id, row.earned_at]));
   return (unwrap(badges, "Impossible de charger les badges.") ?? []).map((badge) => ({
     ...badge,
     criteria_type: badge.criteria_type as BadgeCriteria,
+    rarity: badge.rarity as Rarity,
     earned: earnedAt.has(badge.id),
     earned_at: earnedAt.get(badge.id) ?? null,
   }));

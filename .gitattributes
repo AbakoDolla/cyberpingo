@@ -1,3 +1,6 @@
 # SQL is compared byte-for-byte by tests (generated seed) and run by the Supabase CLI: keep LF everywhere.
 *.sql text eol=lf
 *.toml text eol=lf
+
+# Lab files are generated and compared byte-for-byte by tests (captures are binary): never convert line endings.
+public/labs/** -text

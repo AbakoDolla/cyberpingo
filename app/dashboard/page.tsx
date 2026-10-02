@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, type CSSProperties, type ReactNode } from "react";
 import Link from "next/link";
+import RankProgress from "@/components/academy/RankProgress";
 import AppShell from "@/components/layout/AppShell";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
@@ -28,6 +29,7 @@ import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { dateInZone, effectiveStreak } from "@/lib/levels";
 import { formatDate, formatDuration, formatNumber, formatRelative, formatShortDate, greeting, levelLabel, plural } from "@/lib/format";
+import { getMyAcademy } from "@/services/academy.service";
 import { getMyDashboard } from "@/services/gamification.service";
 import type { ChallengeProgress, ContinueLearningItem, CourseRecommendation, Dashboard } from "@/types/api";
 
@@ -193,6 +195,7 @@ function LearnerDashboard() {
   const { profile, level: learnerLevel, timezone } = useLearner();
   const { setUnreadNotifications } = useUserActions();
   const { data, error, loading, reload } = useAsync(getMyDashboard, []);
+  const { data: academy } = useAsync(() => getMyAcademy().catch(() => null), []);
 
   useEffect(() => {
     if (data) setUnreadNotifications(data.unread_notifications);
@@ -360,6 +363,19 @@ function LearnerDashboard() {
 
         <aside className="dash-side">
           <WeekRhythm week={data.week} />
+
+          {academy && (
+            <section className="dash-panel" aria-labelledby="dash-rank-title">
+              <div className="dash-section-head">
+                <div>
+                  <h2 id="dash-rank-title">Ton grade</h2>
+                  <p>Il progresse avec ta pratique réelle.</p>
+                </div>
+                <Link href="/competences" className="study-link">Compétences</Link>
+              </div>
+              <RankProgress academy={academy} compact />
+            </section>
+          )}
 
           <section className="dash-panel" aria-labelledby="dash-badges-title">
             <div className="dash-section-head">

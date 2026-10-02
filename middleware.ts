@@ -106,6 +106,7 @@ export const config = {
     "/lessons/:path*",
     "/quiz/:path*",
     "/progression/:path*",
+    "/competences/:path*",
     "/parametres/:path*",
     "/notifications/:path*",
     "/onboarding/:path*",

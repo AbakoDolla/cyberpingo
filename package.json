@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/database.test.cjs tests/learning.test.cjs",
+    "test": "node --test tests/database.test.cjs tests/learning.test.cjs tests/academy.test.cjs tests/pcap.test.cjs tests/mascot.test.cjs tests/labview.test.cjs tests/academyview.test.cjs",
     "db:types": "node scripts/generate-db-types.cjs",
     "db:seed": "node scripts/generate-content-seed.cjs"
   },

@@ -128,6 +128,17 @@ Les fonctions SQL lèvent des exceptions avec `hint = 'cyberpingo'` et un messag
 
 Les pages `/`, `/parcours` et `/parcours/[slug]` sont rendues côté serveur avec le client anon sans cookie (`lib/supabase/public.ts`) et revalidées toutes les 5 minutes. `/certificat/[code]` utilise le même client mais est rendue à chaque requête pour refléter immédiatement une révocation. Le client anon ne voit que les cours publiés et les métadonnées des leçons, jamais leur contenu.
 
+## Moteur pédagogique côté interface
+
+| Élément | Emplacement | Rôle |
+|---|---|---|
+| Mascotte | `lib/mascot/*`, `components/mascot/*` | Un bus d'événements découplé (`emitMascot`, `onMascot`) : `UserContext` traduit les récompenses reçues du serveur (XP, niveau, badge, grade, lab terminé) en événements, `MascotCoach` choisit la réplique active correspondante dans `mascot_lines`. Le texte est toujours affiché (sous-titres activés par défaut), l'audio ne bloque jamais une leçon, une seule voix à la fois, et les préférences (mascotte automatique, voix, volume, sous-titres) sont gardées dans `localStorage` (`cyberpingo.mascot`) et réglables dans `/parametres`. Le coach utilise le Pingo SVG ; un seul canvas WebGL est permis par page. |
+| Labs | `components/challenges/*`, `lib/lab-view.ts` | Une interface par format : terminal (`LabTerminal`), PCAP (`PcapViewer` + `lib/pcap.ts`, lecture locale du fichier fourni), journaux (`LogViewer`), Packet Tracer (`PacketTracerGateway` : consignes, fichier à télécharger, formulaire de rendu `LabReportForm`). `LabTasks` gère les étapes et leur correction serveur. Packet Tracer reste un logiciel externe : la plateforme prépare le travail et reçoit le rendu, elle ne prétend jamais l'exécuter dans le navigateur. |
+| Compétences et grades | `app/competences`, `components/academy/RankProgress.tsx`, `lib/academy-view.ts` | État de chaque compétence, grade courant, prochain palier avec ce qu'il manque. Les compteurs viennent de `get_my_academy()`. |
+| Administration | `components/admin/AdminAcademyPages.tsx`, `AdminCatalogPages.tsx`, `AdminLabParts.tsx`, `AdminCourseEditor.tsx` | CMS : domaines, compétences et leurs liens, labs (étapes, ressources, format, brouillon, relecture, publication), badges avec rareté et condition, grades, répliques de la mascotte et file de relecture des rendus (`/admin/rendus`). Aucune édition de code pour ajouter un cours ou un lab. |
+
+La navigation reste identique à tous les niveaux : le grade et la mascotte évoluent dans le contenu et les récompenses, pas dans la structure de l'interface.
+
 ## Règle : pas de faux backend
 
-Il n'existe aucune donnée simulée. Le seul contenu fourni avec le dépôt est le contenu pédagogique de départ dans `supabase/seed/`, chargé dans la base comme n'importe quel cours créé par un administrateur. Les écrans sans données affichent un état vide explicite.
+Il n'existe aucune donnée simulée. Le seul contenu fourni avec le dépôt est le contenu pédagogique de départ dans `supabase/seed/`, chargé dans la base comme n'importe quel cours créé par un administrateur. Les écrans sans données affichent un état vide explicite. Il en va de même pour les voix, les vidéos et le fichier Packet Tracer : tant que l'équipe ne les a pas fournis, l'interface l'indique honnêtement au lieu de simuler.

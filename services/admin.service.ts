@@ -6,14 +6,15 @@ import type { Role } from "@/lib/roles";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "@/types/database.types";
 import type {
   AccessLevel, AdminCourseStats, AdminOverview, AdminQuiz, AdminQuizQuestion, AdminUserDetail, AdminUsersPage,
-  CourseImport, CourseImportResult, CourseStatus, LabCategory, LessonBlock, LevelInfo, SkillLevel,
+  CourseImport, CourseImportResult, CourseStatus, LabAssetKind, LabCategory, LabFormat, LessonBlock, LevelInfo, MascotEvent,
+  MascotExpression, SkillLevel,
 } from "@/types/api";
 
 export type CourseRow = Tables<"courses"> & { status: CourseStatus; level: SkillLevel; access_level: AccessLevel };
 export type CourseModuleRow = Tables<"course_modules">;
 export type LessonRow = Omit<Tables<"lessons">, "content"> & { content: Json; blocks: LessonBlock[] };
 export type QuizRow = Tables<"quizzes">;
-export type LabRow = Tables<"labs"> & { category: LabCategory; difficulty: SkillLevel; status: CourseStatus };
+export type LabRow = Tables<"labs"> & { category: LabCategory; difficulty: SkillLevel; status: CourseStatus; format: LabFormat };
 export type BadgeRow = Tables<"badges">;
 export type ChallengeRow = Tables<"challenges">;
 export type ContactMessageRow = Tables<"contact_messages">;
@@ -66,20 +67,47 @@ export type LessonChanges = Partial<Pick<TablesUpdate<"lessons">, "module_id" | 
 export type LessonCreate = Pick<TablesInsert<"lessons">, "course_id" | "module_id" | "title"> & LessonChanges;
 export type QuizChanges = Partial<Pick<TablesUpdate<"quizzes">, "module_id" | "lesson_id" | "title" | "description" | "pass_percentage" | "position">>;
 export type QuizCreate = Pick<TablesInsert<"quizzes">, "course_id" | "module_id" | "title"> & QuizChanges;
-export type LabChanges = Partial<Pick<TablesUpdate<"labs">, "slug" | "title" | "description" | "category" | "difficulty" | "xp_reward" | "objectives" | "hints" | "terminal_lines" | "flag_placeholder" | "status" | "position">>;
+export type LabChanges = Partial<Pick<TablesUpdate<"labs">, "slug" | "title" | "description" | "category" | "difficulty" | "xp_reward" | "objectives" | "hints" | "terminal_lines" | "flag_placeholder" | "status" | "position" | "course_id" | "format" | "briefing" | "constraints" | "tools" | "requires_computer" | "is_assessment" | "estimated_minutes">>;
 export type LabCreate = Pick<TablesInsert<"labs">, "slug" | "title"> & LabChanges;
-export type BadgeChanges = Partial<Pick<TablesUpdate<"badges">, "slug" | "name" | "description" | "icon" | "criteria_type" | "criteria_value" | "criteria_course_id" | "xp_reward" | "is_active" | "position">>;
+export type BadgeChanges = Partial<Pick<TablesUpdate<"badges">, "slug" | "name" | "description" | "icon" | "criteria_type" | "criteria_value" | "criteria_course_id" | "criteria_lab_id" | "criteria_skill_id" | "rarity" | "xp_reward" | "is_active" | "position">>;
 export type BadgeCreate = Pick<TablesInsert<"badges">, "slug" | "name" | "criteria_type"> & BadgeChanges;
+export type LabAssetRow = Omit<Tables<"lab_assets">, "kind"> & { kind: LabAssetKind };
+export interface LabAssetInput { kind: LabAssetKind; title: string; description: string; url: string; position: number }
+export interface LabTaskDraft { id?: string; prompt: string; hint: string; answer_format: string; accepted: string[]; explanation: string }
+export type MascotLineRow = Omit<Tables<"mascot_lines">, "event" | "expression"> & { event: MascotEvent; expression: MascotExpression };
+export interface MascotLineInput {
+  event: MascotEvent; expression: MascotExpression; text_fr: string; audio_url: string | null; voice_credit: string | null;
+  priority: number; is_active: boolean; position: number;
+}
+export type DomainRow = Tables<"domains">;
+export interface DomainInput { slug: string; name: string; description: string; icon: string; position: number }
+export type SkillRow = Tables<"skills">;
+export interface SkillInput { domain_id: string; slug: string; name: string; description: string; position: number }
+export type SkillLinkKind = "lesson" | "quiz" | "practice" | "validation";
+export type SkillLinkRow = Omit<Tables<"skill_links">, "kind"> & { kind: SkillLinkKind };
+export interface SkillLinkInput { skill_id: string; kind: SkillLinkKind; lesson_id?: string; quiz_id?: string; lab_id?: string }
+export interface SkillLinkTargets {
+  lessons: { id: string; title: string; course_title: string }[];
+  quizzes: { id: string; title: string; course_title: string }[];
+  labs: { id: string; title: string; is_assessment: boolean }[];
+}
+export type SubmissionStatus = "pending" | "approved" | "changes_requested";
+export interface AdminSubmission {
+  id: string; user_id: string; lab_id: string; note: string; link: string | null; status: SubmissionStatus; feedback: string;
+  reviewed_at: string | null; created_at: string; updated_at: string;
+  lab: { title: string; slug: string } | null;
+  learner: { display_name: string; username: string; email: string } | null;
+}
 export type ChallengeChanges = Partial<Pick<TablesUpdate<"challenges">, "slug" | "title" | "description" | "icon" | "period" | "metric" | "target" | "xp_reward" | "is_active" | "starts_at" | "ends_at" | "position">>;
 export type ChallengeCreate = Pick<TablesInsert<"challenges">, "slug" | "title" | "period" | "metric" | "target"> & ChallengeChanges;
 
-const COURSE_SELECT = "id, slug, title, short_description, description, thumbnail_url, level, category, icon, estimated_duration, status, access_level, position, completion_xp, certificate_enabled, created_by, created_at, updated_at, published_at";
+const COURSE_SELECT = "id, slug, title, short_description, description, thumbnail_url, level, category, icon, estimated_duration, status, access_level, position, completion_xp, certificate_enabled, created_by, created_at, updated_at, published_at, domain_id";
 const MODULE_SELECT = "id, course_id, title, description, position, created_at, updated_at";
 const LESSON_SELECT = "id, course_id, module_id, title, summary, content_type, content, duration_minutes, xp_reward, position, created_at, updated_at";
 const QUIZ_SELECT = "id, course_id, module_id, lesson_id, title, description, pass_percentage, position, created_at, updated_at";
 
 const asCourse = (row: Tables<"courses">): CourseRow => ({ ...row, status: row.status as CourseStatus, level: row.level as SkillLevel, access_level: row.access_level as AccessLevel });
-const asLab = (row: Tables<"labs">): LabRow => ({ ...row, category: row.category as LabCategory, difficulty: row.difficulty as SkillLevel, status: row.status as CourseStatus });
+const asLab = (row: Tables<"labs">): LabRow => ({ ...row, category: row.category as LabCategory, difficulty: row.difficulty as SkillLevel, status: row.status as CourseStatus, format: row.format as LabFormat });
 const asLesson = (row: Tables<"lessons">): LessonRow => ({ ...row, blocks: parseLessonBlocks(row.content) });
 const contentFromBlocks = (blocks: LessonBlock[]): Json => ({ blocks: blocks as unknown as Json[] });
 const countOf = (value: unknown) => Array.isArray(value) && typeof value[0]?.count === "number" ? value[0].count as number : 0;
@@ -300,6 +328,129 @@ export async function deleteLab(labId: string): Promise<void> {
   unwrap(await supabase().from("labs").delete().eq("id", labId), "Le lab n’a pas pu être supprimé.");
 }
 
+export async function adminGetLabTasks(labId: string): Promise<LabTaskDraft[]> {
+  const rows = rpcJson(unwrap(await supabase().rpc("admin_get_lab_tasks", { p_lab_id: labId }), "Impossible de charger les tâches du lab."), [] as LabTaskDraft[]);
+  return rows.map((row) => ({ ...row, hint: row.hint ?? "", answer_format: row.answer_format ?? "", explanation: row.explanation ?? "", accepted: row.accepted ?? [] }));
+}
+
+export async function adminSetLabTasks(labId: string, tasks: LabTaskDraft[]): Promise<void> {
+  unwrap(await supabase().rpc("admin_set_lab_tasks", { p_lab_id: labId, p_tasks: tasks as unknown as Json }), "Les tâches n’ont pas pu être enregistrées.");
+}
+
+export async function listLabAssets(labId: string): Promise<LabAssetRow[]> {
+  const rows = unwrap(await supabase().from("lab_assets").select("*").eq("lab_id", labId).order("position").order("title"), "Impossible de charger les ressources du lab.") ?? [];
+  return rows as LabAssetRow[];
+}
+
+export async function createLabAsset(labId: string, input: LabAssetInput): Promise<LabAssetRow> {
+  return unwrap(await supabase().from("lab_assets").insert({ ...input, lab_id: labId }).select("*").single(), "La ressource n’a pas pu être ajoutée.") as LabAssetRow;
+}
+
+export async function updateLabAsset(assetId: string, input: LabAssetInput): Promise<LabAssetRow> {
+  return unwrap(await supabase().from("lab_assets").update(input).eq("id", assetId).select("*").single(), "La ressource n’a pas pu être enregistrée.") as LabAssetRow;
+}
+
+export async function deleteLabAsset(assetId: string): Promise<void> {
+  unwrap(await supabase().from("lab_assets").delete().eq("id", assetId), "La ressource n’a pas pu être supprimée.");
+}
+
+export async function listLabSubmissions(): Promise<AdminSubmission[]> {
+  const rows = unwrap(
+    await supabase().from("lab_submissions")
+      .select("*, labs(title, slug), learner:profiles!lab_submissions_user_id_fkey(display_name, username, email)")
+      .order("created_at", { ascending: false }).limit(200),
+    "Impossible de charger les rendus.",
+  ) ?? [];
+  return rows.map((row) => {
+    const { labs, learner, ...submission } = row as unknown as AdminSubmission & { labs: unknown; learner: unknown };
+    return {
+      ...submission,
+      lab: embeddedOne(labs as AdminSubmission["lab"] | AdminSubmission["lab"][]),
+      learner: embeddedOne(learner as AdminSubmission["learner"] | AdminSubmission["learner"][]),
+    };
+  });
+}
+
+export async function adminReviewSubmission(id: string, status: Exclude<SubmissionStatus, "pending">, feedback: string): Promise<void> {
+  unwrap(await supabase().rpc("admin_review_submission", { p_id: id, p_status: status, p_feedback: feedback }), "Le rendu n’a pas pu être évalué.");
+}
+
+export async function listMascotLines(): Promise<MascotLineRow[]> {
+  const rows = unwrap(await supabase().from("mascot_lines").select("*").order("event").order("priority", { ascending: false }).order("position"), "Impossible de charger les répliques de Pingo.") ?? [];
+  return rows as MascotLineRow[];
+}
+
+export async function createMascotLine(input: MascotLineInput): Promise<MascotLineRow> {
+  return unwrap(await supabase().from("mascot_lines").insert(input).select("*").single(), "La réplique n’a pas pu être créée.") as MascotLineRow;
+}
+
+export async function updateMascotLine(lineId: string, input: MascotLineInput): Promise<MascotLineRow> {
+  return unwrap(await supabase().from("mascot_lines").update(input).eq("id", lineId).select("*").single(), "La réplique n’a pas pu être enregistrée.") as MascotLineRow;
+}
+
+export async function deleteMascotLine(lineId: string): Promise<void> {
+  unwrap(await supabase().from("mascot_lines").delete().eq("id", lineId), "La réplique n’a pas pu être supprimée.");
+}
+
+export async function listDomains(): Promise<DomainRow[]> {
+  return unwrap(await supabase().from("domains").select("*").order("position").order("name"), "Impossible de charger les domaines.") ?? [];
+}
+
+export async function createDomain(input: DomainInput): Promise<DomainRow> {
+  return unwrap(await supabase().from("domains").insert(input).select("*").single(), "Le domaine n’a pas pu être créé.");
+}
+
+export async function updateDomain(domainId: string, input: DomainInput): Promise<DomainRow> {
+  return unwrap(await supabase().from("domains").update(input).eq("id", domainId).select("*").single(), "Le domaine n’a pas pu être enregistré.");
+}
+
+export async function deleteDomain(domainId: string): Promise<void> {
+  unwrap(await supabase().from("domains").delete().eq("id", domainId), "Le domaine n’a pas pu être supprimé.");
+}
+
+export async function listSkills(): Promise<SkillRow[]> {
+  return unwrap(await supabase().from("skills").select("*").order("position").order("name"), "Impossible de charger les compétences.") ?? [];
+}
+
+export async function createSkill(input: SkillInput): Promise<SkillRow> {
+  return unwrap(await supabase().from("skills").insert(input).select("*").single(), "La compétence n’a pas pu être créée.");
+}
+
+export async function updateSkill(skillId: string, input: SkillInput): Promise<SkillRow> {
+  return unwrap(await supabase().from("skills").update(input).eq("id", skillId).select("*").single(), "La compétence n’a pas pu être enregistrée.");
+}
+
+export async function deleteSkill(skillId: string): Promise<void> {
+  unwrap(await supabase().from("skills").delete().eq("id", skillId), "La compétence n’a pas pu être supprimée.");
+}
+
+export async function listSkillLinks(): Promise<SkillLinkRow[]> {
+  return (unwrap(await supabase().from("skill_links").select("*"), "Impossible de charger les liens des compétences.") ?? []) as SkillLinkRow[];
+}
+
+export async function createSkillLink(input: SkillLinkInput): Promise<SkillLinkRow> {
+  return unwrap(await supabase().from("skill_links").insert(input).select("*").single(), "Le lien n’a pas pu être ajouté.") as SkillLinkRow;
+}
+
+export async function deleteSkillLink(linkId: string): Promise<void> {
+  unwrap(await supabase().from("skill_links").delete().eq("id", linkId), "Le lien n’a pas pu être supprimé.");
+}
+
+export async function listSkillLinkTargets(): Promise<SkillLinkTargets> {
+  const client = supabase();
+  const [lessons, quizzes, labs] = await Promise.all([
+    client.from("lessons").select("id, title, courses(title)").order("title"),
+    client.from("quizzes").select("id, title, courses(title)").order("title"),
+    client.from("labs").select("id, title, is_assessment").order("title"),
+  ]);
+  const withCourse = (rows: { id: string; title: string; courses: unknown }[]) =>
+    rows.map((row) => ({ id: row.id, title: row.title, course_title: embeddedOne(row.courses as { title: string } | { title: string }[] | null)?.title ?? "" }));
+  return {
+    lessons: withCourse((unwrap(lessons, "Impossible de charger les leçons.") ?? []) as unknown as { id: string; title: string; courses: unknown }[]),
+    quizzes: withCourse((unwrap(quizzes, "Impossible de charger les quiz.") ?? []) as unknown as { id: string; title: string; courses: unknown }[]),
+    labs: unwrap(labs, "Impossible de charger les labs.") ?? [],
+  };
+}
 export async function listBadges(): Promise<BadgeRow[]> {
   return unwrap(await supabase().from("badges").select("*").order("position").order("name"), "Impossible de charger les badges.") ?? [];
 }

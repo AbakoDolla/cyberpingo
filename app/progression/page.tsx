@@ -6,6 +6,7 @@ import BadgeMedal from "@/components/art/BadgeMedal";
 import EmptyArt from "@/components/art/EmptyArt";
 import SceneBanner from "@/components/art/SceneBanner";
 import { badgeTierFromXp } from "@/components/art/shared";
+import RankProgress from "@/components/academy/RankProgress";
 import AppShell from "@/components/layout/AppShell";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -29,6 +30,8 @@ import { useLearner } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDate, formatDuration, formatNumber, formatRelative, formatShortDate, levelLabel, plural } from "@/lib/format";
+import { RARITY_LABELS, badgeCondition } from "@/lib/academy-view";
+import { getMyAcademy } from "@/services/academy.service";
 import { listMyCourseProgress, listPublishedCourses } from "@/services/courses.service";
 import {
   getCertificatePdfUrl,
@@ -38,7 +41,7 @@ import {
   listMyCertificates,
   listMyXpHistory,
 } from "@/services/gamification.service";
-import type { BadgeCriteria, BadgeWithState, Certificate, CourseProgress, CourseSummary, LearnerStats, XpReason } from "@/types/api";
+import type { Academy, BadgeWithState, Certificate, CourseProgress, CourseSummary, LearnerStats, XpReason } from "@/types/api";
 
 const XP_REASON_LABELS: Record<XpReason, string> = {
   lesson_completed: "Leçon terminée",
@@ -51,16 +54,7 @@ const XP_REASON_LABELS: Record<XpReason, string> = {
   admin_adjustment: "Ajustement",
 };
 
-const BADGE_UNLOCK_LABELS: Record<BadgeCriteria, (value: number) => string> = {
-  lessons_completed: (value) => `Termine ${formatNumber(value)} leçon${value > 1 ? "s" : ""}.`,
-  quizzes_passed: (value) => `Réussis ${formatNumber(value)} quiz.`,
-  courses_completed: (value) => `Termine ${formatNumber(value)} parcours.`,
-  streak_days: (value) => `Tiens une série de ${formatNumber(value)} jour${value > 1 ? "s" : ""}.`,
-  xp_total: (value) => `Atteins ${formatNumber(value)} XP cumulés.`,
-  labs_solved: (value) => `Résous ${formatNumber(value)} lab${value > 1 ? "s" : ""}.`,
-  certificates_earned: (value) => `Obtiens ${formatNumber(value)} certificat${value > 1 ? "s" : ""}.`,
-  course_completed: () => "Termine le parcours associé.",
-};
+
 
 type LevelRow = Awaited<ReturnType<typeof listLevels>>[number];
 type ProgressionData = {
@@ -71,14 +65,30 @@ type ProgressionData = {
   levels: LevelRow[];
   badges: BadgeWithState[];
   certificates: Certificate[];
+  academy: Academy | null;
 };
 
 function xpReasonLabel(reason: string) {
   return XP_REASON_LABELS[reason as XpReason] ?? reason;
 }
 
-function badgeUnlockText(badge: BadgeWithState) {
-  return BADGE_UNLOCK_LABELS[badge.criteria_type]?.(badge.criteria_value) ?? "Continue ta progression pour le débloquer.";
+type BadgeNames = { labs: Map<string, string>; skills: Map<string, string> };
+
+function badgeNamesFrom(academy: Academy | null): BadgeNames {
+  const labs = new Map<string, string>();
+  const skills = new Map<string, string>();
+  for (const skill of academy?.skills ?? []) {
+    skills.set(skill.id, skill.name);
+    for (const link of skill.links) if (link.kind === "practice" || link.kind === "validation") labs.set(link.id, link.title);
+  }
+  return { labs, skills };
+}
+
+function badgeConditionText(badge: BadgeWithState, names: BadgeNames) {
+  return badgeCondition(badge, {
+    labTitle: badge.criteria_lab_id ? names.labs.get(badge.criteria_lab_id) : null,
+    skillName: badge.criteria_skill_id ? names.skills.get(badge.criteria_skill_id) : null,
+  });
 }
 
 function ProgressionLoading() {
@@ -245,7 +255,7 @@ function LevelLadder({ levels, currentLevel }: { levels: LevelRow[]; currentLeve
   );
 }
 
-function BadgeGallery({ badges }: { badges: BadgeWithState[] }) {
+function BadgeGallery({ badges, names }: { badges: BadgeWithState[]; names: BadgeNames }) {
   const earned = badges.filter((badge) => badge.earned);
   const locked = badges.filter((badge) => !badge.earned);
   return (
@@ -272,7 +282,16 @@ function BadgeGallery({ badges }: { badges: BadgeWithState[] }) {
                   <Badge tone={badge.earned ? "green" : "neutral"}>{badge.earned ? "Gagné" : "Verrouillé"}</Badge>
                 </div>
                 <p>{badge.description}</p>
-                <small>{badge.earned_at ? `Obtenu ${formatRelative(badge.earned_at)}` : badgeUnlockText(badge)}</small>
+                <small>{badge.earned_at ? `Obtenu ${formatRelative(badge.earned_at)}` : badgeConditionText(badge, names)}</small>
+                <details className="prog-badge-detail">
+                  <summary>Détails</summary>
+                  <dl>
+                    <div><dt>Rareté</dt><dd>{RARITY_LABELS[badge.rarity]}</dd></div>
+                    <div><dt>Condition</dt><dd>{badgeConditionText(badge, names)}</dd></div>
+                    <div><dt>Récompense</dt><dd>{formatNumber(badge.xp_reward)} XP</dd></div>
+                    <div><dt>Statut</dt><dd>{badge.earned_at ? `Obtenu le ${formatDate(badge.earned_at)}` : "Pas encore obtenu"}</dd></div>
+                  </dl>
+                </details>
               </div>
             </article>
           ))}
@@ -403,7 +422,7 @@ function XpHistoryPanel({ data }: { data: ProgressionData }) {
 function ProgressionContent() {
   const { profile } = useLearner();
   const { data, error, loading, reload } = useAsync<ProgressionData>(async () => {
-    const [stats, courses, catalog, history, levels, badges, certificates] = await Promise.all([
+    const [stats, courses, catalog, history, levels, badges, certificates, academy] = await Promise.all([
       getMyStats(),
       listMyCourseProgress(profile.id),
       listPublishedCourses(),
@@ -411,8 +430,9 @@ function ProgressionContent() {
       listLevels(),
       listBadgesWithState(profile.id),
       listMyCertificates(profile.id),
+      getMyAcademy().catch(() => null),
     ]);
-    return { stats, courses, catalog, history, levels, badges, certificates };
+    return { stats, courses, catalog, history, levels, badges, certificates, academy };
   }, [profile.id]);
 
   if (loading) return <ProgressionLoading />;
@@ -458,6 +478,18 @@ function ProgressionContent() {
         <StatPill label="Certificats" value={data.stats.certificates} icon={<IconCertificate size={18} />} />
       </section>
 
+      {data.academy && (
+        <section className="prog-panel" aria-labelledby="prog-rank-title">
+          <div className="prog-section-head">
+            <div>
+              <h2 id="prog-rank-title">Grade et compétences</h2>
+              <p>Ton grade dépend de ta pratique réelle, pas seulement de ton XP.</p>
+            </div>
+            <Link href="/competences" className="study-link">Voir mes compétences</Link>
+          </div>
+          <RankProgress academy={data.academy} />
+        </section>
+      )}
       <ActivityChart activity={data.stats.activity} />
       <CourseProgressList courses={data.courses} catalog={data.catalog} />
       <XpHistoryPanel data={data} />
@@ -465,7 +497,7 @@ function ProgressionContent() {
         <LevelLadder levels={data.levels} currentLevel={data.stats.level.level} />
         <CertificatesPanel certificates={data.certificates} />
       </section>
-      <BadgeGallery badges={data.badges} />
+      <BadgeGallery badges={data.badges} names={badgeNamesFrom(data.academy)} />
       <p className="prog-footnote">
         Niveau déclaré&nbsp;: {levelLabel(profile.skill_level)}. <Link className="study-link" href="/parametres">Modifier mon profil d’apprentissage</Link>
       </p>

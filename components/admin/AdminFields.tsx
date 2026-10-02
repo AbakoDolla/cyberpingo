@@ -33,7 +33,7 @@ export function isoToLocalInput(value: string | null | undefined): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export const STATUS_LABELS: Record<string, string> = { draft: "Brouillon", published: "Publié", archived: "Archivé" };
+export const STATUS_LABELS: Record<string, string> = { draft: "Brouillon", review: "En relecture", published: "Publié", archived: "Archivé" };
 export const LEVEL_LABELS: Record<string, string> = { debutant: "Débutant", intermediaire: "Intermédiaire", avance: "Avancé" };
 export const LAB_CATEGORY_LABELS: Record<string, string> = {
   reseau: "Réseau", linux: "Linux", web: "Web", cryptographie: "Cryptographie", osint: "OSINT", securite: "Sécurité",
@@ -56,7 +56,7 @@ export function StateMsg({ error, message }: { error?: string | null; message?: 
 }
 
 export function StatusBadge({ status }: { status: string }) {
-  const tone = status === "published" || status === "actif" ? "green" : status === "archived" ? "red" : "neutral";
+  const tone = status === "published" || status === "actif" ? "green" : status === "archived" ? "red" : status === "review" ? "amber" : "neutral";
   return <Badge tone={tone}>{STATUS_LABELS[status] ?? status}</Badge>;
 }
 

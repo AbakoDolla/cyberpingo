@@ -5,18 +5,24 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import LabArt from "@/components/art/LabArt";
 import AppShell, { loginHref } from "@/components/layout/AppShell";
+import LabAssets from "@/components/challenges/LabAssets";
+import LabReportForm from "@/components/challenges/LabReportForm";
+import LabTasks from "@/components/challenges/LabTasks";
 import LabTerminal from "@/components/challenges/LabTerminal";
+import PacketTracerGateway from "@/components/challenges/PacketTracerGateway";
 import { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { IconCheck, IconHint, IconLock, IconTrophy } from "@/components/ui/Icon";
+import { IconCheck, IconClock, IconHint, IconLock, IconTrophy } from "@/components/ui/Icon";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { levelLabel } from "@/lib/format";
-import { getLab } from "@/services/labs.service";
-import type { LabSubmission } from "@/types/api";
+import { getLab, listLabAssets, listLabTasks } from "@/services/labs.service";
+import type { LabFormat, LabSubmission, LabTaskResult } from "@/types/api";
+
+const FORMAT_LABELS: Record<LabFormat, string> = { terminal: "Terminal", pcap: "Capture réseau", logs: "Journaux", packet_tracer: "Packet Tracer" };
 
 function ChallengeDetailView() {
   const params = useParams<{ id: string }>();
@@ -29,11 +35,21 @@ function ChallengeDetailView() {
   const [result, setResult] = useState<LabSubmission | null>(null);
   const [checking, setChecking] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const { data, error, loading, reload, setData } = useAsync(async () => ({ lab: await getLab(slug, userId) }), [slug, userId]);
+  const { data, error, loading, reload, setData } = useAsync(async () => {
+    const lab = await getLab(slug, userId);
+    if (!lab) return { lab: null, tasks: [], assets: [] };
+    const [tasks, assets] = await Promise.all([listLabTasks(lab.id, userId), listLabAssets(lab.id)]);
+    return { lab, tasks, assets };
+  }, [slug, userId]);
   const lab = data?.lab ?? null;
+  const tasks = data?.tasks ?? [];
+  const assets = data?.assets ?? [];
   const solved = Boolean(lab?.solved || (result?.correct ?? false));
   const wrong = result && !result.correct ? result : null;
   const correct = result && result.correct ? result : null;
+  const isTerminal = lab?.format === "terminal";
+  const published = lab?.status === "published";
+  const hasReport = Boolean(lab && (lab.format === "packet_tracer" || assets.some((asset) => asset.kind === "report_template")));
 
   async function validate() {
     if (!lab || checking || solved || !userId) return;
@@ -45,12 +61,21 @@ function ChallengeDetailView() {
     try {
       const submission = await submitLab(lab.id, value);
       setResult(submission);
-      if (submission.correct) setData((current) => current?.lab ? { lab: { ...current.lab, solved: true, solved_at: new Date().toISOString() } } : current);
+      if (submission.correct) setData((current) => current?.lab ? { ...current, lab: { ...current.lab, solved: true, solved_at: new Date().toISOString() } } : current);
     } catch (cause) {
       setFormError(errorMessage(cause, "Ta réponse n’a pas pu être vérifiée."));
     } finally {
       setChecking(false);
     }
+  }
+
+  function taskSolved(taskId: string, outcome: Extract<LabTaskResult, { correct: true }>) {
+    const finished = !outcome.preview && outcome.lab_completed;
+    setData((current) => current?.lab ? {
+      ...current,
+      tasks: current.tasks.map((task) => task.id === taskId ? { ...task, solved: true } : task),
+      lab: finished && !current.lab.solved ? { ...current.lab, solved: true, solved_at: new Date().toISOString() } : current.lab,
+    } : current);
   }
 
   return (
@@ -66,12 +91,13 @@ function ChallengeDetailView() {
               <div className="lab-hero__visual">
                 <div className="lab-hero__media" aria-hidden="true"><LabArt category={lab.category} className="lab-hero__art" /></div>
                 <div className="lab-hero__content">
-                  <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone="green">+{lab.xp_reward} XP</Badge></div>
-                  <h1>{lab.title}</h1>
+                  <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge><Badge tone="neutral">{FORMAT_LABELS[lab.format]}</Badge>{lab.is_assessment && <Badge tone="amber">Évaluation pratique</Badge>}{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone="green">+{lab.xp_reward} XP</Badge></div>
+                  <h1>{lab.title.replace(/ ([:?!;])/g, "\u00A0$1")}</h1>
                   <p>{lab.description}</p>
                   <div className="lab-hero__facts" aria-label="Informations clés du lab">
                     <span>{lab.objectives.length} objectif{lab.objectives.length > 1 ? "s" : ""}</span>
-                    <span>{lab.hints.length} indice{lab.hints.length > 1 ? "s" : ""}</span>
+                    {isTerminal ? <span>{lab.hints.length} indice{lab.hints.length > 1 ? "s" : ""}</span> : <span>{tasks.length} question{tasks.length > 1 ? "s" : ""}</span>}
+                    {lab.estimated_minutes > 0 && <span><IconClock size={13} /> {lab.estimated_minutes} min</span>}
                     <span>{solved ? "Scénario résolu" : "Prêt à jouer"}</span>
                   </div>
                 </div>
@@ -79,15 +105,40 @@ function ChallengeDetailView() {
             </header>
             <section className="lab-layout">
               <div className="lab-layout__main">
+                {lab.briefing && <section className="lab-panel lab-briefing"><h2>Mise en situation</h2><p>{lab.briefing}</p></section>}
                 <section className="lab-panel"><h2>Objectifs</h2><ul>{lab.objectives.map((objective) => <li key={objective}><IconCheck size={15} />{objective}</li>)}</ul></section>
-                <LabTerminal lines={lab.terminal_lines} />
-                {!userId ? (
+                {(lab.constraints.length > 0 || lab.tools.length > 0) && (
+                  <section className="lab-panel lab-context" aria-label="Contraintes et outils">
+                    {lab.constraints.length > 0 && <div><h2>Contraintes</h2><ul>{lab.constraints.map((item) => <li key={item}><IconLock size={14} />{item}</li>)}</ul></div>}
+                    {lab.tools.length > 0 && <div><h2>Outils</h2><ul className="lab-context__tools">{lab.tools.map((tool) => <li key={tool}>{tool}</li>)}</ul></div>}
+                  </section>
+                )}
+                {lab.format === "packet_tracer" && <PacketTracerGateway assets={assets} requiresComputer={lab.requires_computer} />}
+                <LabAssets assets={assets} />
+                {isTerminal && <LabTerminal lines={lab.terminal_lines} />}
+                {tasks.length > 0 && <LabTasks tasks={tasks} signedIn={Boolean(userId)} signInHref={loginHref(`/challenges/${slug}`)} xpReward={lab.xp_reward} onSolved={taskSolved} />}
+                {!isTerminal && tasks.length === 0 && <section className="lab-panel"><h2>Questions du lab</h2><p>Les questions de ce lab sont en cours de rédaction par l’équipe.</p></section>}
+                {!isTerminal && solved && <section className="lab-panel lab-feedback-zone"><p className="lab-feedback is-correct" role="status"><IconTrophy size={16} /> Bravo, lab terminé ! Tu peux relire les fichiers à tout moment.</p></section>}
+                {hasReport && userId && <LabReportForm labId={lab.id} userId={userId} published={published} />}
+                {isTerminal && (!userId ? (
                   <section className="lab-panel"><h2>Ta réponse</h2><p><IconLock size={15} /> Connecte-toi pour soumettre ton flag, suivre tes tentatives et gagner +{lab.xp_reward} XP.</p><div className="study-actions"><Link className="study-button" href={loginHref(`/challenges/${slug}`)}>Se connecter pour répondre</Link><Link className="study-button study-button--ghost" href="/register">Créer un compte gratuit</Link></div></section>
                 ) : (
                 <section className="lab-panel"><h2>Ta réponse</h2><div className="lab-answer"><Input id="lab-answer" label="Flag ou réponse" placeholder={lab.flag_placeholder} maxLength={300} value={answer} disabled={checking || solved} onChange={(event) => { setAnswer(event.target.value); setFormError(null); if (wrong) setResult(null); }} onKeyDown={(event) => { if (event.key === "Enter") void validate(); }} error={formError ?? undefined} /><Button variant="success" loading={checking} disabled={checking || solved} onClick={() => void validate()}>Valider</Button></div><div className="lab-feedback-zone" aria-live="polite">{wrong && <p className="lab-feedback is-wrong" role="status">Réponse incorrecte. {wrong.remaining_attempts} tentative{wrong.remaining_attempts > 1 ? "s" : ""} restante{wrong.remaining_attempts > 1 ? "s" : ""}. Relis les objectifs ou révèle un indice.</p>}{solved && <p className="lab-feedback is-correct" role="status"><IconTrophy size={16} /> Bravo, lab résolu ! {correct && "xp_awarded" in correct && correct.xp_awarded > 0 ? `+${correct.xp_awarded} XP.` : "Tu peux le relire à tout moment."}</p>}</div></section>
-                )}
+                ))}
               </div>
-              <aside className="lab-hints"><h2>Indices progressifs</h2>{lab.hints.length === 0 ? <p>Aucun indice n’est nécessaire pour ce lab.</p> : <><ol>{lab.hints.slice(0, visibleHints).map((hint, index) => <li key={hint}><IconHint size={15} /> <span>Indice {index + 1} : {hint}</span></li>)}</ol>{visibleHints < lab.hints.length ? <Button variant="secondary" size="sm" onClick={() => setVisibleHints((count) => Math.min(lab.hints.length, count + 1))}>Révéler un indice</Button> : <p>Tous les indices sont affichés.</p>}</>}</aside>
+              {!isTerminal && tasks.length > 0 && (
+                <aside className="lab-rail" aria-label="Récapitulatif du lab">
+                  <h2>Parcours du lab</h2>
+                  <ol className="lab-rail__steps">
+                    {tasks.map((task, index) => <li key={task.id} className={task.solved ? "is-solved" : undefined}><a href={`#task-row-${task.id}`}>{task.solved ? <IconCheck size={13} /> : <span aria-hidden="true">{index + 1}</span>}Question {index + 1}</a></li>)}
+                  </ol>
+                  <dl className="lab-rail__facts">
+                    <div><dt>Récompense</dt><dd>+{lab.xp_reward} XP</dd></div>
+                    {lab.estimated_minutes > 0 && <div><dt>Durée estimée</dt><dd>{lab.estimated_minutes} min</dd></div>}
+                  </dl>
+                </aside>
+              )}
+              {isTerminal && <aside className="lab-hints"><h2>Indices progressifs</h2>{lab.hints.length === 0 ? <p>Aucun indice n’est nécessaire pour ce lab.</p> : <><ol>{lab.hints.slice(0, visibleHints).map((hint, index) => <li key={hint}><IconHint size={15} /> <span>Indice {index + 1} : {hint}</span></li>)}</ol>{visibleHints < lab.hints.length ? <Button variant="secondary" size="sm" onClick={() => setVisibleHints((count) => Math.min(lab.hints.length, count + 1))}>Révéler un indice</Button> : <p>Tous les indices sont affichés.</p>}</>}</aside>}
             </section>
           </>
         )}

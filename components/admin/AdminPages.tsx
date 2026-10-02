@@ -30,11 +30,13 @@ import { LEVEL_LABELS, StateMsg, StatusBadge, Textarea, asInt, useRouteId } from
 import { IconPlus, IconTrash } from "@/components/ui/Icon";
 
 export { AdminBadgesPage, AdminChallengesPage, AdminLabsPage } from "./AdminCatalogPages";
+export { AdminCompetencesPage, AdminMascottePage, AdminRendusPage } from "./AdminAcademyPages";
 export { AdminCertificatesPage, AdminLogsPage, AdminMessagesPage, AdminNotificationsPage } from "./AdminOpsPages";
 
 const COURSE_STATUS_OPTIONS = [
   { value: "all", label: "Tous les statuts" },
   { value: "draft", label: "Brouillons" },
+  { value: "review", label: "En relecture" },
   { value: "published", label: "Publiés" },
   { value: "archived", label: "Archivés" },
 ];
