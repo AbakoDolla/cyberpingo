@@ -1,0 +1,92 @@
+Apr  2 00:17:00 web-srv01 CRON[2203]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr  2 00:17:01 web-srv01 CRON[7076]: pam_unix(cron:session): session closed for user root
+Apr  2 00:41:05 web-srv01 sshd[8993]: Accepted publickey for deploy from 10.20.0.5 port 47688 ssh2: RSA SHA256:q3Zk1x0Yh8mP4rT7uWc2LdN6aVbE5sGj9oIf0HnKXyA
+Apr  2 00:41:05 web-srv01 sshd[9409]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr  2 00:47:19 web-srv01 sshd[7037]: pam_unix(sshd:session): session closed for user deploy
+Apr  2 01:17:00 web-srv01 CRON[8177]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr  2 01:17:01 web-srv01 CRON[5719]: pam_unix(cron:session): session closed for user root
+Apr  2 01:52:43 web-srv01 sshd[1817]: Accepted publickey for deploy from 10.20.0.5 port 54265 ssh2: RSA SHA256:q3Zk1x0Yh8mP4rT7uWc2LdN6aVbE5sGj9oIf0HnKXyA
+Apr  2 01:52:43 web-srv01 sshd[4526]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr  2 01:58:00 web-srv01 sshd[4281]: Failed password for root from 192.0.2.88 port 56812 ssh2
+Apr  2 01:58:04 web-srv01 sshd[9021]: Failed password for root from 192.0.2.88 port 36560 ssh2
+Apr  2 01:58:08 web-srv01 sshd[3046]: Failed password for root from 192.0.2.88 port 40583 ssh2
+Apr  2 01:58:15 web-srv01 sshd[2110]: Connection closed by authenticating user root 192.0.2.88 port 40843 [preauth]
+Apr  2 01:59:02 web-srv01 sshd[2617]: pam_unix(sshd:session): session closed for user deploy
+Apr  2 02:14:07 web-srv01 sshd[6628]: Invalid user admin from 203.0.113.45 port 47588
+Apr  2 02:14:08 web-srv01 sshd[3617]: Failed password for invalid user admin from 203.0.113.45 port 47588 ssh2
+Apr  2 02:14:09 web-srv01 sshd[7923]: Failed password for invalid user admin from 203.0.113.45 port 47589 ssh2
+Apr  2 02:14:11 web-srv01 sshd[1229]: Invalid user test from 203.0.113.45 port 47554
+Apr  2 02:14:12 web-srv01 sshd[5662]: Failed password for invalid user test from 203.0.113.45 port 47554 ssh2
+Apr  2 02:14:13 web-srv01 sshd[7214]: Failed password for invalid user test from 203.0.113.45 port 47555 ssh2
+Apr  2 02:14:15 web-srv01 sshd[4775]: Invalid user oracle from 203.0.113.45 port 51136
+Apr  2 02:14:16 web-srv01 sshd[7982]: Failed password for invalid user oracle from 203.0.113.45 port 51136 ssh2
+Apr  2 02:14:17 web-srv01 sshd[4464]: Failed password for invalid user oracle from 203.0.113.45 port 51137 ssh2
+Apr  2 02:14:18 web-srv01 sshd[6964]: Invalid user ubuntu from 203.0.113.45 port 51008
+Apr  2 02:14:19 web-srv01 sshd[2140]: Failed password for invalid user ubuntu from 203.0.113.45 port 51008 ssh2
+Apr  2 02:14:20 web-srv01 sshd[3613]: Failed password for invalid user ubuntu from 203.0.113.45 port 51009 ssh2
+Apr  2 02:14:21 web-srv01 sshd[2122]: Invalid user postgres from 203.0.113.45 port 41182
+Apr  2 02:14:22 web-srv01 sshd[9215]: Failed password for invalid user postgres from 203.0.113.45 port 41182 ssh2
+Apr  2 02:14:23 web-srv01 sshd[9663]: Failed password for invalid user postgres from 203.0.113.45 port 41183 ssh2
+Apr  2 02:14:24 web-srv01 sshd[3142]: Invalid user ftpuser from 203.0.113.45 port 43017
+Apr  2 02:14:25 web-srv01 sshd[6851]: Failed password for invalid user ftpuser from 203.0.113.45 port 43017 ssh2
+Apr  2 02:14:26 web-srv01 sshd[1974]: Failed password for invalid user ftpuser from 203.0.113.45 port 43018 ssh2
+Apr  2 02:14:29 web-srv01 sshd[6212]: Invalid user git from 203.0.113.45 port 42947
+Apr  2 02:14:30 web-srv01 sshd[9468]: Failed password for invalid user git from 203.0.113.45 port 42947 ssh2
+Apr  2 02:14:31 web-srv01 sshd[6381]: Failed password for invalid user git from 203.0.113.45 port 42948 ssh2
+Apr  2 02:14:32 web-srv01 sshd[9431]: Invalid user guest from 203.0.113.45 port 48178
+Apr  2 02:14:33 web-srv01 sshd[5021]: Failed password for invalid user guest from 203.0.113.45 port 48178 ssh2
+Apr  2 02:14:34 web-srv01 sshd[5919]: Failed password for invalid user guest from 203.0.113.45 port 48179 ssh2
+Apr  2 02:14:36 web-srv01 sshd[2730]: Invalid user user from 203.0.113.45 port 43592
+Apr  2 02:14:37 web-srv01 sshd[2290]: Failed password for invalid user user from 203.0.113.45 port 43592 ssh2
+Apr  2 02:14:38 web-srv01 sshd[5849]: Failed password for invalid user user from 203.0.113.45 port 43593 ssh2
+Apr  2 02:14:39 web-srv01 sshd[4134]: Invalid user nagios from 203.0.113.45 port 41970
+Apr  2 02:14:40 web-srv01 sshd[4698]: Failed password for invalid user nagios from 203.0.113.45 port 41970 ssh2
+Apr  2 02:14:41 web-srv01 sshd[6926]: Failed password for invalid user nagios from 203.0.113.45 port 41971 ssh2
+Apr  2 02:14:42 web-srv01 sshd[5323]: Failed password for deploy from 203.0.113.45 port 52404 ssh2
+Apr  2 02:14:46 web-srv01 sshd[3326]: Failed password for deploy from 203.0.113.45 port 53368 ssh2
+Apr  2 02:14:49 web-srv01 sshd[4964]: Failed password for deploy from 203.0.113.45 port 57411 ssh2
+Apr  2 02:14:53 web-srv01 sshd[7656]: Failed password for deploy from 203.0.113.45 port 58788 ssh2
+Apr  2 02:14:57 web-srv01 sshd[6804]: Failed password for deploy from 203.0.113.45 port 59902 ssh2
+Apr  2 02:14:59 web-srv01 sshd[2627]: Failed password for deploy from 203.0.113.45 port 56774 ssh2
+Apr  2 02:15:01 web-srv01 sshd[3691]: Failed password for deploy from 203.0.113.45 port 53682 ssh2
+Apr  2 02:15:03 web-srv01 sshd[4978]: Failed password for deploy from 203.0.113.45 port 57481 ssh2
+Apr  2 02:15:07 web-srv01 sshd[4705]: Failed password for deploy from 203.0.113.45 port 58864 ssh2
+Apr  2 02:15:10 web-srv01 sshd[7767]: Failed password for deploy from 203.0.113.45 port 52501 ssh2
+Apr  2 02:15:13 web-srv01 sshd[7508]: Failed password for deploy from 203.0.113.45 port 58249 ssh2
+Apr  2 02:15:17 web-srv01 sshd[3402]: Failed password for deploy from 203.0.113.45 port 57319 ssh2
+Apr  2 02:15:21 web-srv01 sshd[5841]: Failed password for deploy from 203.0.113.45 port 58092 ssh2
+Apr  2 02:15:23 web-srv01 sshd[4977]: Failed password for deploy from 203.0.113.45 port 53342 ssh2
+Apr  2 02:15:27 web-srv01 sshd[7757]: Failed password for deploy from 203.0.113.45 port 59141 ssh2
+Apr  2 02:15:31 web-srv01 sshd[7885]: Failed password for deploy from 203.0.113.45 port 52527 ssh2
+Apr  2 02:15:35 web-srv01 sshd[7838]: Failed password for deploy from 203.0.113.45 port 59149 ssh2
+Apr  2 02:15:38 web-srv01 sshd[3564]: Failed password for deploy from 203.0.113.45 port 55504 ssh2
+Apr  2 02:15:42 web-srv01 sshd[1966]: Failed password for deploy from 203.0.113.45 port 58122 ssh2
+Apr  2 02:15:46 web-srv01 sshd[2275]: Failed password for deploy from 203.0.113.45 port 58367 ssh2
+Apr  2 02:15:48 web-srv01 sshd[6942]: Failed password for deploy from 203.0.113.45 port 55100 ssh2
+Apr  2 02:15:51 web-srv01 sshd[9758]: Failed password for deploy from 203.0.113.45 port 55896 ssh2
+Apr  2 02:15:55 web-srv01 sshd[5588]: Failed password for deploy from 203.0.113.45 port 53260 ssh2
+Apr  2 02:15:57 web-srv01 sshd[7274]: Failed password for deploy from 203.0.113.45 port 59814 ssh2
+Apr  2 02:16:07 web-srv01 sshd[8303]: Accepted password for deploy from 203.0.113.45 port 53311 ssh2
+Apr  2 02:16:07 web-srv01 sshd[8401]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr  2 02:16:08 web-srv01 systemd-logind[2769]: New session 41 of user deploy.
+Apr  2 02:16:31 web-srv01 sudo[5349]: deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/bin/bash
+Apr  2 02:16:31 web-srv01 sudo[3419]: pam_unix(sudo:session): session opened for user root(uid=0) by deploy(uid=1001)
+Apr  2 02:17:00 web-srv01 CRON[3917]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr  2 02:17:01 web-srv01 CRON[7701]: pam_unix(cron:session): session closed for user root
+Apr  2 02:17:08 web-srv01 useradd[7066]: new group: name=support, GID=1002
+Apr  2 02:17:08 web-srv01 useradd[5504]: new user: name=support, UID=1002, GID=1002, home=/home/support, shell=/bin/bash
+Apr  2 02:17:10 web-srv01 usermod[6880]: add 'support' to group 'sudo'
+Apr  2 02:17:17 web-srv01 passwd[8233]: pam_unix(passwd:chauthtok): password changed for support
+Apr  2 02:17:43 web-srv01 sshd[4681]: pam_unix(sshd:session): session closed for user deploy
+Apr  2 03:17:00 web-srv01 CRON[6016]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr  2 03:17:01 web-srv01 CRON[8004]: pam_unix(cron:session): session closed for user root
+Apr  2 04:09:17 web-srv01 sshd[3088]: Accepted publickey for deploy from 10.20.0.5 port 52064 ssh2: RSA SHA256:q3Zk1x0Yh8mP4rT7uWc2LdN6aVbE5sGj9oIf0HnKXyA
+Apr  2 04:09:17 web-srv01 sshd[8109]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr  2 04:17:00 web-srv01 CRON[8578]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr  2 04:17:01 web-srv01 CRON[5376]: pam_unix(cron:session): session closed for user root
+Apr  2 04:20:41 web-srv01 sshd[6639]: pam_unix(sshd:session): session closed for user deploy
+Apr  2 05:17:00 web-srv01 CRON[6037]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr  2 05:17:01 web-srv01 CRON[3596]: pam_unix(cron:session): session closed for user root
+Apr  2 05:33:37 web-srv01 sshd[3670]: Accepted publickey for deploy from 10.20.0.5 port 51935 ssh2: RSA SHA256:q3Zk1x0Yh8mP4rT7uWc2LdN6aVbE5sGj9oIf0HnKXyA
+Apr  2 05:33:37 web-srv01 sshd[9282]: pam_unix(sshd:session): session opened for user deploy(uid=1001) by (uid=0)
+Apr  2 05:41:13 web-srv01 sshd[4477]: pam_unix(sshd:session): session closed for user deploy

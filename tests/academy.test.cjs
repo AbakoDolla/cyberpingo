@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { contentId } = require("../scripts/generate-content-seed.cjs");
 const { build: buildReseauxSeed, OUTPUT: RESEAUX_SEED } = require("../scripts/generate-reseaux-seed.cjs");
+const { build: buildSocSeed, OUTPUT: SOC_SEED } = require("../scripts/generate-soc-seed.cjs");
 const { buildLabAssets, OUTPUT_DIR: LAB_DIR } = require("../scripts/generate-lab-assets.cjs");
 const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
 
@@ -15,6 +16,7 @@ const lesson = (key) => contentId("lesson", key);
 const quiz = (key) => contentId("quiz", key);
 const lab = (key) => contentId("lab", key);
 const skill = (key) => contentId("skill", key);
+const SOC_SKILLS = ["lecture-journaux-linux", "audit-droits-linux", "detection-bruteforce-ssh", "analyse-logs-web", "reconstitution-incident"];
 
 async function as(uid, sql, params = []) {
   await db.exec("reset role");
@@ -77,6 +79,7 @@ after(async () => { await db?.close(); });
 
 test("the Réseaux seed and the lab files match their generators", () => {
   assert.equal(fs.readFileSync(RESEAUX_SEED, "utf8"), buildReseauxSeed(), "Run node scripts/generate-reseaux-seed.cjs");
+  assert.equal(fs.readFileSync(SOC_SEED, "utf8"), buildSocSeed(), "Run node scripts/generate-soc-seed.cjs");
   for (const file of buildLabAssets().files) {
     assert.deepEqual(fs.readFileSync(path.join(LAB_DIR, file.name)), file.data, `${file.name} is stale: run node scripts/generate-lab-assets.cjs`);
   }
@@ -98,11 +101,11 @@ test("the Réseaux path seeds a complete, published, end-to-end learning path", 
     (select count(*) from public.courses where domain_id is null) as orphan_courses,
     (select count(*) from public.domains) as domains`, [labs.length ? (await sql("select array_agg(id) as ids from public.labs where course_id = $1", [course("c2")]))[0].ids : []]);
   assert.deepEqual(Object.fromEntries(Object.entries(counts).map(([key, value]) => [key, Number(value)])), {
-    tasks: 28, keys: 28, skills: 6, links: 24, orphan_courses: 0, domains: 6,
+    tasks: 28, keys: 28, skills: 11, links: 44, orphan_courses: 0, domains: 6,
   });
 
   const assets = await sql("select kind, url from public.lab_assets");
-  assert.equal(assets.length, 8);
+  assert.equal(assets.length, 17);
   assert.ok(assets.every((row) => row.url.startsWith("/labs/") && fs.existsSync(path.join(LAB_DIR, path.basename(row.url)))), "every asset points to a real file");
 
   const events = await sql("select distinct event from public.mascot_lines where is_active");
@@ -198,7 +201,7 @@ test("an admin previews an unpublished lab without earning anything, learners ca
 
 test("skills advance from learning to validated, never on a quiz alone", async () => {
   const states = await skillStates(ids.ana);
-  assert.equal(Object.keys(states).length, 6);
+  assert.equal(Object.keys(states).length, 11);
   assert.ok(Object.values(states).every((state) => state === "not_studied"));
 
   await rpc(ids.ana, "start_lesson", { p_lesson_id: lesson("reseaux-ipv4") });
@@ -220,7 +223,10 @@ test("skills advance from learning to validated, never on a quiz alone", async (
   await passQuiz(ids.ana, "reseaux-cidr");
   const validation = await solveLab(ids.ana, "evaluation-reseaux");
   const states2 = await skillStates(ids.ana);
-  assert.ok(Object.values(states2).every((state) => state === "validated"), JSON.stringify(states2));
+  const reseauxSkills = Object.keys(states2).filter((slug) => !SOC_SKILLS.includes(slug));
+  assert.equal(reseauxSkills.length, 6);
+  assert.ok(reseauxSkills.every((slug) => states2[slug] === "validated"), JSON.stringify(states2));
+  assert.ok(SOC_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a SOC skill");
   assert.equal(validation.new_skills.length, 6);
   assert.ok(validation.new_badges.some((badge) => badge.slug === "architecte-adressage"));
   assert.ok(validation.new_badges.some((badge) => badge.slug === "gardien-reseau"));
@@ -335,4 +341,57 @@ test("resetting progress also clears academy data, keeps the catalogue", async (
   }
   assert.equal((await rpc(ids.dan, "get_my_academy")).rank.slug, "novice-numerique");
   assert.ok(Number((await sql("select count(*) as n from public.lab_tasks"))[0].n) >= 28);
+});
+test("the SOC path seeds four published log labs whose answer keys come from the generated logs", async () => {
+  const { facts } = buildLabAssets();
+  const slugs = ["audit-linux-droits", "brute-force-ssh", "intrusion-web", "investigation-soc"];
+  const labs = await sql("select slug, format, status, category, course_id, is_assessment from public.labs where slug = any($1) order by position", [slugs]);
+  assert.deepEqual(labs.map((row) => row.slug), slugs);
+  assert.ok(labs.every((row) => row.status === "published" && row.format === "logs"));
+  assert.deepEqual(labs.map((row) => row.course_id), [course("c3"), course("c6"), course("c6"), course("c6")]);
+  assert.deepEqual(labs.map((row) => row.category), ["linux", "securite", "securite", "securite"]);
+  assert.deepEqual(labs.filter((row) => row.is_assessment).map((row) => row.slug), ["investigation-soc"]);
+
+  const answers = async (slug) => (await labTasks(slug)).flatMap((task) => task.accepted.map((value) => value.toLowerCase()));
+  const { audit, ssh, web, incident } = facts.soc;
+  assert.equal((await labTasks("investigation-soc")).length, 11);
+  for (const [slug, expected] of [
+    ["audit-linux-droits", [audit.worldWritableScript, audit.extraRootAccount, String(audit.suidCount)]],
+    ["brute-force-ssh", [ssh.attackerIp, String(ssh.attackerFailures), ssh.targetedUser, ssh.newUser]],
+    ["intrusion-web", [web.attackerIp, web.firstTool, web.vulnerablePage, web.webshellPath]],
+    ["investigation-soc", [incident.attackerIp, incident.compromisedWebAccount, incident.webshellPath, incident.pivotAccount, incident.persistenceFile, String(incident.exfilPort)]],
+  ]) {
+    const known = await answers(slug);
+    for (const value of expected) assert.ok(known.includes(value.toLowerCase()), `${slug} accepts ${value}`);
+  }
+
+  const files = await sql("select a.url from public.lab_assets a join public.labs l on l.id = a.lab_id where l.slug = any($1)", [slugs]);
+  assert.equal(files.length, 9);
+  assert.ok(files.every((row) => fs.existsSync(path.join(LAB_DIR, path.basename(row.url)))), "every SOC asset points to a real file");
+
+  const skills = await sql("select s.slug, d.slug as domain, (select count(*) from public.skill_links k where k.skill_id = s.id) as links from public.skills s join public.domains d on d.id = s.domain_id where s.slug = any($1) order by s.position", [SOC_SKILLS]);
+  assert.deepEqual(skills.map((row) => [row.slug, row.domain, Number(row.links)]), [
+    ["lecture-journaux-linux", "linux", 4], ["audit-droits-linux", "linux", 4], ["detection-bruteforce-ssh", "detection", 4], ["analyse-logs-web", "detection", 4], ["reconstitution-incident", "detection", 4],
+  ]);
+});
+
+test("a learner completes the SOC path end to end: lessons, quizzes, labs, five skills and the SOC badges", async () => {
+  const uid = await createUser("eve@example.test", { display_name: "eve" });
+  const lessons = ["linux-journaux", "linux-audit-droits", "soc-ssh-bruteforce", "soc-web-logs", "soc-chronologie"];
+  for (const key of lessons) { await studyLesson(uid, key); assert.equal((await passQuiz(uid, key)).passed, true, key); }
+  for (const slug of ["audit-linux-droits", "brute-force-ssh", "intrusion-web"]) {
+    const result = await solveLab(uid, slug);
+    assert.equal(result.lab_completed, true, slug);
+  }
+  const states = await skillStates(uid);
+  assert.ok(SOC_SKILLS.every((slug) => states[slug] === "exercises_mastered" || states[slug] === "consolidating" || states[slug] === "learning"), JSON.stringify(states));
+  assert.ok(SOC_SKILLS.every((slug) => states[slug] !== "validated"), "no skill is validated before the assessment");
+
+  const validation = await solveLab(uid, "investigation-soc");
+  assert.equal(validation.lab_completed, true);
+  assert.deepEqual(validation.new_skills.map((entry) => entry.slug).sort(), [...SOC_SKILLS].sort());
+  const earned = (await sql("select b.slug from public.user_badges ub join public.badges b on b.id = ub.badge_id where ub.user_id = $1", [uid])).map((row) => row.slug);
+  for (const slug of ["auditeur-linux", "chasseur-bruteforce", "analyste-web", "analyste-soc", "reconstitueur-incident"]) assert.ok(earned.includes(slug), slug);
+  const final = await skillStates(uid);
+  assert.ok(SOC_SKILLS.every((slug) => final[slug] === "validated"), JSON.stringify(final));
 });

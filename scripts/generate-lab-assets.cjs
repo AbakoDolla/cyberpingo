@@ -5,6 +5,7 @@
 // derived from the same scenario and verified against the files by the tests.
 const fs = require("node:fs");
 const path = require("node:path");
+const { buildSocAssets } = require("./lab-scenarios-soc.cjs");
 
 const root = path.resolve(__dirname, "..");
 const OUTPUT_DIR = path.join(root, "public", "labs");
@@ -488,6 +489,7 @@ function buildLabAssets() {
   const evaluation = buildEvaluationCapture();
   const firewall = buildFirewallLog();
   const packetTracer = buildPacketTracerFacts();
+  const soc = buildSocAssets();
   return {
     files: [
       { name: "reseau-instable.pcap", data: instable.file },
@@ -497,8 +499,9 @@ function buildLabAssets() {
       { name: "packet-tracer-guide.md", data: text(buildPacketTracerGuide(packetTracer)) },
       { name: "modele-rapport-reseau.md", data: text(buildReportTemplate()) },
       { name: "guide-wireshark.md", data: text(buildWiresharkGuide()) },
+      ...soc.files,
     ],
-    facts: { instable: instable.facts, evaluation: evaluation.facts, firewall: firewall.facts, packetTracer },
+    facts: { instable: instable.facts, evaluation: evaluation.facts, firewall: firewall.facts, packetTracer, soc: soc.facts },
   };
 }
 

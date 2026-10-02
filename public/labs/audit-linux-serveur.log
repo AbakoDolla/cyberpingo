@@ -1,0 +1,53 @@
+### CyberPingo, audit Linux de srv-compta01, collecte du 2026-04-02T08:30:00Z
+### Collecte en lecture seule. Aucune modification n’a été faite sur le serveur.
+
+=== ls -l (fichiers de configuration et scripts) ===
+-rwxr-xr-x 1 root root   1043 Mar 28 09:12 /opt/scripts/deploy.sh
+-rwxrwxrwx 1 root root    388 Mar 30 22:47 /opt/scripts/backup.sh
+-rw-r----- 1 root adm  20480 Apr  1 06:25 /var/log/auth.log
+-rw------- 1 root root   1760 Mar 12 14:03 /etc/ssh/ssh_host_rsa_key
+-rw-r--r-- 1 root root   1912 Apr  1 18:40 /etc/passwd
+-rw-r----- 1 root shadow   1210 Apr  1 18:40 /etc/shadow
+
+=== find / -perm -4000 -type f 2>/dev/null ===
+/usr/bin/passwd
+/usr/bin/sudo
+/usr/bin/su
+/usr/bin/mount
+/usr/bin/umount
+/usr/bin/find
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/newgrp
+/usr/bin/gpasswd
+/usr/bin/ping
+
+=== cat /etc/sudoers.d/* ===
+# /etc/sudoers.d/90-cloud-init
+%sudo ALL=(ALL:ALL) ALL
+# /etc/sudoers.d/devops
+devops ALL=(ALL) NOPASSWD: ALL
+# /etc/sudoers.d/compta
+compta ALL=(root) /usr/bin/systemctl restart compta-api
+
+=== crontab -l -u root ===
+# m h dom mon dow command
+0 2 * * * /opt/scripts/deploy.sh --nightly >> /var/log/deploy.log 2>&1
+*/10 * * * * /opt/scripts/backup.sh
+30 3 * * 0 /usr/bin/apt-get -y -qq update
+
+=== cat /etc/passwd ===
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+sshd:x:110:65534::/run/sshd:/usr/sbin/nologin
+deploy:x:1001:1001:Deploy,,,:/home/deploy:/bin/bash
+devops:x:1002:1002:DevOps,,,:/home/devops:/bin/bash
+toor:x:0:0:backup admin:/root:/bin/bash
+compta:x:1003:1003:Comptabilite,,,:/home/compta:/bin/bash
+
+=== awk -F: '$3 == 0 {print $1}' /etc/passwd ===
+root
+toor
+
+### Fin de collecte, 5 sections
