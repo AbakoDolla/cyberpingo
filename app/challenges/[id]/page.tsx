@@ -89,7 +89,7 @@ function ChallengeDetailView() {
             {lab.status === "draft" && <div className="learning-banner learning-banner--preview">Aperçu brouillon : le lab peut être testé par l’équipe, sans XP.</div>}
             <header className="lab-hero lab-hero--visual">
               <div className="lab-hero__visual">
-                <div className="lab-hero__media" aria-hidden="true"><LabArt category={lab.category} className="lab-hero__art" /></div>
+                <div className="lab-hero__media" aria-hidden="true"><LabArt category={lab.category} className="lab-hero__art" photo sizes="(max-width: 1100px) 100vw, 66vw" priority /></div>
                 <div className="lab-hero__content">
                   <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge><Badge tone="neutral">{FORMAT_LABELS[lab.format]}</Badge>{lab.is_assessment && <Badge tone="amber">Évaluation pratique</Badge>}{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone="green">+{lab.xp_reward} XP</Badge></div>
                   <h1>{lab.title.replace(/ ([:?!;])/g, "\u00A0$1")}</h1>

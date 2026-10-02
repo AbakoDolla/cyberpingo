@@ -431,7 +431,7 @@ function CourseRowCard({ course, onDeleted }: { course: AdminCourseListItem; onD
                 className="adm-row-art__image"
               />
             ) : (
-              <CourseArt slug={course.slug} category={course.category} className="adm-row-art__art" />
+              <CourseArt slug={course.slug} category={course.category} className="adm-row-art__art" photo sizes="(max-width: 720px) 100vw, 104px" />
             )}
           </div>
         </div>

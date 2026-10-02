@@ -44,6 +44,21 @@ export const metadata: Metadata = {
   description:
     "Apprends la cybersécurité pas à pas, comme un jeu. Des leçons courtes, des quiz et des défis pratiques pour développer les bons réflexes avec CyberPingo.",
   icons: { icon: "/images/cyberpingo-transparent.png" },
+  metadataBase: new URL("https://cyberpingo.vercel.app"),
+  openGraph: {
+    type: "website",
+    siteName: "CyberPingo",
+    locale: "fr_FR",
+    title: "CyberPingo, apprends, comprends, réussis",
+    description: "Apprends la cybersécurité pas à pas, avec des leçons courtes, des labs et des badges.",
+    images: [{ url: "/images/og-cyberpingo.jpg", width: 1200, height: 630, alt: "CyberPingo, apprends, comprends, réussis" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CyberPingo, apprends, comprends, réussis",
+    description: "Apprends la cybersécurité pas à pas, avec des leçons courtes, des labs et des badges.",
+    images: ["/images/og-cyberpingo.jpg"],
+  },
 };
 
 export default function RootLayout({

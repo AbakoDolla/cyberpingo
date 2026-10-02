@@ -21,7 +21,7 @@ export default function ChallengeCard({ lab, href = `/challenges/${lab.slug}` }:
       <Card glow={lab.solved ? "green" : "purple"} className="lab-card h-full">
         <div className="lab-card__cover">
           <div className="lab-card__cover-media" aria-hidden="true">
-            <LabArt category={lab.category} className="lab-card__cover-art" />
+            <LabArt category={lab.category} className="lab-card__cover-art" photo />
           </div>
           <div className="lab-card__cover-top">
             <div className="lab-card__cover-badges">

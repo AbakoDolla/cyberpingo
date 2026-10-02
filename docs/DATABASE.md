@@ -13,6 +13,7 @@ Le schéma complet est défini par les migrations de `supabase/migrations/`. Ell
 | `20260928190400_admin.sql` | RPC d'administration, import de cours, statistiques, révocation de certificats, annonces, publication Realtime |
 | `20260928190500_storage.sql` | Buckets et politiques Storage |
 | `20261002000000_academy_engine.sql` | Moteur pédagogique : domaines, compétences, labs structurés (étapes, ressources, rendus), grades, répliques de la mascotte, badges à condition vérifiable. Additive, sans suppression de données |
+| `20261002010000_staff_roles_voice.sql` | Journal d'audit réservé au superadmin (politique `Superadmins read the audit log` sur `admin_logs`), bucket `mascot-voice` et ses quatre politiques staff |
 
 Les données de référence indispensables (20 niveaux, 10 badges, 4 défis, 9 grades) sont insérées par les migrations. Le contenu pédagogique de départ est dans `supabase/seed/01_starter_content.sql`, puis `supabase/seed/02_reseaux_path.sql` pour le parcours Réseaux complet.
 
@@ -169,6 +170,9 @@ Le contenu du parcours Réseaux (cours `reseaux`) est dans `supabase/seed/conten
 | `course-images` | public | 5 Mo | images (SVG inclus) | staff |
 | `lesson-assets` | public | 20 Mo | images, PDF, MP4 | staff |
 | `certificates` | privé | 5 Mo | PDF | service role uniquement ; lecture par le propriétaire et le staff |
+| `mascot-voice` | public | 5 Mo | WebM, Ogg, MP3, MP4, WAV | staff (liste, envoi, remplacement, suppression) |
+
+Les voix de Pingo sont des enregistrements humains, jamais de la synthèse vocale : `mascot_lines.audio_url` n'accepte qu'une URL `https://` ou un chemin `/audio/...`, et exige un `voice_credit` (1 à 120 caractères). Le studio d'administration (`/admin/mascotte`) enregistre au micro ou importe un fichier, l'envoie dans `mascot-voice` et renseigne la réplique.
 
 ## Types TypeScript
 

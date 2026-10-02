@@ -5,28 +5,29 @@ import { usePathname } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
 import { ROLE_LABELS } from "@/lib/roles";
+import { canAccessAdminPath, sectionsFor } from "@/lib/admin-access";
 import Avatar from "@/components/ui/Avatar";
 import {
   IconActivity, IconAward, IconBell, IconBrain, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconProfile, IconSend, IconShield,
   IconStar, IconTerminal,
 } from "@/components/ui/Icon";
 
-const NAV = [
-  { href: "/admin", label: "Vue d’ensemble", Icon: IconDashboard },
-  { href: "/admin/utilisateurs", label: "Utilisateurs", Icon: IconProfile },
-  { href: "/admin/cours", label: "Cours", Icon: IconCourses },
-  { href: "/admin/import", label: "Import IA", Icon: IconActivity },
-  { href: "/admin/labs", label: "Labs", Icon: IconTerminal },
-  { href: "/admin/rendus", label: "Rendus", Icon: IconSend },
-  { href: "/admin/competences", label: "Compétences", Icon: IconBrain },
-  { href: "/admin/mascotte", label: "Mascotte", Icon: IconStar },
-  { href: "/admin/badges", label: "Badges", Icon: IconAward },
-  { href: "/admin/defis", label: "Défis", Icon: IconShield },
-  { href: "/admin/certificats", label: "Certificats", Icon: IconCertificate },
-  { href: "/admin/notifications", label: "Notifications", Icon: IconBell },
-  { href: "/admin/messages", label: "Messages", Icon: IconMail },
-  { href: "/admin/journal", label: "Journal", Icon: IconList },
-];
+const ICONS: Record<string, typeof IconDashboard> = {
+  "/admin": IconDashboard,
+  "/admin/utilisateurs": IconProfile,
+  "/admin/cours": IconCourses,
+  "/admin/import": IconActivity,
+  "/admin/labs": IconTerminal,
+  "/admin/rendus": IconSend,
+  "/admin/competences": IconBrain,
+  "/admin/mascotte": IconStar,
+  "/admin/badges": IconAward,
+  "/admin/defis": IconShield,
+  "/admin/certificats": IconCertificate,
+  "/admin/notifications": IconBell,
+  "/admin/messages": IconMail,
+  "/admin/journal": IconList,
+};
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -41,9 +42,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   if (!isAuthenticated || !isStaff) {
     return <GuardFrame><GuardCard title="Accès réservé" detail="Cette console est réservée à l’équipe CyberPingo." /></GuardFrame>;
   }
+  if (!canAccessAdminPath(profile?.role, pathname)) {
+    return <GuardFrame><GuardCard title="Réservé aux super-administrateurs" detail="Ta fonction d’administrateur ne donne pas accès à cette section." to="/admin" cta="Retour à la console" /></GuardFrame>;
+  }
 
   const staffName = profile?.display_name ?? "Staff CyberPingo";
   const staffRole = profile?.role ? ROLE_LABELS[profile.role] : "Équipe";
+  const sections = sectionsFor(profile?.role);
 
   return (
     <div className="adm-shell">
@@ -57,7 +62,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           </span>
         </Link>
         <nav className="adm-nav" aria-label="Navigation admin">
-          {NAV.map(({ href, label, Icon }) => {
+          {sections.map(({ href, label }) => {
+            const Icon = ICONS[href] ?? IconDashboard;
             const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
             return (
               <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("adm-nav-link", active && "is-active")}>
@@ -97,12 +103,12 @@ function GuardFrame({ children, busy = false }: { children: React.ReactNode; bus
   );
 }
 
-function GuardCard({ title, detail }: { title: string; detail: string }) {
+function GuardCard({ title, detail, to = "/dashboard", cta = "Retour au tableau de bord" }: { title: string; detail: string; to?: string; cta?: string }) {
   return (
     <section className="adm-guard-card">
       <h1>{title}</h1>
       <p>{detail}</p>
-      <Link href="/dashboard" className="adm-learner-link mt-6">Retour au tableau de bord</Link>
+      <Link href={to} className="adm-learner-link mt-6">{cta}</Link>
     </section>
   );
 }

@@ -91,7 +91,9 @@ Supabase Auth applique en plus ses propres limites (connexion, inscription, e-ma
 | `admin` | Gérer le contenu, les défis, les badges, les certificats, voir les utilisateurs, ajuster l'XP (via le registre), envoyer des annonces |
 | `superadmin` | Tout ce que fait `admin`, plus changer les rôles et agir sur les comptes du staff |
 
-- `/admin` est protégé trois fois : `middleware.ts` (redirection des visiteurs et des apprenants), `components/admin/AdminShell.tsx` (écran d'accès refusé) et, surtout, la base (RLS et `private.require_admin()`). Les deux premiers niveaux ne sont que du confort.
+- `/admin` n'est visible que par `admin` et `superadmin`. Un visiteur est renvoyé vers la connexion ; un apprenant connecté reçoit une page 404 (réécriture dans `middleware.ts` puis `notFound()` dans `app/admin/layout.tsx`), pour ne pas révéler l'existence de la console. Les liens d'administration (barre latérale, navigation mobile, en-tête, accueil) ne s'affichent qu'au staff. Les règles sont centralisées dans `lib/admin-access.ts` (`canAccessAdminPath`) et testées.
+- Le journal d'audit (`/admin/journal`) est réservé au `superadmin` : même règle dans le middleware, la page, la navigation et la politique RLS de `admin_logs`.
+- Le contrôle de l'interface n'est qu'un confort : la vraie barrière reste la base (RLS et `private.require_admin()`).
 - `admin_set_role` est réservé au superadmin, refuse de modifier son propre rôle et garde toujours au moins un superadmin.
 - L'Edge Function `admin-actions` vérifie `is_admin`, refuse toute action sur son propre compte, exige un superadmin pour toucher un compte du staff et refuse de bannir ou supprimer un superadmin tant qu'il n'a pas été rétrogradé.
 - Journal d'audit : les triggers `audit_admin_change` enregistrent dans `admin_logs` toute création, modification ou suppression sur `courses`, `course_modules`, `lessons`, `quizzes`, `labs`, `badges` et `challenges`. Les RPC et l'Edge Function d'administration journalisent aussi leurs actions (rôles, XP, bannissements, certificats, annonces).
@@ -101,6 +103,7 @@ Supabase Auth applique en plus ses propres limites (connexion, inscription, e-ma
 - Buckets séparés, chacun avec une taille maximale et une liste blanche de types MIME appliquées par Supabase.
 - `avatars` (2 Mo, PNG/JPEG/WebP) : lecture publique, écriture limitée au dossier `<uid>/` du propriétaire ; `profiles.avatar_path` doit commencer par l'identifiant du profil.
 - `course-images` (5 Mo) et `lesson-assets` (20 Mo, images, PDF, MP4) : lecture publique, écriture réservée au staff.
+- `mascot-voice` (5 Mo, audio) : lecture publique (les voix sont jouées pour les apprenants), liste, envoi, remplacement et suppression réservés au staff. Voix humaines uniquement, avec crédit obligatoire.
 - `certificates` (5 Mo, PDF) : bucket privé. Seule la clé `service_role` y écrit (Edge Function `generate-certificate`) ; le propriétaire et le staff y lisent via des URL signées de 120 secondes.
 
 ## Edge Functions

@@ -206,6 +206,9 @@
 }
 .mascot-coach .mascot-coach__text { margin: 0; font-size: 14.5px; line-height: 1.5; }
 .mascot-coach .mascot-coach__text--voice { color: var(--cp-muted); font-style: italic; }
+.mascot-coach .mascot-coach__replay { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 6px 12px; border: 1px solid var(--cp-line-strong); border-radius: 999px; background: rgba(0, 213, 255, 0.1); color: #e8fbff; font: inherit; font-size: 13px; cursor: pointer; }
+.mascot-coach .mascot-coach__replay:hover { background: rgba(0, 213, 255, 0.2); }
+.mascot-coach .mascot-coach__replay:focus-visible { outline: 2px solid var(--cp-cyan); outline-offset: 2px; }
 .mascot-coach .mascot-coach__credit { margin: 6px 0 0; color: var(--cp-subtle); font-size: 12px; }
 .mascot-coach__actions { display: flex; justify-content: flex-end; gap: 4px; margin-top: 6px; }
 .mascot-coach .mascot-coach__button { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--cp-subtle); cursor: pointer; }
@@ -234,6 +237,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mascot-coach,
+  .voice-studio .voice-studio__pulse,
+  .voice-coverage .voice-coverage__track span,
   .lab-downloads a,
   .lab-tasks .lab-task { animation: none; transition: none; }
   .lab-downloads a:hover { transform: none; }
@@ -425,6 +430,25 @@
 .lab-task-editor__tools { display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; }
 
 .mascot-admin-note { color: var(--cp-muted); font-size: 14px; line-height: 1.55; max-width: 62ch; margin: 0 0 16px; }
+.voice-coverage { display: grid; gap: 8px; max-width: 62ch; margin: 0 0 16px; padding: 14px 16px; border: 1px solid var(--cp-line); border-radius: 14px; background: var(--cp-surface, rgba(255, 255, 255, 0.03)); }
+.voice-coverage .voice-coverage__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 14px; color: #f1f7ff; }
+.voice-coverage .voice-coverage__head span { color: var(--cp-cyan); font-weight: 650; font-variant-numeric: tabular-nums; }
+.voice-coverage .voice-coverage__track { height: 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.voice-coverage .voice-coverage__track span { display: block; height: 100%; border-radius: inherit; background: var(--cp-green); transform-origin: left center; transition: transform 420ms var(--cp-ease); }
+.voice-coverage p { margin: 0; color: var(--cp-muted); font-size: 13px; }
+.voice-studio { display: grid; gap: 12px; margin: 0; min-width: 0; padding: 14px 16px 16px; border: 1px solid var(--cp-line); border-radius: 14px; }
+.voice-studio .voice-studio__legend { padding: 0 6px; color: #e3eefb; font-size: 13px; font-weight: 650; }
+.voice-studio .voice-studio__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.voice-studio .voice-studio__hint { margin: 0; color: var(--cp-subtle); font-size: 13px; line-height: 1.5; }
+.voice-studio .voice-studio__take { display: grid; gap: 10px; }
+.voice-studio .voice-studio__live { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.voice-studio .voice-studio__timer { color: #fff; font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.voice-studio .voice-studio__pulse { width: 12px; height: 12px; border-radius: 50%; background: #ff5d6c; animation: voice-pulse 1.1s ease-in-out infinite; }
+.voice-studio__advanced { color: var(--cp-muted); font-size: 13px; }
+.voice-studio__advanced summary { cursor: pointer; width: fit-content; padding: 6px 0; }
+.voice-studio__advanced summary:focus-visible { outline: 2px solid var(--cp-cyan); outline-offset: 2px; border-radius: 4px; }
+.voice-studio__advanced[open] summary { margin-bottom: 10px; }
+@keyframes voice-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
 .submission-review { display: grid; gap: 12px; padding-top: 16px; border-top: 1px solid var(--cp-line); }
 .submission-review blockquote { margin: 0; padding: 0; color: #e3eefb; font-size: 14px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .submission-review dl { display: grid; gap: 6px; margin: 0; }

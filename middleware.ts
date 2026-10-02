@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { isSupabaseConfigured, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
 import { safeReturnPath } from "@/lib/navigation";
+import { canAccessAdminPath } from "@/lib/admin-access";
 import { isStaff } from "@/lib/roles";
 import type { Database } from "@/types/database.types";
 
@@ -12,8 +13,8 @@ const GUEST_PATHS = ["/courses", "/challenges"];
 const matchesPath = (pathname: string, base: string) => pathname === base || pathname.startsWith(`${base}/`);
 
 /**
- * First line of defence only: it keeps visitors out of the private app and learners out of /admin.
- * Every read and write is still enforced by Row Level Security and the SQL functions.
+ * First line of defence only: it keeps visitors out of the private app and learners out of /admin
+ * (as a 404). Every read and write is still enforced by Row Level Security and the SQL functions.
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -84,7 +85,14 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith("/admin")) {
     const profile = await loadProfile(userId);
-    if (!isStaff(profile?.role)) return redirectTo("/dashboard");
+    // Learners must not even learn that the console exists: they get the same 404 as any unknown URL.
+    if (!isStaff(profile?.role)) {
+      const hidden = NextResponse.rewrite(new URL("/_not-found", request.url), { status: 404 });
+      response.cookies.getAll().forEach((cookie) => hidden.cookies.set(cookie));
+      hidden.headers.set("x-robots-tag", "noindex");
+      return hidden;
+    }
+    if (!canAccessAdminPath(profile?.role, pathname)) return redirectTo("/admin");
   }
 
   return response;

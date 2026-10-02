@@ -7,6 +7,7 @@ const { load } = require("../scripts/ts-loader.cjs");
 const { EVENT_PRIORITY, MASCOT_EVENTS, MASCOT_EXPRESSIONS, EXPRESSION_STATE, mascotEventsFromRewards, strongestEvent } = load("lib/mascot/events");
 const { COOLDOWN_MS, IDLE_STATE, decide, pickLine, displayDuration } = load("lib/mascot/scheduler");
 const { DEFAULT_PREFS, parsePrefs } = load("lib/mascot/prefs");
+const { MAX_VOICE_BYTES, MAX_VOICE_SECONDS, VOICE_EXTENSIONS, formatVoiceTime, normalizeVoiceType, pickRecorderMime, voiceCoverage } = load("lib/mascot/voice");
 
 const line = (id, event, priority = 5) => ({ id, event, expression: "happy", text_fr: "x", audio_url: null, voice_credit: null, priority });
 const rewards = (extra = {}) => ({ xp_gained: 10, leveled_up: false, new_badges: [], completed_challenges: [], course_completed: null, new_rank: null, new_skills: [], ...extra });
@@ -75,4 +76,43 @@ test("preferences fall back to safe defaults on broken storage", () => {
   assert.equal(parsePrefs(JSON.stringify({ auto: false })).auto, false);
   assert.equal(parsePrefs(JSON.stringify({ auto: "no" })).auto, true);
   assert.equal(DEFAULT_PREFS.auto && DEFAULT_PREFS.subtitles, true);
+});
+test("recorded voices are normalised to a type the bucket accepts", () => {
+  assert.equal(normalizeVoiceType("audio/webm;codecs=opus"), "audio/webm");
+  assert.equal(normalizeVoiceType("AUDIO/OGG; codecs=opus"), "audio/ogg");
+  assert.equal(normalizeVoiceType("audio/mp3"), "audio/mpeg");
+  assert.equal(normalizeVoiceType("audio/x-m4a"), "audio/mp4");
+  assert.equal(normalizeVoiceType("audio/wave"), "audio/wav");
+  assert.equal(normalizeVoiceType("video/mp4"), null);
+  assert.equal(normalizeVoiceType("application/octet-stream"), null);
+  assert.equal(normalizeVoiceType(""), null);
+  for (const type of Object.keys(VOICE_EXTENSIONS)) assert.equal(normalizeVoiceType(type), type);
+});
+
+test("the recorder prefers Opus and falls back to what the browser supports", () => {
+  assert.equal(pickRecorderMime(() => true), "audio/webm;codecs=opus");
+  assert.equal(pickRecorderMime((mime) => mime === "audio/mp4"), "audio/mp4");
+  assert.equal(pickRecorderMime((mime) => mime === "audio/webm"), "audio/webm");
+  assert.equal(pickRecorderMime(() => false), null);
+});
+
+test("recording time and the voice limits are readable and bounded", () => {
+  assert.equal(formatVoiceTime(0), "0:00");
+  assert.equal(formatVoiceTime(9.9), "0:09");
+  assert.equal(formatVoiceTime(65), "1:05");
+  assert.equal(formatVoiceTime(-4), "0:00");
+  assert.equal(MAX_VOICE_BYTES, 5 * 1024 * 1024);
+  assert.ok(MAX_VOICE_SECONDS <= 45);
+});
+
+test("voice coverage counts only active lines and reports what is left to record", () => {
+  assert.deepEqual(voiceCoverage([]), { total: 0, voiced: 0, percent: 0, missing: 0 });
+  const result = voiceCoverage([
+    { audio_url: "https://x.test/a.webm", is_active: true },
+    { audio_url: null, is_active: true },
+    { audio_url: null, is_active: true },
+    { audio_url: "https://x.test/old.webm", is_active: false },
+    { audio_url: null, is_active: false },
+  ]);
+  assert.deepEqual(result, { total: 3, voiced: 1, percent: 33, missing: 2 });
 });

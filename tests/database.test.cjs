@@ -273,8 +273,10 @@ test("roles are enforced by the database, not by the interface", async () => {
   assert.equal((await one(ids.bob, "select public.is_admin() as ok")).ok, true);
   await rejects(rpc(ids.root, "admin_set_role", { p_user: ids.root, p_role: "user" }), /propre rôle/);
   await rpc(ids.root, "admin_set_role", { p_user: ids.bob, p_role: "user" });
-  const logs = await as(ids.admin, "select action, details from public.admin_logs where action = 'set_role' order by id");
+  const logs = await as(ids.root, "select action, details from public.admin_logs where action = 'set_role' order by id");
   assert.deepEqual(logs.map((log) => log.details.to), ["admin", "user"]);
+  assert.equal((await as(ids.admin, "select id from public.admin_logs")).length, 0, "the audit log is reserved to super-administrators");
+  assert.equal((await as(ids.bob, "select id from public.admin_logs")).length, 0);
   await rejects(as(ids.bob, "insert into public.admin_logs (action, target_type) values ('forge', 'x')"), /permission denied/);
   await rejects(rpc(ids.root, "delete_my_account"), /autre super-administrateur/);
 });
@@ -285,7 +287,7 @@ test("admins adjust XP only through the audited ledger", async () => {
   const info = await rpc(ids.admin, "admin_adjust_xp", { p_user: ids.bob, p_amount: 150, p_reason: "Atelier présentiel validé" });
   assert.deepEqual([info.xp, info.level], [150, 2]);
   assert.equal(await ledgerTotal(ids.bob), 150);
-  assert.equal((await as(ids.admin, "select count(*)::int as n from public.admin_logs where action = 'adjust_xp'"))[0].n, 1);
+  assert.equal((await as(ids.root, "select count(*)::int as n from public.admin_logs where action = 'adjust_xp'"))[0].n, 1);
 });
 
 test("drafts stay private and cannot be published incomplete", async () => {
@@ -294,7 +296,7 @@ test("drafts stay private and cannot be published incomplete", async () => {
   assert.deepEqual([draft.created_by, draft.status], [ids.admin, "draft"]);
   assert.equal((await as(ids.bob, "select id from public.courses where id = $1", [draft.id])).length, 0);
   await rejects(as(ids.admin, "update public.courses set status = 'published' where id = $1", [draft.id]), /au moins un module/);
-  const audit = await as(ids.admin, "select action from public.admin_logs where target_id = $1", [draft.id]);
+  const audit = await as(ids.root, "select action from public.admin_logs where target_id = $1", [draft.id]);
   assert.deepEqual(audit.map((row) => row.action), ["insert_courses"]);
 
   const imported = await rpc(ids.admin, "admin_import_course", { p_course: {
@@ -349,8 +351,13 @@ test("storage folders are isolated per user and content media is staff-only", as
   await rejects(as(ids.carol, "insert into storage.objects (bucket_id, name) values ('course-images', 'wifi.png')"), /row-level security/);
   await as(ids.admin, "insert into storage.objects (bucket_id, name) values ('course-images', 'wifi.png')");
   await rejects(as(ids.carol, "insert into storage.objects (bucket_id, name) values ('certificates', $1)", [`${ids.carol}/faux.pdf`]), /row-level security/);
+  await rejects(as(ids.carol, "insert into storage.objects (bucket_id, name) values ('mascot-voice', 'faux.webm')"), /row-level security/);
+  await as(ids.admin, "insert into storage.objects (bucket_id, name) values ('mascot-voice', 'bienvenue.webm')");
   const buckets = await sql("select id, public from storage.buckets order by id");
-  assert.deepEqual(buckets.map((bucket) => `${bucket.id}:${bucket.public}`), ["avatars:true", "certificates:false", "course-images:true", "lesson-assets:true"]);
+  assert.deepEqual(buckets.map((bucket) => `${bucket.id}:${bucket.public}`), ["avatars:true", "certificates:false", "course-images:true", "lesson-assets:true", "mascot-voice:true"]);
+  const voice = (await sql("select file_size_limit, allowed_mime_types from storage.buckets where id = 'mascot-voice'"))[0];
+  assert.equal(voice.file_size_limit, 5242880);
+  assert.ok(voice.allowed_mime_types.every((type) => type.startsWith("audio/")), "the voice bucket only accepts audio");
   await as(ids.carol, "update public.profiles set avatar_path = $2 where id = $1", [ids.carol, `${ids.carol}/avatar.webp`]);
   await rejects(as(ids.carol, "update public.profiles set avatar_path = $2 where id = $1", [ids.carol, `${ids.bob}/avatar.webp`]), /check constraint/);
 });
