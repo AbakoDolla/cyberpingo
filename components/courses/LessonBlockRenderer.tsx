@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { videoEmbed } from "@/lib/lesson-content";
+import { pendingVideoTitle, videoEmbed } from "@/lib/lesson-content";
 import type { LessonBlock } from "@/types/api";
 
 function TextBlock({ content }: { content: string }) {
@@ -36,6 +36,21 @@ function CodeBlock({ content, language }: { content: string; language?: string }
   );
 }
 
+function PendingVideo({ title }: { title: string }) {
+  return (
+    <figure className="lesson-media lesson-video-slot">
+      <div className="lesson-video-slot__frame" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9.5 5 2.5-5 2.5z" /></svg>
+      </div>
+      <figcaption>
+        <strong>Vidéo en préparation</strong>
+        <span>{title}</span>
+        <small>Le contenu écrit de cette leçon couvre déjà l’essentiel.</small>
+      </figcaption>
+    </figure>
+  );
+}
+
 function VideoBlock({ url, title }: { url: string; title?: string }) {
   const embed = videoEmbed(url);
   if (embed.kind === "iframe") {
@@ -54,8 +69,11 @@ export default function LessonBlockRenderer({ block }: { block: LessonBlock }) {
       return <pre className="lesson-schema"><code>{block.content}</code></pre>;
     case "example":
       return <aside className="lesson-callout lesson-callout--example"><strong>Exemple</strong><p>{block.content}</p></aside>;
-    case "callout":
+    case "callout": {
+      const pending = pendingVideoTitle(block.content);
+      if (pending) return <PendingVideo title={pending} />;
       return <aside className="lesson-callout"><strong>À retenir</strong><p>{block.content}</p></aside>;
+    }
     case "code":
       return <CodeBlock content={block.content} language={block.language} />;
     case "video":

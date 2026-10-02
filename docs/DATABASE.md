@@ -12,8 +12,9 @@ Le schéma complet est défini par les migrations de `supabase/migrations/`. Ell
 | `20260928190300_progress_engine.sql` | `enrollments`, `lesson_progress`, `quiz_attempts`, `lab_completions`, vue `course_progress`, moteur de progression et RPC apprenant |
 | `20260928190400_admin.sql` | RPC d'administration, import de cours, statistiques, révocation de certificats, annonces, publication Realtime |
 | `20260928190500_storage.sql` | Buckets et politiques Storage |
+| `20261002000000_academy_engine.sql` | Moteur pédagogique : domaines, compétences, labs structurés (étapes, ressources, rendus), grades, répliques de la mascotte, badges à condition vérifiable. Additive, sans suppression de données |
 
-Les données de référence indispensables (20 niveaux, 10 badges, 4 défis) sont insérées par les migrations. Le contenu pédagogique de départ est dans `supabase/seed/01_starter_content.sql`.
+Les données de référence indispensables (20 niveaux, 10 badges, 4 défis, 9 grades) sont insérées par les migrations. Le contenu pédagogique de départ est dans `supabase/seed/01_starter_content.sql`, puis `supabase/seed/02_reseaux_path.sql` pour le parcours Réseaux complet.
 
 ## Relations
 
@@ -132,6 +133,34 @@ Fin de parcours : quand toutes les leçons sont terminées et tous les quiz réu
 
 Les modifications de cours, modules, leçons, quiz, labs, badges et défis par le staff passent directement par PostgREST, protégées par des politiques `(select public.is_admin())`, et sont journalisées par triggers.
 
+## Moteur pédagogique
+
+La migration `20261002000000_academy_engine.sql` ajoute la chaîne apprentissage, entraînement, correction, mise en situation et validation. Tout est modifiable depuis `/admin` : aucune nouvelle leçon, étape de lab ou réplique n'exige de toucher au code.
+
+| Objet | Rôle |
+|---|---|
+| `domains`, `courses.domain_id` | Domaines de cybersécurité (6 créés : fondamentaux, réseaux, Linux, sécurité web, pentest, détection). Un cours se rattache à un domaine. |
+| `skills`, `skill_links` | Compétences, reliées à des leçons (`lesson`), des quiz (`quiz`), des labs d'entraînement (`practice`) et des labs d'évaluation (`validation`). Un lien `validation` ne peut viser qu'un lab `is_assessment`. |
+| `user_skills` | État calculé par le serveur : `learning`, `consolidating`, `exercises_mastered`, `validated`. Jamais écrit par le client. |
+| `labs` (colonnes ajoutées) | `format` (`terminal`, `pcap`, `logs`, `packet_tracer`), `briefing`, `constraints`, `tools`, `requires_computer`, `is_assessment`, `estimated_minutes`, `course_id`. Statut `review` ajouté aux cours et aux labs. |
+| `lab_tasks`, `private.lab_task_keys` | Étapes d'un lab (30 au plus). Les réponses attendues vivent dans le schéma `private` et ne sont jamais lisibles par le client. |
+| `lab_task_completions` | Étapes réussies par apprenant. |
+| `lab_assets` | Fichiers fournis (journaux, PCAP, `.pkt`, consignes, topologies, modèles de rapport). Les fichiers du dépôt sont dans `public/labs/`. |
+| `lab_submissions` | Rendu d'un lab Packet Tracer : note, lien HTTPS facultatif, statut `pending`, `approved` ou `changes_requested`, retour du relecteur. Une soumission par apprenant et par lab. |
+| `ranks`, `user_ranks` | Grades pédagogiques. Les critères sont un objet validé par trigger (`min_level`, `lessons_completed`, `labs_solved`, `courses_completed`, `skills_mastered`, `skills_validated`). |
+| `mascot_lines` | Répliques de la mascotte rattachées à un événement et à une expression. Le texte est obligatoire ; un fichier audio exige un crédit de voix. |
+| `badges` (colonnes ajoutées) | `criteria_lab_id`, `criteria_skill_id` et `rarity` (`common`, `rare`, `epic`, `legendary`). |
+
+RPC apprenant : `get_my_academy()` (domaines, compétences, grade et prochain grade), `submit_lab_task(task, answer)` (correction serveur, comparaison normalisée par `private.norm_answer`, 10 erreurs maximum en 10 minutes par étape) et `submit_lab_report(lab, note, link)` (rendu pour un lab Packet Tracer).
+
+RPC staff : `admin_get_lab_tasks`, `admin_set_lab_tasks` (remplace les étapes d'un lab) et `admin_review_submission(id, status, feedback)` (`approved` ou `changes_requested` ; les corrections exigent un retour ; l'apprenant est notifié et l'action est journalisée).
+
+Les fonctions `private.finish_lab`, `private.sync_skills`, `private.evaluate_rank`, `private.evaluate_badges` et `private.after_progress` sont appelées dans la même transaction que la leçon, le quiz ou le lab qui les déclenche : XP, compétence, grade et badge sont donc cohérents.
+
+Un lab ne peut être publié que s'il a un drapeau ou au moins une étape. `reset_my_progress` efface aussi les étapes, rendus, compétences et grades de l'apprenant.
+
+Le contenu du parcours Réseaux (cours `reseaux`) est dans `supabase/seed/content/reseaux-path.ts`, converti par `node scripts/generate-reseaux-seed.cjs` en `supabase/seed/02_reseaux_path.sql` (à charger après `01_starter_content.sql`, idempotent) : 24 leçons, 43 questions de quiz, 10 labs (dont `reseau-instable` en PCAP, `incident-pare-feu` en journaux, `packet-tracer-sous-reseaux` et `evaluation-reseaux`), 8 ressources, 6 compétences, 22 répliques de mascotte. Les fichiers de `public/labs/` sont produits par `scripts/generate-lab-assets.cjs`. Le badge existant `expert-reseau` exige désormais aussi les nouvelles leçons et les nouveaux quiz du parcours.
+
 ## Storage
 
 | Bucket | Accès | Taille max | Types | Écriture |
@@ -153,11 +182,11 @@ npx supabase gen types typescript --linked --schema public > types/database.type
 
 ## Contenu de départ
 
-`supabase/seed/content/*.ts` contient les parcours, leçons, quiz et labs rédigés. `npm run db:seed` les convertit en `supabase/seed/01_starter_content.sql`. Ce fichier ne crée aucun utilisateur ni aucune statistique ; il est chargé par `supabase db reset` en local, ou une fois dans l'éditeur SQL en production.
+`supabase/seed/content/*.ts` contient les parcours, leçons, quiz et labs rédigés. `npm run db:seed` les convertit en `supabase/seed/01_starter_content.sql`. Ce fichier ne crée aucun utilisateur ni aucune statistique ; il est chargé par `supabase db reset` en local, ou une fois dans l'éditeur SQL en production. `supabase/seed/02_reseaux_path.sql` complète le parcours Réseaux (voir « Moteur pédagogique ») et se charge ensuite.
 
 ## Tests
 
-`npm test` lance deux fichiers avec le runner natif de Node.
+`npm test` lance sept fichiers avec le runner natif de Node (75 tests).
 
 `tests/database.test.cjs` (20 tests) applique les migrations et le contenu de départ dans PGlite, avec une émulation minimale des rôles Supabase (`anon`, `authenticated`, `auth.uid()`). Il couvre notamment :
 
@@ -171,3 +200,5 @@ npx supabase gen types typescript --linked --schema public > types/database.type
 - isolation des dossiers Storage, limite de débit du formulaire de contact, réinitialisation de la progression.
 
 `tests/learning.test.cjs` (11 tests) couvre la logique TypeScript partagée : calcul de niveau, série, redirections sûres, traduction des erreurs, validation des imports de cours et des quiz, rendu des blocs de leçon.
+
+`tests/academy.test.cjs` (14 tests) rejoue le moteur pédagogique dans PGlite : seed et fichiers de labs identiques à leurs générateurs, parcours Réseaux complet et publié, réponses des étapes invisibles pour le client, progression non falsifiable, correction serveur avec budget d'erreurs, XP et badge uniques à la fin d'un lab, aperçu administrateur sans gain, états de compétence, grades et prochain palier, rendus validés puis relus par le staff, édition des étapes sans casser la progression, règles de publication et réinitialisation. `tests/pcap.test.cjs` (5 tests) vérifie l'analyseur de fichiers PCAP, `tests/mascot.test.cjs` (8), `tests/labview.test.cjs` (8) et `tests/academyview.test.cjs` (9) la logique pure de la mascotte, des labs et des vues pédagogiques.

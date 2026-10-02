@@ -19,7 +19,7 @@ function Metric({ label, value, detail, Icon, tone = "adm-tone-cyan", href }: { 
   return href ? <Link href={href} className="adm-metric-card">{content}</Link> : <div className="adm-metric-card">{content}</div>;
 }
 
-const COURSE_STATUS_LABELS = { draft: "brouillon", published: "publié", archived: "archivé" } as const;
+const COURSE_STATUS_LABELS = { draft: "brouillon", review: "en relecture", published: "publié", archived: "archivé" } as const;
 
 export default function OverviewPanel({ overview }: { overview: AdminOverview | null }) {
   if (!overview) {

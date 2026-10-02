@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import {
   IconActivity, IconAI, IconArrowRight, IconBell, IconCourses, IconDashboard, IconFlame, IconGlobe, IconLesson,
-  IconMap, IconProfile, IconSettings, IconShield, IconUsers,
+  IconMap, IconProfile, IconSettings, IconShield, IconTarget, IconUsers,
 } from "@/components/ui/Icon";
 
 type NavItem = { href: string; label: string; Icon: typeof IconDashboard };
@@ -17,6 +17,7 @@ const LEARN_ITEMS: NavItem[] = [
   { href: "/courses", label: "Cours", Icon: IconCourses },
   { href: "/challenges", label: "Labs", Icon: IconShield },
   { href: "/progression", label: "Ma progression", Icon: IconActivity },
+  { href: "/competences", label: "Compétences", Icon: IconTarget },
   { href: "/mentor", label: "Mentor IA", Icon: IconAI },
 ];
 

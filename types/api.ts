@@ -5,7 +5,7 @@ import type { Tables } from "@/types/database.types";
 
 export type SkillLevel = "debutant" | "intermediaire" | "avance";
 export type LearningGoal = "decouvrir" | "professionnel" | "emploi" | "competences" | "certification";
-export type CourseStatus = "draft" | "published" | "archived";
+export type CourseStatus = "draft" | "review" | "published" | "archived";
 export type AccessLevel = "free" | "premium" | "private";
 export type LessonStatus = "not_started" | "in_progress" | "completed";
 export type EnrollmentStatus = "active" | "completed";
@@ -14,9 +14,13 @@ export type Difficulty = "facile" | "moyen" | "difficile";
 export type NotificationType = "achievement" | "course" | "challenge" | "system" | "certificate" | "streak" | "level";
 export type ChallengePeriod = "daily" | "weekly" | "one_time";
 export type LabCategory = "reseau" | "linux" | "web" | "cryptographie" | "osint" | "securite";
+export type LabFormat = "terminal" | "pcap" | "logs" | "packet_tracer";
+export type LabAssetKind = "log" | "pcap" | "pkt" | "guide" | "image" | "topology" | "report_template";
+export type SkillState = "not_studied" | "learning" | "consolidating" | "exercises_mastered" | "validated";
+export type ReportStatus = "pending" | "approved" | "changes_requested";
 export type BadgeCriteria =
   | "lessons_completed" | "quizzes_passed" | "courses_completed" | "streak_days" | "xp_total"
-  | "labs_solved" | "certificates_earned" | "course_completed";
+  | "labs_solved" | "certificates_earned" | "course_completed" | "lab_completed" | "skill_validated";
 export type XpReason =
   | "lesson_completed" | "quiz_completed" | "lab_completed" | "challenge_completed" | "course_completed"
   | "achievement" | "daily_goal" | "admin_adjustment";
@@ -35,7 +39,9 @@ export interface LevelInfo {
   progress_percentage: number;
 }
 
-export interface EarnedBadge { id: string; slug: string; name: string; description: string; icon: string }
+export type Rarity = "common" | "rare" | "epic" | "legendary";
+
+export interface EarnedBadge { id: string; slug: string; name: string; description: string; icon: string; rarity?: Rarity }
 
 /** Everything a learning action unlocked, computed inside the same transaction. */
 export interface RewardSummary {
@@ -48,6 +54,8 @@ export interface RewardSummary {
   completed_challenges: { id: string; title: string; xp_reward: number }[];
   course_completed: { id: string; slug: string; title: string } | null;
   certificate: { id: string; certificate_number: string; verification_code: string; course_title: string } | null;
+  new_rank?: { slug: string; name: string; description: string; position: number } | null;
+  new_skills?: { id: string; slug: string; name: string; state: SkillState }[];
 }
 
 // ─── Learning RPCs ────────────────────────────────────────────────────────────
@@ -92,6 +100,17 @@ export type LabSubmission =
   | { correct: true; preview: true; xp_awarded: 0 }
   | (RewardSummary & { correct: true; preview?: false; already_solved: boolean; xp_awarded: number });
 
+export interface LabTask { id: string; lab_id: string; position: number; prompt: string; hint: string; answer_format: string; solved: boolean }
+export interface LabAsset { id: string; lab_id: string; kind: LabAssetKind; title: string; description: string; url: string; position: number }
+export interface LabReport { id: string; lab_id: string; note: string; link: string | null; status: ReportStatus; feedback: string; created_at: string; updated_at: string; reviewed_at: string | null }
+
+export type LabTaskResult =
+  | { correct: false; remaining_attempts: number }
+  | { correct: true; preview: true; xp_awarded: 0; explanation: string }
+  | (RewardSummary & {
+    correct: true; preview?: false; already_solved: boolean; tasks_done: number; tasks_total: number;
+    lab_completed: boolean; lab_newly_completed: boolean; xp_awarded: number; explanation: string;
+  });
 /** Any RPC result that may carry rewards. */
 export function hasRewards(value: unknown): value is RewardSummary {
   return Boolean(value && typeof value === "object" && "level_info" in value && "xp_gained" in value);
@@ -347,6 +366,14 @@ export interface Lab {
   flag_placeholder: string;
   status: CourseStatus;
   position: number;
+  course_id: string | null;
+  format: LabFormat;
+  briefing: string;
+  constraints: string[];
+  tools: string[];
+  requires_computer: boolean;
+  is_assessment: boolean;
+  estimated_minutes: number;
   solved: boolean;
   solved_at: string | null;
 }
@@ -360,10 +387,44 @@ export interface BadgeWithState {
   xp_reward: number;
   criteria_type: BadgeCriteria;
   criteria_value: number;
+  criteria_lab_id: string | null;
+  criteria_skill_id: string | null;
+  rarity: Rarity;
   earned: boolean;
   earned_at: string | null;
 }
 
+// ─── Academy: domains, skills, ranks, mascot ──────────────────────────────────
+
+export interface AcademyDomain { id: string; slug: string; name: string; description: string; icon: string }
+export interface SkillLink { kind: "lesson" | "quiz" | "practice" | "validation"; id: string; title: string; slug?: string; done: boolean }
+export interface Skill { id: string; slug: string; name: string; description: string; domain_id: string; state: SkillState; links: SkillLink[] }
+export interface RankRequirement { key: string; required: number; current: number }
+export interface Rank { slug: string; name: string; description: string; position: number; achieved_at?: string | null }
+export interface RankStep extends Rank { criteria: Record<string, number>; achieved: boolean }
+export interface AcademyMetrics {
+  min_level: number; lessons_completed: number; labs_solved: number; courses_completed: number;
+  skills_mastered: number; skills_validated: number;
+}
+export interface Academy {
+  metrics: AcademyMetrics;
+  rank: Rank;
+  next_rank: (Rank & { requirements: RankRequirement[] }) | null;
+  ranks: RankStep[];
+  domains: AcademyDomain[];
+  skills: Skill[];
+}
+
+export type MascotEvent =
+  | "welcome" | "lesson_start" | "exercise_success" | "exercise_fail" | "chapter_end" | "level_up" | "badge"
+  | "challenge" | "return_after_absence" | "new_skill" | "rank_up" | "path_complete" | "lab_complete";
+export type MascotExpression =
+  | "happy" | "proud" | "encouraging" | "focused" | "surprised" | "disappointed" | "thinking" | "expert"
+  | "celebration" | "mission" | "explanation";
+export interface MascotLine {
+  id: string; event: MascotEvent; expression: MascotExpression; text_fr: string;
+  audio_url: string | null; voice_credit: string | null; priority: number;
+}
 export type Certificate = Tables<"certificates">;
 export type AppNotification = Tables<"notifications"> & { type: NotificationType };
 export type XpTransaction = Tables<"xp_transactions">;

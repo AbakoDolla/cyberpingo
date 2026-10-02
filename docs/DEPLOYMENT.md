@@ -83,6 +83,18 @@ Deux façons de le charger sur un projet cloud :
 
 Le fichier est généré : modifiez `supabase/seed/content/*.ts`, puis `npm run db:seed`.
 
+Chargez ensuite `supabase/seed/02_reseaux_path.sql` (même méthode, idempotent) : il complète le parcours Réseaux avec 24 leçons, 43 questions, 10 labs, 8 ressources, 6 domaines, 6 compétences et 22 répliques de mascotte. Il suppose que la migration `20261002000000_academy_engine.sql` est déjà appliquée (elle crée les 9 grades). Ce fichier est généré par `node scripts/generate-reseaux-seed.cjs` à partir de `supabase/seed/content/reseaux-path.ts`.
+
+### Ce que l'équipe doit fournir
+
+La plateforme a les emplacements et affiche un état vide honnête tant que ces éléments manquent. Rien n'est simulé :
+
+- **Voix humaines** : enregistrements courts d'un comédien ou d'une comédienne, à déposer puis à rattacher à une réplique depuis `/admin/mascotte` (URL `https://` ou chemin `/audio/…`, avec le crédit de la voix obligatoire) ;
+- **Vidéos pédagogiques** : à ajouter dans les leçons par un bloc vidéo (lien YouTube, Vimeo ou fichier), depuis l'éditeur de cours. Les encadrés « Vidéo à venir : titre » déjà présents sont affichés comme tels, sans faux lecteur ;
+- **Fichier Packet Tracer réel** (`.pkt`) : à ajouter comme ressource du lab `packet-tracer-sous-reseaux` ; la plateforme fournit la consigne, le rendu et la relecture, pas l'exécution du logiciel.
+
+Tant qu'un rôle Formateur n'existe pas, la relecture des rendus est réservée aux administrateurs.
+
 ## 5. Déployer les Edge Functions
 
 Deux fonctions nécessitent la clé `service_role` et vivent donc côté serveur :

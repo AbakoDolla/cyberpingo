@@ -8,6 +8,7 @@ import MobileNav from "./MobileNav";
 import Logo from "./Logo";
 import Avatar from "@/components/ui/Avatar";
 import RewardToasts from "@/components/ui/RewardToasts";
+import MascotCoach from "@/components/mascot/MascotCoach";
 import { IconAlert, IconArrowRight, IconBell, IconBolt, IconFlame, IconLock } from "@/components/ui/Icon";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { formatNumber } from "@/lib/format";
@@ -136,6 +137,7 @@ export default function AppShell({ children, allowGuest = false }: { children: R
       </div>
       <MobileNav />
       <RewardToasts />
+      <MascotCoach />
     </div>
   );
 }

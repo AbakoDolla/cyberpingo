@@ -15,12 +15,15 @@ import { errorMessage } from "@/lib/errors";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { slugifyCourse } from "@/lib/course-import";
 import { cn } from "@/lib/utils";
+import { RARITY_LABELS } from "@/lib/academy-view";
 import {
   adminGetLabFlag, adminSetLabFlag, createBadge, createChallenge, createLab, deleteBadge, deleteChallenge, deleteLab,
-  listAdminCourses, listBadges, listChallenges, listLabs, updateBadge, updateChallenge, updateLab,
+  listAdminCourses, listBadges, listChallenges, listLabs, listSkills, updateBadge, updateChallenge, updateLab,
   type AdminCourseListItem, type BadgeChanges, type BadgeRow, type ChallengeChanges, type ChallengeRow, type LabChanges, type LabRow,
 } from "@/services/admin.service";
+import type { LabFormat, Rarity } from "@/types/api";
 import { AdminEmpty, AdminError, AdminLoading, AdminPageHeader, ConfirmModal, Notice } from "./AdminState";
+import { LAB_FORMAT_LABELS, LabAssetsPanel, LabTasksPanel } from "./AdminLabParts";
 import {
   Field, LAB_CATEGORY_LABELS, LEVEL_LABELS, STATUS_LABELS, StatusBadge, Textarea, Toggle, asInt, isoToLocalInput, joinLines, lines,
   localInputToIso, toOptions,
@@ -28,19 +31,19 @@ import {
 
 // ─── Shared catalog building blocks ──────────────────────────────────────────
 
-type Flash = { kind: "success" | "error"; text: string } | null;
-type CatalogItem = { id: string; position: number };
-type CatalogSort = "position" | "title" | "updated";
+export type Flash = { kind: "success" | "error"; text: string } | null;
+export type CatalogItem = { id: string; position: number };
+export type CatalogSort = "position" | "title" | "updated";
 
-const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const ICON_PATTERN = /^[a-z0-9-]{2,40}$/;
+export const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+export const ICON_PATTERN = /^[a-z0-9-]{2,40}$/;
 const toSlug = (value: string) => (value.trim() ? slugifyCourse(value) : "");
 const fold = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-const matches = (needle: string, ...values: (string | null | undefined)[]) => {
+export const matches = (needle: string, ...values: (string | null | undefined)[]) => {
   const folded = fold(needle.trim());
   return !folded || values.some((value) => value && fold(value).includes(folded));
 };
-const plural = (count: number, one: string, many: string) => `${formatNumber(count)} ${count > 1 ? many : one}`;
+export const plural = (count: number, one: string, many: string) => `${formatNumber(count)} ${count > 1 ? many : one}`;
 const CATALOG_SORT_OPTIONS = [
   { value: "position", label: "Position" },
   { value: "title", label: "Titre A-Z" },
@@ -53,7 +56,7 @@ function upsertSorted<T extends CatalogItem>(rows: T[] | undefined, row: T, labe
   return next.sort((a, b) => a.position - b.position || label(a).localeCompare(label(b), "fr"));
 }
 
-function sortCatalogRows<T extends CatalogItem>(rows: T[], sort: CatalogSort, label: (row: T) => string): T[] {
+export function sortCatalogRows<T extends CatalogItem>(rows: T[], sort: CatalogSort, label: (row: T) => string): T[] {
   return [...rows].sort((a, b) => {
     if (sort === "title") return label(a).localeCompare(label(b), "fr");
     if (sort === "updated") return new Date((b as { updated_at?: string }).updated_at ?? 0).getTime() - new Date((a as { updated_at?: string }).updated_at ?? 0).getTime();
@@ -62,7 +65,7 @@ function sortCatalogRows<T extends CatalogItem>(rows: T[], sort: CatalogSort, la
 }
 
 /** Loads a catalog and tracks which row is in the editor (`undefined` = closed, `null` = new row). */
-function useCatalog<T extends CatalogItem>(loader: () => Promise<T[]>, label: (row: T) => string) {
+export function useCatalog<T extends CatalogItem>(loader: () => Promise<T[]>, label: (row: T) => string) {
   const state = useAsync(loader, []);
   const [editing, setEditing] = useState<T | null | undefined>(undefined);
   const [flash, setFlash] = useState<Flash>(null);
@@ -85,7 +88,7 @@ function useCatalog<T extends CatalogItem>(loader: () => Promise<T[]>, label: (r
   };
 }
 
-function CatalogLayout({ editor, children }: { editor: ReactNode | null; children: ReactNode }) {
+export function CatalogLayout({ editor, children }: { editor: ReactNode | null; children: ReactNode }) {
   if (!editor) return <div>{children}</div>;
   return (
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_28rem]">
@@ -95,7 +98,7 @@ function CatalogLayout({ editor, children }: { editor: ReactNode | null; childre
   );
 }
 
-function EditorCard({ title, subtitle, flash, onClose, children }: { title: string; subtitle?: string; flash: Flash; onClose: () => void; children: ReactNode }) {
+export function EditorCard({ title, subtitle, flash, onClose, children }: { title: string; subtitle?: string; flash: Flash; onClose: () => void; children: ReactNode }) {
   const headingId = useId();
   return (
     <section aria-labelledby={headingId} className="adm-editor-panel">
@@ -119,7 +122,7 @@ function EditorCard({ title, subtitle, flash, onClose, children }: { title: stri
   );
 }
 
-function Toolbar({ search, onSearch, placeholder, filterLabel, filter, onFilter, filterOptions, sort, onSort, sortOptions = CATALOG_SORT_OPTIONS, summary }: {
+export function Toolbar({ search, onSearch, placeholder, filterLabel, filter, onFilter, filterOptions, sort, onSort, sortOptions = CATALOG_SORT_OPTIONS, summary }: {
   search: string; onSearch: (value: string) => void; placeholder: string;
   filterLabel: string; filter: string; onFilter: (value: string) => void; filterOptions: { value: string; label: string }[];
   sort?: string; onSort?: (value: CatalogSort) => void; sortOptions?: { value: string; label: string }[];
@@ -148,7 +151,7 @@ function Toolbar({ search, onSearch, placeholder, filterLabel, filter, onFilter,
   );
 }
 
-function CatalogRow({ active, icon, iconClassName, title, meta, aside, onSelect }: { active: boolean; icon: ReactNode; iconClassName?: string; title: string; meta: string; aside: ReactNode; onSelect: () => void }) {
+export function CatalogRow({ active, icon, iconClassName, title, meta, aside, onSelect }: { active: boolean; icon: ReactNode; iconClassName?: string; title: string; meta: string; aside: ReactNode; onSelect: () => void }) {
   return (
     <li>
       <button
@@ -168,7 +171,7 @@ function CatalogRow({ active, icon, iconClassName, title, meta, aside, onSelect 
   );
 }
 
-function EditorActions({ busy, isNew, createLabel, onDelete }: { busy: boolean; isNew: boolean; createLabel: string; onDelete: () => void }) {
+export function EditorActions({ busy, isNew, createLabel, onDelete }: { busy: boolean; isNew: boolean; createLabel: string; onDelete: () => void }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   return (
     <>
@@ -190,7 +193,7 @@ function EditorActions({ busy, isNew, createLabel, onDelete }: { busy: boolean; 
   );
 }
 
-function CatalogBody<T extends CatalogItem>({ catalog, loadingLabel, emptyAll, emptyFiltered, rows, renderRow }: {
+export function CatalogBody<T extends CatalogItem>({ catalog, loadingLabel, emptyAll, emptyFiltered, rows, renderRow }: {
   catalog: ReturnType<typeof useCatalog<T>>; loadingLabel: string; emptyAll: string; emptyFiltered: string; rows: T[]; renderRow: (row: T) => ReactNode;
 }) {
   if (catalog.loading && !catalog.data) return <AdminLoading label={loadingLabel} />;
@@ -201,7 +204,7 @@ function CatalogBody<T extends CatalogItem>({ catalog, loadingLabel, emptyAll, e
 }
 
 /** Title input whose value seeds the slug until the slug is edited by hand. */
-function useTitleSlug(initialTitle: string, initialSlug: string, isNew: boolean) {
+export function useTitleSlug(initialTitle: string, initialSlug: string, isNew: boolean) {
   const [title, setTitleState] = useState(initialTitle);
   const [slug, setSlugState] = useState(initialSlug);
   const [slugTouched, setSlugTouched] = useState(!isNew);
@@ -217,7 +220,7 @@ function iconOptions(current: string) {
   return GAMIFICATION_ICON_OPTIONS.some((option) => option.value === current) ? GAMIFICATION_ICON_OPTIONS : [{ value: current, label: current }, ...GAMIFICATION_ICON_OPTIONS];
 }
 
-const ACTIVE_FILTER = [
+export const ACTIVE_FILTER = [
   { value: "all", label: "Tous" },
   { value: "active", label: "Actifs" },
   { value: "inactive", label: "Inactifs" },
@@ -236,6 +239,7 @@ function terminalLines(value: string): string[] {
 
 export function AdminLabsPage() {
   const catalog = useCatalog<LabRow>(listLabs, (lab) => lab.title);
+  const courses = useAsync(listAdminCourses, []);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
   const [sort, setSort] = useState<CatalogSort>("position");
@@ -250,6 +254,7 @@ export function AdminLabsPage() {
     <LabEditor
       key={catalog.editing?.id ?? "new"}
       lab={catalog.editing}
+      courses={courses.data ?? []}
       flash={catalog.flash}
       onClose={catalog.close}
       onSaved={catalog.saved}
@@ -261,7 +266,7 @@ export function AdminLabsPage() {
     <div>
       <AdminPageHeader
         title="Labs"
-        description="Scénarios pratiques joués dans le terminal. Un lab ne peut être publié qu’une fois sa réponse attendue définie."
+        description="Laboratoires pratiques : terminal, captures réseau, journaux et Packet Tracer. Un lab ne peut être publié qu’avec au moins une tâche ou une réponse attendue."
         action={<Button size="sm" icon={<IconPlus size={16} />} onClick={() => catalog.open(null)}>Nouveau lab</Button>}
       />
       {catalog.editing === undefined && catalog.flash && <div className="mb-4"><Notice kind={catalog.flash.kind}>{catalog.flash.text}</Notice></div>}
@@ -286,7 +291,7 @@ export function AdminLabsPage() {
               icon={<LabArt category={lab.category} className="adm-list-icon__art" />}
               iconClassName="is-art"
               title={lab.title}
-              meta={`${LAB_CATEGORY_LABELS[lab.category] ?? lab.category} · ${LEVEL_LABELS[lab.difficulty] ?? lab.difficulty} · ${formatNumber(lab.xp_reward)} XP`}
+              meta={`${LAB_CATEGORY_LABELS[lab.category] ?? lab.category} · ${LEVEL_LABELS[lab.difficulty] ?? lab.difficulty} · ${formatNumber(lab.xp_reward)} XP${lab.is_assessment ? " · Évaluation" : ""}`}
               aside={<StatusBadge status={lab.status} />}
             />
           )}
@@ -296,13 +301,23 @@ export function AdminLabsPage() {
   );
 }
 
-function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
-  lab: LabRow | null; flash: Flash; onClose: () => void; onSaved: (lab: LabRow, flash: Flash) => void; onDeleted: (id: string) => void;
+const LAB_FORMAT_OPTIONS = (Object.keys(LAB_FORMAT_LABELS) as LabFormat[]).map((value) => ({ value, label: LAB_FORMAT_LABELS[value] }));
+
+function LabEditor({ lab, courses, flash, onClose, onSaved, onDeleted }: {
+  lab: LabRow | null; courses: AdminCourseListItem[]; flash: Flash; onClose: () => void; onSaved: (lab: LabRow, flash: Flash) => void; onDeleted: (id: string) => void;
 }) {
   const isNew = !lab;
   const id = useId();
   const names = useTitleSlug(lab?.title ?? "", lab?.slug ?? "", isNew);
   const [description, setDescription] = useState(lab?.description ?? "");
+  const [format, setFormat] = useState<LabFormat>(lab?.format ?? "terminal");
+  const [courseId, setCourseId] = useState(lab?.course_id ?? "");
+  const [briefing, setBriefing] = useState(lab?.briefing ?? "");
+  const [constraints, setConstraints] = useState(joinLines(lab?.constraints ?? []));
+  const [tools, setTools] = useState(joinLines(lab?.tools ?? []));
+  const [requiresComputer, setRequiresComputer] = useState(lab?.requires_computer ?? false);
+  const [isAssessment, setIsAssessment] = useState(lab?.is_assessment ?? false);
+  const [minutes, setMinutes] = useState(String(lab?.estimated_minutes ?? 20));
   const [category, setCategory] = useState<string>(lab?.category ?? "reseau");
   const [difficulty, setDifficulty] = useState<string>(lab?.difficulty ?? "debutant");
   const [xp, setXp] = useState(String(lab?.xp_reward ?? 100));
@@ -329,7 +344,12 @@ function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
     const hint = placeholder.trim();
     if (hint.length < 1 || hint.length > 120) return "Le texte d’aide du champ réponse doit contenir entre 1 et 120 caractères.";
     if (flag.trim().length > 200) return "La réponse attendue ne doit pas dépasser 200 caractères.";
-    if (isNew && status === "published" && !flag.trim()) return "Définis la réponse attendue pour publier ce lab dès sa création.";
+    if (briefing.trim().length > 4000) return "Le briefing ne doit pas dépasser 4 000 caractères.";
+    if (lines(constraints).length > 10) return "10 contraintes maximum.";
+    if (lines(tools).length > 10) return "10 outils maximum.";
+    const minutesValue = asInt(minutes, 0);
+    if (minutesValue < 1 || minutesValue > 600) return "La durée estimée doit être comprise entre 1 et 600 minutes.";
+    if (isNew && status === "published" && !flag.trim()) return "Crée d’abord le lab en brouillon, ajoute ses tâches, puis publie-le. Une réponse attendue permet aussi de le publier dès la création.";
     return null;
   }
 
@@ -351,6 +371,14 @@ function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
       hints: lines(hints),
       terminal_lines: terminalLines(terminal),
       flag_placeholder: placeholder.trim(),
+      format,
+      course_id: courseId || null,
+      briefing: briefing.trim(),
+      constraints: lines(constraints),
+      tools: lines(tools),
+      requires_computer: requiresComputer,
+      is_assessment: isAssessment,
+      estimated_minutes: asInt(minutes, 20),
     };
     try {
       if (lab) {
@@ -389,7 +417,7 @@ function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
   return (
     <EditorCard
       title={isNew ? "Nouveau lab" : "Modifier le lab"}
-      subtitle={lab?.published_at ? `Publié le ${formatDateTime(lab.published_at)}` : isNew ? "Créé en brouillon tant que la réponse n’est pas définie." : undefined}
+      subtitle={lab?.published_at ? `Publié le ${formatDateTime(lab.published_at)}` : isNew ? "Créé en brouillon : ajoute ensuite les tâches et les ressources, puis publie." : undefined}
       flash={flash}
       onClose={onClose}
     >
@@ -406,6 +434,32 @@ function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
           <Input id={`${id}-position`} label="Position" type="number" inputMode="numeric" value={position} onChange={(e) => setPosition(e.target.value)} />
         </div>
         <Select id={`${id}-status`} label="Statut" value={status} onChange={(e) => setStatus(e.target.value)} options={toOptions(STATUS_LABELS)} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Select id={`${id}-format`} label="Format" value={format} onChange={(e) => setFormat(e.target.value as LabFormat)} options={LAB_FORMAT_OPTIONS} />
+          <Select
+            id={`${id}-course`}
+            label="Parcours rattaché"
+            value={courseId}
+            onChange={(e) => setCourseId(e.target.value)}
+            options={[{ value: "", label: "Aucun parcours" }, ...courses.map((course) => ({ value: course.id, label: course.title }))]}
+          />
+          <Input id={`${id}-minutes`} label="Durée estimée (minutes)" type="number" inputMode="numeric" min={1} max={600} value={minutes} onChange={(e) => setMinutes(e.target.value)} />
+        </div>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <Toggle label="Évaluation (peut valider une compétence)" checked={isAssessment} onChange={setIsAssessment} />
+          <Toggle label="Nécessite un ordinateur" checked={requiresComputer} onChange={setRequiresComputer} />
+        </div>
+        <Field label={`Briefing de mission (${briefing.length}/4000)`}>
+          <Textarea value={briefing} onChange={(e) => setBriefing(e.target.value)} rows={4} maxLength={4000} />
+        </Field>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Contraintes (une par ligne, 10 maximum)">
+            <Textarea value={constraints} onChange={(e) => setConstraints(e.target.value)} rows={3} />
+          </Field>
+          <Field label="Outils conseillés (un par ligne, 10 maximum)">
+            <Textarea value={tools} onChange={(e) => setTools(e.target.value)} rows={3} />
+          </Field>
+        </div>
         <Field label="Objectifs (un par ligne, 12 maximum)">
           <Textarea value={objectives} onChange={(e) => setObjectives(e.target.value)} rows={4} />
         </Field>
@@ -419,7 +473,7 @@ function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
         {isNew && (
           <Input
             id={`${id}-flag`}
-            label="Réponse attendue (obligatoire pour publier)"
+            label="Réponse attendue (facultative si le lab a des tâches)"
             type="password"
             autoComplete="off"
             value={flag}
@@ -430,6 +484,8 @@ function LabEditor({ lab, flash, onClose, onSaved, onDeleted }: {
         {err && <Notice kind="error">{err}</Notice>}
         <EditorActions busy={busy} isNew={isNew} createLabel="Créer le lab" onDelete={() => void remove()} />
       </form>
+      {lab && <LabTasksPanel labId={lab.id} />}
+      {lab && <LabAssetsPanel labId={lab.id} />}
       {lab && <LabFlagPanel labId={lab.id} />}
     </EditorCard>
   );
@@ -518,12 +574,28 @@ const CRITERIA_LABELS: Record<string, string> = {
   labs_solved: "Labs résolus",
   certificates_earned: "Certificats obtenus",
   course_completed: "Cours précis terminé",
+  lab_completed: "Lab précis réussi",
+  skill_validated: "Compétence validée",
 };
 
-function criteriaSummary(badge: BadgeRow, courses: AdminCourseListItem[] | undefined) {
+type BadgeTargets = {
+  courses: AdminCourseListItem[] | undefined;
+  labs: LabRow[] | undefined;
+  skills: { id: string; name: string }[] | undefined;
+};
+
+function criteriaSummary(badge: BadgeRow, { courses, labs, skills }: BadgeTargets) {
   if (badge.criteria_type === "course_completed") {
     const course = courses?.find((item) => item.id === badge.criteria_course_id);
     return `Cours terminé : ${course?.title ?? "cours introuvable"}`;
+  }
+  if (badge.criteria_type === "lab_completed") {
+    const lab = labs?.find((item) => item.id === badge.criteria_lab_id);
+    return `Lab réussi : ${lab?.title ?? "lab introuvable"}`;
+  }
+  if (badge.criteria_type === "skill_validated") {
+    const skill = skills?.find((item) => item.id === badge.criteria_skill_id);
+    return `Compétence validée : ${skill?.name ?? "compétence introuvable"}`;
   }
   return `${CRITERIA_LABELS[badge.criteria_type] ?? badge.criteria_type} : ${formatNumber(badge.criteria_value)}`;
 }
@@ -531,6 +603,8 @@ function criteriaSummary(badge: BadgeRow, courses: AdminCourseListItem[] | undef
 export function AdminBadgesPage() {
   const catalog = useCatalog<BadgeRow>(listBadges, (badge) => badge.name);
   const courses = useAsync(listAdminCourses, []);
+  const labs = useAsync(listLabs, []);
+  const skills = useAsync(listSkills, []);
   const [search, setSearch] = useState("");
   const [active, setActive] = useState("all");
   const [sort, setSort] = useState<CatalogSort>("position");
@@ -546,7 +620,9 @@ export function AdminBadgesPage() {
       key={catalog.editing?.id ?? "new"}
       badge={catalog.editing}
       courses={courses.data ?? []}
-      coursesError={courses.error?.message ?? null}
+      labs={labs.data ?? []}
+      skills={skills.data ?? []}
+      coursesError={courses.error?.message ?? labs.error?.message ?? skills.error?.message ?? null}
       flash={catalog.flash}
       onClose={catalog.close}
       onSaved={catalog.saved}
@@ -583,7 +659,7 @@ export function AdminBadgesPage() {
               icon={<BadgeMedal icon={badge.icon} earned={badge.is_active} tier={badgeTierFromXp(badge.xp_reward)} size={54} />}
               iconClassName="is-medal"
               title={badge.name}
-              meta={`${criteriaSummary(badge, courses.data)} · ${formatNumber(badge.xp_reward)} XP`}
+              meta={`${criteriaSummary(badge, { courses: courses.data, labs: labs.data, skills: skills.data })} · ${RARITY_LABELS[badge.rarity as Rarity] ?? badge.rarity} · ${formatNumber(badge.xp_reward)} XP`}
               aside={<Badge tone={badge.is_active ? "green" : "neutral"}>{badge.is_active ? "Actif" : "Inactif"}</Badge>}
             />
           )}
@@ -593,8 +669,10 @@ export function AdminBadgesPage() {
   );
 }
 
-function BadgeEditor({ badge, courses, coursesError, flash, onClose, onSaved, onDeleted }: {
-  badge: BadgeRow | null; courses: AdminCourseListItem[]; coursesError: string | null; flash: Flash;
+const RARITY_OPTIONS = (Object.keys(RARITY_LABELS) as Rarity[]).map((value) => ({ value, label: RARITY_LABELS[value] }));
+
+function BadgeEditor({ badge, courses, labs, skills, coursesError, flash, onClose, onSaved, onDeleted }: {
+  badge: BadgeRow | null; courses: AdminCourseListItem[]; labs: LabRow[]; skills: { id: string; name: string }[]; coursesError: string | null; flash: Flash;
   onClose: () => void; onSaved: (badge: BadgeRow, flash: Flash) => void; onDeleted: (id: string) => void;
 }) {
   const isNew = !badge;
@@ -605,13 +683,21 @@ function BadgeEditor({ badge, courses, coursesError, flash, onClose, onSaved, on
   const [criteria, setCriteria] = useState(badge?.criteria_type ?? "lessons_completed");
   const [value, setValue] = useState(String(badge?.criteria_value ?? 1));
   const [courseId, setCourseId] = useState(badge?.criteria_course_id ?? "");
+  const [labId, setLabId] = useState(badge?.criteria_lab_id ?? "");
+  const [skillId, setSkillId] = useState(badge?.criteria_skill_id ?? "");
+  const [rarity, setRarity] = useState<Rarity>((badge?.rarity as Rarity | undefined) ?? "common");
   const [xp, setXp] = useState(String(badge?.xp_reward ?? 50));
   const [position, setPosition] = useState(String(badge?.position ?? 0));
   const [isActive, setIsActive] = useState(badge?.is_active ?? true);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const forCourse = criteria === "course_completed";
+  const forLab = criteria === "lab_completed";
+  const forSkill = criteria === "skill_validated";
+  const hasTarget = forCourse || forLab || forSkill;
   const courseOptions = [{ value: "", label: courses.length ? "Choisir un cours" : "Aucun cours disponible" }, ...courses.map((course) => ({ value: course.id, label: course.title }))];
+  const labOptions = [{ value: "", label: labs.length ? "Choisir un lab" : "Aucun lab disponible" }, ...labs.map((lab) => ({ value: lab.id, label: lab.title }))];
+  const skillOptions = [{ value: "", label: skills.length ? "Choisir une compétence" : "Aucune compétence disponible" }, ...skills.map((skill) => ({ value: skill.id, label: skill.name }))];
 
   function validate(): string | null {
     const name = names.title.trim();
@@ -620,8 +706,10 @@ function BadgeEditor({ badge, courses, coursesError, flash, onClose, onSaved, on
     if (description.trim().length > 300) return "La description ne doit pas dépasser 300 caractères.";
     if (!ICON_PATTERN.test(icon)) return "Choisis une icône valide.";
     if (forCourse && !courseId) return "Choisis le cours à terminer pour obtenir ce badge.";
+    if (forLab && !labId) return "Choisis le lab à réussir pour obtenir ce badge.";
+    if (forSkill && !skillId) return "Choisis la compétence à valider pour obtenir ce badge.";
     const threshold = asInt(value, 0);
-    if (!forCourse && (threshold < 1 || threshold > 1_000_000)) return "Le seuil doit être compris entre 1 et 1 000 000.";
+    if (!hasTarget && (threshold < 1 || threshold > 1_000_000)) return "Le seuil doit être compris entre 1 et 1 000 000.";
     const xpValue = asInt(xp, -1);
     if (xpValue < 0 || xpValue > 5000) return "La récompense doit être comprise entre 0 et 5 000 XP.";
     return null;
@@ -639,8 +727,11 @@ function BadgeEditor({ badge, courses, coursesError, flash, onClose, onSaved, on
       description: description.trim(),
       icon,
       criteria_type: criteria,
-      criteria_value: forCourse ? 1 : asInt(value, 1),
+      criteria_value: hasTarget ? 1 : asInt(value, 1),
       criteria_course_id: forCourse ? courseId : null,
+      criteria_lab_id: forLab ? labId : null,
+      criteria_skill_id: forSkill ? skillId : null,
+      rarity,
       xp_reward: asInt(xp),
       position: asInt(position),
       is_active: isActive,
@@ -689,14 +780,17 @@ function BadgeEditor({ badge, courses, coursesError, flash, onClose, onSaved, on
         </Field>
         <Select id={`${id}-icon`} label="Icône" value={icon} onChange={(e) => setIcon(e.target.value)} options={iconOptions(icon)} />
         <Select id={`${id}-criteria`} label="Critère d’obtention" value={criteria} onChange={(e) => setCriteria(e.target.value)} options={toOptions(CRITERIA_LABELS)} />
-        {forCourse ? (
+        {hasTarget ? (
           <div className="space-y-2">
-            <Select id={`${id}-course`} label="Cours à terminer" value={courseId} onChange={(e) => setCourseId(e.target.value)} options={courseOptions} />
+            {forCourse && <Select id={`${id}-course`} label="Cours à terminer" value={courseId} onChange={(e) => setCourseId(e.target.value)} options={courseOptions} />}
+            {forLab && <Select id={`${id}-lab`} label="Lab à réussir" value={labId} onChange={(e) => setLabId(e.target.value)} options={labOptions} />}
+            {forSkill && <Select id={`${id}-skill`} label="Compétence à valider" value={skillId} onChange={(e) => setSkillId(e.target.value)} options={skillOptions} />}
             {coursesError && <p className="text-sm text-red-200">{coursesError}</p>}
           </div>
         ) : (
           <Input id={`${id}-value`} label="Seuil à atteindre" type="number" inputMode="numeric" min={1} max={1000000} value={value} onChange={(e) => setValue(e.target.value)} />
         )}
+        <Select id={`${id}-rarity`} label="Rareté" value={rarity} onChange={(e) => setRarity(e.target.value as Rarity)} options={RARITY_OPTIONS} />
         <div className="grid gap-4 sm:grid-cols-2">
           <Input id={`${id}-xp`} label="Bonus (XP)" type="number" inputMode="numeric" min={0} max={5000} value={xp} onChange={(e) => setXp(e.target.value)} />
           <Input id={`${id}-position`} label="Position" type="number" inputMode="numeric" value={position} onChange={(e) => setPosition(e.target.value)} />
