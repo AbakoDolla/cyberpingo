@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import intro from "@/data/pingo-intro.json";
 import { IconPause, IconPlay } from "@/components/ui/Icon";
+import { isSyntheticVoice } from "@/lib/mascot/voice";
 
 const BARS = [38, 62, 46, 78, 54, 92, 66, 48, 84, 58, 72, 40, 88, 52, 68, 44, 80, 56, 70, 36, 60, 50, 74, 42];
 
@@ -70,10 +71,12 @@ export default function PingoIntroPlayer() {
           onError={() => { setFailed(true); setPlaying(false); }}
         />
         <p className="intro-player__text">{intro.text}</p>
-        <p className="intro-player__credit">
-          {failed ? "L’audio n’est pas disponible pour le moment, le texte reste complet. " : ""}
-          {intro.credit}.
-        </p>
+        {(failed || !isSyntheticVoice(intro.credit)) && (
+          <p className="intro-player__credit">
+            {failed ? "L’audio n’est pas disponible pour le moment, le texte reste complet. " : ""}
+            {isSyntheticVoice(intro.credit) ? "" : `${intro.credit}.`}
+          </p>
+        )}
       </div>
     </section>
   );
