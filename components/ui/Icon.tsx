@@ -347,6 +347,12 @@ export const IconPlay = icon(
   `<polygon points="6 4 20 12 6 20 6 4"/>`
 );
 
+/** Pause */
+export const IconPause = icon(
+  `<rect x="6" y="4" width="4" height="16" rx="1"/>
+   <rect x="14" y="4" width="4" height="16" rx="1"/>`
+);
+
 /** Arrêt */
 export const IconStop = icon(
   `<rect x="5" y="5" width="14" height="14" rx="2"/>`

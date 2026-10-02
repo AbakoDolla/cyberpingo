@@ -584,7 +584,7 @@ export function AdminMascottePage() {
         action={<Button size="sm" icon={<IconPlus size={16} />} onClick={() => catalog.open(null)}>Nouvelle réplique</Button>}
       />
       <p className="mascot-admin-note">
-        La voix ne passe que par de vraies voix humaines. Enregistre une prise depuis ton micro ou importe un fichier, puis crédite la personne qui parle ; sans audio, la réplique s’affiche en sous-titre uniquement.
+        La voix passe par des enregistrements crédités. Enregistre une prise depuis ton micro ou importe un fichier, puis crédite la personne qui parle ; une voix de synthèse peut servir de remplaçante, à condition d’être indiquée comme telle dans le crédit. Sans audio, la réplique s’affiche en sous-titre uniquement.
       </p>
       {catalog.data && coverage.total > 0 && (
         <section className="voice-coverage" aria-label="Couverture vocale">
@@ -595,7 +595,14 @@ export function AdminMascottePage() {
           <div className="voice-coverage__track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={coverage.percent} aria-label="Répliques avec voix">
             <span style={{ transform: `scaleX(${Math.min(1, Math.max(0, coverage.percent / 100))})` }} />
           </div>
-          <p>{coverage.missing === 0 ? "Toutes les répliques actives sont prononcées par une voix humaine." : `${plural(coverage.missing, "réplique reste", "répliques restent")} à enregistrer.`}</p>
+          <p>
+            {coverage.missing > 0
+              ? `${plural(coverage.missing, "réplique reste", "répliques restent")} sans voix. `
+              : "Toutes les répliques actives sont prononcées. "}
+            {coverage.synthetic > 0
+              ? `${plural(coverage.synthetic, "voix est", "voix sont")} de synthèse : à remplacer par un enregistrement humain.`
+              : coverage.missing === 0 ? "Toutes les voix sont humaines." : ""}
+          </p>
         </section>
       )}
       {catalog.editing === undefined && catalog.flash && <div className="mb-4"><Notice kind={catalog.flash.kind}>{catalog.flash.text}</Notice></div>}
@@ -668,7 +675,7 @@ function MascotLineEditor({ line, defaultEvent, nextPosition: suggested, flash, 
     if (audio) {
       const valid = audio.length <= 508 && !audio.includes("..") && (AUDIO_HTTPS.test(audio) || AUDIO_LOCAL.test(audio));
       if (!valid) return "Le fichier audio doit commencer par https:// ou par /audio/ (fichier hébergé avec le site).";
-      if (credit.trim().length < 1) return "Indique le crédit de la voix : seule une vraie voix humaine créditée est acceptée.";
+      if (credit.trim().length < 1) return "Indique le crédit de la voix : le nom de la personne, ou « voix de synthèse » si elle ne l’est pas.";
     }
     if (credit.trim().length > 120) return "Le crédit de la voix ne doit pas dépasser 120 caractères.";
     return null;

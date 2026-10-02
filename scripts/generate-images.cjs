@@ -261,6 +261,23 @@ ${led(150, 150, "#ff6b7d", 9)}${led(268, 244, P.warm, 9)}${led(250, 120, P.a, 8)
 <circle cx="150" cy="200" r="76" fill="#04101f" stroke="${P.a}" stroke-width="3.5"/><circle cx="150" cy="200" r="52" fill="none" stroke="${P.a}" stroke-width="2" opacity=".5"/><circle cx="150" cy="200" r="22" fill="url(#accent)"/>
 <path d="M150 200L286 140" stroke="url(#metal)" stroke-width="12" stroke-linecap="round"/><circle cx="292" cy="138" r="14" fill="url(#metal)"/>
 ${led(326, 266, P.c, 7)}${bar(220, 266, 290, 266, white, 8, 0.25)}`,
+  mic: (P) => `<path d="M96 178C96 252 140 292 200 292C260 292 304 252 304 178" fill="none" stroke="url(#metal)" stroke-width="22" stroke-linecap="round"/>
+${bar(200, 292, 200, 342, "url(#metal)", 22)}${bar(132, 354, 268, 354, "url(#metal)", 24)}
+${glass(rrp(144, 34, 112, 206, 56))}
+<g stroke="${white}" stroke-opacity=".28" stroke-width="5" stroke-linecap="round">${[86, 112, 138, 164, 190].map((y) => `<path d="M162 ${y}H238"/>`).join("")}</g>
+<circle cx="200" cy="136" r="62" fill="${P.a}" opacity=".35" filter="url(#glow)"/>
+<g fill="none" stroke="${P.c}" stroke-width="9" stroke-linecap="round"><path d="M58 110C40 150 40 190 58 230" opacity=".9"/><path d="M26 88C-2 150 -2 190 26 252" opacity=".5"/><path d="M342 110C360 150 360 190 342 230" opacity=".9"/><path d="M374 88C402 150 402 190 374 252" opacity=".5"/></g>`,
+  medal: (P) => {
+    const star = Array.from({ length: 10 }, (_, i) => {
+      const r = i % 2 ? 24 : 54;
+      const a = (Math.PI / 5) * i - Math.PI / 2;
+      return `${n(200 + r * Math.cos(a))} ${n(246 + r * Math.sin(a))}`;
+    }).join("L");
+    return `<path d="M120 24H190L226 146H156Z" fill="url(#warm)"/><path d="M280 24H210L174 146H244Z" fill="url(#accent)"/>
+<circle cx="200" cy="246" r="118" fill="url(#panel)" stroke="url(#edge)" stroke-width="4"/><circle cx="200" cy="246" r="118" fill="url(#sheen)"/>
+<circle cx="200" cy="246" r="88" fill="none" stroke="${P.a}" stroke-width="3" opacity=".6"/>
+<path d="M${star}Z" fill="${P.warm}" opacity=".6" filter="url(#glow)"/><path d="M${star}Z" fill="url(#warm)" stroke="#fff" stroke-opacity=".7" stroke-width="3" stroke-linejoin="round"/>`;
+  },
 };
 
 function pingo(pose = "idle") {
@@ -361,6 +378,46 @@ const labs = {
   securite: { tone: "red", main: "shield", side: ["radar", "bug"] },
 };
 
+const heroes = {
+  "features/hero": { tone: "blue", pose: "wave", items: [["books", { x: 1290, y: 260, s: 0.78 }], ["shield", { x: 990, y: 350, s: 0.4, rot: -8 }], ["terminal", { x: 1560, y: 110, s: 0.3, rot: 8, op: 0.9 }], ["trophy", { x: 1040, y: 110, s: 0.26, rot: 10, op: 0.8 }]] },
+  "about/hero": { tone: "cyan", pose: "happy", items: [["globe", { x: 1290, y: 260, s: 0.78 }], ["shield", { x: 990, y: 350, s: 0.4, rot: -8 }], ["padlock", { x: 1560, y: 110, s: 0.3, rot: 8, op: 0.9 }], ["network", { x: 1040, y: 110, s: 0.26, rot: 10, op: 0.8 }]] },
+  "resources/hero": { tone: "violet", pose: "idle", items: [["books", { x: 1290, y: 260, s: 0.78 }], ["magnifier", { x: 990, y: 350, s: 0.4, rot: -8 }], ["certificate", { x: 1560, y: 110, s: 0.3, rot: 8, op: 0.9 }], ["key", { x: 1040, y: 110, s: 0.26, rot: 10, op: 0.8 }]] },
+};
+
+const scenes = {
+  "features/parcours": { tone: "blue", main: "network", side: ["books", "server"], pose: "idle" },
+  "features/quiz": { tone: "green", main: "shield", side: ["books", "medal"], pose: "happy" },
+  "features/defis": { tone: "red", main: "radar", side: ["terminal", "bug"], pose: "wave" },
+  "features/suivi": { tone: "amber", main: "trophy", side: ["medal", "profile"], pose: "celebrate" },
+  "features/mentor": { tone: "violet", main: "chip", side: ["terminal", "bell"], pose: "happy" },
+  "about/situations": { tone: "amber", main: "bell", side: ["browser", "padlock"], pose: "wave" },
+  "about/responsabilite": { tone: "cyan", main: "shield", side: ["certificate", "key"], pose: "idle" },
+  "about/construction": { tone: "violet", main: "cube", side: ["gear", "terminal"], pose: "happy" },
+  "about/monde": { tone: "green", main: "globe", side: ["network", "phone"], pose: "wave" },
+  "about/voix": { tone: "violet", main: "mic", side: ["chip", "bell"], pose: "happy" },
+  "resources/article-securiser-ses-comptes": { tone: "cyan", main: "padlock", side: ["key", "shield"], pose: "happy" },
+  "resources/article-reperer-phishing": { tone: "red", main: "browser", side: ["bell", "magnifier"], pose: "wave" },
+  "resources/article-premiers-logs": { tone: "green", main: "terminal", side: ["magnifier", "server"], pose: "idle" },
+  "resources/article-laboratoire-ethique": { tone: "violet", main: "terminal", side: ["shield", "certificate"], pose: "idle" },
+  "resources/article-sauvegardes-utiles": { tone: "blue", main: "drive", side: ["cloud", "shield"], pose: "happy" },
+};
+
+function sceneSvg(def, seed) {
+  return compose({
+    W: 1000,
+    H: 640,
+    tone: def.tone,
+    seed,
+    horizon: 0.68,
+    items: [
+      [def.side[0], { x: 150, y: 470, s: 0.36, rot: -8, op: 0.92 }],
+      [def.side[1], { x: 820, y: 130, s: 0.32, rot: 10, op: 0.9 }],
+      [def.main, { x: 450, y: 320, s: 1.08 }],
+    ],
+    mascot: { pose: def.pose, cx: 850, bottom: 612, s: 1.12 },
+  });
+}
+
 function coverSvg(def, seed, withPingo) {
   return compose({
     W: 960,
@@ -451,6 +508,49 @@ const groups = {
       .jpeg({ quality: 86, mozjpeg: true })
       .toFile(file);
     console.log(`${path.relative(ROOT, file)}  ${(fs.statSync(file).size / 1024).toFixed(0)} KB`);
+  },
+  async heroes() {
+    let seed = 301;
+    for (const [name, def] of Object.entries(heroes)) {
+      const svg = compose({
+        W: 1920,
+        H: 560,
+        tone: def.tone,
+        seed: (seed += 17),
+        horizon: 0.72,
+        items: def.items,
+        mascot: { pose: def.pose, cx: 1745, bottom: 530, s: 1.78 },
+      });
+      await writeWebp(svg, path.join(OUT, `${name}.webp`), 76);
+    }
+  },
+  async pages() {
+    let seed = 501;
+    for (const [name, def] of Object.entries(scenes)) {
+      await writeWebp(sceneSvg(def, (seed += 19)), path.join(OUT, `${name}.webp`), 78);
+    }
+  },
+  async logo() {
+    const trimmed = await sharp(path.join(OUT, "cyberpingo-transparent.png")).trim({ threshold: 10 }).toBuffer({ resolveWithObject: true });
+    const { width, height } = trimmed.info;
+    const top = await sharp(trimmed.data)
+      .extract({ left: 0, top: 0, width, height: Math.round(height * 0.665) })
+      .trim({ threshold: 10 })
+      .resize({ height: 384 })
+      .toBuffer();
+    const file = path.join(OUT, "brand", "cyberpingo-mark.webp");
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    await sharp(top).webp({ quality: 92, alphaQuality: 100, effort: 5 }).toFile(file);
+    console.log(`${path.relative(ROOT, file)}  ${(fs.statSync(file).size / 1024).toFixed(0)} KB`);
+    const meta = await sharp(top).metadata();
+    const side = Math.min(meta.width, meta.height);
+    const squareFile = path.join(OUT, "brand", "cyberpingo-mark-square.webp");
+    await sharp(top)
+      .extract({ left: Math.round((meta.width - side) / 2) + 6, top: 0, width: side - 12, height: side })
+      .resize({ width: 192, height: 192, fit: "cover" })
+      .webp({ quality: 92, alphaQuality: 100, effort: 5 })
+      .toFile(squareFile);
+    console.log(`${path.relative(ROOT, squareFile)}  ${(fs.statSync(squareFile).size / 1024).toFixed(0)} KB`);
   },
 };
 

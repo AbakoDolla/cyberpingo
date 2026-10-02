@@ -174,7 +174,7 @@ Le parcours Linux et investigation SOC (cours `linux` et `analyse-logs`) est dan
 | `certificates` | privé | 5 Mo | PDF | service role uniquement ; lecture par le propriétaire et le staff |
 | `mascot-voice` | public | 5 Mo | WebM, Ogg, MP3, MP4, WAV | staff (liste, envoi, remplacement, suppression) |
 
-Les voix de Pingo sont des enregistrements humains, jamais de la synthèse vocale : `mascot_lines.audio_url` n'accepte qu'une URL `https://` ou un chemin `/audio/...`, et exige un `voice_credit` (1 à 120 caractères). Le studio d'administration (`/admin/mascotte`) enregistre au micro ou importe un fichier, l'envoie dans `mascot-voice` et renseigne la réplique.
+Les voix de Pingo sont soit des enregistrements humains, soit une voix de synthèse déclarée comme telle (le crédit commence alors par « Voix de synthèse »). Les 30 répliques de départ utilisent la synthèse et sont attachées par supabase/seed/04_mascot_voices.sql ; chacune se remplace depuis le studio. `mascot_lines.audio_url` n'accepte qu'une URL `https://` ou un chemin `/audio/...`, et exige un `voice_credit` (1 à 120 caractères). Le studio d'administration (`/admin/mascotte`) enregistre au micro ou importe un fichier, l'envoie dans `mascot-voice` et renseigne la réplique.
 
 ## Types TypeScript
 

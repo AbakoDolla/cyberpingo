@@ -110,7 +110,10 @@ test("the Réseaux path seeds a complete, published, end-to-end learning path", 
 
   const events = await sql("select distinct event from public.mascot_lines where is_active");
   assert.equal(events.length, 13);
-  assert.ok((await sql("select 1 from public.mascot_lines where audio_url is not null")).length === 0, "no audio is claimed before the team records it");
+  const voiced = await sql("select audio_url, voice_credit, is_active from public.mascot_lines");
+  assert.equal(voiced.length, 30);
+  assert.ok(voiced.every((row) => /^\/audio\/mascot\/[0-9a-f-]{36}\.mp3$/.test(row.audio_url)), "every line is voiced by the generated library");
+  assert.ok(voiced.every((row) => /synthèse/.test(row.voice_credit)), "a synthetic voice is never presented as a human recording");
   const rarities = await sql("select slug, rarity from public.badges where slug in ('serie-30', 'premier-pas', 'expert-reseau') order by slug");
   assert.deepEqual(rarities, [{ slug: "expert-reseau", rarity: "epic" }, { slug: "premier-pas", rarity: "common" }, { slug: "serie-30", rarity: "epic" }]);
 });
