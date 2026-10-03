@@ -5,7 +5,7 @@
 //
 // The layout lives in render.ts (CyberPingo logo, mascot, brand fonts and a verification QR code). The ".v2" of the file name
 // is the design version: a certificate whose stored PDF still has the plain first design is rendered again the next time
-// it is downloaded, and the old file is removed.
+// it is downloaded, and the old file is removed. If that new rendering fails, the learner keeps the PDF they already had.
 import { HttpError, readJson, requireCaller, requireUuid, serve, serviceClient, userClient } from "../_shared/http.ts";
 import { renderCertificatePdf } from "./render.ts";
 
@@ -40,26 +40,34 @@ serve(async (request) => {
   if (certificate.revoked_at) throw new HttpError(409, "Ce certificat a été révoqué.");
 
   const admin = serviceClient();
-  if (certificate.pdf_path?.endsWith(DESIGN_SUFFIX)) {
-    const folder = certificate.pdf_path.split("/")[0];
-    const file = certificate.pdf_path.slice(folder.length + 1);
-    const { data: existing } = await admin.storage.from("certificates").list(folder, { search: file, limit: 1 });
-    if (existing?.some((entry) => entry.name === file)) return { pdf_path: certificate.pdf_path };
-  }
+  const stored = async (path: string | null): Promise<boolean> => {
+    if (!path) return false;
+    const folder = path.split("/")[0];
+    const file = path.slice(folder.length + 1);
+    const { data } = await admin.storage.from("certificates").list(folder, { search: file, limit: 1 });
+    return Boolean(data?.some((entry) => entry.name === file));
+  };
+
+  if (certificate.pdf_path?.endsWith(DESIGN_SUFFIX) && (await stored(certificate.pdf_path))) return { pdf_path: certificate.pdf_path };
 
   const site = (Deno.env.get("SITE_URL") ?? "https://cyberpingo.vercel.app").replace(/\/+$/, "");
-  const bytes = await renderCertificatePdf(certificate, `${site}/certificat/${certificate.verification_code}`);
   const safeNumber = certificate.certificate_number.replace(/[^A-Za-z0-9._-]/g, "-");
   const path = `${certificate.user_id}/${safeNumber}${DESIGN_SUFFIX}`;
 
-  const { error: uploadError } = await admin.storage.from("certificates").upload(path, bytes, {
-    contentType: "application/pdf",
-    upsert: true,
-  });
-  if (uploadError) throw uploadError;
-
-  const { error: updateError } = await admin.from("certificates").update({ pdf_path: path }).eq("id", certificate.id);
-  if (updateError) throw updateError;
+  try {
+    const bytes = await renderCertificatePdf(certificate, `${site}/certificat/${certificate.verification_code}`);
+    const { error: uploadError } = await admin.storage.from("certificates").upload(path, bytes, { contentType: "application/pdf", upsert: true });
+    if (uploadError) throw uploadError;
+    const { error: updateError } = await admin.from("certificates").update({ pdf_path: path }).eq("id", certificate.id);
+    if (updateError) throw updateError;
+  } catch (failure) {
+    // A certificate issued before the new design already has a PDF: serve it rather than an error.
+    if (certificate.pdf_path && (await stored(certificate.pdf_path))) {
+      console.error("Nouveau rendu du certificat impossible, ancien PDF conservé :", failure);
+      return { pdf_path: certificate.pdf_path };
+    }
+    throw failure;
+  }
 
   // The first design is replaced, not kept next to the new one (best effort: a leftover file is harmless).
   if (certificate.pdf_path && certificate.pdf_path !== path) {

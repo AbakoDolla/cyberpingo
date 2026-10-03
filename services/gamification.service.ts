@@ -1,4 +1,5 @@
 import { getSupabaseBrowserClient, type TypedSupabaseClient } from "@/lib/supabase/client";
+import { isCurrentCertificatePdf } from "@/lib/certificate-pdf";
 import { AppError, toAppError, unwrap } from "@/lib/errors";
 import type { BadgeCriteria, BadgeWithState, Rarity, Certificate, CertificateVerification, Dashboard, LearnerStats, XpTransaction } from "@/types/api";
 
@@ -60,16 +61,17 @@ export async function verifyCertificate(code: string, client?: TypedSupabaseClie
 
 /**
  * Returns a short-lived download link for the certificate PDF, asking the generate-certificate
- * Edge Function to render it first when it does not exist yet.
+ * Edge Function to render it first when it does not exist yet or still has an older design. A learner who already has
+ * a PDF never gets an error because the new rendering failed: the older file is served instead.
  */
 export async function getCertificatePdfUrl(certificate: Pick<Certificate, "id" | "pdf_path" | "revoked_at">) {
   if (certificate.revoked_at) throw new AppError("forbidden", "Ce certificat a été révoqué.");
   const supabase = getSupabaseBrowserClient();
   let path = certificate.pdf_path;
-  if (!path) {
+  if (!path || !isCurrentCertificatePdf(path)) {
     const { data, error } = await supabase.functions.invoke<{ pdf_path: string }>("generate-certificate", { body: { certificate_id: certificate.id } });
-    if (error || !data?.pdf_path) throw toAppError(error, "Le PDF du certificat n’a pas pu être généré. Réessaie dans un instant.");
-    path = data.pdf_path;
+    path = data?.pdf_path ?? path;
+    if (!path) throw toAppError(error, "Le PDF du certificat n’a pas pu être généré. Réessaie dans un instant.");
   }
   const { data, error } = await supabase.storage.from("certificates").createSignedUrl(path, 120, { download: true });
   if (error || !data) throw toAppError(error, "Le téléchargement du certificat a échoué.");
