@@ -1,7 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 import ResourceLibrary from "@/components/public/ResourceLibrary";
 import { articles } from "@/data/public-content";
+import { equipment, equipmentById, type Equipment } from "@/data/equipment";
 export const metadata = { title: "Guides et ressources", description: "Des guides pratiques en français pour protéger ses comptes, repérer le phishing et apprendre avec méthode." };
+const PROMO = ["switch", "pare-feu", "nas", "cle-securite"].map(equipmentById).filter((device): device is Equipment => Boolean(device));
 export default function ResourcesPage() {
   const categories = new Set(articles.map((article) => article.category));
   return <div className="public-container inner-page">
@@ -19,6 +22,16 @@ export default function ResourcesPage() {
         </dl>
       </div>
     </header>
+    <section className="equip-promo" aria-labelledby="equip-promo-title">
+      <div>
+        <h2 id="equip-promo-title">Le matériel, en photos réelles</h2>
+        <p>Switch, routeur, pare-feu, NAS, clé de sécurité : {equipment.length} équipements d’entreprise ou de maison, avec leur risque principal et le bon réflexe.</p>
+        <Link className="public-button button-outline" href="/materiel">Voir le matériel</Link>
+      </div>
+      <ul className="equip-promo__photos" aria-hidden="true">
+        {PROMO.map((device) => <li key={device.id}><Image src={device.photo} alt="" width={240} height={180} sizes="86px" /></li>)}
+      </ul>
+    </section>
     <ResourceLibrary />
   </div>;
 }

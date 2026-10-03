@@ -4,7 +4,7 @@ import logo from "@/public/images/cyberpingo-transparent.png";
 
 const groups = [
   { title: "Plateforme", links: [{ href: "/parcours", label: "Tous les parcours" }, { href: "/fonctionnalites", label: "Fonctionnalités" }, { href: "/progression", label: "Ma progression" }, { href: "/communaute", label: "Communauté" }] },
-  { title: "Ressources", links: [{ href: "/ressources", label: "Guides & articles" }, { href: "/faq", label: "Questions fréquentes" }, { href: "/contact", label: "Contact & assistance" }] },
+  { title: "Ressources", links: [{ href: "/ressources", label: "Guides & articles" }, { href: "/materiel", label: "Le matériel en photos" }, { href: "/faq", label: "Questions fréquentes" }, { href: "/contact", label: "Contact & assistance" }] },
   { title: "CyberPingo", links: [{ href: "/a-propos", label: "Notre mission" }, { href: "/confidentialite", label: "Confidentialité" }, { href: "/conditions", label: "Conditions d’utilisation" }, { href: "/register", label: "Créer un compte" }] },
 ];
 

@@ -164,7 +164,7 @@ test("every lab file the database points to is generated, and every generated Fo
   const { sql } = helpers(db);
   const urls = (await sql("select a.url from public.lab_assets a join public.labs l on l.id = a.lab_id where l.course_id = $1", [course("c1")])).map((row) => row.url);
   assert.ok(urls.length >= 20);
-  const files = fs.readdirSync(path.join(root, "public", "labs")).filter((name) => name.startsWith("fond-"));
+  const files = fs.readdirSync(path.join(root, "public", "labs")).filter((name) => name.startsWith("fond-") && !name.endsWith(".pdf"));
   for (const url of urls) assert.ok(files.includes(path.basename(url)), `${url} est généré dans public/labs`);
   for (const file of files) assert.ok(urls.includes(`/labs/${file}`), `${file} est déclaré par un laboratoire`);
 });

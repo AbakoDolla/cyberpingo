@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import LabArt from "@/components/art/LabArt";
 import AppShell, { loginHref } from "@/components/layout/AppShell";
 import LabAssets from "@/components/challenges/LabAssets";
+import LabEquipment from "@/components/equipment/LabEquipment";
 import LabReportForm from "@/components/challenges/LabReportForm";
 import LabTasks from "@/components/challenges/LabTasks";
 import LabTerminal from "@/components/challenges/LabTerminal";
@@ -106,6 +107,7 @@ function ChallengeDetailView() {
             <section className="lab-layout">
               <div className="lab-layout__main">
                 {lab.briefing && <section className="lab-panel lab-briefing"><h2>Mise en situation</h2><p>{lab.briefing}</p></section>}
+                <LabEquipment slug={lab.slug} />
                 <section className="lab-panel"><h2>Objectifs</h2><ul>{lab.objectives.map((objective) => <li key={objective}><IconCheck size={15} />{objective}</li>)}</ul></section>
                 {(lab.constraints.length > 0 || lab.tools.length > 0) && (
                   <section className="lab-panel lab-context" aria-label="Contraintes et outils">

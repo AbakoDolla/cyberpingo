@@ -12,6 +12,7 @@ import "./system.css";
 import "./admin.css";
 import "./art.css";
 import "./academy.css";
+import "./equipment.css";
 import Providers from "./providers";
 
 const spaceGrotesk = localFont({

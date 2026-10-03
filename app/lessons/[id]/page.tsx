@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import LessonBlockRenderer from "@/components/courses/LessonBlockRenderer";
+import EquipmentBox from "@/components/equipment/EquipmentBox";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -13,6 +14,7 @@ import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDuration } from "@/lib/format";
+import { equipmentBoxes, type EquipmentBoxData } from "@/lib/lesson-equipment";
 import { getLesson, getMyLessonProgress, saveLessonProgress, startLesson } from "@/services/lessons.service";
 import type { LessonCompletion, LessonStart } from "@/types/api";
 
@@ -48,6 +50,7 @@ function LessonView() {
 
   const lesson = data?.lesson ?? null;
   const sequence = useMemo(() => lesson ? sequenceAround(lesson.sequence, lesson.id) : { index: -1, previous: null, next: null }, [lesson]);
+  const equipmentAfter = useMemo(() => lesson ? equipmentBoxes(lesson.id, lesson.blocks) : new Map<number, EquipmentBoxData[]>(), [lesson]);
   const completed = Boolean(completion) || startInfo?.status === "completed" || data?.progress?.status === "completed";
   const preview = Boolean(startInfo?.preview || lesson?.course.status === "draft");
   const startMs = startInfo?.started_at ? new Date(startInfo.started_at).getTime() : startedAtMs;
@@ -167,7 +170,7 @@ function LessonView() {
                 </nav>
               </aside>
               <article ref={articleRef} className="lesson-content">
-                {lesson.blocks.length ? lesson.blocks.map((block, index) => <LessonBlockRenderer key={`${lesson.id}-${index}`} block={block} />) : <div className="study-empty"><p>Cette leçon ne contient pas encore de bloc de contenu.</p></div>}
+                {lesson.blocks.length ? lesson.blocks.map((block, index) => <Fragment key={`${lesson.id}-${index}`}><LessonBlockRenderer block={block} />{equipmentAfter.get(index)?.map((box) => <EquipmentBox key={box.title} title={box.title} devices={box.devices} />)}</Fragment>) : <div className="study-empty"><p>Cette leçon ne contient pas encore de bloc de contenu.</p></div>}
               </article>
             </div>
 

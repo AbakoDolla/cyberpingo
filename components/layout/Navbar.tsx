@@ -13,6 +13,7 @@ const links = [
   { href: "/parcours", label: "Cours" },
   { href: "/fonctionnalites", label: "Fonctionnalités" },
   { href: "/ressources", label: "Ressources" },
+  { href: "/materiel", label: "Matériel" },
   { href: "/a-propos", label: "À propos" },
 ];
 

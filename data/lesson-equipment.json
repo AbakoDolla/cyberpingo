@@ -1,0 +1,384 @@
+{
+  "lessons": {
+    "b2aa5220-1c43-9e81-21f3-4449980d7fc2": {
+      "title": "LAN, WAN, topologies et équipements",
+      "placements": [
+        {
+          "after": "ATELIER D’AWA (LAN)",
+          "title": "L’atelier d’Awa, en vrai",
+          "devices": [
+            "poste-fixe",
+            "imprimante-bureau",
+            "switch"
+          ]
+        },
+        {
+          "after": "Quatre équipements reviennent partout.",
+          "title": "Routeur, point d’accès, pare-feu et box",
+          "devices": [
+            "routeur",
+            "point-acces-wifi",
+            "pare-feu",
+            "box-internet"
+          ]
+        }
+      ]
+    },
+    "9853f10a-9941-0b53-c76a-a1ac142e2bbb": {
+      "title": "Le modèle OSI en pratique",
+      "placements": [
+        {
+          "after": "7 Application service visible",
+          "title": "La couche 1 en vrai : du cuivre ou de la lumière",
+          "devices": [
+            "cable-ethernet",
+            "fibre-optique"
+          ]
+        },
+        {
+          "after": "OSI TCP/IP Exemple d’équipement",
+          "title": "Un équipement pour chaque couche",
+          "devices": [
+            "pare-feu",
+            "routeur",
+            "switch",
+            "point-acces-wifi"
+          ]
+        }
+      ]
+    },
+    "006876f8-c1b0-2aa5-1ec0-ac998c960288": {
+      "title": "Ethernet, adresses MAC et table de commutation",
+      "placements": [
+        {
+          "after": "Un commutateur apprend en observant",
+          "title": "Un commutateur et une imprimante réseau",
+          "devices": [
+            "switch",
+            "imprimante-bureau"
+          ]
+        }
+      ]
+    },
+    "c33a4522-d29b-18d7-589c-7438abec177e": {
+      "title": "VLAN, ports access et trunk 802.1Q",
+      "placements": [
+        {
+          "after": "Un VLAN est un domaine de diffusion logique.",
+          "title": "Un seul commutateur, plusieurs réseaux logiques",
+          "devices": [
+            "switch",
+            "poste-fixe"
+          ]
+        }
+      ]
+    },
+    "b1e6d953-5cb5-88df-23f4-d2c0735be76e": {
+      "title": "Routage inter-VLAN : un routeur pour plusieurs réseaux",
+      "placements": [
+        {
+          "after": "Un VLAN sépare les diffusions, pas les besoins métier.",
+          "title": "Le routeur et le commutateur reliés par un trunk",
+          "devices": [
+            "routeur",
+            "switch"
+          ]
+        }
+      ]
+    },
+    "ab51c641-1833-1001-a951-d183830838ea": {
+      "title": "Comment un routeur décide : table de routage et routes statiques",
+      "placements": [
+        {
+          "after": "Une entrée de table de routage associe",
+          "title": "Un routeur, vu de face",
+          "devices": [
+            "routeur"
+          ]
+        }
+      ]
+    },
+    "43daea90-f63b-c9c3-4a92-89f5526c1f42": {
+      "title": "NAT et PAT : partager une adresse publique",
+      "placements": [
+        {
+          "after": "NAT (Network Address Translation) modifie",
+          "title": "Le routeur ou la box qui traduit les adresses",
+          "devices": [
+            "routeur",
+            "box-internet"
+          ]
+        }
+      ]
+    },
+    "3b3977f9-35da-5c11-82f2-26f6084881d1": {
+      "title": "Segmentation, DMZ et pare-feu : cloisonner pour limiter les dégâts",
+      "placements": [
+        {
+          "after": "Segmenter, c’est séparer le réseau en zones",
+          "title": "Un pare-feu entre les zones",
+          "devices": [
+            "pare-feu",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "cc077a0c-1cda-e187-2be3-338cf896f030": {
+      "title": "Wi-Fi et équipements : sécuriser l’accès et l’administration",
+      "placements": [
+        {
+          "after": "La sécurité Wi-Fi commence par le bon mode.",
+          "title": "Du point d’accès d’entreprise à la box domestique",
+          "devices": [
+            "point-acces-wifi",
+            "box-internet"
+          ]
+        },
+        {
+          "after": "Démonstration guidée : le Wi-Fi n’est pas le seul sujet.",
+          "title": "Les équipements à durcir",
+          "devices": [
+            "switch",
+            "routeur"
+          ]
+        }
+      ]
+    },
+    "4eb83d11-868f-a912-fefc-3907afd3aa66": {
+      "title": "Documenter un réseau : schéma, plan d’adressage et compte rendu",
+      "placements": [
+        {
+          "after": "Le schéma physique montre qui est branché où",
+          "title": "Ce que le schéma physique doit montrer",
+          "devices": [
+            "baie",
+            "panneau-brassage",
+            "switch",
+            "point-acces-wifi"
+          ]
+        }
+      ]
+    },
+    "4a008f9c-3624-a469-6392-224e0f72514f": {
+      "title": "Packet Tracer : de la théorie à la pratique",
+      "placements": [
+        {
+          "after": "Cisco Packet Tracer est un simulateur gratuit",
+          "title": "Le vrai matériel que le simulateur reproduit",
+          "devices": [
+            "routeur",
+            "switch",
+            "poste-fixe"
+          ]
+        }
+      ]
+    },
+    "cf8db6dd-d520-a71e-d1d9-6947a51ea2d4": {
+      "title": "TCP/IP et encapsulation : le voyage d’un paquet",
+      "placements": [
+        {
+          "after": "Lien 1 Lien 2 Lien 3",
+          "title": "Un poste, des routeurs et un serveur",
+          "devices": [
+            "poste-fixe",
+            "routeur",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "11c2eb2f-c1ad-430d-bab7-7140b77e2fe3": {
+      "title": "Lire les sorties d’un équipement : interfaces, VLAN et routes",
+      "placements": [
+        {
+          "after": "Sur Cisco IOS, le mode utilisateur",
+          "title": "Les équipements dont on lit les sorties",
+          "devices": [
+            "switch",
+            "routeur"
+          ]
+        }
+      ]
+    },
+    "f224ac19-650c-93e5-75f9-1276cc02ae0a": {
+      "title": "Qu’est-ce que la cybersécurité ?",
+      "placements": [
+        {
+          "after": "La cybersécurité n’est pas seulement une affaire d’experts.",
+          "title": "Tes appareils sont déjà des cibles",
+          "devices": [
+            "smartphone",
+            "portable"
+          ]
+        }
+      ]
+    },
+    "adc9689b-9ce8-4e74-a389-2165989d6350": {
+      "title": "L’ingénierie sociale : comment on manipule les gens",
+      "placements": [
+        {
+          "after": "La reconnaissance prépare l’attaque.",
+          "title": "Une clé USB abandonnée, un téléphone qui sonne",
+          "devices": [
+            "cle-usb",
+            "smartphone"
+          ]
+        }
+      ]
+    },
+    "998aebd3-c337-e876-7d2c-f5c15fd999c7": {
+      "title": "Arnaques par SMS, appels et paiements mobiles",
+      "placements": [
+        {
+          "after": "Le téléphone concentre beaucoup de choses",
+          "title": "Le téléphone, cible préférée des escrocs",
+          "devices": [
+            "smartphone"
+          ]
+        }
+      ]
+    },
+    "ed5343e4-8bcd-4ee8-5372-299bd9b2798c": {
+      "title": "Gestionnaires de mots de passe, double authentification et clés d’accès",
+      "placements": [
+        {
+          "after": "Les clés de sécurité et les clés d’accès",
+          "title": "Une clé de sécurité matérielle et un téléphone",
+          "devices": [
+            "cle-securite",
+            "smartphone"
+          ]
+        }
+      ]
+    },
+    "8c59c582-1eb6-2ff0-0ab4-51844ad05b8d": {
+      "title": "Mises à jour, antivirus et surface d’attaque",
+      "placements": [
+        {
+          "after": "Élément à suivre Exemple",
+          "title": "Des appareils qui reçoivent aussi des mises à jour",
+          "devices": [
+            "box-internet",
+            "routeur",
+            "imprimante-bureau",
+            "smartphone"
+          ]
+        }
+      ]
+    },
+    "6691e9b7-e6bc-c9d8-72bc-46077a073445": {
+      "title": "Chiffrer ses appareils et se protéger sur le Wi-Fi",
+      "placements": [
+        {
+          "after": "Le chiffrement complet du disque protège",
+          "title": "Les appareils qui voyagent avec toi",
+          "devices": [
+            "portable",
+            "smartphone",
+            "tablette"
+          ]
+        },
+        {
+          "after": "Le Wi-Fi domestique mérite aussi de l’attention.",
+          "title": "La box de la maison",
+          "devices": [
+            "box-internet"
+          ]
+        }
+      ]
+    },
+    "c3c8ea55-49de-9d15-7ce3-cf2ca90b370b": {
+      "title": "Sauvegardes : la règle 3-2-1 et le test de restauration",
+      "placements": [
+        {
+          "after": "La règle 3-2-1 est un bon repère",
+          "title": "Des supports pour la règle 3-2-1",
+          "devices": [
+            "disque-externe",
+            "nas",
+            "cle-usb"
+          ]
+        }
+      ]
+    },
+    "96b02bb7-463c-85b4-fcb9-14feebc83d24": {
+      "title": "Évaluer un risque : actifs, menaces, vulnérabilités",
+      "placements": [
+        {
+          "after": "Un actif est ce que tu veux protéger",
+          "title": "Des actifs que l’on peut toucher",
+          "devices": [
+            "poste-fixe",
+            "serveur",
+            "smartphone"
+          ]
+        }
+      ]
+    },
+    "1cfe5e31-d5de-9945-c10a-1239974a969c": {
+      "title": "Les principes de la sécurité : confidentialité, intégrité, disponibilité, moindre privilège",
+      "placements": [
+        {
+          "after": "La défense en profondeur empile des couches",
+          "title": "Des couches de défense, de la porte au poste",
+          "devices": [
+            "lecteur-badge",
+            "camera-ip",
+            "pare-feu",
+            "poste-fixe"
+          ]
+        }
+      ]
+    },
+    "e17f9e23-37d2-6396-44ae-ec0f2a436175": {
+      "title": "Protéger ses comptes avec un gestionnaire et la MFA",
+      "placements": [
+        {
+          "after": "La double authentification ajoute une seconde preuve.",
+          "title": "La clé de sécurité matérielle",
+          "devices": [
+            "cle-securite"
+          ]
+        }
+      ]
+    },
+    "57de4155-e6dc-5e3b-be8f-aafc5bf84d14": {
+      "title": "Reconstituer la chronologie d’un incident",
+      "placements": [
+        {
+          "after": "Une attaque réelle ne laisse pas toutes ses traces au même endroit.",
+          "title": "Là où chaque trace se cache",
+          "devices": [
+            "serveur",
+            "pare-feu"
+          ]
+        }
+      ]
+    },
+    "82d908d7-039d-ba6a-9023-f566d39a819f": {
+      "title": "Les journaux d’un serveur Linux",
+      "placements": [
+        {
+          "after": "Un serveur Linux raconte tout ce qui lui arrive",
+          "title": "Un serveur, vu de face",
+          "devices": [
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "16e2b52c-750a-fd98-e22e-bb1228adecff": {
+      "title": "Auditer droits, comptes et tâches planifiées",
+      "placements": [
+        {
+          "after": "Un système Linux est surtout une affaire de droits.",
+          "title": "Le serveur que l’on audite",
+          "devices": [
+            "serveur"
+          ]
+        }
+      ]
+    }
+  }
+}

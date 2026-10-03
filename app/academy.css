@@ -49,6 +49,19 @@
 .lab-downloads__icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(0, 213, 255, 0.12); color: var(--cp-cyan); flex: 0 0 auto; }
 .lab-downloads__text { display: grid; gap: 2px; min-width: 0; }
 .lab-downloads__text small { color: var(--cp-subtle); font-size: 12.5px; line-height: 1.4; }
+.lab-downloads__type {
+  margin-left: auto;
+  padding: 4px 9px;
+  flex: 0 0 auto;
+  color: #bfeaff;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(0, 213, 255, 0.3);
+  border-radius: 999px;
+}
+.lab-downloads__type--pdf { color: #fff; border-color: transparent; background: linear-gradient(135deg, #00a8ff, #8b5cf6); }
 
 /* ---------- Capture and log viewers ---------- */
 .lab-assets .lab-viewer { border: 1px solid var(--cp-line); border-radius: 16px; background: #030c1b; overflow: hidden; }
