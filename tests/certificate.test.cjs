@@ -122,6 +122,8 @@ test("the Function renders through render.ts and stores the PDF under a versione
   assert.match(source, /const DESIGN_SUFFIX = "\.v2\.pdf"/);
   assert.match(source, /endsWith\(DESIGN_SUFFIX\)/, "a certificate stored with the first design is rendered again");
   assert.match(source, /\.remove\(\[certificate\.pdf_path\]\)/, "and the first file is removed");
+  assert.match(source, /catch \(failure\)[\s\S]{0,200}stored\(certificate\.pdf_path\)[\s\S]{0,200}return \{ pdf_path: certificate\.pdf_path \}/, "if the new rendering fails, the learner keeps the PDF they already had");
+  assert.match(source, /throw failure/, "and a certificate with no PDF at all still reports the error");
   assert.ok(!/from "npm:pdf-lib/.test(source), "the drawing code lives in render.ts only");
 
   const migration = fs.readFileSync(path.join(root, "supabase", "migrations", "20260928190200_gamification.sql"), "utf8");
@@ -138,4 +140,24 @@ test("render.ts has no file or network access: everything it draws comes from br
   assert.ok(!/Deno\.(readFile|readTextFile|open)|fetch\(|readFileSync/.test(source));
   assert.match(source, /from "\.\/brand\.ts"/);
   assert.match(source, /getCharacterSet/, "characters the font cannot draw are dropped");
+});
+
+test("the client asks the Function again for a certificate whose PDF is not the current design, and keeps the old one if that fails", () => {
+  const { CERTIFICATE_DESIGN_SUFFIX, isCurrentCertificatePdf } = load("lib/certificate-pdf");
+  const userId = "0b5d2c1e-8a4f-4c3b-9e2d-1a2b3c4d5e6f";
+  assert.equal(CERTIFICATE_DESIGN_SUFFIX, ".v2.pdf");
+  assert.equal(isCurrentCertificatePdf(`${userId}/CP-2026-000142.v2.pdf`), true);
+  assert.equal(isCurrentCertificatePdf(`${userId}/CP-2026-000142.pdf`), false, "the first design is asked again");
+  assert.equal(isCurrentCertificatePdf(null), false, "no PDF yet");
+  assert.equal(isCurrentCertificatePdf(undefined), false);
+  assert.equal(isCurrentCertificatePdf(""), false);
+
+  // The suffix of the client and the one of the Function are the same constant written twice: they must not drift apart.
+  const fn = fs.readFileSync(path.join(FUNCTION_DIR, "index.ts"), "utf8");
+  assert.equal(fn.match(/const DESIGN_SUFFIX = "([^"]+)"/)?.[1], CERTIFICATE_DESIGN_SUFFIX);
+
+  const service = fs.readFileSync(path.join(root, "services", "gamification.service.ts"), "utf8");
+  assert.match(service, /if \(!path \|\| !isCurrentCertificatePdf\(path\)\)/, "the Function is asked unless the PDF is already the current one");
+  assert.match(service, /path = data\?\.pdf_path \?\? path;/, "an older PDF is kept when the new one cannot be made");
+  assert.match(service, /if \(!path\) throw toAppError/, "and a certificate with no PDF at all still reports the error");
 });

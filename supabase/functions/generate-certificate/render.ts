@@ -162,8 +162,8 @@ function spacedWidth(font: PDFFont, text: string, size: number, spacing: number)
   return font.widthOfTextAtSize(text, size) + spacing * Math.max(0, Array.from(text).length - 1);
 }
 
-// Letter-spaced capitals, for the small labels. The text stays one string (PDF character spacing), so that copying it or
-// reading it aloud gives "CERTIFICAT DE RÉUSSITE" and not one letter at a time. `anchor` is the left edge, or the centre.
+// Letter-spaced capitals, for the small labels. The label is one text run with PDF character spacing, not one drawing operation
+// per letter: the file stays small and the text keeps its reading order. `anchor` is the left edge, or the centre.
 function spaced(page: PDFPage, text: string, options: { anchor: number; y: number; size: number; font: PDFFont; color: Color; spacing: number; center?: boolean }) {
   const x = options.center ? options.anchor - spacedWidth(options.font, text, options.size, options.spacing) / 2 : options.anchor;
   const fontKey = page.node.newFontDictionary(options.font.name, options.font.ref);
