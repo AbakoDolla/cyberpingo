@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 450" role="img" aria-labelledby="t d" font-family="Inter, Arial, sans-serif">
+  <title id="t">Topologie du TP 2 : VLAN et routage inter-VLAN chez Kora</title>
+  <desc id="d">Un routeur R1 est relié par un seul lien trunk à un commutateur SW1. Trois PC sont placés dans trois VLAN différents.</desc>
+  <rect width="760" height="450" rx="16" fill="#0b1020"/>
+  <path d="M380 79 V112 H380 V145" fill="none" stroke="#334155" stroke-width="2"/><text x="380" y="107" text-anchor="middle" fill="#00d9ff" font-size="11" font-family="'JetBrains Mono', Consolas, monospace">trunk Gi0/0 - Gi0/1</text>
+  <path d="M380 195 V233.5 H130 V272" fill="none" stroke="#334155" stroke-width="2"/>
+  <path d="M380 195 V233.5 H380 V272" fill="none" stroke="#334155" stroke-width="2"/>
+  <path d="M380 195 V233.5 H630 V272" fill="none" stroke="#334155" stroke-width="2"/>
+  <g>
+    <rect x="270" y="21" width="220" height="58" rx="10" fill="#0f1a33" stroke="#00d9ff" stroke-width="2"/>
+    <text x="380" y="47" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="700">R1</text>
+    <text x="380" y="65" text-anchor="middle" fill="#94a3b8" font-size="11">routeur sur un bras</text>
+  </g>
+  <g>
+    <rect x="280" y="145" width="200" height="50" rx="10" fill="#0f1a33" stroke="#2563eb" stroke-width="2"/>
+    <text x="380" y="167" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="700">SW1</text>
+    <text x="380" y="185" text-anchor="middle" fill="#94a3b8" font-size="11">commutateur 2960</text>
+  </g>
+  <g>
+    <rect x="35" y="272" width="190" height="56" rx="10" fill="#0f1a33" stroke="#22c55e" stroke-width="2"/>
+    <text x="130" y="297" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="700">PC-Direction</text>
+    <text x="130" y="315" text-anchor="middle" fill="#94a3b8" font-size="11">VLAN 10 · 10.40.10.0/24</text>
+  </g>
+  <g>
+    <rect x="285" y="272" width="190" height="56" rx="10" fill="#0f1a33" stroke="#7c3aed" stroke-width="2"/>
+    <text x="380" y="297" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="700">PC-Compta</text>
+    <text x="380" y="315" text-anchor="middle" fill="#94a3b8" font-size="11">VLAN 20 · 10.40.20.0/24</text>
+  </g>
+  <g>
+    <rect x="535" y="272" width="190" height="56" rx="10" fill="#0f1a33" stroke="#f59e0b" stroke-width="2"/>
+    <text x="630" y="297" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="700">Borne-Invités</text>
+    <text x="630" y="315" text-anchor="middle" fill="#94a3b8" font-size="11">VLAN 30 · 10.40.30.0/24</text>
+  </g>
+  <text x="380" y="418" text-anchor="middle" fill="#94a3b8" font-size="12">Gestion : VLAN 99 · 10.40.99.0/24 · VLAN natif du trunk</text>
+  <text x="380" y="436" text-anchor="middle" fill="#94a3b8" font-size="12">Chaque VLAN a sa passerelle sur le routeur : la première adresse utilisable.</text>
+</svg>

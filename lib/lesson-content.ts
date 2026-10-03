@@ -42,3 +42,27 @@ const VIDEO_PENDING = /^Vidéo à venir\s*:\s*(.+)$/u;
 export function pendingVideoTitle(content: string): string | null {
   return VIDEO_PENDING.exec(content.trim())?.[1]?.trim() || null;
 }
+
+export type CalloutKind = "objectives" | "prerequisites" | "scenario" | "mistakes" | "safety" | "practice" | "takeaway" | "note";
+
+const CALLOUT_KINDS: ReadonlyArray<{ pattern: RegExp; kind: CalloutKind; label: string }> = [
+  { pattern: /^Objectifs?\s*:\s*/u, kind: "objectives", label: "Objectifs d’apprentissage" },
+  { pattern: /^Prérequis\s*:\s*/u, kind: "prerequisites", label: "Prérequis" },
+  { pattern: /^Mise en situation\s*:\s*/u, kind: "scenario", label: "Mise en situation" },
+  { pattern: /^Erreurs fréquentes\s*:\s*/u, kind: "mistakes", label: "Erreurs fréquentes" },
+  { pattern: /^Sécurité\s*:\s*/u, kind: "safety", label: "Sécurité et limites" },
+  { pattern: /^Pour pratiquer\s*:\s*/u, kind: "practice", label: "Pour pratiquer" },
+  { pattern: /^À retenir\s*:\s*/u, kind: "takeaway", label: "À retenir" },
+];
+
+/** A callout that starts with a known label ("Objectifs :", "Erreurs fréquentes :"...) is shown with that label and its own tone. */
+export function parseCallout(content: string): { kind: CalloutKind; label: string; body: string } {
+  const trimmed = content.trim();
+  for (const { pattern, kind, label } of CALLOUT_KINDS) {
+    const match = pattern.exec(trimmed);
+    if (!match) continue;
+    const body = trimmed.slice(match[0].length).trim();
+    return { kind, label, body: body ? body.charAt(0).toUpperCase() + body.slice(1) : trimmed };
+  }
+  return { kind: "note", label: "À retenir", body: trimmed };
+}

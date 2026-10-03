@@ -1,0 +1,114 @@
+// The publication checklist applied to everything the seeds publish (scripts/content-quality.cjs).
+// A course listed in ENFORCED_COURSES must have no issue at all. For the others, the lessons that still fall
+// short are listed by title in KNOWN_DEBT: the list can only shrink, so the debt never grows unnoticed and
+// the day a lesson is brought up to standard, this test asks for it to leave the list.
+const { test, before, after } = require("node:test");
+const assert = require("node:assert/strict");
+const { load } = require("../scripts/ts-loader.cjs");
+const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
+const { contentId } = require("../scripts/generate-content-seed.cjs");
+const { lessonIssues, labIssues, moduleIssues, allowedReferenceUrls, ENFORCED_COURSES } = require("../scripts/content-quality.cjs");
+const { readLessons } = require("../scripts/content-snapshot.cjs");
+
+// Lessons published before the quality gate existed, per course. Remove a title as soon as its lesson passes.
+const KNOWN_DEBT = {
+  fondamentaux: ["Qu'est-ce que la cybersécurité ?", "Les types de menaces informatiques", "Les acteurs de la cybersécurité"],
+  linux: ["Naviguer dans le système de fichiers Linux", "Permissions et gestion des utilisateurs", "Les journaux d’un serveur Linux", "Auditer droits, comptes et tâches planifiées"],
+  "securite-web": ["HTTPS : ce que le cadenas protège vraiment", "Protéger ses comptes avec un gestionnaire et la MFA", "Déjouer un message de phishing"],
+  "pentest-intro": ["Autorisation et périmètre d’un audit", "Une méthode de test responsable", "Rédiger une recommandation utile"],
+  "analyse-logs": [
+    "Lire un événement dans un journal", "Relier les événements sans conclure trop vite", "Qualifier une alerte et documenter la suite",
+    "Reconnaître une attaque SSH par force brute", "Lire les journaux d’un serveur web", "Reconstituer la chronologie d’un incident",
+  ],
+};
+
+let db;
+before(async () => { db = await createSupabaseDatabase({ seed: true }); });
+after(async () => { await db?.close(); });
+const rows = async (text, params = []) => (await db.query(text, params)).rows;
+
+/** Keys of the lessons written with the full template: the programme parts, new lessons and upgrades alike. */
+function templateLessonIds() {
+  const ids = new Set();
+  for (const part of ["a", "b", "c", "d"]) {
+    const { modules } = load(`supabase/seed/content/reseaux-programme-${part}`);
+    for (const part of modules) for (const lesson of part.lessons) if (!lesson.existing) ids.add(contentId("lesson", lesson.key));
+  }
+  return ids;
+}
+
+test("the lessons of a finished course meet the whole checklist, and the debt of the others only shrinks", async () => {
+  const { REFERENCES } = load("supabase/seed/content/path-kit");
+  const allowedUrls = allowedReferenceUrls(REFERENCES);
+  const template = templateLessonIds();
+  const lessons = await readLessons(db);
+  const failing = new Map();
+  const status = new Map();
+  for (const lesson of lessons) {
+    const level = template.has(lesson.id) ? "template" : "base";
+    // An upgraded starter lesson may keep its original quiz, which predates the checklist.
+    const quizInherited = level === "template" && lesson.id === contentId("lesson", "l1");
+    const issues = lessonIssues({ key: lesson.title, title: lesson.title, blocks: lesson.blocks, quiz: lesson.quiz }, { level, allowedUrls, quizInherited });
+    const tally = status.get(lesson.course) ?? { total: 0, conforming: 0 };
+    tally.total += 1;
+    if (!issues.length) tally.conforming += 1;
+    status.set(lesson.course, tally);
+    if (issues.length) failing.set(lesson.course, [...(failing.get(lesson.course) ?? []), { title: lesson.title, issues }]);
+  }
+  for (const [course, tally] of status) console.log(`  qualité ${course} : ${tally.conforming}/${tally.total} leçons conformes`);
+
+  for (const course of ENFORCED_COURSES) {
+    const list = failing.get(course) ?? [];
+    assert.deepEqual(list, [], `Le cours ${course} doit être sans écart :\n${list.map((entry) => `- ${entry.title}\n    ${entry.issues.join("\n    ")}`).join("\n")}`);
+  }
+  for (const [course, debt] of Object.entries(KNOWN_DEBT)) {
+    const actual = (failing.get(course) ?? []).map((entry) => entry.title).sort();
+    assert.deepEqual(actual, [...debt].sort(), `La dette de qualité de ${course} a changé : ${course === "" ? "" : "mets KNOWN_DEBT à jour"}.`);
+  }
+  const unknown = [...failing.keys()].filter((course) => !ENFORCED_COURSES.includes(course) && !(course in KNOWN_DEBT));
+  assert.deepEqual(unknown, [], "un cours avec des écarts doit figurer dans KNOWN_DEBT");
+});
+
+test("the labs with checked tasks meet the checklist: briefing, constraints, hints, corrections and files", async () => {
+  const labs = await rows(`select l.id, l.slug, l.title, l.description, l.briefing, l.constraints, l.objectives, l.hints, l.tools, l.format,
+      l.requires_computer, l.is_assessment, l.estimated_minutes, c.slug as course
+    from public.labs l left join public.courses c on c.id = l.course_id
+    where exists (select 1 from public.lab_tasks t where t.lab_id = l.id) order by l.position`);
+  assert.ok(labs.length >= 13, "the checked labs of the academy");
+  const report = [];
+  for (const lab of labs) {
+    const tasks = await rows(`select t.prompt, t.hint, t.answer_format, k.accepted, k.explanation
+      from public.lab_tasks t join private.lab_task_keys k on k.task_id = t.id where t.lab_id = $1 order by t.position`, [lab.id]);
+    const assets = await rows("select kind from public.lab_assets where lab_id = $1", [lab.id]);
+    const issues = labIssues({
+      slug: lab.slug, title: lab.title, description: lab.description, briefing: lab.briefing, constraints: lab.constraints, objectives: lab.objectives,
+      hints: lab.hints, tools: lab.tools, format: lab.format, requiresComputer: lab.requires_computer, isAssessment: lab.is_assessment, minutes: lab.estimated_minutes,
+      tasks: tasks.map((task) => ({ prompt: task.prompt, hint: task.hint, answerFormat: task.answer_format, accepted: task.accepted, explanation: task.explanation })),
+      assets: assets.map((asset) => ({ kind: asset.kind })),
+    });
+    if (issues.length) report.push(`${lab.slug}\n    ${issues.join("\n    ")}`);
+  }
+  assert.deepEqual(report, [], report.join("\n"));
+});
+
+test("every module of a finished course states its success criteria, and no module is empty", async () => {
+  for (const course of ENFORCED_COURSES) {
+    const modules = await rows(`select m.title, m.description, m.position, (select count(*)::int from public.lessons l where l.module_id = m.id) as lessons
+      from public.course_modules m join public.courses c on c.id = m.course_id where c.slug = $1 order by m.position`, [course]);
+    assert.ok(modules.length >= 9, `${course} : un parcours complet compte au moins neuf modules`);
+    assert.deepEqual(modules.map((module) => module.position), modules.map((_, index) => index + 1), `${course} : les modules se suivent sans trou`);
+    const report = modules.flatMap((module) => moduleIssues({ title: module.title, description: module.description, lessons: Array(module.lessons).fill(0) }));
+    assert.deepEqual(report, [], report.join("\n"));
+  }
+});
+
+test("every skill of a finished course links a lesson, its quiz, a practice lab and a practical assessment", async () => {
+  const skills = await rows(`select s.slug, d.slug as domain,
+      (select count(*)::int from public.skill_links k where k.skill_id = s.id and k.kind = 'lesson' and k.lesson_id is not null) as lessons,
+      (select count(*)::int from public.skill_links k where k.skill_id = s.id and k.kind = 'quiz' and k.quiz_id is not null) as quizzes,
+      (select count(*)::int from public.skill_links k where k.skill_id = s.id and k.kind = 'practice' and k.lab_id is not null) as practice,
+      (select count(*)::int from public.skill_links k join public.labs l on l.id = k.lab_id where k.skill_id = s.id and k.kind = 'validation' and l.is_assessment) as validation
+    from public.skills s join public.domains d on d.id = s.domain_id order by s.position`);
+  assert.ok(skills.length >= 21);
+  for (const skill of skills) assert.deepEqual([skill.lessons, skill.quizzes, skill.practice, skill.validation], [1, 1, 1, 1], `${skill.slug} : une compétence se prouve par la leçon, le quiz, la pratique et l’évaluation`);
+});

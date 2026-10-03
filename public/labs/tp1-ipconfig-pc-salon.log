@@ -1,0 +1,29 @@
+C:\> ipconfig /all
+
+Configuration IP de Windows
+
+   Nom de l’hôte . . . . . . . . . . . . : PC-SALON
+   Suffixe DNS principal  . . . . . . . . :
+   Type de nœud. . . . . . . . . . . . . .: Hybride
+   Routage IP activé . . . . . . . . . . : Non
+   Proxy WINS activé . . . . . . . . . . : Non
+
+Carte Ethernet Ethernet :
+
+   Suffixe DNS propre à la connexion. . . : maison.example
+   Description. . . . . . . . . . . . . . : Carte réseau Gigabit
+   Adresse physique . . . . . . . . . . . : 00-1A-4B-5C-6D-7E
+   DHCP activé. . . . . . . . . . . . . . : Oui
+   Configuration automatique activée. . . : Oui
+   Adresse IPv6. . . . . . . . . . . . . .: 2001:db8:5a00:1:21a:4bff:fe5c:6d7e(préféré)
+   Adresse IPv6 temporaire . . . . . . . .: 2001:db8:5a00:1:7d3e:91c2:48aa:b5f(préféré)
+   Adresse IPv6 de liaison locale. . . . .: fe80::21a:4bff:fe5c:6d7e%12(préféré)
+   Adresse IPv4. . . . . . . . . . . . . .: 192.168.50.100(préféré)
+   Masque de sous-réseau. . . . . . . . . : 255.255.255.0
+   Bail obtenu. . . . . . . . . . . . . . : samedi 14 mars 2026 09:12:03
+   Bail expirant. . . . . . . . . . . . . : dimanche 15 mars 2026 09:12:03
+   Passerelle par défaut. . . . . . . . . : fe80::1%12
+                                            192.168.50.1
+   Serveur DHCP . . . . . . . . . . . . . : 192.168.50.1
+   Serveurs DNS. . .  . . . . . . . . . . : 192.168.50.1
+   NetBIOS sur Tcpip. . . . . . . . . . . : Activé
