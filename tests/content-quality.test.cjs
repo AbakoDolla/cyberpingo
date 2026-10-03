@@ -7,12 +7,11 @@ const assert = require("node:assert/strict");
 const { load } = require("../scripts/ts-loader.cjs");
 const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
 const { contentId } = require("../scripts/generate-content-seed.cjs");
-const { lessonIssues, labIssues, moduleIssues, allowedReferenceUrls, ENFORCED_COURSES } = require("../scripts/content-quality.cjs");
-const { readLessons } = require("../scripts/content-snapshot.cjs");
+const { lessonIssues, labIssues, moduleIssues, allowedReferenceUrls, ENFORCED_COURSES, PLAN } = require("../scripts/content-quality.cjs");
+const { readLessons, templateLessonIds } = require("../scripts/content-snapshot.cjs");
 
 // Lessons published before the quality gate existed, per course. Remove a title as soon as its lesson passes.
 const KNOWN_DEBT = {
-  fondamentaux: ["Qu'est-ce que la cybersécurité ?", "Les types de menaces informatiques", "Les acteurs de la cybersécurité"],
   linux: ["Naviguer dans le système de fichiers Linux", "Permissions et gestion des utilisateurs", "Les journaux d’un serveur Linux", "Auditer droits, comptes et tâches planifiées"],
   "securite-web": ["HTTPS : ce que le cadenas protège vraiment", "Protéger ses comptes avec un gestionnaire et la MFA", "Déjouer un message de phishing"],
   "pentest-intro": ["Autorisation et périmètre d’un audit", "Une méthode de test responsable", "Rédiger une recommandation utile"],
@@ -26,16 +25,6 @@ let db;
 before(async () => { db = await createSupabaseDatabase({ seed: true }); });
 after(async () => { await db?.close(); });
 const rows = async (text, params = []) => (await db.query(text, params)).rows;
-
-/** Keys of the lessons written with the full template: the programme parts, new lessons and upgrades alike. */
-function templateLessonIds() {
-  const ids = new Set();
-  for (const part of ["a", "b", "c", "d"]) {
-    const { modules } = load(`supabase/seed/content/reseaux-programme-${part}`);
-    for (const part of modules) for (const lesson of part.lessons) if (!lesson.existing) ids.add(contentId("lesson", lesson.key));
-  }
-  return ids;
-}
 
 test("the lessons of a finished course meet the whole checklist, and the debt of the others only shrinks", async () => {
   const { REFERENCES } = load("supabase/seed/content/path-kit");
@@ -95,7 +84,7 @@ test("every module of a finished course states its success criteria, and no modu
   for (const course of ENFORCED_COURSES) {
     const modules = await rows(`select m.title, m.description, m.position, (select count(*)::int from public.lessons l where l.module_id = m.id) as lessons
       from public.course_modules m join public.courses c on c.id = m.course_id where c.slug = $1 order by m.position`, [course]);
-    assert.ok(modules.length >= 9, `${course} : un parcours complet compte au moins neuf modules`);
+    assert.ok(modules.length >= PLAN[course].modules, `${course} : un parcours complet compte au moins ${PLAN[course].modules} modules`);
     assert.deepEqual(modules.map((module) => module.position), modules.map((_, index) => index + 1), `${course} : les modules se suivent sans trou`);
     const report = modules.flatMap((module) => moduleIssues({ title: module.title, description: module.description, lessons: Array(module.lessons).fill(0) }));
     assert.deepEqual(report, [], report.join("\n"));
@@ -109,6 +98,6 @@ test("every skill of a finished course links a lesson, its quiz, a practice lab 
       (select count(*)::int from public.skill_links k where k.skill_id = s.id and k.kind = 'practice' and k.lab_id is not null) as practice,
       (select count(*)::int from public.skill_links k join public.labs l on l.id = k.lab_id where k.skill_id = s.id and k.kind = 'validation' and l.is_assessment) as validation
     from public.skills s join public.domains d on d.id = s.domain_id order by s.position`);
-  assert.ok(skills.length >= 21);
+  assert.ok(skills.length >= 29);
   for (const skill of skills) assert.deepEqual([skill.lessons, skill.quizzes, skill.practice, skill.validation], [1, 1, 1, 1], `${skill.slug} : une compétence se prouve par la leçon, le quiz, la pratique et l’évaluation`);
 });

@@ -7,17 +7,7 @@ const { load } = require("./ts-loader.cjs");
 const { createSupabaseDatabase } = require("./pglite-supabase.cjs");
 const { contentId } = require("./generate-content-seed.cjs");
 const { lessonIssues, allowedReferenceUrls, ENFORCED_COURSES, PLAN } = require("./content-quality.cjs");
-const { readLessons, readCourseStats } = require("./content-snapshot.cjs");
-
-/** Lessons written with the full lesson template (the programme parts), found by their key. */
-function templateLessonIds() {
-  const ids = new Set();
-  for (const part of ["a", "b", "c", "d"]) {
-    const { modules } = load(`supabase/seed/content/reseaux-programme-${part}`);
-    for (const part of modules) for (const lesson of part.lessons) if (!lesson.existing) ids.add(contentId("lesson", lesson.key));
-  }
-  return ids;
-}
+const { readLessons, readCourseStats, templateLessonIds } = require("./content-snapshot.cjs");
 
 const pad = (value, width) => String(value).padEnd(width);
 const hours = (minutes) => `${(minutes / 60).toFixed(1)} h`;

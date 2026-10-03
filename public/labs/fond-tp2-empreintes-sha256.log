@@ -1,0 +1,13 @@
+Extrait de l’ancien outil interne
+algorithme | commentaire
+sha-256 sans sel | comparer chaque mot du dictionnaire au condensat exact
+
+identifiant | sha256
+mariam.sow | 9364cdb3cb69e3e04777c25a941b23e956f8df8d4499e1529dfa4c1846758ff5
+jm.tchoumi | 73192b5ec73e85051a547a29937a1111706cbcdae6f929c6537f187d40b0c614
+yao.kouassi | 0e769d470ea3885ecc52e0ee7718f0b525c1b3ef6bc88175b49eadcbb2bc6306
+aissatou.ndiaye | 4b6fb52598551ee044faa34aed787f64ea733a6e52a4b8cd43bae9f626c09020
+salle-03 | 4b6fb52598551ee044faa34aed787f64ea733a6e52a4b8cd43bae9f626c09020
+archives-bot | aeb6b403c674eed356dd01d2bc30f2377e1218284a80597f031ae0dc3ff45dc2
+dons-mobile | b91155da233a5bb753244cd88c70e54f5a33ee59bb5f2e4a274f41a1dee128f8
+pc-direction-local | 227439986d00f8b624ecf8cf71e9585f3acb2cb36f58d12a182f9648261973af

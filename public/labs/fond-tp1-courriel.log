@@ -1,0 +1,61 @@
+Return-Path: <rebond@paiement-horizon.test>
+Received: from inbox.soleil.example (inbox.soleil.example [192.168.77.18])
+  by mail.soleil.example with ESMTPS id CNS-20260303-1730
+  for <aissatou.ndiaye@soleil.example>; Tue, 03 Mar 2026 10:17:33 +0000
+Received: from mx-relai.example.net (mx-relai.example.net [203.0.113.58])
+  by inbox.soleil.example with ESMTPS id CNS-20260303-1729
+  for <aissatou.ndiaye@soleil.example>; Tue, 03 Mar 2026 10:17:29 +0000
+Received: from webmail.horizon-securite.test (unknown [198.51.100.77])
+  by mx-relai.example.net with ESMTP id MX-4421
+  for <aissatou.ndiaye@soleil.example>; Tue, 03 Mar 2026 10:17:24 +0000
+Authentication-Results: inbox.soleil.example;
+  spf=fail smtp.mailfrom=paiement-horizon.test;
+  dkim=none header.d=none;
+  dmarc=fail action=quarantine header.from=banque-horzion.example
+From: "Banque Horizon, Service Sécurité" <service.securite@banque-horzion.example>
+Reply-To: "Conseiller prioritaire" <conseiller@dossiers-horizon.example.net>
+To: aissatou.ndiaye@soleil.example
+Subject: Suspension du compte association sous 24 heures
+Date: Tue, 03 Mar 2026 10:17:20 +0000
+Message-ID: <20260303.101720.7842@horizon-securite.test>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="CNS-PHISH-BOUNDARY"
+
+--CNS-PHISH-BOUNDARY
+Content-Type: multipart/alternative; boundary="CNS-PHISH-ALT"
+
+--CNS-PHISH-ALT
+Content-Type: text/plain; charset=utf-8
+
+Bonjour,
+
+Notre service sécurité a détecté un blocage temporaire du compte de l’association.
+Vous devez confirmer l’identité du titulaire sous 24 heures pour éviter une suspension des paiements.
+Confirmez votre identité ici : https://banque-horizon.example.verification-mobile.horizon-securite.test/session/confirm?id=7842
+La facture jointe reprend l’opération signalée.
+
+Cordialement,
+Service Sécurité Banque Horizon
+
+--CNS-PHISH-ALT
+Content-Type: text/html; charset=utf-8
+
+<html><body>
+<p>Bonjour,</p>
+<p>Notre service sécurité a détecté un blocage temporaire du compte de l’association.</p>
+<p>Vous devez confirmer l’identité du titulaire sous 24 heures pour éviter une suspension des paiements.</p>
+<p><a href="https://banque-horizon.example.verification-mobile.horizon-securite.test/session/confirm?id=7842">https://www.banque-horizon.example/securite</a></p>
+<p>Pièce jointe : Facture_Mars.pdf.exe</p>
+</body></html>
+
+--CNS-PHISH-ALT--
+
+--CNS-PHISH-BOUNDARY
+Content-Type: application/octet-stream; name="Facture_Mars.pdf.exe"
+Content-Disposition: attachment; filename="Facture_Mars.pdf.exe"
+Content-Transfer-Encoding: base64
+X-Attachment-Size: 48213
+
+VGhpcyBpcyBhIGZha2UgYmluYXJ5IHBheWxvYWQgZm9yIHRoZSBsYWIu
+
+--CNS-PHISH-BOUNDARY--

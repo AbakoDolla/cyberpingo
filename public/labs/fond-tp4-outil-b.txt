@@ -1,0 +1,4 @@
+nom=controle-lntegrite
+mode=verification
+cible=poste-formation
+signature=sha256

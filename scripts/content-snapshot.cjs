@@ -1,7 +1,25 @@
 // Reads what the seeds publish, in the shape the publication checklist (scripts/content-quality.cjs) expects.
 // Shared by tests/content-quality.test.cjs and scripts/content-report.cjs.
 
+const { load } = require("./ts-loader.cjs");
+const { contentId } = require("./generate-content-seed.cjs");
+
 const rows = async (db, text, params = []) => (await db.query(text, params)).rows;
+
+/** The authoring files of every finished programme: each one is split in parts "a" to "d" (see docs/CONTENU.md). */
+const PROGRAMMES = ["reseaux-programme", "fondamentaux-programme"];
+
+/** Lessons written with the full lesson template (the programme parts), found by their id. */
+function templateLessonIds() {
+  const ids = new Set();
+  for (const programme of PROGRAMMES) {
+    for (const part of ["a", "b", "c", "d"]) {
+      const { modules } = load(`supabase/seed/content/${programme}-${part}`);
+      for (const entry of modules) for (const lesson of entry.lessons) if (!lesson.existing) ids.add(contentId("lesson", lesson.key));
+    }
+  }
+  return ids;
+}
 
 /** Every lesson with its blocks and its quiz, in teaching order. */
 async function readLessons(db) {
@@ -44,4 +62,4 @@ async function readCourseStats(db) {
     from public.courses c where c.status = 'published' order by c.position`);
 }
 
-module.exports = { readLessons, readCourseStats };
+module.exports = { readLessons, readCourseStats, templateLessonIds, PROGRAMMES };

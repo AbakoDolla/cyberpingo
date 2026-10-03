@@ -1,0 +1,31 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 41:77:20:26:08:12
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN = Autorité de Confiance Fictive, O = PKI Exemple
+        Validity
+            Not Before: Mar 10 00:00:00 2026 GMT
+            Not After : Aug 12 23:59:59 2026 GMT
+        Subject: CN = www.soleil.example, O = Centre Numérique Soleil
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+        X509v3 Subject Alternative Name:
+            DNS:www.soleil.example, DNS:cdn.soleil.example
+
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 41:77:20:26:02:28
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN = Autorité de Confiance Fictive, O = PKI Exemple
+        Validity
+            Not Before: Feb 28 00:00:00 2025 GMT
+            Not After : Feb 28 23:59:59 2026 GMT
+        Subject: CN = intranet.soleil.example, O = Centre Numérique Soleil
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+        X509v3 Subject Alternative Name:
+            DNS:intranet.soleil.example

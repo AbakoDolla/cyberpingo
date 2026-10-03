@@ -1,0 +1,34 @@
+# Notes de terrain
+
+- C01 | Domaine: authentification | La couverture de la double authentification doit être vérifiée dans le relevé d’accès fourni avec le projet. Preuve: export mfa du panneau d’administration du 31 mars 2026.
+- C02 | Domaine: authentification | Le mot de passe du compte accueil est connu de 3 personnes. Preuve: entretien avec Aïssatou et Fatima.
+- C03 | Domaine: authentification | Deux postes partagent encore un compte local « formation ». Preuve: relevé des sessions de SALLE-03 et SALLE-04.
+- C04 | Domaine: authentification | Aucun registre de révocation des sessions actives n’est documenté. Preuve: entretien avec Jean-Marc.
+- C05 | Domaine: postes | Plusieurs postes utilisent encore Système Alpha 8. Preuve: recouper l’inventaire des postes et la table de fin de support du projet.
+- C06 | Domaine: postes | Le retard maximal de mise à jour observé est de 62 jours. Preuve: export de l’inventaire du 31 mars.
+- C07 | Domaine: postes | 2 portables ne sont pas chiffrés. Preuve: relevé BitLocker et fiche d’inventaire.
+- C08 | Domaine: postes | 6 postes ont plus d’un administrateur local. Preuve: export des groupes administrateurs.
+- C09 | Domaine: sauvegardes | La fraîcheur de la dernière sauvegarde réussie doit être relue dans le journal nocturne du projet. Preuve: journal central joint.
+- C10 | Domaine: sauvegardes | Aucune copie hors site n’est tenue à jour. Preuve: visite de l’armoire technique.
+- C11 | Domaine: sauvegardes | Le dernier test de restauration réussi remonte au 15 janvier 2026. Preuve: ticket « restore-test-0115 ».
+- C12 | Domaine: sauvegardes | Le contrôle d’intégrité publié pour les archives repose sur une famille d’algorithmes ancienne. Preuve: journal d’intégrité joint.
+- C13 | Domaine: réseau et wi-fi | Le mot de passe administrateur de la box est encore celui livré par l’opérateur. Preuve: fiche collée sous la box.
+- C14 | Domaine: réseau et wi-fi | Le réseau invité n’est pas séparé du réseau interne. Preuve: même plage 192.168.77.0/24 observée des deux côtés.
+- C15 | Domaine: réseau et wi-fi | L’inventaire des équipements connectés est incomplet de 2 points d’accès. Preuve: comparaison visite et tableau d’actifs.
+- C16 | Domaine: réseau et wi-fi | Le certificat de www.soleil.example expire le 12 avril 2026. Preuve: sortie texte du certificat archivée.
+- C17 | Domaine: données personnelles | L’état du registre des traitements doit être vérifié dans l’inventaire documentaire de conformité. Preuve: dossier conformité joint.
+- C18 | Domaine: données personnelles | Les fiches papier des apprenants sont rangées dans une armoire non verrouillée. Preuve: visite du secrétariat.
+- C19 | Domaine: données personnelles | Aucune durée de conservation n’est écrite pour les dossiers papier. Preuve: revue documentaire.
+- C20 | Domaine: données personnelles | Les exportations de donateurs conservent des colonnes inutiles. Preuve: tableur de février 2026.
+- C21 | Domaine: sensibilisation | La simulation de phishing du 20 mars a été envoyée à 6 personnes. Preuve: rapport du prestataire bénévole.
+- C22 | Domaine: sensibilisation | Le nombre de personnes ayant cliqué doit être relu dans le relevé détaillé de simulation. Preuve: rapport du prestataire bénévole joint.
+- C23 | Domaine: sensibilisation | Aucune session de rappel n’a été planifiée après la simulation. Preuve: agenda partagé.
+- C24 | Domaine: incidents | Il n’existe pas de procédure écrite de réponse à incident. Preuve: revue documentaire.
+- C25 | Domaine: incidents | Aucun exercice d’escalade n’a été rejoué cette année. Preuve: entretien équipe.
+- C26 | Domaine: incidents | La liste de contacts d’urgence n’est pas testée. Preuve: feuille imprimée datée de 2024.
+- C27 | Domaine: gouvernance | Aucun suivi trimestriel des actions sécurité n’est inscrit à l’ordre du jour du comité. Preuve: comptes rendus.
+- C28 | Domaine: gouvernance | Le contrat de sauvegarde externe n’inclut pas de garantie de restauration. Preuve: lecture du contrat.
+- C29 | Domaine: données personnelles | 14 fiches d’inscription de 2021 sont encore présentes sans justification. Preuve: comptage physique.
+- C30 | Domaine: site web | Le renouvellement automatique du certificat n’est pas supervisé. Preuve: absence d’alerte dans l’outil interne.
+- C31 | Domaine: site web | Le site publie encore une adresse de contact non revue depuis 2024. Preuve: page contact.
+- C32 | Domaine: postes | Les signatures antivirus de 5 postes ont plus de 7 jours de retard. Preuve: export de l’antivirus.

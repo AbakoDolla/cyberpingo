@@ -1,0 +1,7 @@
+horodatage | compte | action | detail
+2026-03-25T06:24:05Z | yao.kouassi@soleil.example | regle_transfert_creee | destination=archives-finance@courrier.invalid
+2026-03-25T06:31:44Z | yao.kouassi@soleil.example | messages_supprimes | quantite=14
+2026-03-25T06:37:12Z | yao.kouassi@soleil.example | pieces_jointes_telechargees | quantite=6
+2026-03-25T06:38:47Z | yao.kouassi@soleil.example | lecture_dossier_adhesions | boite=Reçus 2026
+2026-03-25T09:47:20Z | yao.kouassi@soleil.example | motdepasse_reinitialise | initie_par_utilisateur=oui
+2026-03-25T09:49:09Z | jm.tchoumi@soleil.example | regle_transfert_supprimee | destination=archives-finance@courrier.invalid

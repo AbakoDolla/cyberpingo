@@ -1,0 +1,4 @@
+mode=lecture
+journal=atelier
+niveau=info
+rotation=hebdomadaire

@@ -19,7 +19,7 @@ export const publicPaths: PublicPath[] = [
     image: "covers/course-fondamentaux.webp",
     tone: "blue",
     courseSlug: "fondamentaux",
-    topics: ["Comprendre la cybersécurité", "Reconnaître les menaces", "Découvrir les métiers"],
+    topics: ["Hameçonnage et mots de passe", "Sauvegardes et cryptographie", "Risques, données et incidents"],
   },
   {
     id: "web",
