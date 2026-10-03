@@ -379,6 +379,94 @@
           ]
         }
       ]
+    },
+    "f638f916-d05f-bae5-b2cd-9ac3e323da67": {
+      "title": "Linux, distributions et environnements : s’exercer gratuitement",
+      "placements": [
+        {
+          "after": "Un défenseur doit connaître Linux parce que",
+          "title": "Linux tourne bien au-delà du poste de bureau",
+          "devices": [
+            "serveur",
+            "raspberry-pi",
+            "smartphone"
+          ]
+        },
+        {
+          "after": "Pour t’exercer gratuitement, trois options reviennent souvent.",
+          "title": "Ton terrain d’exercice : un vieux portable ou un téléphone suffisent",
+          "devices": [
+            "portable",
+            "smartphone"
+          ]
+        }
+      ]
+    },
+    "d2327bf3-67b9-5d93-6f32-799db0922bf3": {
+      "title": "Voir et diagnostiquer le réseau : ip, ss, dig, curl",
+      "placements": [
+        {
+          "after": "La commande « ip » remplace plusieurs anciens outils.",
+          "title": "La passerelle par défaut, en vrai",
+          "devices": [
+            "box-internet",
+            "routeur"
+          ]
+        }
+      ]
+    },
+    "8844a6b5-0493-80d0-0fc0-f7150e367af1": {
+      "title": "Pare-feu sous Linux : ufw et nftables",
+      "placements": [
+        {
+          "after": "Le pare-feu Linux s’appuie sur le filtrage du noyau",
+          "title": "Un pare-feu, matériel ou logiciel : même rôle de filtre",
+          "devices": [
+            "pare-feu",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "2049fc87-1815-2f3f-1d59-4d54d7632a69": {
+      "title": "Disques, partitions et systèmes de fichiers",
+      "placements": [
+        {
+          "after": "Les options de montage servent aussi au durcissement.",
+          "title": "Les supports amovibles : le cas où nosuid et noexec servent",
+          "devices": [
+            "cle-usb",
+            "disque-externe"
+          ]
+        }
+      ]
+    },
+    "b166be31-17a9-c97b-a832-d0fe25236fad": {
+      "title": "Sauvegarder sous Linux : tar, rsync, restic",
+      "placements": [
+        {
+          "after": "Sur un serveur, tu ne sauvegardes pas seulement les documents",
+          "title": "Trois copies, deux supports, une copie hors site",
+          "devices": [
+            "serveur",
+            "nas",
+            "disque-externe"
+          ]
+        }
+      ]
+    },
+    "b064a56b-ffb8-202b-ce1c-8ec612a480eb": {
+      "title": "Chiffrer sous Linux : LUKS, GnuPG et OpenSSL",
+      "placements": [
+        {
+          "after": "Le chiffrement ne sert pas toujours au même niveau.",
+          "title": "Un portable perdu, un disque de sauvegarde volé",
+          "devices": [
+            "portable",
+            "disque-externe"
+          ]
+        }
+      ]
     }
   }
 }

@@ -1,0 +1,119 @@
+# systemctl list-units --type=service --all --no-pager
+  UNIT                      LOAD   ACTIVE   SUB     DESCRIPTION
+  nginx.service             loaded active   running A high performance web server
+  php8.2-fpm.service        loaded active   running The PHP 8.2 FastCGI Process Manager
+  mariadb.service           loaded active   running MariaDB 10.11.6 database server
+  rsyslog.service           loaded active   running System Logging Service
+  fail2ban.service          loaded active   running Fail2Ban Service
+  backup-nuit.service       loaded active   exited  Sauvegarde nocturne
+  auditd.service            loaded failed   failed  Security Auditing Service
+  legacy-sync.service       loaded failed   failed  Ancienne synchro prestataire
+  cron.service              loaded active   running Regular background program processing daemon
+  ssh.service               loaded active   running OpenBSD Secure Shell server
+
+# /etc/rsyslog.d/60-central.conf
+# action(type="omfwd" target="srv-log01.alize.example" port="514" protocol="tcp")
+
+# /etc/logrotate.d/nginx
+/var/log/nginx/*.log {
+    weekly
+    rotate 8
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 640 www-data adm
+}
+
+# /etc/cron.d/backup-nuit
+30 2 * * * root /usr/local/bin/backup-nightly.sh >/var/log/backup-nightly.log 2>&1
+
+# /etc/cron.d/cache-prime
+5 */6 * * * root /usr/local/bin/cache-prime.sh >/var/log/cache-prime.log 2>&1
+
+# ls -l --time-style=long-iso /usr/local/bin/backup-nightly.sh
+-rwxr-x--- 1 root root 812 2026-02-18 07:14 /usr/local/bin/backup-nightly.sh
+# ls -l --time-style=long-iso /usr/local/bin/cache-prime.sh
+-rwxr-x--- 1 root root 544 2026-03-02 06:10 /usr/local/bin/cache-prime.sh
+
+# restic snapshots
+ID        Time                 Host             Tags        Paths
+a10f92d1  2026-04-16 02:31:07 srv-fichiers01   nightly     /srv/partages /etc
+b11f92d2  2026-04-17 02:31:10 srv-fichiers01   nightly     /srv/partages /etc
+c12f92d3  2026-04-18 02:31:11 srv-fichiers01   nightly     /srv/partages /etc
+d13f92d4  2026-04-19 02:31:10 srv-fichiers01   nightly     /srv/partages /etc
+e14f92d5  2026-04-20 02:31:11 srv-fichiers01   nightly     /srv/partages /etc
+f15f92d6  2026-04-21 02:31:12 srv-fichiers01   nightly     /srv/partages /etc
+d19f92da  2026-04-25 02:31:09 srv-fichiers01   nightly     /srv/partages /etc
+
+# backup-nightly.log
+2026-04-01T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=48G
+2026-04-02T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=49G
+2026-04-03T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=50G
+2026-04-04T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=51G
+2026-04-05T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=52G
+2026-04-06T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=53G
+2026-04-07T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=54G
+2026-04-08T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=55G
+2026-04-09T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=56G
+2026-04-10T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=57G
+2026-04-11T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=58G
+2026-04-12T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=59G
+2026-04-13T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=60G
+2026-04-14T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=61G
+2026-04-15T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=62G
+2026-04-16T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=63G
+2026-04-17T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=64G
+2026-04-18T02:30:00Z | SUCCESS | repo=restic-local offsite=yes hash=sha256 size=65G
+2026-04-19T02:30:00Z | SUCCESS | repo=restic-local offsite=pending hash=sha256 size=66G
+2026-04-20T02:30:00Z | SUCCESS | repo=restic-local offsite=pending hash=sha256 size=67G
+2026-04-21T02:30:00Z | SUCCESS | repo=restic-local offsite=pending hash=sha256 size=68G
+2026-04-22T02:30:00Z | FAIL | repo=restic-local reason=rsync timeout to srv-sauvegarde01
+2026-04-23T02:30:00Z | FAIL | repo=restic-local reason=offsite destination unavailable
+2026-04-24T02:30:00Z | FAIL | repo=restic-local reason=repository locked
+2026-04-25T02:30:00Z | SUCCESS | repo=restic-local offsite=pending hash=sha256 size=71G
+2026-04-26T02:30:00Z | FAIL | repo=restic-local reason=offsite destination unavailable
+2026-04-27T02:30:00Z | FAIL | repo=restic-local reason=offsite destination unavailable
+
+# offsite-replication.log
+2026-04-18T03:12:44Z | SUCCESS | destination=srv-sauvegarde01 snapshot=c12f92d3
+2026-04-19T03:12:47Z | FAIL | destination=srv-sauvegarde01 reason=link reset
+2026-04-20T03:12:49Z | FAIL | destination=srv-sauvegarde01 reason=link reset
+2026-04-21T03:12:51Z | FAIL | destination=srv-sauvegarde01 reason=timeout
+2026-04-22T03:12:55Z | FAIL | destination=srv-sauvegarde01 reason=timeout
+2026-04-23T03:12:58Z | FAIL | destination=srv-sauvegarde01 reason=timeout
+2026-04-24T03:13:02Z | FAIL | destination=srv-sauvegarde01 reason=destination unavailable
+2026-04-25T03:13:05Z | FAIL | destination=srv-sauvegarde01 reason=destination unavailable
+2026-04-26T03:13:08Z | FAIL | destination=srv-sauvegarde01 reason=destination unavailable
+2026-04-27T03:13:11Z | FAIL | destination=srv-sauvegarde01 reason=destination unavailable
+
+# restore-tests.log
+2026-02-18T10:14:00Z | RESTORE_OK | archive=c8d9f0aa target=/tmp/restore-check
+
+# restic config
+repository_version=2
+encryption=aes256-ctr
+integrity=sha256
+
+# /etc/nginx/sites-enabled/alize.conf
+server {
+    listen 80;
+    listen 443 ssl http2;
+    server_name www.alize.example;
+    root /var/www/html/alize;
+    location /uploads/ {
+        alias /var/www/html/alize/uploads/;
+        try_files $uri $uri/ =404;
+    }
+}
+
+# /etc/php/8.2/fpm/pool.d/www.conf
+; no dedicated protection for uploads here
+
+# /etc/mysql/mariadb.conf.d/50-server.cnf
+bind-address = 127.0.0.1
+
+# find / -xdev -perm -4000 -type f -ls
+  40201    56 -rwsr-xr-x   1 root     root        59704 2025-12-18 10:20 /usr/bin/passwd
+  40277    52 -rwsr-xr-x   1 root     root        48896 2025-12-18 10:20 /usr/bin/su
+  40411    48 -rwsr-xr-x   1 root     root        35128 2025-12-18 10:20 /usr/bin/umount

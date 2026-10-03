@@ -1,0 +1,19 @@
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 2202/tcp                   ALLOW IN    10.20.0.100
+[ 2] 80/tcp                     ALLOW IN    Anywhere
+[ 3] 443/tcp                    ALLOW IN    Anywhere
+[ 4] 2202/tcp                   DENY IN     203.0.113.0/24
+[ 5] 2202/tcp                   ALLOW IN    198.51.100.47             # prestataire-temp
+[ 6] 22/tcp                     ALLOW IN    Anywhere                   # support-temp
+[ 7] 3306/tcp                   DENY IN     Anywhere
+[ 8] 2202/tcp                   DENY IN     Anywhere
+
+Apr  9 03:12:11 srv-web01 kernel: [UFW ALLOW] IN=ens18 OUT= MAC=52:54:00:12:34:10 SRC=198.51.100.47 DST=10.20.0.10 LEN=60 TOS=0x00 PREC=0x00 TTL=49 ID=51531 DF PROTO=TCP SPT=51234 DPT=2202 WINDOW=64240 RES=0x00 SYN URGP=0
+Apr  9 03:12:28 srv-web01 kernel: [UFW ALLOW] IN=ens18 OUT= MAC=52:54:00:12:34:10 SRC=198.51.100.47 DST=10.20.0.10 LEN=60 TOS=0x00 PREC=0x00 TTL=49 ID=51532 DF PROTO=TCP SPT=51248 DPT=2202 WINDOW=64240 RES=0x00 SYN URGP=0
+Apr  9 03:13:05 srv-web01 kernel: [UFW ALLOW] IN=ens18 OUT= MAC=52:54:00:12:34:10 SRC=198.51.100.47 DST=10.20.0.10 LEN=60 TOS=0x00 PREC=0x00 TTL=49 ID=51533 DF PROTO=TCP SPT=51263 DPT=2202 WINDOW=64240 RES=0x00 SYN URGP=0
+Apr  9 03:14:44 srv-web01 kernel: [UFW ALLOW] IN=ens18 OUT= MAC=52:54:00:12:34:10 SRC=198.51.100.47 DST=10.20.0.10 LEN=60 TOS=0x00 PREC=0x00 TTL=49 ID=51534 DF PROTO=TCP SPT=51291 DPT=2202 WINDOW=64240 RES=0x00 SYN URGP=0
+Apr  9 03:17:42 srv-web01 kernel: [UFW ALLOW] IN=ens18 OUT= MAC=52:54:00:12:34:10 SRC=198.51.100.47 DST=10.20.0.10 LEN=60 TOS=0x00 PREC=0x00 TTL=49 ID=51535 DF PROTO=TCP SPT=51341 DPT=2202 WINDOW=64240 RES=0x00 SYN URGP=0
+Apr  9 03:18:17 srv-web01 kernel: [UFW BLOCK] IN=ens18 OUT= MAC=52:54:00:12:34:10 SRC=203.0.113.90 DST=10.20.0.10 LEN=60 TOS=0x00 PREC=0x00 TTL=52 ID=51536 DF PROTO=TCP SPT=52341 DPT=2202 WINDOW=64240 RES=0x00 SYN URGP=0

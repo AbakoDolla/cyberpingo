@@ -1,0 +1,10 @@
+from="10.20.0.100",no-port-forwarding ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIn90XZmoPO+aRUrhlBaJqb/D73Zqf5Xz9zo53pLf//064 odiallo@adm-pc01 | bits=256 | SHA256:ETkL0NgUb7MH+4IXQFHEGkWzpN2Epb7LcfZP7RjfU9d
+from="10.20.0.30" ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ6fjgBgcQfIl9eVNdqDiPsusFqvSjRoytwnnahz1XlJEX svc-backup@srv-sauvegarde01 | bits=4096 | SHA256:vK9ITDiRPcTjqsGiDnatW9B2xpjrqlT/l5ZMzBmzPg8
+from="10.20.0.100",command="/usr/local/bin/run-deploy-check" ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQFWNXn9/FJGYLzEhvyRPZJXA03HsqK9CQ5eqkZk0PaVwh nkamga-maintenance | bits=2048 | SHA256:nLAOMpoaCQKyQj4E255nPMjC5lsGfhY7S800FB5PYvC
+no-port-forwarding ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQBgVuAkU2JAWcuVrG52ExYbN7ZtPfDJx2vRIcmt8kAS18 | bits=1024 | SHA256:NqIIuTxMlOpfNNSIj/vT2yn55yG0esYzgO0LeJgdpmm
+from="10.20.0.20" ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBeNoCfnslPNRHGycRaw2FagFdI8jf+62CeEL5zqo/rYFU straore-batch | bits=256 | SHA256:zd4SUaLAB1L4OiaV4joqthlqrn2OsGYBRz6kDub5m1H
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIs/qz7cKz2tAbakXVglitrKd24dbuIrJi/BsQklsI8lvF cfall-lab | bits=256 | SHA256:c/iFrJYA4+ThFFklTRJYr+HO8vlqSk4x1iyYkGFkhQz
+from="10.20.0.111" ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQHajU7fLl3q4HNrUbY0FsaL4jPrEaE+lrfoYZ1opHgO4Q adm-pc01-fallback | bits=4096 | SHA256:iDkzfTAN7VuXa3D9CqCVtOCjJ3vkVLfgzzhimF5qozt
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQHnjoCFA+UmVd/vR5q7QzdWRrG+vowfKo6linbpyVaoIe websync | bits=4096 | SHA256:LxtiEyD1/aKq53I4l5yIFXIbm2QY+tfs41FP/cUH+nd
+from="10.20.0.100",no-agent-forwarding ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBO8qY79Ur61u24HzdOh62LKcn+hlVCx/62VdqEibsEfUF audit-console | bits=256 | SHA256:InZmWnLeo6AidMdzMehUGEgXzCJGc6ceu1jo02c0U3O
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIllkw3cpHmZ+GV2gxJ0jG9wmkw9ZOUdSFD9YCQMtc1QOg support-tablette | bits=256 | SHA256:O4ELSgfj7PchcxNsGrczMSXIjF8CibQ0AD487JwU/oB

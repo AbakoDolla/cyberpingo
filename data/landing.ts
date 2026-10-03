@@ -64,12 +64,12 @@ export const publicPaths: PublicPath[] = [
   {
     id: "linux",
     title: "Administration Linux",
-    description: "Prends en main le terminal, les commandes et les permissions.",
+    description: "Administre un système Linux : droits, services, SSH, sauvegardes, scripts et audit d’un serveur.",
     level: "Intermédiaire",
     image: "covers/course-linux.webp",
     tone: "teal",
     courseSlug: "linux",
-    topics: ["Les premières commandes", "Les permissions", "Les bons réflexes dans le terminal"],
+    topics: ["Terminal, fichiers et texte", "Droits, services et SSH", "Sauvegardes, scripts et audit"],
   },
 ];
 

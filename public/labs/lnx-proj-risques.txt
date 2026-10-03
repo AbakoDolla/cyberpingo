@@ -1,0 +1,13 @@
+id	controle	mesure	vraisemblance	impact	effort
+R01	AC2	Désactiver PasswordAuthentication pour les comptes d’administration	2	3	1
+R02	AC3	Retirer le shell interactif du compte svc-backup	2	3	1
+R03	AC4	Réduire la délégation NOPASSWD de svc-backup à un seul wrapper	2	2	1
+R04	RE3	Fermer rsync sur toutes les interfaces publiques	2	3	1
+R05	SY1	Appliquer les correctifs de sécurité en attente	3	4	2
+R06	SY3	Ajouter noexec au montage de /tmp	2	2	1
+R07	JO3	Activer auditd et vérifier sa persistance au démarrage	3	4	1
+R08	JO4	Réactiver l’envoi des journaux vers srv-log01	3	3	2
+R09	SA1	Rétablir une sauvegarde réussie quotidienne	3	4	1
+R10	SA2	Vérifier chaque jour la copie hors site	2	3	2
+R11	SE2	Bloquer l’exécution de PHP dans le dossier d’upload	4	4	1
+R12	SE3	Corriger ou retirer le service legacy-sync en échec	2	2	1

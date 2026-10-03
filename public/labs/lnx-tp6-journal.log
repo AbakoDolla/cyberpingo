@@ -1,0 +1,207 @@
+Apr 14 06:10:10 srv-web01 sshd[2206]: Failed password for adjovi from 192.0.2.40 port 41306 ssh2
+Apr 14 06:12:12 srv-web01 sshd[2287]: Failed password for adjovi from 203.0.113.77 port 41187 ssh2
+Apr 14 06:13:13 srv-web01 sshd[2100]: Failed password for adjovi from 198.51.100.23 port 41000 ssh2
+Apr 14 06:13:13 srv-web01 sshd[2291]: Failed password for adjovi from 198.51.100.61 port 41391 ssh2
+Apr 14 06:13:17 srv-web01 sshd[2223]: Failed password for invalid user audit from 192.0.2.40 port 41323 ssh2
+Apr 14 06:15:19 srv-web01 sshd[2104]: Failed password for invalid user audit from 203.0.113.77 port 41204 ssh2
+Apr 14 06:16:20 srv-web01 sshd[2108]: Failed password for invalid user audit from 198.51.100.61 port 41408 ssh2
+Apr 14 06:16:20 srv-web01 sshd[2117]: Failed password for invalid user audit from 198.51.100.23 port 41017 ssh2
+Apr 14 06:16:24 srv-web01 sshd[2240]: Failed password for adjovi from 192.0.2.40 port 41340 ssh2
+Apr 14 06:18:26 srv-web01 sshd[2121]: Failed password for adjovi from 203.0.113.77 port 41221 ssh2
+Apr 14 06:19:27 srv-web01 sshd[2125]: Failed password for adjovi from 198.51.100.61 port 41425 ssh2
+Apr 14 06:19:27 srv-web01 sshd[2134]: Failed password for adjovi from 198.51.100.23 port 41034 ssh2
+Apr 14 06:19:31 srv-web01 sshd[2257]: Failed password for invalid user audit from 192.0.2.40 port 41357 ssh2
+Apr 14 06:21:33 srv-web01 sshd[2138]: Failed password for invalid user audit from 203.0.113.77 port 41238 ssh2
+Apr 14 06:22:34 srv-web01 sshd[2142]: Failed password for invalid user audit from 198.51.100.61 port 41442 ssh2
+Apr 14 06:22:34 srv-web01 sshd[2151]: Failed password for invalid user audit from 198.51.100.23 port 41051 ssh2
+Apr 14 06:22:38 srv-web01 sshd[2274]: Failed password for adjovi from 192.0.2.40 port 41374 ssh2
+Apr 14 06:24:40 srv-web01 sshd[2155]: Failed password for adjovi from 203.0.113.77 port 41255 ssh2
+Apr 14 06:25:41 srv-web01 sshd[2168]: Failed password for adjovi from 198.51.100.23 port 41068 ssh2
+Apr 14 06:27:47 srv-web01 sshd[2172]: Failed password for invalid user audit from 203.0.113.77 port 41272 ssh2
+Apr 14 06:28:48 srv-web01 sshd[2185]: Failed password for invalid user audit from 198.51.100.23 port 41085 ssh2
+Apr 14 06:30:54 srv-web01 sshd[2189]: Failed password for adjovi from 203.0.113.77 port 41289 ssh2
+Apr 14 06:31:55 srv-web01 sshd[2202]: Failed password for adjovi from 198.51.100.23 port 41102 ssh2
+Apr 14 06:34:02 srv-web01 sshd[2219]: Failed password for invalid user audit from 198.51.100.23 port 41119 ssh2
+Apr 14 06:37:09 srv-web01 sshd[2236]: Failed password for adjovi from 198.51.100.23 port 41136 ssh2
+Apr 14 06:40:16 srv-web01 sshd[2253]: Failed password for invalid user audit from 198.51.100.23 port 41153 ssh2
+Apr 14 06:43:23 srv-web01 sshd[2270]: Failed password for adjovi from 198.51.100.23 port 41170 ssh2
+Apr 14 07:00:00 srv-web01 sshd[3200]: Accepted publickey for odiallo from 10.20.0.100 port 50000 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:00:30 srv-web01 CRON[3330]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:02:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:02:35 srv-web01 sshd[3431]: Connection closed by authenticating user cfall 10.20.0.111 port 51031 [preauth]
+Apr 14 07:04:10 srv-web01 CRON[3302]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:04:40 srv-web01 sshd[3232]: Accepted publickey for odiallo from 10.20.0.100 port 50032 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:06:15 srv-web01 sshd[3403]: Connection closed by authenticating user cfall 10.20.0.111 port 51003 [preauth]
+Apr 14 07:06:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:08:20 srv-web01 sshd[3204]: Accepted publickey for odiallo from 10.20.0.100 port 50004 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:08:50 srv-web01 CRON[3334]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:10:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:10:55 srv-web01 sshd[3435]: Connection closed by authenticating user cfall 10.20.0.111 port 51035 [preauth]
+Apr 14 07:12:00 srv-web01 sshd[3236]: Accepted publickey for odiallo from 10.20.0.100 port 50036 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:12:30 srv-web01 CRON[3306]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:14:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:14:35 srv-web01 sshd[3407]: Connection closed by authenticating user cfall 10.20.0.111 port 51007 [preauth]
+Apr 14 07:16:10 srv-web01 CRON[3338]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:16:40 srv-web01 sshd[3208]: Accepted publickey for odiallo from 10.20.0.100 port 50008 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:18:15 srv-web01 sshd[3439]: Connection closed by authenticating user cfall 10.20.0.111 port 51039 [preauth]
+Apr 14 07:18:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:20:20 srv-web01 sshd[3240]: Accepted publickey for odiallo from 10.20.0.100 port 50040 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:20:50 srv-web01 CRON[3310]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:22:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:22:55 srv-web01 sshd[3411]: Connection closed by authenticating user cfall 10.20.0.111 port 51011 [preauth]
+Apr 14 07:24:00 srv-web01 sshd[3212]: Accepted publickey for odiallo from 10.20.0.100 port 50012 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:24:30 srv-web01 CRON[3342]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:26:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:26:35 srv-web01 sshd[3443]: Connection closed by authenticating user cfall 10.20.0.111 port 51043 [preauth]
+Apr 14 07:28:10 srv-web01 CRON[3314]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:28:40 srv-web01 sshd[3244]: Accepted publickey for odiallo from 10.20.0.100 port 50044 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:30:15 srv-web01 sshd[3415]: Connection closed by authenticating user cfall 10.20.0.111 port 51015 [preauth]
+Apr 14 07:30:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:32:20 srv-web01 sshd[3216]: Accepted publickey for odiallo from 10.20.0.100 port 50016 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:32:50 srv-web01 CRON[3346]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:34:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:34:55 srv-web01 sshd[3447]: Connection closed by authenticating user cfall 10.20.0.111 port 51047 [preauth]
+Apr 14 07:36:00 srv-web01 sshd[3248]: Accepted publickey for odiallo from 10.20.0.100 port 50048 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:36:30 srv-web01 CRON[3318]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:38:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:38:35 srv-web01 sshd[3419]: Connection closed by authenticating user cfall 10.20.0.111 port 51019 [preauth]
+Apr 14 07:40:10 srv-web01 CRON[3350]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:40:40 srv-web01 sshd[3220]: Accepted publickey for odiallo from 10.20.0.100 port 50020 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:42:15 srv-web01 sshd[3451]: Connection closed by authenticating user cfall 10.20.0.111 port 51051 [preauth]
+Apr 14 07:42:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:44:20 srv-web01 sshd[3252]: Accepted publickey for odiallo from 10.20.0.100 port 50052 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:44:50 srv-web01 CRON[3322]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:46:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:46:55 srv-web01 sshd[3423]: Connection closed by authenticating user cfall 10.20.0.111 port 51023 [preauth]
+Apr 14 07:48:00 srv-web01 sshd[3224]: Accepted publickey for odiallo from 10.20.0.100 port 50024 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:48:30 srv-web01 CRON[3354]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:50:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:50:35 srv-web01 sshd[3455]: Connection closed by authenticating user cfall 10.20.0.111 port 51055 [preauth]
+Apr 14 07:52:10 srv-web01 CRON[3326]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:52:40 srv-web01 sshd[3256]: Accepted publickey for odiallo from 10.20.0.100 port 50056 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:54:15 srv-web01 sshd[3427]: Connection closed by authenticating user cfall 10.20.0.111 port 51027 [preauth]
+Apr 14 07:54:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:56:20 srv-web01 sshd[3228]: Accepted publickey for odiallo from 10.20.0.100 port 50028 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 07:56:50 srv-web01 CRON[3358]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 07:58:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 07:58:55 srv-web01 sshd[3459]: Connection closed by authenticating user cfall 10.20.0.111 port 51059 [preauth]
+Apr 14 08:00:00 srv-web01 sshd[3260]: Accepted publickey for odiallo from 10.20.0.100 port 50060 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:00:30 srv-web01 CRON[3390]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:02:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:02:35 srv-web01 sshd[3491]: Connection closed by authenticating user cfall 10.20.0.111 port 51091 [preauth]
+Apr 14 08:04:10 srv-web01 CRON[3362]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:04:40 srv-web01 sshd[3292]: Accepted publickey for odiallo from 10.20.0.100 port 50092 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:06:15 srv-web01 sshd[3463]: Connection closed by authenticating user cfall 10.20.0.111 port 51063 [preauth]
+Apr 14 08:06:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:08:20 srv-web01 sshd[3264]: Accepted publickey for odiallo from 10.20.0.100 port 50064 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:08:50 srv-web01 CRON[3394]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:10:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:10:55 srv-web01 sshd[3495]: Connection closed by authenticating user cfall 10.20.0.111 port 51095 [preauth]
+Apr 14 08:12:00 srv-web01 sshd[3296]: Accepted publickey for odiallo from 10.20.0.100 port 50096 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:12:30 srv-web01 CRON[3366]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:14:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:14:35 srv-web01 sshd[3467]: Connection closed by authenticating user cfall 10.20.0.111 port 51067 [preauth]
+Apr 14 08:16:10 srv-web01 CRON[3398]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:16:40 srv-web01 sshd[3268]: Accepted publickey for odiallo from 10.20.0.100 port 50068 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:18:15 srv-web01 sshd[3499]: Connection closed by authenticating user cfall 10.20.0.111 port 51099 [preauth]
+Apr 14 08:18:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:20:20 srv-web01 sshd[3300]: Accepted publickey for odiallo from 10.20.0.100 port 50100 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:20:50 srv-web01 CRON[3370]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:22:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:22:55 srv-web01 sshd[3471]: Connection closed by authenticating user cfall 10.20.0.111 port 51071 [preauth]
+Apr 14 08:24:00 srv-web01 sshd[3272]: Accepted publickey for odiallo from 10.20.0.100 port 50072 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:24:30 srv-web01 CRON[3402]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:26:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:26:35 srv-web01 sshd[3503]: Connection closed by authenticating user cfall 10.20.0.111 port 51103 [preauth]
+Apr 14 08:28:10 srv-web01 CRON[3374]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:28:40 srv-web01 sshd[3304]: Accepted publickey for odiallo from 10.20.0.100 port 50104 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:30:15 srv-web01 sshd[3475]: Connection closed by authenticating user cfall 10.20.0.111 port 51075 [preauth]
+Apr 14 08:30:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:32:20 srv-web01 sshd[3276]: Accepted publickey for odiallo from 10.20.0.100 port 50076 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:32:50 srv-web01 CRON[3406]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:34:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:34:55 srv-web01 sshd[3507]: Connection closed by authenticating user cfall 10.20.0.111 port 51107 [preauth]
+Apr 14 08:36:00 srv-web01 sshd[3308]: Accepted publickey for odiallo from 10.20.0.100 port 50108 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:36:30 srv-web01 CRON[3378]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:38:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:38:35 srv-web01 sshd[3479]: Connection closed by authenticating user cfall 10.20.0.111 port 51079 [preauth]
+Apr 14 08:40:10 srv-web01 CRON[3410]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:40:40 srv-web01 sshd[3280]: Accepted publickey for odiallo from 10.20.0.100 port 50080 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:42:15 srv-web01 sshd[3511]: Connection closed by authenticating user cfall 10.20.0.111 port 51111 [preauth]
+Apr 14 08:42:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:44:20 srv-web01 sshd[3312]: Accepted publickey for odiallo from 10.20.0.100 port 50112 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:44:50 srv-web01 CRON[3382]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:46:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:46:55 srv-web01 sshd[3483]: Connection closed by authenticating user cfall 10.20.0.111 port 51083 [preauth]
+Apr 14 08:48:00 srv-web01 sshd[3284]: Accepted publickey for odiallo from 10.20.0.100 port 50084 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:48:30 srv-web01 CRON[3414]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:50:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:50:35 srv-web01 sshd[3515]: Connection closed by authenticating user cfall 10.20.0.111 port 51115 [preauth]
+Apr 14 08:52:10 srv-web01 CRON[3386]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:52:40 srv-web01 sshd[3316]: Accepted publickey for odiallo from 10.20.0.100 port 50116 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:54:15 srv-web01 sshd[3487]: Connection closed by authenticating user cfall 10.20.0.111 port 51087 [preauth]
+Apr 14 08:54:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:56:20 srv-web01 sshd[3288]: Accepted publickey for odiallo from 10.20.0.100 port 50088 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 08:56:50 srv-web01 CRON[3418]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 08:58:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 08:58:55 srv-web01 sshd[3519]: Connection closed by authenticating user cfall 10.20.0.111 port 51119 [preauth]
+Apr 14 09:00:00 srv-web01 sshd[3320]: Accepted publickey for odiallo from 10.20.0.100 port 50120 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:00:30 srv-web01 CRON[3450]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:02:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:02:35 srv-web01 sshd[3551]: Connection closed by authenticating user cfall 10.20.0.111 port 51151 [preauth]
+Apr 14 09:04:10 srv-web01 CRON[3422]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:04:40 srv-web01 sshd[3352]: Accepted publickey for odiallo from 10.20.0.100 port 50152 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:06:15 srv-web01 sshd[3523]: Connection closed by authenticating user cfall 10.20.0.111 port 51123 [preauth]
+Apr 14 09:06:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:08:20 srv-web01 sshd[3324]: Accepted publickey for odiallo from 10.20.0.100 port 50124 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:08:50 srv-web01 CRON[3454]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:10:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:10:55 srv-web01 sshd[3555]: Connection closed by authenticating user cfall 10.20.0.111 port 51155 [preauth]
+Apr 14 09:12:00 srv-web01 sshd[3356]: Accepted publickey for odiallo from 10.20.0.100 port 50156 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:12:30 srv-web01 CRON[3426]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:14:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:14:35 srv-web01 sshd[3527]: Connection closed by authenticating user cfall 10.20.0.111 port 51127 [preauth]
+Apr 14 09:16:10 srv-web01 CRON[3458]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:16:40 srv-web01 sshd[3328]: Accepted publickey for odiallo from 10.20.0.100 port 50128 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:18:15 srv-web01 sshd[3559]: Connection closed by authenticating user cfall 10.20.0.111 port 51159 [preauth]
+Apr 14 09:18:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:20:20 srv-web01 sshd[3360]: Accepted publickey for odiallo from 10.20.0.100 port 50160 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:20:50 srv-web01 CRON[3430]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:22:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:22:55 srv-web01 sshd[3531]: Connection closed by authenticating user cfall 10.20.0.111 port 51131 [preauth]
+Apr 14 09:24:00 srv-web01 sshd[3332]: Accepted publickey for odiallo from 10.20.0.100 port 50132 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:24:30 srv-web01 CRON[3462]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:26:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:26:35 srv-web01 sshd[3563]: Connection closed by authenticating user cfall 10.20.0.111 port 51163 [preauth]
+Apr 14 09:28:10 srv-web01 CRON[3434]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:28:40 srv-web01 sshd[3364]: Accepted publickey for odiallo from 10.20.0.100 port 50164 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:30:15 srv-web01 sshd[3535]: Connection closed by authenticating user cfall 10.20.0.111 port 51135 [preauth]
+Apr 14 09:30:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:32:20 srv-web01 sshd[3336]: Accepted publickey for odiallo from 10.20.0.100 port 50136 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:32:50 srv-web01 CRON[3466]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:34:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:34:55 srv-web01 sshd[3567]: Connection closed by authenticating user cfall 10.20.0.111 port 51167 [preauth]
+Apr 14 09:36:00 srv-web01 sshd[3368]: Accepted publickey for odiallo from 10.20.0.100 port 50168 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:36:30 srv-web01 CRON[3438]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:38:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:38:35 srv-web01 sshd[3539]: Connection closed by authenticating user cfall 10.20.0.111 port 51139 [preauth]
+Apr 14 09:40:10 srv-web01 CRON[3470]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:40:40 srv-web01 sshd[3340]: Accepted publickey for odiallo from 10.20.0.100 port 50140 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:42:15 srv-web01 sshd[3571]: Connection closed by authenticating user cfall 10.20.0.111 port 51171 [preauth]
+Apr 14 09:42:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:44:20 srv-web01 sshd[3372]: Accepted publickey for odiallo from 10.20.0.100 port 50172 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:44:50 srv-web01 CRON[3442]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:46:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:46:55 srv-web01 sshd[3543]: Connection closed by authenticating user cfall 10.20.0.111 port 51143 [preauth]
+Apr 14 09:48:00 srv-web01 sshd[3344]: Accepted publickey for odiallo from 10.20.0.100 port 50144 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:48:30 srv-web01 CRON[3474]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:50:05 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:50:35 srv-web01 sshd[3575]: Connection closed by authenticating user cfall 10.20.0.111 port 51175 [preauth]
+Apr 14 09:52:10 srv-web01 CRON[3446]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:52:40 srv-web01 sshd[3376]: Accepted publickey for odiallo from 10.20.0.100 port 50176 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:54:15 srv-web01 sshd[3547]: Connection closed by authenticating user cfall 10.20.0.111 port 51147 [preauth]
+Apr 14 09:54:45 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:56:20 srv-web01 sshd[3348]: Accepted publickey for odiallo from 10.20.0.100 port 50148 ssh2: ED25519 SHA256:QvWnJx2wIyd3jVnVcp4JfQ8W8x2kTrT2wJd2JrR9dPs
+Apr 14 09:56:50 srv-web01 CRON[3478]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 14 09:58:25 srv-web01 sudo:  odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl status nginx
+Apr 14 09:58:55 srv-web01 sshd[3579]: Connection closed by authenticating user cfall 10.20.0.111 port 51179 [preauth]

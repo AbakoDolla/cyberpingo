@@ -27,7 +27,8 @@
       "risk": "C’est la porte d’entrée du réseau : une interface d’administration exposée ou un mot de passe d’origine en fait une cible de choix.",
       "habit": "Réserve l’administration au réseau de gestion, mets le micrologiciel à jour et supprime les services dont tu n’as pas besoin.",
       "courses": [
-        "reseaux"
+        "reseaux",
+        "linux"
       ]
     },
     {
@@ -42,7 +43,8 @@
       "risk": "Une règle trop large ou jamais relue annule sa protection, et des journaux non lus laissent passer les attaques sans alerte.",
       "habit": "Applique le refus par défaut, documente chaque règle et relis régulièrement les journaux et la liste des règles.",
       "courses": [
-        "reseaux"
+        "reseaux",
+        "linux"
       ]
     },
     {
@@ -73,7 +75,8 @@
       "habit": "Mets-le à jour, limite les comptes administrateurs, sauvegarde-le et ne publie sur Internet que les services nécessaires.",
       "courses": [
         "reseaux",
-        "fondamentaux"
+        "fondamentaux",
+        "linux"
       ]
     },
     {
@@ -148,7 +151,8 @@
       "risk": "Un NAS exposé sur Internet ou jamais mis à jour attire les rançongiciels, et une sauvegarde gardée sur le même boîtier ne protège pas de sa panne.",
       "habit": "Ne l’expose pas directement, active la double authentification, applique la règle 3-2-1 et teste la restauration.",
       "courses": [
-        "fondamentaux"
+        "fondamentaux",
+        "linux"
       ]
     },
     {
@@ -270,7 +274,8 @@
       "risk": "Perte, vol, Wi-Fi public ou écran vu par-dessus l’épaule : un disque non chiffré peut être lu par n’importe qui.",
       "habit": "Chiffre le disque, verrouille l’écran, mets à jour et utilise un VPN sur les réseaux publics.",
       "courses": [
-        "fondamentaux"
+        "fondamentaux",
+        "linux"
       ]
     },
     {
@@ -285,7 +290,8 @@
       "risk": "Applications piégées, SMS frauduleux et vol de l’appareil : il concentre tes secrets.",
       "habit": "Verrouille-le par un code, applique les mises à jour, installe seulement depuis les boutiques officielles et sauvegarde.",
       "courses": [
-        "fondamentaux"
+        "fondamentaux",
+        "linux"
       ]
     },
     {
@@ -346,7 +352,8 @@
       "habit": "Change les mots de passe d’origine, utilise WPA2 ou WPA3, désactive le WPS et ouvre un réseau invité séparé.",
       "courses": [
         "reseaux",
-        "fondamentaux"
+        "fondamentaux",
+        "linux"
       ]
     },
     {
@@ -392,7 +399,8 @@
       "risk": "Une clé trouvée ou prêtée peut contenir un logiciel malveillant, et une clé perdue expose tous ses fichiers.",
       "habit": "Ne branche jamais une clé inconnue et chiffre celles qui contiennent des données sensibles.",
       "courses": [
-        "fondamentaux"
+        "fondamentaux",
+        "linux"
       ]
     },
     {
@@ -407,7 +415,8 @@
       "risk": "Sans chiffrement, un disque perdu ou volé livre son contenu, et un disque branché en permanence peut être chiffré à son tour par un rançongiciel.",
       "habit": "Chiffre-le, déconnecte-le après la sauvegarde et garde une copie hors site.",
       "courses": [
-        "fondamentaux"
+        "fondamentaux",
+        "linux"
       ]
     },
     {
@@ -526,6 +535,39 @@
       "nas",
       "box-internet",
       "point-acces-wifi"
+    ],
+    "tp-linux-arborescence": [
+      "serveur",
+      "portable"
+    ],
+    "tp-linux-comptes-droits": [
+      "serveur"
+    ],
+    "tp-linux-processus-services": [
+      "serveur"
+    ],
+    "tp-linux-reseau-ssh": [
+      "serveur",
+      "pare-feu",
+      "routeur"
+    ],
+    "tp-linux-maj-sauvegardes": [
+      "serveur",
+      "disque-externe",
+      "nas"
+    ],
+    "tp-linux-scripts": [
+      "portable",
+      "raspberry-pi"
+    ],
+    "incident-serveur-linux": [
+      "serveur",
+      "pare-feu"
+    ],
+    "projet-audit-linux": [
+      "serveur",
+      "nas",
+      "pare-feu"
     ]
   }
 }

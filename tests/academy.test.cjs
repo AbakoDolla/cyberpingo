@@ -8,6 +8,7 @@ const { build: buildReseauxSeed, OUTPUT: RESEAUX_SEED } = require("../scripts/ge
 const { build: buildSocSeed, OUTPUT: SOC_SEED } = require("../scripts/generate-soc-seed.cjs");
 const { build: buildProgrammeSeed, OUTPUT: PROGRAMME_SEED } = require("../scripts/generate-reseaux-programme-seed.cjs");
 const { build: buildFondamentauxSeed, OUTPUT: FONDAMENTAUX_SEED } = require("../scripts/generate-fondamentaux-seed.cjs");
+const { build: buildLinuxSeed, OUTPUT: LINUX_SEED } = require("../scripts/generate-linux-seed.cjs");
 const { buildLabAssets, OUTPUT_DIR: LAB_DIR } = require("../scripts/generate-lab-assets.cjs");
 const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
 
@@ -21,6 +22,7 @@ const skill = (key) => contentId("skill", key);
 const SOC_SKILLS = ["lecture-journaux-linux", "audit-droits-linux", "detection-bruteforce-ssh", "analyse-logs-web", "reconstitution-incident"];
 const PROGRAMME_SKILLS = ["modeles-reseau", "plan-vlsm", "adressage-ipv6", "services-dhcp", "nat-pat", "commutation-vlan", "routage-statique", "filtrage-acl", "diagnostic-reseau", "documentation-reseau"];
 const FONDAMENTAUX_SKILLS = ["principes-securite", "ingenierie-sociale", "authentification-forte", "hygiene-numerique", "bases-cryptographie", "analyse-risques", "protection-donnees", "reponse-incident"];
+const LINUX_SKILLS = ["ligne-de-commande", "droits-et-comptes", "processus-services", "logiciels-correctifs", "reseau-ssh-pare-feu", "sauvegarde-chiffrement-linux", "scripts-shell", "durcissement-linux"];
 
 async function as(uid, sql, params = []) {
   await db.exec("reset role");
@@ -86,6 +88,7 @@ test("the Réseaux seed and the lab files match their generators", () => {
   assert.equal(fs.readFileSync(SOC_SEED, "utf8"), buildSocSeed(), "Run node scripts/generate-soc-seed.cjs");
   assert.equal(fs.readFileSync(PROGRAMME_SEED, "utf8"), buildProgrammeSeed(), "Run node scripts/generate-reseaux-programme-seed.cjs");
   assert.equal(fs.readFileSync(FONDAMENTAUX_SEED, "utf8"), buildFondamentauxSeed(), "Run node scripts/generate-fondamentaux-seed.cjs");
+  assert.equal(fs.readFileSync(LINUX_SEED, "utf8"), buildLinuxSeed(), "Run node scripts/generate-linux-seed.cjs");
   for (const file of buildLabAssets().files) {
     assert.deepEqual(fs.readFileSync(path.join(LAB_DIR, file.name)), file.data, `${file.name} is stale: run node scripts/generate-lab-assets.cjs`);
   }
@@ -107,11 +110,11 @@ test("the Réseaux path seeds a complete, published, end-to-end learning path", 
     (select count(*) from public.courses where domain_id is null) as orphan_courses,
     (select count(*) from public.domains) as domains`, [labs.length ? (await sql("select array_agg(id) as ids from public.labs where course_id = $1", [course("c2")]))[0].ids : []]);
   assert.deepEqual(Object.fromEntries(Object.entries(counts).map(([key, value]) => [key, Number(value)])), {
-    tasks: 91, keys: 91, skills: 29, links: 116, orphan_courses: 0, domains: 6,
+    tasks: 91, keys: 91, skills: 37, links: 148, orphan_courses: 0, domains: 6,
   });
 
   const assets = await sql("select kind, url from public.lab_assets");
-  assert.equal(assets.length, 73);
+  assert.equal(assets.length, 134);
   assert.ok(assets.every((row) => row.url.startsWith("/labs/") && fs.existsSync(path.join(LAB_DIR, path.basename(row.url)))), "every asset points to a real file");
 
   const events = await sql("select distinct event from public.mascot_lines where is_active");
@@ -210,7 +213,7 @@ test("an admin previews an unpublished lab without earning anything, learners ca
 
 test("skills advance from learning to validated, never on a quiz alone", async () => {
   const states = await skillStates(ids.ana);
-  assert.equal(Object.keys(states).length, 29);
+  assert.equal(Object.keys(states).length, 37);
   assert.ok(Object.values(states).every((state) => state === "not_studied"));
 
   await rpc(ids.ana, "start_lesson", { p_lesson_id: lesson("reseaux-ipv4") });
@@ -232,11 +235,12 @@ test("skills advance from learning to validated, never on a quiz alone", async (
   await passQuiz(ids.ana, "reseaux-cidr");
   const validation = await solveLab(ids.ana, "evaluation-reseaux");
   const states2 = await skillStates(ids.ana);
-  const reseauxSkills = Object.keys(states2).filter((slug) => !SOC_SKILLS.includes(slug) && !PROGRAMME_SKILLS.includes(slug) && !FONDAMENTAUX_SKILLS.includes(slug));
+  const reseauxSkills = Object.keys(states2).filter((slug) => !SOC_SKILLS.includes(slug) && !PROGRAMME_SKILLS.includes(slug) && !FONDAMENTAUX_SKILLS.includes(slug) && !LINUX_SKILLS.includes(slug));
   assert.equal(reseauxSkills.length, 6);
   assert.ok(reseauxSkills.every((slug) => states2[slug] === "validated"), JSON.stringify(states2));
   assert.ok(SOC_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a SOC skill");
   assert.ok(FONDAMENTAUX_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a Fondamentaux skill");
+  assert.ok(LINUX_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a Linux skill");
   assert.ok(PROGRAMME_SKILLS.every((slug) => states2[slug] !== "validated"), "the first Réseaux assessment never validates a skill of the programme");
   assert.equal(states2["plan-vlsm"], "learning", "its practice lab was solved, its lesson was not");
   assert.equal(validation.new_skills.length, 6);

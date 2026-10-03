@@ -1,0 +1,40 @@
+# /etc/sudoers
+# Fichier généré pour audit de configuration
+
+Defaults        env_reset
+Defaults        mail_badpass
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Defaults        use_pty
+Defaults        logfile="/var/log/sudo.log"
+
+# Spécification des privilèges utilisateur
+root            ALL=(ALL:ALL) ALL
+
+# Membres du groupe admin
+%admin          ALL=(ALL) ALL
+
+# Membres du groupe sudo
+%sudo           ALL=(ALL:ALL) ALL
+
+# Autorise les administrateurs à vérifier l’état des services
+%admins         ALL=(root) /usr/bin/systemctl status nginx, /usr/bin/systemctl status ssh, /usr/bin/systemctl status mariadb
+
+# Inclus les règles locales de l’organisation
+@includedir /etc/sudoers.d
+
+# /etc/sudoers.d/20-backup-maint
+# Besoin métier : lancer les sauvegardes nocturnes sans accès shell complet
+svc-backup ALL=(root) NOPASSWD: /usr/bin/rsync --archive --delete /srv/partage/ /srv/sauvegarde/
+svc-backup ALL=(root) NOPASSWD: /usr/bin/tar -C /srv -czf /var/backups/partage.tgz partage
+svc-backup ALL=(root) /usr/bin/systemctl status backup-nuit
+
+# /etc/sudoers.d/50-helpdesk
+# Règle limitée et nominative pour le stagiaire
+cfall ALL=(root) /usr/bin/systemctl status nginx, /usr/bin/systemctl status ssh
+cfall ALL=(root) /usr/bin/journalctl -u nginx --since today
+
+# /etc/sudoers.d/99-web-maint
+# Règle temporaire laissée par le prestataire web
+nkamga ALL=(ALL) NOPASSWD: ALL
+
+# Fin des extraits sudoers.d

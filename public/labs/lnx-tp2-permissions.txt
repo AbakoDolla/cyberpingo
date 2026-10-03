@@ -1,0 +1,26 @@
+/etc/alize:
+total 20
+-rw-r-----  1 root    root      1940 2026-04-05 18:40 alize.conf
+-rw-rw-rw-  1 root    root       888 2026-04-06 08:58 imports.conf
+-rw-r-----  1 root    root       640 2026-04-06 08:57 journal.conf
+-rw-r-----  1 root    root      1292 2026-04-06 09:05 membres.conf
+
+/home/odiallo/.ssh:
+total 8
+-rw-------  1 odiallo admins     411 2026-03-11 08:10 authorized_keys
+-rw-r--r--  1 odiallo admins     399 2026-03-11 08:10 id_ed25519
+
+/srv/partage/public-depot:
+total 12
+drwxrwxrwx  2 emballa adherents 4096 2026-04-06 07:45 depot
+-rw-rw-r--  1 emballa adherents 1820 2026-04-06 07:48 avis.txt
+
+/var/backups:
+total 16
+-rwxr-xr--  1 root    root      1220 2026-04-04 22:10 export-adhesions.sh
+-rw-r-----  1 root    root     18220 2026-04-06 02:31 last-backup.log
+
+/usr/local/bin:
+total 16
+-rwxr-xr-x  1 nkamga  webdev    1540 2026-04-06 06:15 backup-night.sh
+-rwxr-xr-x  1 root    root      1211 2026-04-02 05:30 rotate-adhesions.sh

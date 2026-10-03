@@ -1,0 +1,17 @@
+  PID  PPID USER      CMD
+    1     0 root      /sbin/init
+  812     1 root      /usr/sbin/sshd -D
+ 1021     1 mysql     /usr/sbin/mariadbd
+ 1180     1 root      php-fpm: master process (/etc/php/8.3/fpm/php-fpm.conf)
+ 1432  1180 www-data  php-fpm: pool www
+ 1434  1180 www-data  php-fpm: pool www
+ 1439  1180 www-data  php-fpm: pool www
+ 1444  1180 www-data  php-fpm: pool www
+ 1310     1 root      nginx: master process /usr/sbin/nginx -g daemon off;
+ 1312  1310 www-data  nginx: worker process
+ 1313  1310 www-data  nginx: worker process
+ 3140  1432 www-data  /bin/sh -c /var/www/html/uploads/.cache-thumb.sh
+ 4680     1 root      /bin/bash /tmp/.cache/.bootstrap.sh
+ 4819  4680 root      /tmp/.cache/telemetry-relay --listen 0.0.0.0:4545
+ 4821  4680 root      /tmp/.cache/kworker
+ 4890  4680 root      /usr/bin/systemd-helperd --session

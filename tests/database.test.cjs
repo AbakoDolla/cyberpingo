@@ -152,17 +152,17 @@ test("rewards, roles and certificates cannot be forged from the browser", async 
 
 test("the catalogue exposes published outlines publicly and hides answers from everyone", async () => {
   assert.equal((await as(null, "select id from public.courses")).length, 6);
-  assert.equal((await as(null, "select id, title from public.lessons")).length, 71);
+  assert.equal((await as(null, "select id, title from public.lessons")).length, 96);
   await rejects(as(null, "select content from public.lessons"), /permission denied/);
   await rejects(as(null, "select prompt from public.quiz_questions"), /permission denied/);
   assert.equal((await as(ids.bob, "select content from public.lessons where id = $1", [lesson("l1")]))[0].content.blocks.length > 0, true);
-  assert.equal((await as(ids.bob, "select id, prompt from public.quiz_questions")).length, 248);
+  assert.equal((await as(ids.bob, "select id, prompt from public.quiz_questions")).length, 354);
   await rejects(as(ids.bob, "select explanation from public.quiz_questions"), /permission denied/);
   await rejects(as(ids.bob, "select is_correct from public.quiz_answers"), /permission denied/);
   await rejects(as(ids.bob, "select flag from private.lab_flags"), /permission denied/);
-  assert.equal((await as(null, "select slug from public.labs")).length, 26);
+  assert.equal((await as(null, "select slug from public.labs")).length, 34);
   const [{ modules }] = await as(null, "select count(*)::int as modules from public.course_modules");
-  assert.equal(modules, 28);
+  assert.equal(modules, 34);
 });
 
 test("a lesson must be opened and read before it pays XP, and pays only once", async () => {

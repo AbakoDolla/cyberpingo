@@ -1,0 +1,387 @@
+Apr 21 00:00:00 srv-web01 CRON[900]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 00:00:04 srv-web01 CRON[900]: pam_unix(cron:session): session closed for user root
+Apr 21 00:12:00 srv-web01 CRON[901]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 00:12:04 srv-web01 CRON[901]: pam_unix(cron:session): session closed for user root
+Apr 21 00:24:00 srv-web01 CRON[902]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 00:24:04 srv-web01 CRON[902]: pam_unix(cron:session): session closed for user root
+Apr 21 00:36:00 srv-web01 CRON[903]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 00:36:04 srv-web01 CRON[903]: pam_unix(cron:session): session closed for user root
+Apr 21 00:48:00 srv-web01 CRON[904]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 00:48:04 srv-web01 CRON[904]: pam_unix(cron:session): session closed for user root
+Apr 21 01:00:00 srv-web01 CRON[905]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 01:00:04 srv-web01 CRON[905]: pam_unix(cron:session): session closed for user root
+Apr 21 01:12:00 srv-web01 CRON[906]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 01:12:04 srv-web01 CRON[906]: pam_unix(cron:session): session closed for user root
+Apr 21 01:24:00 srv-web01 CRON[907]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 01:24:04 srv-web01 CRON[907]: pam_unix(cron:session): session closed for user root
+Apr 21 01:36:00 srv-web01 CRON[908]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 01:36:04 srv-web01 CRON[908]: pam_unix(cron:session): session closed for user root
+Apr 21 01:48:00 srv-web01 CRON[909]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 01:48:04 srv-web01 CRON[909]: pam_unix(cron:session): session closed for user root
+Apr 21 02:00:00 srv-web01 CRON[910]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 02:00:04 srv-web01 CRON[910]: pam_unix(cron:session): session closed for user root
+Apr 21 02:12:00 srv-web01 CRON[911]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 02:12:04 srv-web01 CRON[911]: pam_unix(cron:session): session closed for user root
+Apr 21 02:17:05 srv-web01 sshd[2400]: Failed password for invalid user admin from 198.51.100.23 port 56066 ssh2
+Apr 21 02:17:07 srv-web01 sshd[2400]: Connection closed by authenticating user admin 198.51.100.23 port 56066 [preauth]
+Apr 21 02:17:44 srv-web01 sshd[2405]: Failed password for root from 198.51.100.23 port 50185 ssh2
+Apr 21 02:17:46 srv-web01 sshd[2405]: Connection closed by authenticating user root 198.51.100.23 port 50185 [preauth]
+Apr 21 02:18:19 srv-web01 sshd[2410]: Failed password for invalid user test from 198.51.100.23 port 56156 ssh2
+Apr 21 02:18:21 srv-web01 sshd[2410]: Connection closed by authenticating user test 198.51.100.23 port 56156 [preauth]
+Apr 21 02:24:00 srv-web01 CRON[912]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 02:24:04 srv-web01 CRON[912]: pam_unix(cron:session): session closed for user root
+Apr 21 02:36:00 srv-web01 CRON[913]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 02:36:04 srv-web01 CRON[913]: pam_unix(cron:session): session closed for user root
+Apr 21 02:48:00 srv-web01 CRON[914]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 02:48:04 srv-web01 CRON[914]: pam_unix(cron:session): session closed for user root
+Apr 21 03:00:00 srv-web01 CRON[915]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 03:00:04 srv-web01 CRON[915]: pam_unix(cron:session): session closed for user root
+Apr 21 03:12:00 srv-web01 CRON[916]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 03:12:04 srv-web01 CRON[916]: pam_unix(cron:session): session closed for user root
+Apr 21 03:24:00 srv-web01 CRON[917]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 03:24:04 srv-web01 CRON[917]: pam_unix(cron:session): session closed for user root
+Apr 21 03:36:00 srv-web01 CRON[918]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 03:36:04 srv-web01 CRON[918]: pam_unix(cron:session): session closed for user root
+Apr 21 03:48:00 srv-web01 CRON[919]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 03:48:04 srv-web01 CRON[919]: pam_unix(cron:session): session closed for user root
+Apr 21 04:00:00 srv-web01 CRON[920]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 04:00:04 srv-web01 CRON[920]: pam_unix(cron:session): session closed for user root
+Apr 21 04:12:00 srv-web01 CRON[921]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 04:12:04 srv-web01 CRON[921]: pam_unix(cron:session): session closed for user root
+Apr 21 04:24:00 srv-web01 CRON[922]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 04:24:04 srv-web01 CRON[922]: pam_unix(cron:session): session closed for user root
+Apr 21 04:36:00 srv-web01 CRON[923]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 04:36:04 srv-web01 CRON[923]: pam_unix(cron:session): session closed for user root
+Apr 21 04:48:00 srv-web01 CRON[924]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 04:48:04 srv-web01 CRON[924]: pam_unix(cron:session): session closed for user root
+Apr 21 05:00:00 srv-web01 CRON[925]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 05:00:04 srv-web01 CRON[925]: pam_unix(cron:session): session closed for user root
+Apr 21 05:12:00 srv-web01 CRON[926]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 05:12:04 srv-web01 CRON[926]: pam_unix(cron:session): session closed for user root
+Apr 21 05:24:00 srv-web01 CRON[927]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 05:24:04 srv-web01 CRON[927]: pam_unix(cron:session): session closed for user root
+Apr 21 05:36:00 srv-web01 CRON[928]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 05:36:04 srv-web01 CRON[928]: pam_unix(cron:session): session closed for user root
+Apr 21 05:48:00 srv-web01 CRON[929]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 05:48:04 srv-web01 CRON[929]: pam_unix(cron:session): session closed for user root
+Apr 21 06:00:00 srv-web01 CRON[930]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 06:00:04 srv-web01 CRON[930]: pam_unix(cron:session): session closed for user root
+Apr 21 06:12:00 srv-web01 CRON[931]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 06:12:04 srv-web01 CRON[931]: pam_unix(cron:session): session closed for user root
+Apr 21 06:24:00 srv-web01 CRON[932]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 06:24:04 srv-web01 CRON[932]: pam_unix(cron:session): session closed for user root
+Apr 21 06:36:00 srv-web01 CRON[933]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 06:36:04 srv-web01 CRON[933]: pam_unix(cron:session): session closed for user root
+Apr 21 06:40:55 srv-web01 sshd[2415]: Failed password for invalid user deploy from 198.51.100.101 port 57535 ssh2
+Apr 21 06:40:57 srv-web01 sshd[2415]: Connection closed by authenticating user deploy 198.51.100.101 port 57535 [preauth]
+Apr 21 06:41:21 srv-web01 sshd[2420]: Failed password for root from 198.51.100.101 port 58293 ssh2
+Apr 21 06:41:23 srv-web01 sshd[2420]: Connection closed by authenticating user root 198.51.100.101 port 58293 [preauth]
+Apr 21 06:42:03 srv-web01 sshd[2425]: Failed password for odiallo from 198.51.100.101 port 51843 ssh2
+Apr 21 06:42:05 srv-web01 sshd[2425]: Connection closed by authenticating user odiallo 198.51.100.101 port 51843 [preauth]
+Apr 21 06:48:00 srv-web01 CRON[934]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 06:48:04 srv-web01 CRON[934]: pam_unix(cron:session): session closed for user root
+Apr 21 07:00:00 srv-web01 CRON[935]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 07:00:04 srv-web01 CRON[935]: pam_unix(cron:session): session closed for user root
+Apr 21 07:12:00 srv-web01 CRON[936]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 07:12:04 srv-web01 CRON[936]: pam_unix(cron:session): session closed for user root
+Apr 21 07:12:17 srv-web01 sshd[1500]: Accepted publickey for odiallo from 10.20.0.100 port 42634 ssh2: ED25519 SHA256:9v2YK1r7ZsM0dQnX3NwT
+Apr 21 07:12:18 srv-web01 sshd[1500]: pam_unix(sshd:session): session opened for user odiallo(uid=1020) by (uid=0)
+Apr 21 07:21:17 srv-web01 sudo[1700]: odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+Apr 21 07:24:00 srv-web01 CRON[937]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 07:24:04 srv-web01 CRON[937]: pam_unix(cron:session): session closed for user root
+Apr 21 07:36:00 srv-web01 CRON[938]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 07:36:04 srv-web01 CRON[938]: pam_unix(cron:session): session closed for user root
+Apr 21 07:46:17 srv-web01 sshd[1500]: pam_unix(sshd:session): session closed for user odiallo
+Apr 21 07:48:00 srv-web01 CRON[939]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 07:48:04 srv-web01 CRON[939]: pam_unix(cron:session): session closed for user root
+Apr 21 08:00:00 srv-web01 CRON[940]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 08:00:04 srv-web01 CRON[940]: pam_unix(cron:session): session closed for user root
+Apr 21 08:12:00 srv-web01 CRON[941]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 08:12:04 srv-web01 CRON[941]: pam_unix(cron:session): session closed for user root
+Apr 21 08:24:00 srv-web01 CRON[942]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 08:24:04 srv-web01 CRON[942]: pam_unix(cron:session): session closed for user root
+Apr 21 08:36:00 srv-web01 CRON[943]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 08:36:04 srv-web01 CRON[943]: pam_unix(cron:session): session closed for user root
+Apr 21 08:48:00 srv-web01 CRON[944]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 08:48:04 srv-web01 CRON[944]: pam_unix(cron:session): session closed for user root
+Apr 21 09:00:00 srv-web01 CRON[945]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 09:00:04 srv-web01 CRON[945]: pam_unix(cron:session): session closed for user root
+Apr 21 09:12:00 srv-web01 CRON[946]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 09:12:04 srv-web01 CRON[946]: pam_unix(cron:session): session closed for user root
+Apr 21 09:24:00 srv-web01 CRON[947]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 09:24:04 srv-web01 CRON[947]: pam_unix(cron:session): session closed for user root
+Apr 21 09:36:00 srv-web01 CRON[948]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 09:36:04 srv-web01 CRON[948]: pam_unix(cron:session): session closed for user root
+Apr 21 09:40:05 srv-web01 sshd[1528]: Accepted publickey for nkamga from 203.0.113.44 port 49854 ssh2: RSA SHA256:U5x7L9eQ2mYc8JdR1BvK
+Apr 21 09:40:06 srv-web01 sshd[1528]: pam_unix(sshd:session): session opened for user nkamga(uid=1008) by (uid=0)
+Apr 21 09:48:00 srv-web01 CRON[949]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 09:48:04 srv-web01 CRON[949]: pam_unix(cron:session): session closed for user root
+Apr 21 10:00:00 srv-web01 CRON[950]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 10:00:04 srv-web01 CRON[950]: pam_unix(cron:session): session closed for user root
+Apr 21 10:12:00 srv-web01 CRON[951]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 10:12:04 srv-web01 CRON[951]: pam_unix(cron:session): session closed for user root
+Apr 21 10:16:05 srv-web01 sshd[1528]: pam_unix(sshd:session): session closed for user nkamga
+Apr 21 10:24:00 srv-web01 CRON[952]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 10:24:04 srv-web01 CRON[952]: pam_unix(cron:session): session closed for user root
+Apr 21 10:36:00 srv-web01 CRON[953]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 10:36:04 srv-web01 CRON[953]: pam_unix(cron:session): session closed for user root
+Apr 21 10:48:00 srv-web01 CRON[954]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 10:48:04 srv-web01 CRON[954]: pam_unix(cron:session): session closed for user root
+Apr 21 11:00:00 srv-web01 CRON[955]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 11:00:04 srv-web01 CRON[955]: pam_unix(cron:session): session closed for user root
+Apr 21 11:12:00 srv-web01 CRON[956]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 11:12:04 srv-web01 CRON[956]: pam_unix(cron:session): session closed for user root
+Apr 21 11:24:00 srv-web01 CRON[957]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 11:24:04 srv-web01 CRON[957]: pam_unix(cron:session): session closed for user root
+Apr 21 11:36:00 srv-web01 CRON[958]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 11:36:04 srv-web01 CRON[958]: pam_unix(cron:session): session closed for user root
+Apr 21 11:48:00 srv-web01 CRON[959]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 11:48:04 srv-web01 CRON[959]: pam_unix(cron:session): session closed for user root
+Apr 21 11:58:36 srv-web01 sshd[1563]: Accepted publickey for emballa from 203.0.113.24 port 48657 ssh2: ED25519 SHA256:6sR0nP2qW4cY8jT5mH1a
+Apr 21 11:58:37 srv-web01 sshd[1563]: pam_unix(sshd:session): session opened for user emballa(uid=1003) by (uid=0)
+Apr 21 12:00:00 srv-web01 CRON[960]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 12:00:04 srv-web01 CRON[960]: pam_unix(cron:session): session closed for user root
+Apr 21 12:12:00 srv-web01 CRON[961]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 12:12:04 srv-web01 CRON[961]: pam_unix(cron:session): session closed for user root
+Apr 21 12:24:00 srv-web01 CRON[962]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 12:24:04 srv-web01 CRON[962]: pam_unix(cron:session): session closed for user root
+Apr 21 12:35:36 srv-web01 sshd[1563]: pam_unix(sshd:session): session closed for user emballa
+Apr 21 12:36:00 srv-web01 CRON[963]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 12:36:04 srv-web01 CRON[963]: pam_unix(cron:session): session closed for user root
+Apr 21 12:48:00 srv-web01 CRON[964]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 12:48:04 srv-web01 CRON[964]: pam_unix(cron:session): session closed for user root
+Apr 21 13:00:00 srv-web01 CRON[965]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 13:00:04 srv-web01 CRON[965]: pam_unix(cron:session): session closed for user root
+Apr 21 13:12:00 srv-web01 CRON[966]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 13:12:04 srv-web01 CRON[966]: pam_unix(cron:session): session closed for user root
+Apr 21 13:22:48 srv-web01 sshd[1507]: Accepted publickey for odiallo from 10.20.0.100 port 42477 ssh2: ED25519 SHA256:9v2YK1r7ZsM0dQnX3NwT
+Apr 21 13:22:49 srv-web01 sshd[1507]: pam_unix(sshd:session): session opened for user odiallo(uid=1027) by (uid=0)
+Apr 21 13:24:00 srv-web01 CRON[967]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 13:24:04 srv-web01 CRON[967]: pam_unix(cron:session): session closed for user root
+Apr 21 13:31:48 srv-web01 sudo[1707]: odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+Apr 21 13:36:00 srv-web01 CRON[968]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 13:36:04 srv-web01 CRON[968]: pam_unix(cron:session): session closed for user root
+Apr 21 13:48:00 srv-web01 CRON[969]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 13:48:04 srv-web01 CRON[969]: pam_unix(cron:session): session closed for user root
+Apr 21 13:51:02 srv-web01 sshd[2800]: Failed password for invalid user admin from 203.0.113.91 port 51461 ssh2
+Apr 21 13:51:03 srv-web01 sshd[2800]: Invalid user admin from 203.0.113.91 port 51461
+Apr 21 13:51:05 srv-web01 sshd[2800]: Connection closed by authenticating user admin 203.0.113.91 port 51461 [preauth]
+Apr 21 13:52:24 srv-web01 sshd[2804]: Failed password for root from 203.0.113.91 port 51684 ssh2
+Apr 21 13:52:27 srv-web01 sshd[2804]: Connection closed by authenticating user root 203.0.113.91 port 51684 [preauth]
+Apr 21 13:53:17 srv-web01 sshd[2808]: Failed password for invalid user support from 203.0.113.91 port 51535 ssh2
+Apr 21 13:53:18 srv-web01 sshd[2808]: Invalid user support from 203.0.113.91 port 51535
+Apr 21 13:54:31 srv-web01 sshd[2812]: Failed password for odiallo from 203.0.113.91 port 51871 ssh2
+Apr 21 13:55:42 srv-web01 sshd[2816]: Failed password for root from 203.0.113.91 port 51506 ssh2
+Apr 21 13:57:18 srv-web01 sshd[2820]: Failed password for svc-web from 203.0.113.91 port 51628 ssh2
+Apr 21 13:57:21 srv-web01 sshd[2820]: Connection closed by authenticating user svc-web 203.0.113.91 port 51628 [preauth]
+Apr 21 13:58:47 srv-web01 sshd[2824]: Failed password for invalid user prestataire from 203.0.113.91 port 51979 ssh2
+Apr 21 13:58:48 srv-web01 sshd[2824]: Invalid user prestataire from 203.0.113.91 port 51979
+Apr 21 13:58:50 srv-web01 sshd[2824]: Connection closed by authenticating user prestataire 203.0.113.91 port 51979 [preauth]
+Apr 21 13:59:48 srv-web01 sshd[1507]: pam_unix(sshd:session): session closed for user odiallo
+Apr 21 14:00:00 srv-web01 CRON[970]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 14:00:02 srv-web01 sshd[2828]: Failed password for root from 203.0.113.91 port 51585 ssh2
+Apr 21 14:00:04 srv-web01 CRON[970]: pam_unix(cron:session): session closed for user root
+Apr 21 14:00:05 srv-web01 sshd[2828]: Connection closed by authenticating user root 203.0.113.91 port 51585 [preauth]
+Apr 21 14:01:16 srv-web01 sshd[2832]: Failed password for svc-web from 203.0.113.91 port 51321 ssh2
+Apr 21 14:02:25 srv-web01 sshd[2836]: Failed password for invalid user ubuntu from 203.0.113.91 port 52050 ssh2
+Apr 21 14:02:26 srv-web01 sshd[2836]: Invalid user ubuntu from 203.0.113.91 port 52050
+Apr 21 14:03:11 srv-web01 sshd[2840]: Failed password for odiallo from 203.0.113.91 port 52194 ssh2
+Apr 21 14:04:08 srv-web01 sshd[2844]: Failed password for root from 203.0.113.91 port 51374 ssh2
+Apr 21 14:05:39 srv-web01 sshd[2848]: Failed password for svc-web from 203.0.113.91 port 51757 ssh2
+Apr 21 14:07:02 srv-web01 sshd[2852]: Failed password for svc-web from 203.0.113.91 port 51954 ssh2
+Apr 21 14:12:00 srv-web01 CRON[971]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 14:12:04 srv-web01 CRON[971]: pam_unix(cron:session): session closed for user root
+Apr 21 14:18:07 srv-web01 sshd[3114]: Accepted password for svc-web from 198.51.100.62 port 56318 ssh2
+Apr 21 14:18:09 srv-web01 sshd[3114]: pam_unix(sshd:session): session opened for user svc-web(uid=996) by (uid=0)
+Apr 21 14:21:42 srv-web01 sudo[3190]: svc-web : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/tee /etc/cron.d/system-cache
+Apr 21 14:22:03 srv-web01 sudo[3194]: svc-web : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/tee /usr/local/bin/system-cache-refresh.sh
+Apr 21 14:24:00 srv-web01 CRON[972]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 14:24:04 srv-web01 CRON[972]: pam_unix(cron:session): session closed for user root
+Apr 21 14:25:11 srv-web01 sudo[3207]: svc-web : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash -G sudo sysmaint
+Apr 21 14:25:13 srv-web01 useradd[3208]: new user: name=sysmaint, UID=1008, GID=1008, home=/home/sysmaint, shell=/bin/bash, from=/dev/pts/1
+Apr 21 14:25:31 srv-web01 sudo[3214]: svc-web : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/sbin/chpasswd -e
+Apr 21 14:25:33 srv-web01 groupadd[3215]: new group: name=sysmaint, GID=1008
+Apr 21 14:26:04 srv-web01 sudo[3221]: svc-web : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/chmod 755 /usr/local/bin/system-cache-refresh.sh
+Apr 21 14:29:12 srv-web01 sshd[3114]: pam_unix(sshd:session): session closed for user svc-web
+Apr 21 14:36:00 srv-web01 CRON[973]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 14:36:04 srv-web01 CRON[973]: pam_unix(cron:session): session closed for user root
+Apr 21 14:48:00 srv-web01 CRON[974]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 14:48:04 srv-web01 CRON[974]: pam_unix(cron:session): session closed for user root
+Apr 21 15:00:00 srv-web01 CRON[975]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 15:00:04 srv-web01 CRON[975]: pam_unix(cron:session): session closed for user root
+Apr 21 15:12:00 srv-web01 CRON[976]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 15:12:04 srv-web01 CRON[976]: pam_unix(cron:session): session closed for user root
+Apr 21 15:24:00 srv-web01 CRON[977]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 15:24:04 srv-web01 CRON[977]: pam_unix(cron:session): session closed for user root
+Apr 21 15:36:00 srv-web01 CRON[978]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 15:36:04 srv-web01 CRON[978]: pam_unix(cron:session): session closed for user root
+Apr 21 15:48:00 srv-web01 CRON[979]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 15:48:04 srv-web01 CRON[979]: pam_unix(cron:session): session closed for user root
+Apr 21 16:00:00 srv-web01 CRON[980]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 16:00:04 srv-web01 CRON[980]: pam_unix(cron:session): session closed for user root
+Apr 21 16:12:00 srv-web01 CRON[981]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 16:12:04 srv-web01 CRON[981]: pam_unix(cron:session): session closed for user root
+Apr 21 16:18:12 srv-web01 sshd[1535]: Accepted publickey for nkamga from 203.0.113.44 port 45889 ssh2: RSA SHA256:U5x7L9eQ2mYc8JdR1BvK
+Apr 21 16:18:13 srv-web01 sshd[1535]: pam_unix(sshd:session): session opened for user nkamga(uid=1015) by (uid=0)
+Apr 21 16:24:00 srv-web01 CRON[982]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 16:24:04 srv-web01 CRON[982]: pam_unix(cron:session): session closed for user root
+Apr 21 16:36:00 srv-web01 CRON[983]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 16:36:04 srv-web01 CRON[983]: pam_unix(cron:session): session closed for user root
+Apr 21 16:48:00 srv-web01 CRON[984]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 16:48:04 srv-web01 CRON[984]: pam_unix(cron:session): session closed for user root
+Apr 21 16:51:12 srv-web01 sshd[1535]: pam_unix(sshd:session): session closed for user nkamga
+Apr 21 17:00:00 srv-web01 CRON[985]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 17:00:04 srv-web01 CRON[985]: pam_unix(cron:session): session closed for user root
+Apr 21 17:12:00 srv-web01 CRON[986]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 17:12:04 srv-web01 CRON[986]: pam_unix(cron:session): session closed for user root
+Apr 21 17:24:00 srv-web01 CRON[987]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 17:24:04 srv-web01 CRON[987]: pam_unix(cron:session): session closed for user root
+Apr 21 17:36:00 srv-web01 CRON[988]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 17:36:04 srv-web01 CRON[988]: pam_unix(cron:session): session closed for user root
+Apr 21 17:48:00 srv-web01 CRON[989]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 17:48:04 srv-web01 CRON[989]: pam_unix(cron:session): session closed for user root
+Apr 21 18:00:00 srv-web01 CRON[990]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 18:00:04 srv-web01 CRON[990]: pam_unix(cron:session): session closed for user root
+Apr 21 18:05:49 srv-web01 sshd[1549]: Accepted publickey for adjovi from 203.0.113.18 port 52851 ssh2: ED25519 SHA256:2mVf7pQ8kL3xY0nB6sD1
+Apr 21 18:05:50 srv-web01 sshd[1549]: pam_unix(sshd:session): session opened for user adjovi(uid=1029) by (uid=0)
+Apr 21 18:12:00 srv-web01 CRON[991]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 18:12:04 srv-web01 CRON[991]: pam_unix(cron:session): session closed for user root
+Apr 21 18:24:00 srv-web01 CRON[992]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 18:24:04 srv-web01 CRON[992]: pam_unix(cron:session): session closed for user root
+Apr 21 18:36:00 srv-web01 CRON[993]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 18:36:04 srv-web01 CRON[993]: pam_unix(cron:session): session closed for user root
+Apr 21 18:39:49 srv-web01 sshd[1549]: pam_unix(sshd:session): session closed for user adjovi
+Apr 21 18:48:00 srv-web01 CRON[994]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 18:48:04 srv-web01 CRON[994]: pam_unix(cron:session): session closed for user root
+Apr 21 19:00:00 srv-web01 CRON[995]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 19:00:04 srv-web01 CRON[995]: pam_unix(cron:session): session closed for user root
+Apr 21 19:12:00 srv-web01 CRON[996]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 19:12:04 srv-web01 CRON[996]: pam_unix(cron:session): session closed for user root
+Apr 21 19:24:00 srv-web01 CRON[997]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 19:24:04 srv-web01 CRON[997]: pam_unix(cron:session): session closed for user root
+Apr 21 19:36:00 srv-web01 CRON[998]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 19:36:04 srv-web01 CRON[998]: pam_unix(cron:session): session closed for user root
+Apr 21 19:48:00 srv-web01 CRON[999]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 19:48:04 srv-web01 CRON[999]: pam_unix(cron:session): session closed for user root
+Apr 21 20:00:00 srv-web01 CRON[1000]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 20:00:04 srv-web01 CRON[1000]: pam_unix(cron:session): session closed for user root
+Apr 21 20:07:31 srv-web01 sshd[1514]: Accepted publickey for odiallo from 10.20.0.100 port 45617 ssh2: ED25519 SHA256:9v2YK1r7ZsM0dQnX3NwT
+Apr 21 20:07:32 srv-web01 sshd[1514]: pam_unix(sshd:session): session opened for user odiallo(uid=1034) by (uid=0)
+Apr 21 20:12:00 srv-web01 CRON[1001]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 20:12:04 srv-web01 CRON[1001]: pam_unix(cron:session): session closed for user root
+Apr 21 20:16:31 srv-web01 sudo[1714]: odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+Apr 21 20:24:00 srv-web01 CRON[1002]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 20:24:04 srv-web01 CRON[1002]: pam_unix(cron:session): session closed for user root
+Apr 21 20:36:00 srv-web01 CRON[1003]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 20:36:04 srv-web01 CRON[1003]: pam_unix(cron:session): session closed for user root
+Apr 21 20:41:31 srv-web01 sshd[1514]: pam_unix(sshd:session): session closed for user odiallo
+Apr 21 20:48:00 srv-web01 CRON[1004]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 20:48:04 srv-web01 CRON[1004]: pam_unix(cron:session): session closed for user root
+Apr 21 21:00:00 srv-web01 CRON[1005]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 21:00:04 srv-web01 CRON[1005]: pam_unix(cron:session): session closed for user root
+Apr 21 21:12:00 srv-web01 CRON[1006]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 21:12:04 srv-web01 CRON[1006]: pam_unix(cron:session): session closed for user root
+Apr 21 21:24:00 srv-web01 CRON[1007]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 21:24:04 srv-web01 CRON[1007]: pam_unix(cron:session): session closed for user root
+Apr 21 21:36:00 srv-web01 CRON[1008]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 21:36:04 srv-web01 CRON[1008]: pam_unix(cron:session): session closed for user root
+Apr 21 21:48:00 srv-web01 CRON[1009]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 21:48:04 srv-web01 CRON[1009]: pam_unix(cron:session): session closed for user root
+Apr 21 22:00:00 srv-web01 CRON[1010]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 22:00:04 srv-web01 CRON[1010]: pam_unix(cron:session): session closed for user root
+Apr 21 22:12:00 srv-web01 CRON[1011]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 22:12:04 srv-web01 CRON[1011]: pam_unix(cron:session): session closed for user root
+Apr 21 22:15:17 srv-web01 sshd[2430]: Failed password for invalid user backup from 203.0.113.150 port 53449 ssh2
+Apr 21 22:15:19 srv-web01 sshd[2430]: Connection closed by authenticating user backup 203.0.113.150 port 53449 [preauth]
+Apr 21 22:15:49 srv-web01 sshd[2435]: Failed password for nkamga from 203.0.113.150 port 52269 ssh2
+Apr 21 22:15:51 srv-web01 sshd[2435]: Connection closed by authenticating user nkamga 203.0.113.150 port 52269 [preauth]
+Apr 21 22:16:20 srv-web01 sshd[2440]: Failed password for invalid user support from 203.0.113.150 port 53250 ssh2
+Apr 21 22:16:22 srv-web01 sshd[2440]: Connection closed by authenticating user support 203.0.113.150 port 53250 [preauth]
+Apr 21 22:24:00 srv-web01 CRON[1012]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 22:24:04 srv-web01 CRON[1012]: pam_unix(cron:session): session closed for user root
+Apr 21 22:36:00 srv-web01 CRON[1013]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 22:36:04 srv-web01 CRON[1013]: pam_unix(cron:session): session closed for user root
+Apr 21 22:48:00 srv-web01 CRON[1014]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 22:48:04 srv-web01 CRON[1014]: pam_unix(cron:session): session closed for user root
+Apr 21 23:00:00 srv-web01 CRON[1015]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 23:00:04 srv-web01 CRON[1015]: pam_unix(cron:session): session closed for user root
+Apr 21 23:12:00 srv-web01 CRON[1016]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 23:12:04 srv-web01 CRON[1016]: pam_unix(cron:session): session closed for user root
+Apr 21 23:24:00 srv-web01 CRON[1017]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 23:24:04 srv-web01 CRON[1017]: pam_unix(cron:session): session closed for user root
+Apr 21 23:36:00 srv-web01 CRON[1018]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 23:36:04 srv-web01 CRON[1018]: pam_unix(cron:session): session closed for user root
+Apr 21 23:48:00 srv-web01 CRON[1019]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 21 23:48:04 srv-web01 CRON[1019]: pam_unix(cron:session): session closed for user root
+Apr 22 00:00:00 srv-web01 CRON[1020]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 00:00:04 srv-web01 CRON[1020]: pam_unix(cron:session): session closed for user root
+Apr 22 00:12:00 srv-web01 CRON[1021]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 00:12:04 srv-web01 CRON[1021]: pam_unix(cron:session): session closed for user root
+Apr 22 00:24:00 srv-web01 CRON[1022]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 00:24:04 srv-web01 CRON[1022]: pam_unix(cron:session): session closed for user root
+Apr 22 00:36:00 srv-web01 CRON[1023]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 00:36:04 srv-web01 CRON[1023]: pam_unix(cron:session): session closed for user root
+Apr 22 00:48:00 srv-web01 CRON[1024]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 00:48:04 srv-web01 CRON[1024]: pam_unix(cron:session): session closed for user root
+Apr 22 01:00:00 srv-web01 CRON[1025]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 01:00:04 srv-web01 CRON[1025]: pam_unix(cron:session): session closed for user root
+Apr 22 01:12:00 srv-web01 CRON[1026]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 01:12:04 srv-web01 CRON[1026]: pam_unix(cron:session): session closed for user root
+Apr 22 01:14:09 srv-web01 sshd[1542]: Accepted publickey for nkamga from 203.0.113.44 port 48156 ssh2: RSA SHA256:U5x7L9eQ2mYc8JdR1BvK
+Apr 22 01:14:10 srv-web01 sshd[1542]: pam_unix(sshd:session): session opened for user nkamga(uid=1022) by (uid=0)
+Apr 22 01:24:00 srv-web01 CRON[1027]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 01:24:04 srv-web01 CRON[1027]: pam_unix(cron:session): session closed for user root
+Apr 22 01:36:00 srv-web01 CRON[1028]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 01:36:04 srv-web01 CRON[1028]: pam_unix(cron:session): session closed for user root
+Apr 22 01:46:09 srv-web01 sshd[1542]: pam_unix(sshd:session): session closed for user nkamga
+Apr 22 01:48:00 srv-web01 CRON[1029]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 01:48:04 srv-web01 CRON[1029]: pam_unix(cron:session): session closed for user root
+Apr 22 02:00:00 srv-web01 CRON[1030]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 02:00:04 srv-web01 CRON[1030]: pam_unix(cron:session): session closed for user root
+Apr 22 02:12:00 srv-web01 CRON[1031]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 02:12:04 srv-web01 CRON[1031]: pam_unix(cron:session): session closed for user root
+Apr 22 02:24:00 srv-web01 CRON[1032]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 02:24:04 srv-web01 CRON[1032]: pam_unix(cron:session): session closed for user root
+Apr 22 02:36:00 srv-web01 CRON[1033]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 02:36:04 srv-web01 CRON[1033]: pam_unix(cron:session): session closed for user root
+Apr 22 02:48:00 srv-web01 CRON[1034]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 02:48:04 srv-web01 CRON[1034]: pam_unix(cron:session): session closed for user root
+Apr 22 03:00:00 srv-web01 CRON[1035]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 03:00:04 srv-web01 CRON[1035]: pam_unix(cron:session): session closed for user root
+Apr 22 03:12:00 srv-web01 CRON[1036]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 03:12:04 srv-web01 CRON[1036]: pam_unix(cron:session): session closed for user root
+Apr 22 03:24:00 srv-web01 CRON[1037]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 03:24:04 srv-web01 CRON[1037]: pam_unix(cron:session): session closed for user root
+Apr 22 03:36:00 srv-web01 CRON[1038]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 03:36:04 srv-web01 CRON[1038]: pam_unix(cron:session): session closed for user root
+Apr 22 03:48:00 srv-web01 CRON[1039]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 03:48:04 srv-web01 CRON[1039]: pam_unix(cron:session): session closed for user root
+Apr 22 04:00:00 srv-web01 CRON[1040]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 04:00:04 srv-web01 CRON[1040]: pam_unix(cron:session): session closed for user root
+Apr 22 04:12:00 srv-web01 CRON[1041]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 04:12:04 srv-web01 CRON[1041]: pam_unix(cron:session): session closed for user root
+Apr 22 04:12:22 srv-web01 sshd[1556]: Accepted publickey for adjovi from 203.0.113.18 port 51537 ssh2: ED25519 SHA256:2mVf7pQ8kL3xY0nB6sD1
+Apr 22 04:12:23 srv-web01 sshd[1556]: pam_unix(sshd:session): session opened for user adjovi(uid=1036) by (uid=0)
+Apr 22 04:24:00 srv-web01 CRON[1042]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 04:24:04 srv-web01 CRON[1042]: pam_unix(cron:session): session closed for user root
+Apr 22 04:36:00 srv-web01 CRON[1043]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 04:36:04 srv-web01 CRON[1043]: pam_unix(cron:session): session closed for user root
+Apr 22 04:47:22 srv-web01 sshd[1556]: pam_unix(sshd:session): session closed for user adjovi
+Apr 22 04:48:00 srv-web01 CRON[1044]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 04:48:04 srv-web01 CRON[1044]: pam_unix(cron:session): session closed for user root
+Apr 22 05:00:00 srv-web01 CRON[1045]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 05:00:04 srv-web01 CRON[1045]: pam_unix(cron:session): session closed for user root
+Apr 22 05:12:00 srv-web01 CRON[1046]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 05:12:04 srv-web01 CRON[1046]: pam_unix(cron:session): session closed for user root
+Apr 22 05:24:00 srv-web01 CRON[1047]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 05:24:04 srv-web01 CRON[1047]: pam_unix(cron:session): session closed for user root
+Apr 22 05:36:00 srv-web01 CRON[1048]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 05:36:04 srv-web01 CRON[1048]: pam_unix(cron:session): session closed for user root
+Apr 22 05:41:44 srv-web01 sshd[1521]: Accepted publickey for odiallo from 10.20.0.100 port 46313 ssh2: ED25519 SHA256:9v2YK1r7ZsM0dQnX3NwT
+Apr 22 05:41:45 srv-web01 sshd[1521]: pam_unix(sshd:session): session opened for user odiallo(uid=1001) by (uid=0)
+Apr 22 05:48:00 srv-web01 CRON[1049]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 05:48:04 srv-web01 CRON[1049]: pam_unix(cron:session): session closed for user root
+Apr 22 05:50:44 srv-web01 sudo[1721]: odiallo : TTY=pts/0 ; PWD=/home/odiallo ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+Apr 22 06:00:00 srv-web01 CRON[1050]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+Apr 22 06:00:04 srv-web01 CRON[1050]: pam_unix(cron:session): session closed for user root
+Apr 22 06:17:44 srv-web01 sshd[1521]: pam_unix(sshd:session): session closed for user odiallo

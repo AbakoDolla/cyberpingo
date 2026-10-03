@@ -1,0 +1,223 @@
+/srv:
+total 8
+drwxr-xr-x  2 root     root       4096 2026-04-06 07:11 partage
+drwxr-xr-x  2 odiallo  admins     4096 2026-04-06 06:50 scripts
+
+/srv/partage:
+total 12
+drwxr-xr-x  2 emballa  adherents   4096 2026-04-06 07:13 adhesions
+drwxr-xr-x  2 adjovi   webdev     4096 2026-04-06 07:15 communication
+drwxr-xr-x  2 straore  compta     4096 2026-04-06 07:12 compta
+
+/srv/partage/compta:
+total 16
+drwxr-xr-x  2 straore  compta     4096 2026-03-31 17:40 2026-03
+drwxr-xr-x  2 straore  compta     4096 2026-04-06 09:32 2026-04
+drwxr-xr-x  2 straore  compta     4096 2026-04-01 08:20 archive
+lrwxrwxrwx  1 root     root          7 2026-04-06 07:12 courant -> 2026-04
+drwxr-xr-x  2 straore  compta     4096 2026-03-18 12:18 modeles
+
+/srv/partage/compta/2026-03:
+total 1236
+-rw-r--r--  1 straore  compta   249442 2026-03-31 17:28 balance-2026-03.pdf
+-rw-r--r--  1 straore  compta    18424 2026-03-29 14:04 factures-fournisseurs-2026-03.csv
+-rw-r--r--  1 straore  compta    91324 2026-03-31 17:22 grand-livre-2026-03.ods
+-rw-r--r--  1 straore  compta    48213 2026-03-30 16:42 journal-banque-2026-03.xlsx
+-rw-r--r--  1 straore  compta    39102 2026-03-30 16:48 journal-caisse-2026-03.xlsx
+-rw-r--r--  1 straore  compta   603218 2026-03-31 16:58 justificatifs-2026-03.zip
+-rw-r--r--  1 straore  compta     2231 2026-03-27 11:02 note-verification.txt
+-rw-r--r--  1 straore  compta     8122 2026-03-29 15:10 releve-mobile-money-2026-03.csv
+-rw-r--r--  1 straore  compta    19288 2026-03-31 17:40 synthese-2026-03.docx
+-rw-r--r--  1 straore  compta    27428 2026-03-31 17:32 tva-2026-03.ods
+-rw-r--r--  1 straore  compta     9441 2026-03-29 15:16 versements-2026-03.csv
+-rw-r--r--  1 straore  compta   143118 2026-03-31 17:35 virements-2026-03.pdf
+
+/srv/partage/compta/2026-04:
+total 1407
+-rw-r--r--  1 straore  compta   267904 2026-04-06 09:22 balance-2026-04.pdf
+-rw-r--r--  1 straore  compta    19221 2026-04-06 09:08 factures-fournisseurs-2026-04.csv
+-rw-r--r--  1 straore  compta    98412 2026-04-06 09:18 grand-livre-2026-04.ods
+-rw-r--r--  1 straore  compta    52188 2026-04-06 09:11 journal-banque-2026-04.xlsx
+-rw-r--r--  1 straore  compta    43810 2026-04-06 09:15 journal-caisse-2026-04.xlsx
+-rw-r--r--  1 straore  compta   734112 2026-04-06 09:32 justificatifs-2026-04.zip
+-rw-r--r--  1 straore  compta     2914 2026-04-06 08:57 memo-controle.txt
+-rw-r--r--  1 straore  compta     9018 2026-04-06 09:14 releve-mobile-money-2026-04.csv
+-rw-r--r--  1 straore  compta    20112 2026-04-06 09:29 synthese-2026-04.docx
+-rw-r--r--  1 straore  compta    28144 2026-04-06 09:26 tva-2026-04.ods
+-rw-r--r--  1 straore  compta    10018 2026-04-06 09:16 versements-2026-04.csv
+-rw-r--r--  1 straore  compta   151002 2026-04-06 09:24 virements-2026-04.pdf
+
+/srv/partage/compta/archive:
+total 1875
+-rw-r--r--  1 straore  compta   162004 2026-03-22 10:44 archives-audit.tar.gz
+-rw-r--r--  1 straore  compta    97012 2026-01-07 08:02 banques-2025.tar.gz
+-rw-r--r--  1 straore  compta   190112 2025-12-01 08:05 compta-2025-11.tar.gz
+-rw-r--r--  1 straore  compta   194208 2026-01-03 08:05 compta-2025-12.tar.gz
+-rw-r--r--  1 straore  compta   198144 2026-02-01 08:06 compta-2026-01.tar.gz
+-rw-r--r--  1 straore  compta   201744 2026-03-01 08:06 compta-2026-02.tar.gz
+-rw-r--r--  1 straore  compta   205312 2026-04-01 08:07 compta-2026-03.tar.gz
+-rw-r--r--  1 straore  compta   119552 2026-01-07 07:58 inventaires-2025.tar.gz
+-rw-r--r--  1 straore  compta   398112 2026-01-07 07:59 pieces-justificatives-2025.tar.gz
+-rw-r--r--  1 straore  compta   149002 2026-01-07 08:01 rapports-2025.tar.gz
+
+/srv/partage/compta/modeles:
+total 59
+-rw-r--r--  1 straore  compta      842 2026-03-18 12:21 lire-moi.txt
+-rw-r--r--  1 straore  compta    18244 2026-03-18 12:18 modele-facture.ods
+-rw-r--r--  1 straore  compta    17441 2026-03-18 12:18 modele-note-frais.ods
+-rw-r--r--  1 straore  compta    16920 2026-03-18 12:19 modele-releve.ods
+-rw-r--r--  1 straore  compta     1944 2026-03-18 12:20 modele-virement.csv
+-rw-r--r--  1 straore  compta     2830 2026-03-18 12:21 procedure-cloture.txt
+
+/srv/partage/adhesions:
+total 12
+drwxr-xr-x  2 emballa  adherents   4096 2026-04-06 10:22 contrats
+lrwxrwxrwx  1 root     root         31 2026-04-06 08:20 derniere-liste -> listes/adhesions-2026-04-06.csv
+drwxr-xr-x  2 emballa  adherents   4096 2026-04-06 08:34 imports
+drwxr-xr-x  2 emballa  adherents   4096 2026-04-05 15:42 listes
+
+/srv/partage/adhesions/contrats:
+total 2139
+-rw-r--r--  1 emballa  adherents 122523 2026-04-01 09:07 contrat-2026-04-01.pdf
+-rw-r--r--  1 emballa  adherents 124604 2026-04-02 10:14 contrat-2026-04-02.pdf
+-rw-r--r--  1 emballa  adherents 125965 2026-04-03 11:21 contrat-2026-04-03.pdf
+-rw-r--r--  1 emballa  adherents 128046 2026-04-04 12:28 contrat-2026-04-04.pdf
+-rw-r--r--  1 emballa  adherents 130127 2026-04-05 08:35 contrat-2026-04-05.pdf
+-rw-r--r--  1 emballa  adherents 131488 2026-04-06 09:42 contrat-2026-04-06.pdf
+-rw-r--r--  1 emballa  adherents 133569 2026-04-01 10:49 contrat-2026-04-07.pdf
+-rw-r--r--  1 emballa  adherents 135650 2026-04-02 11:56 contrat-2026-04-08.pdf
+-rw-r--r--  1 emballa  adherents 137011 2026-04-03 12:03 contrat-2026-04-09.pdf
+-rw-r--r--  1 emballa  adherents 139092 2026-04-04 08:10 contrat-2026-04-10.pdf
+-rw-r--r--  1 emballa  adherents 141173 2026-04-05 09:17 contrat-2026-04-11.pdf
+-rw-r--r--  1 emballa  adherents 142534 2026-04-06 10:24 contrat-2026-04-12.pdf
+-rw-r--r--  1 emballa  adherents 144615 2026-04-01 11:31 contrat-2026-04-13.pdf
+-rw-r--r--  1 emballa  adherents 146696 2026-04-02 12:38 contrat-2026-04-14.pdf
+-rw-r--r--  1 emballa  adherents 148057 2026-04-03 08:45 contrat-2026-04-15.pdf
+-rw-r--r--  1 emballa  adherents 150138 2026-04-04 09:52 contrat-2026-04-16.pdf
+
+/srv/partage/adhesions/imports:
+total 71
+-rw-r--r--  1 emballa  adherents   8421 2026-04-06 08:08 adherents-avril.csv
+-rw-r--r--  1 emballa  adherents   3180 2026-04-06 08:14 adherents-avril.log
+-rw-r--r--  1 emballa  adherents   8610 2026-04-06 08:34 adherents-v2.csv
+-rw-r--r--  1 emballa  adherents   1442 2026-04-06 08:21 cartes-a-verifier.csv
+-rw-r--r--  1 emballa  adherents   1188 2026-04-06 08:05 import-adhesions.sh
+-rw-r--r--  1 emballa  adherents  42118 2026-04-06 08:32 imports-2026-04-06.tar.gz
+-rw-r--r--  1 emballa  adherents   1680 2026-04-06 08:31 retours-erreurs.txt
+-rw-r--r--  1 emballa  adherents    924 2026-04-05 17:42 ville-reference.csv
+
+/srv/partage/adhesions/listes:
+total 36
+-rw-r--r--  1 emballa  adherents   6210 2026-04-02 17:02 adhesions-2026-04-02.csv
+-rw-r--r--  1 emballa  adherents   6288 2026-04-03 17:05 adhesions-2026-04-03.csv
+-rw-r--r--  1 emballa  adherents   6332 2026-04-04 17:10 adhesions-2026-04-04.csv
+-rw-r--r--  1 emballa  adherents   6404 2026-04-05 17:18 adhesions-2026-04-05.csv
+-rw-r--r--  1 emballa  adherents   6532 2026-04-06 10:12 adhesions-2026-04-06.csv
+-rw-r--r--  1 emballa  adherents    784 2026-04-06 10:15 doublons-2026-04-06.txt
+
+/srv/partage/communication:
+total 8
+drwxr-xr-x  2 adjovi   webdev     4096 2026-04-02 10:10 campagnes
+drwxr-xr-x  2 svc-web  webdev     4096 2026-04-06 09:12 site
+
+/srv/partage/communication/site:
+total 218
+-rw-r--r--  1 svc-web  webdev     3481 2026-04-06 08:50 accueil.html
+-rw-r--r--  1 svc-web  webdev     8124 2026-04-06 09:02 espace-adherents.php
+-rw-r--r--  1 svc-web  webdev     2824 2026-04-05 18:02 faq.html
+-rw-r--r--  1 svc-web  webdev   184220 2026-04-04 11:10 hero.jpg
+-rw-r--r--  1 svc-web  webdev     2941 2026-04-01 09:20 logo-alize.svg
+-rw-r--r--  1 svc-web  webdev     5160 2026-04-05 16:50 mentions-legales.html
+-rw-r--r--  1 svc-web  webdev     7482 2026-04-06 09:12 style.css
+-rw-r--r--  1 svc-web  webdev     6021 2026-04-05 14:11 televersement-formulaire.php
+
+/srv/partage/communication/campagnes:
+total 1319
+-rw-r--r--  1 adjovi   webdev   402281 2026-04-02 10:10 affiche-mutuelle-avril.pdf
+-rw-r--r--  1 adjovi   webdev     1911 2026-04-02 11:05 campagne-radio-avril.txt
+-rw-r--r--  1 adjovi   webdev   240118 2026-04-01 15:44 depliant-famille.pdf
+-rw-r--r--  1 adjovi   webdev   221402 2026-04-01 15:48 flyer-bourse-sante.pdf
+-rw-r--r--  1 adjovi   webdev    88112 2026-04-02 09:52 kit-reseaux-sociaux.zip
+-rw-r--r--  1 adjovi   webdev     9602 2026-04-02 09:45 newsletter-avril.html
+-rw-r--r--  1 adjovi   webdev   174121 2026-04-02 09:47 photo-stand.jpg
+-rw-r--r--  1 adjovi   webdev   208844 2026-04-02 10:02 visuels-avril.png
+
+/srv/scripts:
+total 15
+-rwxr-xr-x  1 odiallo  admins     1310 2026-04-06 06:40 archiver-compta.sh
+-rwxr-xr-x  1 odiallo  admins     1102 2026-04-06 06:42 controle-espace.sh
+-rwxr-xr-x  1 odiallo  admins     1488 2026-04-06 06:46 import-adhesions.sh
+-rwxr-xr-x  1 odiallo  admins      980 2026-04-06 06:48 nettoyer-cache.sh
+-rwxr-xr-x  1 odiallo  admins     1722 2026-04-06 06:50 publier-site.sh
+-rwxr-xr-x  1 odiallo  admins     1248 2026-04-06 06:38 ranger-exports.sh
+-rwxr-xr-x  1 odiallo  admins     1608 2026-04-06 06:44 sauvegarder-rapports.sh
+-rwxr-xr-x  1 odiallo  admins     1190 2026-04-06 06:36 verifier-droits.sh
+
+/home:
+total 12
+drwxr-x---  2 cfall    cfall      4096 2026-04-06 08:40 cfall
+drwx------  2 odiallo  admins     4096 2026-04-06 06:40 odiallo
+drwxr-x---  2 straore  compta     4096 2026-04-05 18:02 straore
+
+/home/cfall:
+total 21
+-rw-------  1 cfall    cfall      2240 2026-04-06 08:40 .bash_history
+-rw-r--r--  1 cfall    cfall      3771 2026-03-08 09:01 .bashrc
+drwxr-x---  2 cfall    cfall      4096 2026-04-06 08:54 .config
+-rw-r--r--  1 cfall    cfall       812 2026-04-06 08:54 .config.json
+-rw-r--r--  1 cfall    cfall       807 2026-03-08 09:01 .profile
+drwxr-x---  2 cfall    cfall      4096 2026-04-06 08:41 Documents
+-rw-r--r--  1 cfall    cfall      1290 2026-04-06 08:44 notes-premier-jour.txt
+-rw-r--r--  1 cfall    cfall       601 2026-04-06 08:45 repere-chemins.txt
+-rw-r--r--  1 cfall    cfall       418 2026-04-06 08:46 todo-labo.txt
+
+/home/cfall/.config:
+total 2
+-rw-r--r--  1 cfall    cfall       384 2026-04-06 08:54 marque-pages.json
+-rw-r--r--  1 cfall    cfall       222 2026-04-06 08:55 preferences.ini
+
+/home/cfall/Documents:
+total 2
+-rw-r--r--  1 cfall    cfall       284 2026-04-06 08:41 raccourcis.txt
+-rw-r--r--  1 cfall    cfall       840 2026-04-06 08:42 schema-dossiers.txt
+
+/home/straore:
+total 39
+-rw-r--r--  1 straore  compta     3771 2026-02-10 10:00 .bashrc
+-rw-r--r--  1 straore  compta      522 2026-02-10 10:00 .vimrc
+-rw-r-----  1 straore  compta    32110 2026-04-05 18:02 budget-avril.ods
+-rw-r-----  1 straore  compta      810 2026-04-05 17:51 rappel-echeances.txt
+-rw-r--r--  1 straore  compta      188 2026-04-02 11:04 signature-email.txt
+
+/home/odiallo:
+total 10
+-rw-------  1 odiallo  admins     3182 2026-04-06 06:40 .bash_history
+-rw-------  1 odiallo  admins      240 2026-03-11 08:10 .ssh-config
+-rw-------  1 odiallo  admins     1422 2026-04-06 06:42 diagnostic.txt
+-rw-------  1 odiallo  admins      620 2026-04-06 06:43 liste-ports.txt
+-rw-------  1 odiallo  admins      980 2026-04-06 06:44 notes-maintenance.txt
+-rw-------  1 odiallo  admins      311 2026-04-06 06:45 ports-prevus.txt
+
+/etc:
+total 4
+drwxr-xr-x  2 root     root       4096 2026-04-06 09:05 alize
+
+/etc/alize:
+total 14
+-rw-r-----  1 root     root       1940 2026-04-05 18:40 alize.conf
+drwxr-xr-x  2 root     root       4096 2026-04-06 09:14 conf.d
+-rw-r-----  1 root     root        888 2026-04-06 08:58 imports.conf
+-rw-r-----  1 root     root        640 2026-04-06 08:57 journal.conf
+-rw-r-----  1 root     root       1292 2026-04-06 09:05 membres.conf
+-rw-r-----  1 root     root        712 2026-04-06 08:54 notifications.conf
+-rw-r-----  1 root     root        344 2026-04-01 09:10 secrets.example
+-rw-r-----  1 root     root       1008 2026-04-06 09:07 televersement.conf
+-rw-r--r--  1 root     root         12 2026-04-04 15:10 version.txt
+
+/etc/alize/conf.d:
+total 5
+-rw-r-----  1 root     root        402 2026-04-05 18:31 10-base.conf
+-rw-r-----  1 root     root        508 2026-04-06 08:59 20-web.conf
+-rw-r-----  1 root     root        621 2026-04-06 09:10 30-exports.conf
+-rw-r-----  1 root     root        487 2026-04-06 09:14 40-adhesions.conf
+-rw-r-----  1 root     root        418 2026-04-06 09:13 50-alertes.conf
