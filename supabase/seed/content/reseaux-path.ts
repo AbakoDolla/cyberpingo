@@ -28,7 +28,7 @@ export interface PathLab {
   briefing: string; constraints: string[]; tools: string[]; objectives: string[]; hints: string[]; tasks: PathTask[]; assets: PathAsset[];
 }
 export interface PathSkill {
-  slug: string; name: string; description: string; lessonKey: string; practiceLab: string;
+  slug: string; name: string; description: string; lessonKey: string; practiceLab: string; validationLab?: string; domain?: string;
 }
 export interface PathBadge { slug: string; name: string; description: string; icon: string; rarity: "common" | "rare" | "epic" | "legendary"; xp: number; position: number; lab?: string; skill?: string }
 export interface PathDomain { slug: string; name: string; description: string; icon: string; categories: string[] }

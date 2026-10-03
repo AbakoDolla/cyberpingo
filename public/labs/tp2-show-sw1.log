@@ -1,0 +1,45 @@
+SW1#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/23, Fa0/24, Gi0/2
+10   Administration                   active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8
+20   Employes                         active    Fa0/9, Fa0/10, Fa0/11, Fa0/12
+                                                Fa0/13, Fa0/14, Fa0/15, Fa0/16
+30   Invites                          active    Fa0/17, Fa0/18, Fa0/19, Fa0/20
+                                                Fa0/21, Fa0/22
+99   Gestion                          active
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+1004 fddinet-default                  act/unsup
+1005 trnet-default                    act/unsup
+
+SW1#show interfaces trunk
+
+Port        Mode             Encapsulation  Status        Native vlan
+Gi0/1       on               802.1q         trunking      99
+
+Port        Vlans allowed on trunk
+Gi0/1       10,20,30,99
+
+Port        Vlans allowed and active in management domain
+Gi0/1       10,20,30,99
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Gi0/1       10,20,30,99
+
+SW1#show mac address-table dynamic
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+  10    0001.9632.aa01    DYNAMIC     Fa0/1
+  10    0001.c7e4.0b10    DYNAMIC     Gi0/1
+  20    00d0.ba3c.5e02    DYNAMIC     Fa0/9
+  20    0001.c7e4.0b10    DYNAMIC     Gi0/1
+  30    0060.2f4a.19c1    DYNAMIC     Fa0/17
+  30    0001.c7e4.0b10    DYNAMIC     Gi0/1
+  99    0001.c7e4.0b10    DYNAMIC     Gi0/1
+Total Mac Addresses for this criterion: 7

@@ -6,6 +6,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { buildSocAssets } = require("./lab-scenarios-soc.cjs");
+const { buildReseauxLabAssets } = require("./lab-scenarios-reseaux.cjs");
+const { buildKoraAssets } = require("./lab-scenarios-kora.cjs");
 
 const root = path.resolve(__dirname, "..");
 const OUTPUT_DIR = path.join(root, "public", "labs");
@@ -490,6 +492,8 @@ function buildLabAssets() {
   const firewall = buildFirewallLog();
   const packetTracer = buildPacketTracerFacts();
   const soc = buildSocAssets();
+  const programmeLabs = buildReseauxLabAssets();
+  const kora = buildKoraAssets();
   return {
     files: [
       { name: "reseau-instable.pcap", data: instable.file },
@@ -500,8 +504,13 @@ function buildLabAssets() {
       { name: "modele-rapport-reseau.md", data: text(buildReportTemplate()) },
       { name: "guide-wireshark.md", data: text(buildWiresharkGuide()) },
       ...soc.files,
+      ...programmeLabs.files,
+      ...kora.files,
     ],
-    facts: { instable: instable.facts, evaluation: evaluation.facts, firewall: firewall.facts, packetTracer, soc: soc.facts },
+    facts: {
+      instable: instable.facts, evaluation: evaluation.facts, firewall: firewall.facts, packetTracer, soc: soc.facts,
+      programme: { ...programmeLabs.facts, ...kora.facts },
+    },
   };
 }
 

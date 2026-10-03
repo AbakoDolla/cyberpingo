@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { pendingVideoTitle, videoEmbed } from "@/lib/lesson-content";
+import { parseCallout, pendingVideoTitle, videoEmbed } from "@/lib/lesson-content";
 import type { LessonBlock } from "@/types/api";
 
 function TextBlock({ content }: { content: string }) {
@@ -72,7 +72,8 @@ export default function LessonBlockRenderer({ block }: { block: LessonBlock }) {
     case "callout": {
       const pending = pendingVideoTitle(block.content);
       if (pending) return <PendingVideo title={pending} />;
-      return <aside className="lesson-callout"><strong>À retenir</strong><p>{block.content}</p></aside>;
+      const { kind, label, body } = parseCallout(block.content);
+      return <aside className={`lesson-callout lesson-callout--${kind}`}><strong>{label}</strong><p>{body}</p></aside>;
     }
     case "code":
       return <CodeBlock content={block.content} language={block.language} />;

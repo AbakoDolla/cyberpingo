@@ -91,5 +91,6 @@ Les rôles sont vérifiés par PostgreSQL (`is_admin()`, `is_superadmin()` dans 
 - [Base de données](docs/DATABASE.md) : tables, relations, RPC, XP, niveaux, séries, certificats, Storage
 - [Sécurité](docs/SECURITY.md) : RLS, anti-triche, limites de débit, secrets
 - [Déploiement](docs/DEPLOYMENT.md) : Supabase (migrations, fonctions, Auth), Vercel, premier administrateur
+- [Contenu pédagogique](docs/CONTENU.md) : gabarit d'une leçon, grille de publication, migration sans perte, état des six parcours
 
 Les polices de `public/fonts/` sont sous licence SIL OFL.

@@ -1,0 +1,160 @@
+=== KORA : TICKET 2026-0317 ===
+Symptômes signalés : les postes de la comptabilité n’atteignent plus le serveur de fichiers FS01 (10.40.10.10), le Wi-Fi des invités ne passe plus,
+et un poste de l’atelier ne reçoit plus d’adresse. Les relevés ci-dessous ont été faits le 17/03/2026. Les heures sont celles affichées par chaque équipement.
+
+--- 1. Poste PC-Compta (VLAN 20) ---
+C:\> ipconfig
+
+Configuration IP de Windows
+
+Carte Ethernet Ethernet :
+
+   Suffixe DNS propre à la connexion. . . : kora.example
+   Adresse IPv4. . . . . . . . . . . . . .: 10.40.20.15
+   Masque de sous-réseau. . . . . . . . . : 255.255.255.0
+   Passerelle par défaut. . . . . . . . . : 10.40.20.254
+
+C:\> ping 10.40.20.1
+
+Envoi d’une requête 'Ping'  10.40.20.1 avec 32 octets de données :
+Réponse de 10.40.20.1 : octets=32 temps<1ms TTL=255
+Réponse de 10.40.20.1 : octets=32 temps<1ms TTL=255
+Réponse de 10.40.20.1 : octets=32 temps<1ms TTL=255
+Réponse de 10.40.20.1 : octets=32 temps<1ms TTL=255
+
+Statistiques Ping pour 10.40.20.1:
+    Paquets : envoyés = 4, reçus = 4, perdus = 0 (perte 0%),
+Durée approximative des boucles en millisecondes :
+    Minimum = 0ms, Maximum = 0ms, Moyenne = 0ms
+
+C:\> ping 10.40.10.10
+
+Envoi d’une requête 'Ping'  10.40.10.10 avec 32 octets de données :
+Réponse de 10.40.20.15 : Impossible de joindre l’hôte de destination.
+Réponse de 10.40.20.15 : Impossible de joindre l’hôte de destination.
+Réponse de 10.40.20.15 : Impossible de joindre l’hôte de destination.
+Réponse de 10.40.20.15 : Impossible de joindre l’hôte de destination.
+
+Statistiques Ping pour 10.40.10.10:
+    Paquets : envoyés = 4, reçus = 4, perdus = 0 (perte 0%),
+
+--- 2. Poste PC-Direction (VLAN 10) ---
+C:\> ping 10.40.10.10
+
+Envoi d’une requête 'Ping'  10.40.10.10 avec 32 octets de données :
+Réponse de 10.40.10.10 : octets=32 temps=1ms TTL=128
+Réponse de 10.40.10.10 : octets=32 temps=1ms TTL=128
+Réponse de 10.40.10.10 : octets=32 temps=1ms TTL=128
+Réponse de 10.40.10.10 : octets=32 temps=1ms TTL=128
+
+Statistiques Ping pour 10.40.10.10:
+    Paquets : envoyés = 4, reçus = 4, perdus = 0 (perte 0%),
+Durée approximative des boucles en millisecondes :
+    Minimum = 1ms, Maximum = 1ms, Moyenne = 1ms
+
+--- 3. Poste PC-Atelier ---
+C:\> ipconfig /all
+
+Carte Ethernet Ethernet :
+
+   Description. . . . . . . . . . . . . . : Carte réseau Fast Ethernet
+   Adresse physique . . . . . . . . . . . : 00-90-2B-7A-31-D5
+   DHCP activé. . . . . . . . . . . . . . : Oui
+   Adresse IPv4 autoconfiguration. . . . .: 169.254.38.7(préféré)
+   Masque de sous-réseau. . . . . . . . . : 255.255.0.0
+   Passerelle par défaut. . . . . . . . . :
+   Serveur DHCP . . . . . . . . . . . . . :
+
+--- 4. Routeur R1 ---
+R1#show ip interface brief
+Interface                  IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0         unassigned      YES unset  up                    up
+GigabitEthernet0/0.10      10.40.10.1      YES manual up                    up
+GigabitEthernet0/0.20      10.40.20.1      YES manual up                    up
+GigabitEthernet0/0.30      10.40.30.1      YES manual up                    up
+GigabitEthernet0/0.99      10.40.99.1      YES manual up                    up
+GigabitEthernet0/1         unassigned      YES unset  administratively down down
+
+R1#show running-config interface GigabitEthernet0/0.10
+Building configuration...
+
+Current configuration : 148 bytes
+!
+interface GigabitEthernet0/0.10
+ encapsulation dot1Q 10
+ ip address 10.40.10.1 255.255.255.0
+ ip access-group SERVEURS out
+ no ip unreachables
+end
+
+--- 5. Après correction de la passerelle de PC-Compta (maintenant 10.40.20.1) ---
+C:\> ping 10.40.10.10
+
+Envoi d’une requête 'Ping'  10.40.10.10 avec 32 octets de données :
+Délai d’attente de la demande dépassé.
+Délai d’attente de la demande dépassé.
+Délai d’attente de la demande dépassé.
+Délai d’attente de la demande dépassé.
+
+Statistiques Ping pour 10.40.10.10:
+    Paquets : envoyés = 4, reçus = 0, perdus = 4 (perte 100%),
+
+R1#show access-lists
+Extended IP access list SERVEURS
+    10 deny ip 10.40.20.0 0.0.0.255 host 10.40.10.10 (12 matches)
+    20 permit ip any any (87 matches)
+
+--- 6. Commutateur SW1 ---
+SW1#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/12, Fa0/23, Fa0/24, Gi0/2
+10   Administration                   active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8
+20   Employes                         active    Fa0/9, Fa0/10, Fa0/11, Fa0/13
+                                                Fa0/14, Fa0/15, Fa0/16
+30   Invites                          active    Fa0/17, Fa0/18, Fa0/19, Fa0/20
+                                                Fa0/21, Fa0/22
+99   Gestion                          active
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+1004 fddinet-default                  act/unsup
+1005 trnet-default                    act/unsup
+
+SW1#show interfaces trunk
+
+Port        Mode             Encapsulation  Status        Native vlan
+Gi0/1       on               802.1q         trunking      99
+
+Port        Vlans allowed on trunk
+Gi0/1       10,20,99
+
+Port        Vlans allowed and active in management domain
+Gi0/1       10,20,99
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Gi0/1       10,20,99
+
+SW1#show mac address-table dynamic
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+   1    0090.2b7a.31d5    DYNAMIC     Fa0/12
+  10    0001.9632.aa01    DYNAMIC     Fa0/1
+  10    0001.c7e4.0b10    DYNAMIC     Gi0/1
+  20    00d0.ba3c.5e02    DYNAMIC     Fa0/9
+  20    0001.c7e4.0b10    DYNAMIC     Gi0/1
+  99    0001.c7e4.0b10    DYNAMIC     Gi0/1
+Total Mac Addresses for this criterion: 6
+
+--- 7. Journaux (le port Gi0/0 de R1 est relié au port Gi0/1 de SW1) ---
+R1#show logging | include UPDOWN
+*Mar 17 09:41:12.512: %LINK-3-UPDOWN: Interface GigabitEthernet0/0, changed state to down
+*Mar 17 09:41:14.530: %LINK-3-UPDOWN: Interface GigabitEthernet0/0, changed state to up
+
+SW1#show logging | include UPDOWN
+*Mar 17 09:34:12.231: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to down
+*Mar 17 09:34:14.248: %LINK-3-UPDOWN: Interface GigabitEthernet0/1, changed state to up

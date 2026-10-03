@@ -70,3 +70,15 @@ test("pendingVideoTitle recognises the video placeholder callout", () => {
   assert.equal(lesson.pendingVideoTitle("Vidéo à venir :"), null);
   assert.equal(lesson.pendingVideoTitle("À retenir : une adresse IP identifie une interface."), null);
 });
+test("parseCallout labels a callout from its first words and keeps the rest as the body", () => {
+  const { parseCallout } = load("lib/lesson-content");
+  assert.deepEqual(parseCallout("Objectifs : lire une adresse, calculer un masque."), { kind: "objectives", label: "Objectifs d’apprentissage", body: "Lire une adresse, calculer un masque." });
+  assert.equal(parseCallout("Prérequis : aucun.").kind, "prerequisites");
+  assert.equal(parseCallout("Mise en situation : Awa ouvre un atelier.").kind, "scenario");
+  assert.equal(parseCallout("Erreurs fréquentes : confondre LAN et WAN.").kind, "mistakes");
+  assert.equal(parseCallout("Sécurité : change le mot de passe par défaut.").label, "Sécurité et limites");
+  assert.equal(parseCallout("Pour pratiquer : ouvre le TP 1.").kind, "practice");
+  assert.deepEqual(parseCallout("À retenir : un masque sépare réseau et hôte."), { kind: "takeaway", label: "À retenir", body: "Un masque sépare réseau et hôte." });
+  assert.deepEqual(parseCallout("Packet Tracer s’exécute sur ton ordinateur."), { kind: "note", label: "À retenir", body: "Packet Tracer s’exécute sur ton ordinateur." });
+  assert.equal(parseCallout("Objectifs :").body, "Objectifs :");
+});

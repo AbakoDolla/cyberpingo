@@ -6,6 +6,7 @@ const path = require("node:path");
 const { contentId } = require("../scripts/generate-content-seed.cjs");
 const { build: buildReseauxSeed, OUTPUT: RESEAUX_SEED } = require("../scripts/generate-reseaux-seed.cjs");
 const { build: buildSocSeed, OUTPUT: SOC_SEED } = require("../scripts/generate-soc-seed.cjs");
+const { build: buildProgrammeSeed, OUTPUT: PROGRAMME_SEED } = require("../scripts/generate-reseaux-programme-seed.cjs");
 const { buildLabAssets, OUTPUT_DIR: LAB_DIR } = require("../scripts/generate-lab-assets.cjs");
 const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
 
@@ -17,6 +18,7 @@ const quiz = (key) => contentId("quiz", key);
 const lab = (key) => contentId("lab", key);
 const skill = (key) => contentId("skill", key);
 const SOC_SKILLS = ["lecture-journaux-linux", "audit-droits-linux", "detection-bruteforce-ssh", "analyse-logs-web", "reconstitution-incident"];
+const PROGRAMME_SKILLS = ["modeles-reseau", "plan-vlsm", "adressage-ipv6", "services-dhcp", "nat-pat", "commutation-vlan", "routage-statique", "filtrage-acl", "diagnostic-reseau", "documentation-reseau"];
 
 async function as(uid, sql, params = []) {
   await db.exec("reset role");
@@ -80,6 +82,7 @@ after(async () => { await db?.close(); });
 test("the Réseaux seed and the lab files match their generators", () => {
   assert.equal(fs.readFileSync(RESEAUX_SEED, "utf8"), buildReseauxSeed(), "Run node scripts/generate-reseaux-seed.cjs");
   assert.equal(fs.readFileSync(SOC_SEED, "utf8"), buildSocSeed(), "Run node scripts/generate-soc-seed.cjs");
+  assert.equal(fs.readFileSync(PROGRAMME_SEED, "utf8"), buildProgrammeSeed(), "Run node scripts/generate-reseaux-programme-seed.cjs");
   for (const file of buildLabAssets().files) {
     assert.deepEqual(fs.readFileSync(path.join(LAB_DIR, file.name)), file.data, `${file.name} is stale: run node scripts/generate-lab-assets.cjs`);
   }
@@ -87,10 +90,10 @@ test("the Réseaux seed and the lab files match their generators", () => {
 
 test("the Réseaux path seeds a complete, published, end-to-end learning path", async () => {
   const labs = await sql("select slug, format, status, is_assessment, requires_computer from public.labs where course_id = $1 order by position", [course("c2")]);
-  assert.deepEqual(labs.map((row) => row.slug), ["reseau-instable", "incident-pare-feu", "packet-tracer-sous-reseaux", "evaluation-reseaux"]);
+  assert.deepEqual(labs.map((row) => row.slug), ["reseau-instable", "incident-pare-feu", "packet-tracer-sous-reseaux", "evaluation-reseaux", "tp-reseau-domestique", "tp-vlan-pme", "tp-multi-sites", "incident-reseau-kora", "projet-reseau-kora"]);
   assert.ok(labs.every((row) => row.status === "published"));
-  assert.deepEqual(labs.map((row) => row.format), ["pcap", "logs", "packet_tracer", "pcap"]);
-  assert.deepEqual(labs.filter((row) => row.is_assessment).map((row) => row.slug), ["evaluation-reseaux"]);
+  assert.deepEqual(labs.map((row) => row.format), ["pcap", "logs", "packet_tracer", "pcap", "packet_tracer", "packet_tracer", "packet_tracer", "logs", "packet_tracer"]);
+  assert.deepEqual(labs.filter((row) => row.is_assessment).map((row) => row.slug), ["evaluation-reseaux", "incident-reseau-kora", "projet-reseau-kora"]);
   assert.equal(labs.find((row) => row.format === "packet_tracer").requires_computer, true);
 
   const [counts] = await sql(`select
@@ -101,11 +104,11 @@ test("the Réseaux path seeds a complete, published, end-to-end learning path", 
     (select count(*) from public.courses where domain_id is null) as orphan_courses,
     (select count(*) from public.domains) as domains`, [labs.length ? (await sql("select array_agg(id) as ids from public.labs where course_id = $1", [course("c2")]))[0].ids : []]);
   assert.deepEqual(Object.fromEntries(Object.entries(counts).map(([key, value]) => [key, Number(value)])), {
-    tasks: 28, keys: 28, skills: 11, links: 44, orphan_courses: 0, domains: 6,
+    tasks: 91, keys: 91, skills: 21, links: 84, orphan_courses: 0, domains: 6,
   });
 
   const assets = await sql("select kind, url from public.lab_assets");
-  assert.equal(assets.length, 17);
+  assert.equal(assets.length, 31);
   assert.ok(assets.every((row) => row.url.startsWith("/labs/") && fs.existsSync(path.join(LAB_DIR, path.basename(row.url)))), "every asset points to a real file");
 
   const events = await sql("select distinct event from public.mascot_lines where is_active");
@@ -204,7 +207,7 @@ test("an admin previews an unpublished lab without earning anything, learners ca
 
 test("skills advance from learning to validated, never on a quiz alone", async () => {
   const states = await skillStates(ids.ana);
-  assert.equal(Object.keys(states).length, 11);
+  assert.equal(Object.keys(states).length, 21);
   assert.ok(Object.values(states).every((state) => state === "not_studied"));
 
   await rpc(ids.ana, "start_lesson", { p_lesson_id: lesson("reseaux-ipv4") });
@@ -218,7 +221,7 @@ test("skills advance from learning to validated, never on a quiz alone", async (
   assert.equal((await skillStates(ids.ana))["adressage-ipv4"], "consolidating", "a quiz alone never masters a skill");
 
   const practice = await solveLab(ids.ana, "packet-tracer-sous-reseaux");
-  assert.deepEqual(practice.new_skills.map((entry) => [entry.slug, entry.state]).sort(), [["adressage-ipv4", "exercises_mastered"], ["sous-reseaux-cidr", "learning"]]);
+  assert.deepEqual(practice.new_skills.map((entry) => [entry.slug, entry.state]).sort(), [["adressage-ipv4", "exercises_mastered"], ["plan-vlsm", "learning"], ["sous-reseaux-cidr", "learning"]]);
   assert.equal((await skillStates(ids.ana))["adressage-ipv4"], "exercises_mastered");
   assert.equal((await skillStates(ids.ana))["sous-reseaux-cidr"], "learning", "the lab was practiced but the lesson was not");
 
@@ -226,10 +229,12 @@ test("skills advance from learning to validated, never on a quiz alone", async (
   await passQuiz(ids.ana, "reseaux-cidr");
   const validation = await solveLab(ids.ana, "evaluation-reseaux");
   const states2 = await skillStates(ids.ana);
-  const reseauxSkills = Object.keys(states2).filter((slug) => !SOC_SKILLS.includes(slug));
+  const reseauxSkills = Object.keys(states2).filter((slug) => !SOC_SKILLS.includes(slug) && !PROGRAMME_SKILLS.includes(slug));
   assert.equal(reseauxSkills.length, 6);
   assert.ok(reseauxSkills.every((slug) => states2[slug] === "validated"), JSON.stringify(states2));
   assert.ok(SOC_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a SOC skill");
+  assert.ok(PROGRAMME_SKILLS.every((slug) => states2[slug] !== "validated"), "the first Réseaux assessment never validates a skill of the programme");
+  assert.equal(states2["plan-vlsm"], "learning", "its practice lab was solved, its lesson was not");
   assert.equal(validation.new_skills.length, 6);
   assert.ok(validation.new_badges.some((badge) => badge.slug === "architecte-adressage"));
   assert.ok(validation.new_badges.some((badge) => badge.slug === "gardien-reseau"));

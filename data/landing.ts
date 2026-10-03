@@ -59,7 +59,7 @@ export const publicPaths: PublicPath[] = [
     image: "covers/course-reseaux.webp",
     tone: "blue",
     courseSlug: "reseaux",
-    topics: ["Les bases du réseau", "Le modèle OSI", "Les protocoles essentiels"],
+    topics: ["Adressage IPv4 et IPv6", "VLAN, routage et filtrage", "Dépannage et documentation"],
   },
   {
     id: "linux",
