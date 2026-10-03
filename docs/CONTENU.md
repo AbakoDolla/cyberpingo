@@ -65,16 +65,46 @@ Les cours déjà publiés se réorganisent sans jamais rien supprimer (`scripts/
 
 Les identifiants des modules, leçons et quiz ne changent jamais : la progression, les tentatives de quiz et les compétences des apprenants sont conservées. Rejouer une graine ne change rien.
 
+## Matériel en photos et documents en PDF
+
+Deux ensembles de fichiers statiques complètent les parcours. Ils ne changent ni les leçons ni les laboratoires publiés, et ils sont contrôlés par `tests/equipment.test.cjs` et `tests/documents.test.cjs`.
+
+### Le matériel en photos (`/materiel`)
+
+`data/equipment.json` décrit chaque équipement (switch, routeur, pare-feu, serveur, NAS, portable, smartphone, clé de sécurité...) : nom, catégorie, phrase de présentation, risque principal, bon réflexe, parcours concernés. Les photos sont de vraies photos de Wikimedia Commons sous licence libre (CC0, domaine public, CC BY, CC BY-SA), en WebP 1200 x 900 dans `public/images/equipment/`. L'auteur, la licence et la page source de chacune sont dans `data/equipment-credits.json` et affichés sous la photo ainsi que dans la section « Crédits photographiques » de la page. La section `labs` du même fichier dit quels équipements montrer dans quel laboratoire.
+
+Où une photo apparaît :
+
+- la page publique `/materiel` (tous les équipements, avec leur risque et leur réflexe) ;
+- chaque laboratoire concerné, sous la mise en situation (`components/equipment/LabEquipment.tsx`) ;
+- les leçons, juste après le paragraphe qui parle de l'appareil. `data/lesson-equipment.json` associe l'identifiant d'une leçon à un début de paragraphe (l'ancre) et à des équipements. L'ancre suit le texte, pas sa position : un paragraphe déplacé dans la console garde sa photo, et un paragraphe réécrit fait glisser la photo en fin de leçon au lieu de la perdre. Le test vérifie chaque ancre contre les leçons de la graine ;
+- les PDF des laboratoires, dans un bandeau « Matériel que tu croises dans ce laboratoire ».
+
+Ajouter ou remplacer une photo : choisir un fichier sous licence libre, le recadrer en 1200 x 900 (l'appareil entier, sur un fond propre, sans visage ni donnée personnelle lisible), puis lancer `node scripts/import-equipment-photos.cjs <dossier>` : le dossier contient les `<id>.webp` et un `credits.json` (titre Commons, page, auteur, licence, texte alternatif, crédit court). Le script contrôle les licences, les dimensions et les crédits, copie les images, écrit `data/equipment-credits.json` et refait la mosaïque de la page (`scripts/build-equipment-hero.cjs`).
+
+### Les documents des laboratoires en PDF
+
+Les guides, aide-mémoire, cahiers des charges, grilles et modèles de rapport sont téléchargés en PDF : page de garde avec le logo et la mascotte, polices Space Grotesk, Inter et JetBrains Mono, titres illustrés, encadrés, tableaux, blocs de commandes colorés, lignes d'écriture pour les modèles à remplir, bandeau de photos du matériel. Le fichier Markdown de `public/labs/` reste la source et la version texte (utile pour copier une commande longue) ; le PDF en est fabriqué.
+
+- `scripts/pdf/documents.cjs` liste les 22 documents, leur type, leur parcours et le matériel à montrer ;
+- `node scripts/build-lab-pdfs.cjs` fabrique les PDF avec Chrome ou Edge (variable `CHROME_PATH` pour un chemin particulier). Il ne refait que les documents dont la source, la mise en page, le logo, les polices ou les photos ont changé (empreintes dans `scripts/pdf/manifest.json`, calculées avec des fins de ligne normalisées) ; `--force` refait tout, `--only a,b` certains, `--check` signale ceux qui sont périmés ;
+- `node scripts/generate-documents-seed.cjs` écrit `supabase/seed/07_lab_documents_pdf.sql`, qui fait pointer les labs vers les PDF (voir `docs/DEPLOYMENT.md`).
+
+Les fichiers de données que l'apprenant doit analyser ou hacher (dictionnaire de mots de passe, textes à comparer, journaux, captures) ne sont jamais convertis : ils restent tels quels. Après toute modification d'un guide (`scripts/lab-scenarios-*.cjs`), lancer `node scripts/generate-lab-assets.cjs` puis `node scripts/build-lab-pdfs.cjs` : le test échoue tant qu'un PDF est périmé.
+
 ## Commandes
 
 | Commande | Rôle |
 |---|---|
 | `node scripts/check-path-part.cjs <fichier.ts>` | contrôle une partie de parcours pendant la rédaction |
 | `node scripts/generate-lab-assets.cjs` | écrit les fichiers de laboratoire dans `public/labs/` |
+| `node scripts/build-lab-pdfs.cjs` | fabrique les PDF des guides et modèles (Chrome ou Edge requis) |
+| `node scripts/generate-documents-seed.cjs` | génère `supabase/seed/07_lab_documents_pdf.sql` |
+| `node scripts/import-equipment-photos.cjs <dossier>` | importe un lot de photos du matériel avec leurs crédits |
 | `node scripts/generate-reseaux-programme-seed.cjs` | génère `supabase/seed/05_reseaux_programme.sql` |
 | `node scripts/generate-fondamentaux-seed.cjs` | génère `supabase/seed/06_fondamentaux_programme.sql` |
 | `npm run content:report` | état réel du contenu, cours par cours |
-| `npm test` | toute la suite, dont `programme.test.cjs` et `content-quality.test.cjs` |
+| `npm test` | toute la suite, dont `programme.test.cjs`, `content-quality.test.cjs`, `equipment.test.cjs` et `documents.test.cjs` |
 
 Pour publier un parcours : déployer le code (les laboratoires pointent vers des fichiers de `public/labs/`), puis charger la graine dans la base de production (voir `docs/DEPLOYMENT.md`).
 

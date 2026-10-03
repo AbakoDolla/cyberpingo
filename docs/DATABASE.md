@@ -192,7 +192,7 @@ npx supabase gen types typescript --linked --schema public > types/database.type
 
 ## Contenu de départ
 
-`supabase/seed/content/*.ts` contient les parcours, leçons, quiz et labs rédigés. `npm run db:seed` les convertit en `supabase/seed/01_starter_content.sql`. Ce fichier ne crée aucun utilisateur ni aucune statistique ; il est chargé par `supabase db reset` en local, ou une fois dans l'éditeur SQL en production. `supabase/seed/02_reseaux_path.sql` complète le parcours Réseaux (voir « Moteur pédagogique »), `03_soc_path.sql` le parcours SOC, `04_mascot_voices.sql` rattache les voix `05_reseaux_programme.sql` livre le programme Réseaux complet et `06_fondamentaux_programme.sql` le programme Fondamentaux complet ; ils se chargent ensuite, dans cet ordre.
+`supabase/seed/content/*.ts` contient les parcours, leçons, quiz et labs rédigés. `npm run db:seed` les convertit en `supabase/seed/01_starter_content.sql`. Ce fichier ne crée aucun utilisateur ni aucune statistique ; il est chargé par `supabase db reset` en local, ou une fois dans l'éditeur SQL en production. `supabase/seed/02_reseaux_path.sql` complète le parcours Réseaux (voir « Moteur pédagogique »), `03_soc_path.sql` le parcours SOC, `04_mascot_voices.sql` rattache les voix `05_reseaux_programme.sql` livre le programme Réseaux complet, `06_fondamentaux_programme.sql` le programme Fondamentaux complet et `07_lab_documents_pdf.sql` fait pointer les documents des labs vers leur version PDF ; ils se chargent ensuite, dans cet ordre.
 
 ## Tests
 

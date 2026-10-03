@@ -10,6 +10,9 @@ const KIND_LABEL: Record<LabAssetKind, string> = {
   log: "Journal", pcap: "Capture réseau", pkt: "Fichier Packet Tracer", guide: "Guide", image: "Image", topology: "Topologie", report_template: "Modèle de rapport",
 };
 
+/** « PDF » or « TXT », read from the end of the address: a document and a data file do not look the same to a learner. */
+const fileType = (url: string): string => (url.split(/[?#]/)[0].match(/\.([A-Za-z0-9]{2,5})$/)?.[1] ?? "").toUpperCase();
+
 /** Files the learner works from: captures and logs open in a viewer, everything else is a download. */
 export default function LabAssets({ assets }: { assets: LabAsset[] }) {
   if (!assets.length) return null;
@@ -35,6 +38,7 @@ export default function LabAssets({ assets }: { assets: LabAsset[] }) {
               <a href={asset.url} download>
                 <span className="lab-downloads__icon" aria-hidden="true"><IconDownload size={16} /></span>
                 <span className="lab-downloads__text"><strong>{asset.title}</strong><small>{KIND_LABEL[asset.kind]}{asset.description ? ` · ${asset.description}` : ""}</small></span>
+                {fileType(asset.url) && <span className={`lab-downloads__type lab-downloads__type--${fileType(asset.url).toLowerCase()}`}>{fileType(asset.url)}</span>}
               </a>
             </li>
           ))}

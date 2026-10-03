@@ -1,0 +1,531 @@
+{
+  "devices": [
+    {
+      "id": "switch",
+      "name": "Commutateur (switch)",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/switch.webp",
+      "caption": "Un commutateur relie les appareils d’un même réseau local : chaque câble branché sur un port y connecte un ordinateur, une imprimante ou une borne Wi-Fi.",
+      "summary": "Relie les ordinateurs, imprimantes et bornes d’un même réseau local et envoie chaque trame uniquement vers le port du destinataire, grâce aux adresses MAC.",
+      "pdfSummary": "Relie les appareils d’un même réseau local",
+      "risk": "Une prise libre et un switch sans protection permettent à un inconnu de se brancher, voire d’observer le trafic.",
+      "habit": "Désactive les ports inutilisés, sépare les usages en VLAN, change le mot de passe d’administration et garde le micrologiciel à jour.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "routeur",
+      "name": "Routeur",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/routeur.webp",
+      "caption": "Un routeur relie des réseaux différents, par exemple ton réseau local et Internet, et choisit le chemin de chaque paquet d’après son adresse IP.",
+      "summary": "Relie plusieurs réseaux entre eux, comme le réseau de l’entreprise et Internet, et choisit le chemin de chaque paquet d’après son adresse IP.",
+      "pdfSummary": "Relie le réseau à Internet et aux autres réseaux",
+      "risk": "C’est la porte d’entrée du réseau : une interface d’administration exposée ou un mot de passe d’origine en fait une cible de choix.",
+      "habit": "Réserve l’administration au réseau de gestion, mets le micrologiciel à jour et supprime les services dont tu n’as pas besoin.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "pare-feu",
+      "name": "Pare-feu (firewall)",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/pare-feu.webp",
+      "caption": "Un pare-feu applique des règles entre deux zones : qui peut parler à qui, sur quel port et dans quel sens. Ses journaux racontent ce qui a été refusé.",
+      "summary": "Filtre le trafic entre deux zones de confiance selon des règles : qui peut parler à qui, sur quel port, dans quel sens.",
+      "pdfSummary": "Filtre le trafic entre deux zones selon des règles",
+      "risk": "Une règle trop large ou jamais relue annule sa protection, et des journaux non lus laissent passer les attaques sans alerte.",
+      "habit": "Applique le refus par défaut, documente chaque règle et relis régulièrement les journaux et la liste des règles.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "point-acces-wifi",
+      "name": "Point d’accès Wi-Fi",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/point-acces-wifi.webp",
+      "caption": "Un point d’accès joue pour les appareils sans fil le rôle que le commutateur joue pour les câbles. En entreprise, il est souvent fixé au plafond.",
+      "summary": "Diffuse le réseau sans fil et relie les appareils mobiles au réseau filaire. En entreprise, il est souvent fixé au plafond et alimenté par le câble réseau.",
+      "pdfSummary": "Diffuse le Wi-Fi et relie les mobiles au réseau filaire",
+      "risk": "Un Wi-Fi mal protégé, avec un mot de passe partagé, le WPS actif ou des invités non isolés, ouvre le réseau interne depuis la rue.",
+      "habit": "Utilise WPA2 ou WPA3, sépare les invités du réseau interne et désactive le WPS.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "serveur",
+      "name": "Serveur",
+      "category": "entreprise",
+      "group": "Serveurs et stockage",
+      "photo": "/images/equipment/serveur.webp",
+      "caption": "Un serveur est un ordinateur robuste, toujours allumé, qui rend un service aux autres : fichiers, messagerie, site web, base de données. Il est souvent monté en baie.",
+      "summary": "Ordinateur robuste et toujours allumé qui fournit un service aux autres machines : fichiers, messagerie, site web, base de données. Souvent monté en baie.",
+      "pdfSummary": "Fournit fichiers, messagerie ou site web aux autres",
+      "risk": "Il concentre les données et les droits : un serveur non mis à jour ou trop exposé est l’une des cibles préférées des attaquants.",
+      "habit": "Mets-le à jour, limite les comptes administrateurs, sauvegarde-le et ne publie sur Internet que les services nécessaires.",
+      "courses": [
+        "reseaux",
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "baie",
+      "name": "Baie de brassage",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/baie.webp",
+      "caption": "Une baie de brassage est une armoire au format 19 pouces qui range les commutateurs, les panneaux de brassage et parfois les serveurs.",
+      "summary": "Armoire métallique au format 19 pouces qui regroupe commutateurs, serveurs, panneaux de brassage et onduleurs de façon ordonnée.",
+      "pdfSummary": "Armoire qui range commutateurs et brassage",
+      "risk": "Une baie ouverte dans un couloir permet de débrancher, brancher ou voler un équipement en quelques secondes.",
+      "habit": "Ferme-la à clé, étiquette les câbles et tiens à jour la liste de ce qui est branché.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "panneau-brassage",
+      "name": "Panneau de brassage",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/panneau-brassage.webp",
+      "caption": "Un panneau de brassage regroupe les câbles venant des prises murales ; de courts cordons le relient ensuite au commutateur.",
+      "summary": "Rangée de prises RJ45 sur laquelle arrivent les câbles des prises murales. De courts cordons relient chaque prise au commutateur.",
+      "pdfSummary": "Regroupe les câbles des prises murales",
+      "risk": "Un câble non étiqueté ou une prise murale active dans une salle publique offre un point d’entrée discret.",
+      "habit": "Étiquette chaque prise, débranche celles qui ne servent pas et contrôle qui accède à la baie.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "cable-ethernet",
+      "name": "Câble Ethernet (RJ45)",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/cable-ethernet.webp",
+      "caption": "Un câble Ethernet transporte les données dans des paires de fils en cuivre torsadées, avec un connecteur RJ45 à chaque bout.",
+      "summary": "Câble en cuivre à paires torsadées terminé par des connecteurs RJ45. Il transporte les données, et parfois l’alimentation, sur 100 mètres au plus pour les usages courants.",
+      "pdfSummary": "Cuivre à paires torsadées, connecteur RJ45",
+      "risk": "Un câble relie physiquement le réseau : quiconque branche un appareil sur une prise active peut tenter de s’y connecter.",
+      "habit": "Contrôle l’accès aux prises en désactivant les ports inutiles et garde une cartographie des câbles.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "fibre-optique",
+      "name": "Fibre optique",
+      "category": "entreprise",
+      "group": "Réseau",
+      "photo": "/images/equipment/fibre-optique.webp",
+      "caption": "La fibre optique transmet les données sous forme de lumière dans un fil de verre : très haut débit, longues distances et pas d’interférences électriques.",
+      "summary": "Transmet les données sous forme d’impulsions de lumière dans un fil de verre : très haut débit, longues distances, insensible aux interférences électriques.",
+      "pdfSummary": "Transmet les données par la lumière, sur de longues distances",
+      "risk": "Plus difficile à écouter que le cuivre, elle n’est pas invulnérable : un raccord accessible peut être dérivé, et les équipements aux extrémités restent des cibles.",
+      "habit": "Protège les locaux techniques et surveille les coupures et les pertes de signal inhabituelles.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "nas",
+      "name": "Stockage en réseau (NAS)",
+      "category": "entreprise",
+      "group": "Serveurs et stockage",
+      "photo": "/images/equipment/nas.webp",
+      "caption": "Un NAS est un boîtier à plusieurs disques relié au réseau : il sert de dossier partagé et de sauvegarde, mais il doit lui-même être sauvegardé.",
+      "summary": "Boîtier à plusieurs disques durs relié au réseau, qui sert de dossier partagé et de sauvegarde pour une équipe ou une famille.",
+      "pdfSummary": "Dossier partagé et sauvegarde pour toute l’équipe",
+      "risk": "Un NAS exposé sur Internet ou jamais mis à jour attire les rançongiciels, et une sauvegarde gardée sur le même boîtier ne protège pas de sa panne.",
+      "habit": "Ne l’expose pas directement, active la double authentification, applique la règle 3-2-1 et teste la restauration.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "onduleur",
+      "name": "Onduleur (UPS)",
+      "category": "entreprise",
+      "group": "Serveurs et stockage",
+      "photo": "/images/equipment/onduleur.webp",
+      "caption": "Un onduleur alimente les équipements pendant une coupure : il protège la disponibilité et laisse le temps d’arrêter proprement un serveur.",
+      "summary": "Batterie qui alimente les équipements quelques minutes lors d’une coupure ou d’une variation de courant et permet un arrêt propre.",
+      "pdfSummary": "Alimente les équipements pendant une coupure",
+      "risk": "Sans lui, une coupure peut corrompre des données, et un onduleur relié au réseau doit lui aussi être protégé par un mot de passe.",
+      "habit": "Dimensionne-le pour l’arrêt propre des serveurs et teste-le régulièrement.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "imprimante-bureau",
+      "name": "Imprimante multifonction de bureau",
+      "category": "entreprise",
+      "group": "Postes et périphériques",
+      "photo": "/images/equipment/imprimante-bureau.webp",
+      "caption": "Une imprimante de bureau est un petit ordinateur sur le réseau : elle garde des documents en mémoire et propose une page web d’administration.",
+      "summary": "Imprime, copie et numérise, se relie au réseau, garde des documents en mémoire et propose une interface web d’administration.",
+      "pdfSummary": "Imprime, copie et numérise, reliée au réseau",
+      "risk": "Mot de passe d’origine, micrologiciel ancien et documents conservés sur son disque en font un point faible souvent oublié.",
+      "habit": "Change le mot de passe d’administration, désactive les services inutiles et récupère sans attendre les impressions sensibles.",
+      "courses": [
+        "reseaux",
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "telephone-ip",
+      "name": "Téléphone IP",
+      "category": "entreprise",
+      "group": "Postes et périphériques",
+      "photo": "/images/equipment/telephone-ip.webp",
+      "caption": "Un téléphone IP passe ses appels par le réseau informatique : on le place souvent dans un VLAN voix, séparé des ordinateurs.",
+      "summary": "Téléphone de bureau qui passe ses appels par le réseau informatique (voix sur IP) au lieu de la ligne téléphonique classique.",
+      "pdfSummary": "Téléphone de bureau qui passe par le réseau",
+      "risk": "Les appels peuvent être écoutés si le trafic n’est pas chiffré, et le téléphone peut servir de point d’entrée vers le réseau.",
+      "habit": "Place la téléphonie dans un VLAN dédié, chiffre les appels et change les identifiants d’origine.",
+      "courses": [
+        "reseaux"
+      ]
+    },
+    {
+      "id": "camera-ip",
+      "name": "Caméra IP",
+      "category": "entreprise",
+      "group": "Sécurité physique",
+      "photo": "/images/equipment/camera-ip.webp",
+      "caption": "Une caméra IP est un petit ordinateur relié au réseau : mot de passe d’origine et micrologiciel jamais mis à jour en font une cible fréquente.",
+      "summary": "Caméra de surveillance connectée au réseau, qui envoie son flux vidéo vers un enregistreur ou un service en ligne.",
+      "pdfSummary": "Caméra de surveillance reliée au réseau",
+      "risk": "Mots de passe d’origine et micrologiciel jamais mis à jour : des caméras ont déjà été détournées pour attaquer à grande échelle.",
+      "habit": "Change les identifiants, isole les caméras dans un VLAN et ne les expose pas directement sur Internet.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "poste-fixe",
+      "name": "Poste de travail (ordinateur fixe)",
+      "category": "entreprise",
+      "group": "Postes et périphériques",
+      "photo": "/images/equipment/poste-fixe.webp",
+      "caption": "Un poste de travail, c’est l’ordinateur de bureau que quelqu’un utilise tous les jours : c’est là qu’arrivent les courriels piégés.",
+      "summary": "Ordinateur de bureau, avec tour ou mini-PC, écran, clavier et souris, utilisé au quotidien par une personne de l’organisation.",
+      "pdfSummary": "L’ordinateur de bureau utilisé chaque jour",
+      "risk": "C’est là qu’arrivent les courriels piégés et les logiciels malveillants : un poste non mis à jour ou avec trop de droits ouvre la porte au reste du réseau.",
+      "habit": "Active les mises à jour automatiques, travaille avec un compte standard, garde un antivirus actif et chiffre le disque.",
+      "courses": [
+        "reseaux",
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "cle-securite",
+      "name": "Clé de sécurité matérielle (FIDO2)",
+      "category": "entreprise",
+      "group": "Sécurité physique",
+      "photo": "/images/equipment/cle-securite.webp",
+      "caption": "Une clé de sécurité prouve ton identité par cryptographie : on la touche ou on l’insère pour valider la connexion, et elle ne répond qu’au vrai site.",
+      "summary": "Petit boîtier USB ou NFC qui prouve ton identité par cryptographie : on le touche ou on l’insère pour valider la connexion.",
+      "pdfSummary": "Prouve ton identité, résiste à l’hameçonnage",
+      "risk": "Elle résiste à l’hameçonnage parce qu’elle ne répond qu’au vrai site, mais la perdre sans clé de secours peut te bloquer.",
+      "habit": "Enregistres-en deux, garde la seconde en lieu sûr et note la procédure de récupération.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "lecteur-badge",
+      "name": "Lecteur de badge (contrôle d’accès)",
+      "category": "entreprise",
+      "group": "Sécurité physique",
+      "photo": "/images/equipment/lecteur-badge.webp",
+      "caption": "Un lecteur de badge protège l’accès physique : c’est la couche « physique » de la défense en profondeur, avec la serrure et la caméra.",
+      "summary": "Lit un badge RFID ou NFC pour ouvrir une porte ou enregistrer un passage, parfois avec un code.",
+      "pdfSummary": "Ouvre une porte avec un badge RFID ou NFC",
+      "risk": "Les badges anciens peuvent être clonés, et un badge perdu qui n’est pas révoqué annule la protection.",
+      "habit": "Révoque tout badge perdu, préfère une technologie de badge récente et relis les journaux d’accès.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "portable",
+      "name": "Ordinateur portable",
+      "category": "personnel",
+      "group": "Appareils personnels",
+      "photo": "/images/equipment/portable.webp",
+      "caption": "Un portable sort du bureau et voyage avec ses données : sans chiffrement du disque, une perte ou un vol expose tout son contenu.",
+      "summary": "Ordinateur léger et autonome que l’on emporte partout : il sort du bureau et voyage avec ses données.",
+      "pdfSummary": "L’ordinateur que l’on emporte partout",
+      "risk": "Perte, vol, Wi-Fi public ou écran vu par-dessus l’épaule : un disque non chiffré peut être lu par n’importe qui.",
+      "habit": "Chiffre le disque, verrouille l’écran, mets à jour et utilise un VPN sur les réseaux publics.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "smartphone",
+      "name": "Smartphone",
+      "category": "personnel",
+      "group": "Appareils personnels",
+      "photo": "/images/equipment/smartphone.webp",
+      "caption": "Un smartphone concentre messages, photos, argent mobile et codes de secours : c’est souvent l’appareil le plus précieux à protéger.",
+      "summary": "Ordinateur de poche qui contient messages, photos, comptes bancaires et applications d’authentification.",
+      "pdfSummary": "Messages, photos, argent mobile et codes",
+      "risk": "Applications piégées, SMS frauduleux et vol de l’appareil : il concentre tes secrets.",
+      "habit": "Verrouille-le par un code, applique les mises à jour, installe seulement depuis les boutiques officielles et sauvegarde.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "tablette",
+      "name": "Tablette",
+      "category": "personnel",
+      "group": "Appareils personnels",
+      "photo": "/images/equipment/tablette.webp",
+      "caption": "Une tablette est souvent partagée à la maison : sans verrou, elle donne accès à tous les comptes restés ouverts.",
+      "summary": "Appareil tactile à grand écran, souvent partagé à la maison ou utilisé en mobilité pour consulter et saisir.",
+      "pdfSummary": "Appareil tactile, souvent partagé en famille",
+      "risk": "Partagée dans la famille ou laissée sans verrou, elle donne accès à tes comptes ouverts.",
+      "habit": "Crée un profil par personne, définis un code de verrouillage et applique les mises à jour.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "montre-connectee",
+      "name": "Montre connectée",
+      "category": "personnel",
+      "group": "Appareils personnels",
+      "photo": "/images/equipment/montre-connectee.webp",
+      "caption": "Une montre connectée collecte des données de santé et de localisation : ce sont des données personnelles, parfois sensibles.",
+      "summary": "Montre reliée au téléphone, qui affiche les notifications et mesure l’activité physique et la santé.",
+      "pdfSummary": "Notifications, activité et santé au poignet",
+      "risk": "Elle collecte des données de santé et de localisation, et affiche au poignet des notifications qui peuvent contenir des codes.",
+      "habit": "Limite les autorisations, verrouille-la par un code et efface les données avant de la revendre.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "enceinte-connectee",
+      "name": "Enceinte connectée",
+      "category": "personnel",
+      "group": "Maison connectée",
+      "photo": "/images/equipment/enceinte-connectee.webp",
+      "caption": "Une enceinte connectée écoute en permanence le mot qui la réveille et garde l’historique de tes demandes chez son fournisseur.",
+      "summary": "Enceinte à micro qui répond à la voix, joue de la musique et commande d’autres objets de la maison.",
+      "pdfSummary": "Enceinte à micro qui répond à la voix",
+      "risk": "Micro toujours à l’écoute, historique des demandes conservé chez le fournisseur et achats vocaux possibles.",
+      "habit": "Coupe le micro quand tu n’en as pas besoin, supprime l’historique et protège les achats par un code.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "box-internet",
+      "name": "Box Internet (routeur domestique)",
+      "category": "personnel",
+      "group": "Maison connectée",
+      "photo": "/images/equipment/box-internet.webp",
+      "caption": "Une box réunit modem, routeur, commutateur, Wi-Fi et pare-feu dans un seul boîtier : elle protège (ou expose) tout le foyer.",
+      "summary": "Boîtier fourni par l’opérateur qui réunit modem, routeur, commutateur, Wi-Fi et parfois la télévision.",
+      "pdfSummary": "Modem, routeur et Wi-Fi dans un seul boîtier",
+      "risk": "Mot de passe Wi-Fi faible, administration accessible depuis Internet ou micrologiciel ancien : elle protège tout le foyer.",
+      "habit": "Change les mots de passe d’origine, utilise WPA2 ou WPA3, désactive le WPS et ouvre un réseau invité séparé.",
+      "courses": [
+        "reseaux",
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "imprimante-perso",
+      "name": "Imprimante jet d’encre domestique",
+      "category": "personnel",
+      "group": "Maison connectée",
+      "photo": "/images/equipment/imprimante-perso.webp",
+      "caption": "Une imprimante de maison est souvent reliée au Wi-Fi : son micrologiciel est rarement mis à jour et ses services réseau sont actifs par défaut.",
+      "summary": "Imprimante de maison, souvent reliée au Wi-Fi, avec application mobile et accès à distance.",
+      "pdfSummary": "Imprimante de maison, souvent en Wi-Fi",
+      "risk": "Micrologiciel rarement mis à jour et services réseau actifs par défaut.",
+      "habit": "Mets-la à jour, change le mot de passe d’administration et coupe l’impression à distance si tu ne t’en sers pas.",
+      "courses": [
+        "reseaux",
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "objet-connecte",
+      "name": "Objet connecté (prise, ampoule, sonnette)",
+      "category": "personnel",
+      "group": "Maison connectée",
+      "photo": "/images/equipment/objet-connecte.webp",
+      "caption": "Une prise ou une ampoule connectée a une adresse IP comme un ordinateur, mais rarement des mises à jour : on la range sur le réseau invité.",
+      "summary": "Appareil du quotidien relié au Wi-Fi et piloté par une application : prise, ampoule, thermostat, sonnette vidéo.",
+      "pdfSummary": "Prise, ampoule ou sonnette pilotée par application",
+      "risk": "Sécurité souvent minimale, mises à jour rares et mots de passe d’origine : un objet compromis peut servir de relais pour attaquer le reste du réseau.",
+      "habit": "Place-les sur le réseau invité, change les mots de passe et débranche ce que tu n’utilises plus.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "cle-usb",
+      "name": "Clé USB",
+      "category": "personnel",
+      "group": "Stockage",
+      "photo": "/images/equipment/cle-usb.webp",
+      "caption": "Une clé USB inconnue est un classique de l’ingénierie sociale : on la laisse traîner en espérant qu’une personne curieuse la branche.",
+      "summary": "Mémoire flash portable pour transporter des fichiers d’un ordinateur à l’autre.",
+      "pdfSummary": "Mémoire flash pour transporter des fichiers",
+      "risk": "Une clé trouvée ou prêtée peut contenir un logiciel malveillant, et une clé perdue expose tous ses fichiers.",
+      "habit": "Ne branche jamais une clé inconnue et chiffre celles qui contiennent des données sensibles.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "disque-externe",
+      "name": "Disque dur externe",
+      "category": "personnel",
+      "group": "Stockage",
+      "photo": "/images/equipment/disque-externe.webp",
+      "caption": "Un disque externe sert aux sauvegardes, à condition de le déconnecter après la copie et de garder une autre copie ailleurs.",
+      "summary": "Stockage USB indépendant, très utilisé pour les sauvegardes et le transport de gros fichiers.",
+      "pdfSummary": "Stockage USB pour sauvegardes et gros fichiers",
+      "risk": "Sans chiffrement, un disque perdu ou volé livre son contenu, et un disque branché en permanence peut être chiffré à son tour par un rançongiciel.",
+      "habit": "Chiffre-le, déconnecte-le après la sauvegarde et garde une copie hors site.",
+      "courses": [
+        "fondamentaux"
+      ]
+    },
+    {
+      "id": "raspberry-pi",
+      "name": "Raspberry Pi",
+      "category": "personnel",
+      "group": "Apprendre",
+      "photo": "/images/equipment/raspberry-pi.webp",
+      "caption": "Un Raspberry Pi est un mini-ordinateur de la taille d’une carte bancaire : un moyen peu coûteux de monter un petit laboratoire réel pour s’entraîner.",
+      "summary": "Mini-ordinateur de la taille d’une carte bancaire, très utilisé pour apprendre Linux, bricoler et monter des laboratoires à petit prix.",
+      "pdfSummary": "Mini-ordinateur pour apprendre Linux à petit prix",
+      "risk": "Laissé avec des identifiants faibles et exposé sur Internet, il est attaqué en quelques minutes.",
+      "habit": "Crée un utilisateur avec un mot de passe solide, utilise des clés SSH et mets le système à jour.",
+      "courses": [
+        "reseaux",
+        "linux"
+      ]
+    }
+  ],
+  "labs": {
+    "tp-reseau-domestique": [
+      "routeur",
+      "switch",
+      "poste-fixe",
+      "portable",
+      "imprimante-perso"
+    ],
+    "tp-vlan-pme": [
+      "routeur",
+      "switch",
+      "poste-fixe",
+      "point-acces-wifi"
+    ],
+    "tp-multi-sites": [
+      "routeur",
+      "poste-fixe"
+    ],
+    "incident-reseau-kora": [
+      "routeur",
+      "switch",
+      "serveur",
+      "point-acces-wifi",
+      "poste-fixe"
+    ],
+    "projet-reseau-kora": [
+      "routeur",
+      "switch",
+      "point-acces-wifi",
+      "serveur",
+      "nas",
+      "poste-fixe"
+    ],
+    "packet-tracer-sous-reseaux": [
+      "routeur",
+      "switch",
+      "poste-fixe"
+    ],
+    "evaluation-reseaux": [
+      "poste-fixe",
+      "serveur"
+    ],
+    "reseau-instable": [
+      "poste-fixe",
+      "serveur"
+    ],
+    "incident-pare-feu": [
+      "pare-feu",
+      "serveur"
+    ],
+    "brute-force-ssh": [
+      "serveur"
+    ],
+    "intrusion-web": [
+      "serveur"
+    ],
+    "investigation-soc": [
+      "serveur",
+      "pare-feu"
+    ],
+    "audit-linux-droits": [
+      "serveur"
+    ],
+    "tp-analyse-phishing": [
+      "portable",
+      "smartphone"
+    ],
+    "tp-audit-mots-de-passe": [
+      "cle-securite",
+      "smartphone",
+      "portable"
+    ],
+    "tp-hygiene-postes": [
+      "poste-fixe",
+      "portable",
+      "disque-externe",
+      "nas"
+    ],
+    "tp-integrite-chiffrement": [
+      "portable",
+      "cle-usb",
+      "disque-externe"
+    ],
+    "tp-registre-risques": [
+      "poste-fixe",
+      "box-internet",
+      "nas"
+    ],
+    "incident-compte-compromis": [
+      "portable",
+      "smartphone",
+      "cle-securite"
+    ],
+    "projet-audit-soleil": [
+      "poste-fixe",
+      "portable",
+      "nas",
+      "box-internet",
+      "point-acces-wifi"
+    ]
+  }
+}

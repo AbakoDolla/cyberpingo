@@ -18,6 +18,8 @@ function load(file) {
   const localRequire = (specifier) => {
     if (!specifier.startsWith("@/") && !specifier.startsWith(".")) return require(specifier);
     const target = specifier.startsWith("@/") ? path.join(root, specifier.slice(2)) : path.resolve(path.dirname(filename), specifier);
+    // `import data from "./file.json"` : the JSON is the default export, as with resolveJsonModule.
+    if (target.endsWith(".json")) return { __esModule: true, default: JSON.parse(fs.readFileSync(target, "utf8")) };
     return load(path.relative(root, target));
   };
   vm.runInThisContext(`(function(require,module,exports){${output}\n})`, { filename })(localRequire, module, module.exports);

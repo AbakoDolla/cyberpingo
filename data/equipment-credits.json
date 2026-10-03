@@ -1,0 +1,282 @@
+{
+  "switch": {
+    "title": "File:5 Port Gigabit Netzwerk-Switch TL-SG1005D 01.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:5_Port_Gigabit_Netzwerk-Switch_TL-SG1005D_01.jpg",
+    "author": "www.heimnetzwerke.net",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "altFr": "Switch Ethernet noir de bureau avec cinq ports RJ45 en façade",
+    "creditShort": "www.heimnetzwerke.net, CC BY 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "routeur": {
+    "title": "File:MikroTIK hAP Lite.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:MikroTIK_hAP_Lite.jpg",
+    "author": "Stacatto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Petit routeur Ethernet bleu et blanc avec quatre ports RJ45",
+    "creditShort": "Stacatto, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "pare-feu": {
+    "title": "File:Watchguard Firebox 1000 1.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Watchguard_Firebox_1000_1.jpg",
+    "author": "Jakez",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "altFr": "Appliance pare-feu rouge de bureau avec voyants en façade",
+    "creditShort": "Jakez, CC BY-SA 3.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "point-acces-wifi": {
+    "title": "File:Unifi AC Lite Access Point.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Unifi_AC_Lite_Access_Point.jpg",
+    "author": "ServerGuruBrisbane",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Point d’accès Wi-Fi rond blanc fixé au mur avec anneau lumineux",
+    "creditShort": "ServerGuruBrisbane, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "serveur": {
+    "title": "File:WikimediaServersOct07 3.JPG",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:WikimediaServersOct07_3.JPG",
+    "author": "Florence Devouard",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Façades de serveurs en rack empilés dans une baie",
+    "creditShort": "Florence Devouard, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "baie": {
+    "title": "File:19-inch rackmount Ethernet switches and patch panels.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:19-inch_rackmount_Ethernet_switches_and_patch_panels.jpg",
+    "author": "Dsimic",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Baie réseau 19 pouces avec switches et câblage ordonné",
+    "creditShort": "Dsimic, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "panneau-brassage": {
+    "title": "File:Panduit Pan-Net Cable Management System detail 2.JPG",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Panduit_Pan-Net_Cable_Management_System_detail_2.JPG",
+    "author": "BrokenSphere",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "altFr": "Panneau de brassage RJ45 avec guides et câbles orange",
+    "creditShort": "BrokenSphere, CC BY-SA 3.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "cable-ethernet": {
+    "title": "File:Ethernet connector.webp",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Ethernet_connector.webp",
+    "author": "Wikideas1",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "altFr": "Deux connecteurs RJ45 transparents au bout d’un câble Ethernet jaune",
+    "creditShort": "Wikideas1, CC0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "fibre-optique": {
+    "title": "File:LC-optical-fiber-connector-hdr-0a.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:LC-optical-fiber-connector-hdr-0a.jpg",
+    "author": "Adamantios",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "altFr": "Connecteur fibre optique LC beige sur fond blanc",
+    "creditShort": "Adamantios, CC BY-SA 3.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "nas": {
+    "title": "File:Synology Disk Station DS223J - NAS-Server.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Synology_Disk_Station_DS223J_-_NAS-Server.jpg",
+    "author": "DYVER",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "NAS blanc Synology à deux baies vu en trois quarts",
+    "creditShort": "DYVER, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "onduleur": {
+    "title": "File:Apc ups rs500 02.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Apc_ups_rs500_02.jpg",
+    "author": "Hundehalter",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "altFr": "Onduleur tour APC gris et blanc vu en trois quarts",
+    "creditShort": "Hundehalter, CC BY-SA 3.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "imprimante-bureau": {
+    "title": "File:HP LaserJet M140w Printer.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:HP_LaserJet_M140w_Printer.jpg",
+    "author": "TaurusEmerald",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Imprimante laser multifonction blanche de bureau vue de face",
+    "creditShort": "TaurusEmerald, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "telephone-ip": {
+    "title": "File:Polycom SoundPoint IP 335 Desk Phone.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Polycom_SoundPoint_IP_335_Desk_Phone.jpg",
+    "author": "TaurusEmerald",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Téléphone IP de bureau noir avec écran et combiné",
+    "creditShort": "TaurusEmerald, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "camera-ip": {
+    "title": "File:Axis ip dome cameras.png",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Axis_ip_dome_cameras.png",
+    "author": "Bungle",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Caméra IP dôme blanche de vidéosurveillance sur fond clair",
+    "creditShort": "Bungle, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "poste-fixe": {
+    "title": "File:Velocity Micro \"ProMagix HD60\" Workstation Computer.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Velocity_Micro_%22ProMagix_HD60%22_Workstation_Computer.jpg",
+    "author": "Mnicolois",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "altFr": "Poste de travail sobre avec écran, clavier, souris et tour noire",
+    "creditShort": "Mnicolois, CC BY 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "cle-securite": {
+    "title": "File:U2F Hardware Authentication Security Keys (Yubico Yubikey 4 and Feitian MultiPass FIDO) (42286852310).jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:U2F_Hardware_Authentication_Security_Keys_(Yubico_Yubikey_4_and_Feitian_MultiPass_FIDO)_(42286852310).jpg",
+    "author": "Tony Webster from Minneapolis, Minnesota, United States",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "altFr": "Clés de sécurité matérielle USB pour authentification forte",
+    "creditShort": "Tony Webster, CC BY 2.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "lecteur-badge": {
+    "title": "File:Access control solutions from Axis Communications.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Access_control_solutions_from_Axis_Communications.jpg",
+    "author": "Lindiloue",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "altFr": "Lecteur de badge noir avec clavier mural et lecteur sans contact",
+    "creditShort": "Lindiloue, CC0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "portable": {
+    "title": "File:Dell Latitude 7490 running Ubuntu Cinnamon 23.10.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Dell_Latitude_7490_running_Ubuntu_Cinnamon_23.10.jpg",
+    "author": "Ahunt",
+    "license": "CC0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "altFr": "Ordinateur portable Dell Latitude ouvert sur une table en bois, vu de dessus",
+    "creditShort": "Ahunt, CC0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "smartphone": {
+    "title": "File:IPhone 14 Pro Max Deep purple A2896 China, Hong Kong and Macao version front.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:IPhone_14_Pro_Max_Deep_purple_A2896_China,_Hong_Kong_and_Macao_version_front.jpg",
+    "author": "茅野ふたば",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Smartphone moderne vu de face, écran verrouillé qui n’affiche que l’heure",
+    "creditShort": "茅野ふたば, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "tablette": {
+    "title": "File:Tablet computer.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Tablet_computer.jpg",
+    "author": "KK IN HK",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Tablette tactile noire avec clavier sur fond clair",
+    "creditShort": "KK IN HK, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "montre-connectee": {
+    "title": "File:Apple Watch Series 7; January 2022 (01).jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Apple_Watch_Series_7;_January_2022_(01).jpg",
+    "author": "MIKI Yoshihito",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "altFr": "Montre connectée à bracelet violet, écran éteint",
+    "creditShort": "MIKI Yoshihito, CC BY 2.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "enceinte-connectee": {
+    "title": "File:Alexa Amazon Echo Dot 3rd Gen Smart Speaker - Sandstone Fabric (Creative Commons) (51049189591).jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Alexa_Amazon_Echo_Dot_3rd_Gen_Smart_Speaker_-_Sandstone_Fabric_(Creative_Commons)_(51049189591).jpg",
+    "author": "Smart Home Perfected",
+    "license": "CC BY 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+    "altFr": "Enceinte connectée ronde blanche posée sur fond blanc",
+    "creditShort": "Smart Home Perfected, CC BY 2.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "box-internet": {
+    "title": "File:TP-Link TL-WR740N router HS1.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:TP-Link_TL-WR740N_router_HS1.jpg",
+    "author": "Hayden Schiff",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "altFr": "Box Internet Wi-Fi blanche avec antenne et voyants en façade",
+    "creditShort": "Hayden Schiff, CC BY 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "imprimante-perso": {
+    "title": "File:HP Deskjet D1560 FL Open 2.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:HP_Deskjet_D1560_FL_Open_2.jpg",
+    "author": "MarcoTangerino",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "altFr": "Imprimante jet d’encre domestique grise avec bac ouvert",
+    "creditShort": "MarcoTangerino, domaine public",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "objet-connecte": {
+    "title": "File:EDP-redy-Plug.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:EDP-redy-Plug.jpg",
+    "author": "MarcoTangerino",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "altFr": "Prise connectée blanche de maison posée sur fond clair",
+    "creditShort": "MarcoTangerino, domaine public",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "cle-usb": {
+    "title": "File:Samsung FIT Plus 128GB flash drive HS1.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Samsung_FIT_Plus_128GB_flash_drive_HS1.jpg",
+    "author": "Hayden Schiff",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "altFr": "Clé USB compacte noire et grise sur fond blanc",
+    "creditShort": "Hayden Schiff, CC BY 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "disque-externe": {
+    "title": "File:Seagate SRD0NF1 portable hard drive HS2.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Seagate_SRD0NF1_portable_hard_drive_HS2.jpg",
+    "author": "Hayden Schiff",
+    "license": "CC BY 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+    "altFr": "Disque dur externe portable noir posé sur fond blanc",
+    "creditShort": "Hayden Schiff, CC BY 4.0",
+    "changes": "recadrée et convertie en WebP"
+  },
+  "raspberry-pi": {
+    "title": "File:Raspberry Pi 4 Model B - Top.jpg",
+    "pageUrl": "https://commons.wikimedia.org/wiki/File:Raspberry_Pi_4_Model_B_-_Top.jpg",
+    "author": "Laserlicht",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "altFr": "Carte Raspberry Pi verte avec ports visibles",
+    "creditShort": "Laserlicht, CC BY-SA 4.0",
+    "changes": "recadrée et convertie en WebP"
+  }
+}
