@@ -1,0 +1,128 @@
+# /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin
+_apt:x:42:65534::/nonexistent:/usr/sbin/nologin
+systemd-network:x:998:998:systemd Network Management:/:/usr/sbin/nologin
+systemd-timesync:x:997:997:systemd Time Synchronization:/:/usr/sbin/nologin
+messagebus:x:100:102::/nonexistent:/usr/sbin/nologin
+syslog:x:101:103::/home/syslog:/usr/sbin/nologin
+uuidd:x:102:104::/run/uuidd:/usr/sbin/nologin
+tcpdump:x:103:105::/nonexistent:/usr/sbin/nologin
+sshd:x:104:65534::/run/sshd:/usr/sbin/nologin
+mysql:x:105:109:MySQL Server,,,:/nonexistent:/bin/false
+landscape:x:106:110::/var/lib/landscape:/usr/sbin/nologin
+pollinate:x:107:1::/var/cache/pollinate:/bin/false
+fwupd-refresh:x:108:111:fwupd-refresh user,,,:/run/systemd:/usr/sbin/nologin
+svc-web:x:996:995:Service web:/var/www:/usr/sbin/nologin
+svc-backup:x:995:994:Service sauvegarde:/var/backups:/bin/bash
+odiallo:x:1001:1001:Ousmane Diallo:/home/odiallo:/bin/bash
+adjovi:x:1002:1002:Brice Adjovi:/home/adjovi:/bin/bash
+straore:x:1003:1003:Salimata Traoré:/home/straore:/bin/bash
+emballa:x:1004:1004:Estelle Mballa:/home/emballa:/bin/bash
+cfall:x:1005:1005:Cheikh Fall:/home/cfall:/bin/bash
+nkamga:x:1006:1006:Nadège Kamga:/home/nkamga:/bin/bash
+
+# /etc/shadow
+root:$y$j9T$eDnjjAOY86F0IShF$tzJXEsXbApK/lhuXzkzuR8cC9pF7JLoE1Ug21DObcyr:19820:0:99999:7:::
+daemon:*:19600:0:99999:7:::
+bin:*:19600:0:99999:7:::
+sys:*:19600:0:99999:7:::
+sync:*:19600:0:99999:7:::
+games:*:19600:0:99999:7:::
+man:*:19600:0:99999:7:::
+lp:*:19600:0:99999:7:::
+mail:*:19600:0:99999:7:::
+news:*:19600:0:99999:7:::
+uucp:*:19600:0:99999:7:::
+proxy:*:19600:0:99999:7:::
+www-data:*:19600:0:99999:7:::
+backup:*:19600:0:99999:7:::
+list:*:19600:0:99999:7:::
+irc:*:19600:0:99999:7:::
+_apt:*:19600:0:99999:7:::
+systemd-network:*:19600:0:99999:7:::
+systemd-timesync:*:19600:0:99999:7:::
+messagebus:*:19600:0:99999:7:::
+syslog:*:19600:0:99999:7:::
+uuidd:*:19600:0:99999:7:::
+tcpdump:*:19600:0:99999:7:::
+sshd:*:19600:0:99999:7:::
+mysql:*:19600:0:99999:7:::
+landscape:*:19600:0:99999:7:::
+pollinate:*:19600:0:99999:7:::
+fwupd-refresh:*:19600:0:99999:7:::
+svc-web:*:19600:0:99999:7:::
+svc-backup:$y$j9T$cLrSXRrQoB5dTk6j$UuZCgwTy0QOtE8qS8.TBsvaIIgCqmqgnK1Eo8SJwZJI:19855:0:99999:7:::
+odiallo:$y$j9T$u5.HHJ7xddEgLuUZ$bIuPsFeI3.EZ15Sbg9/tw84kxXagEfv.PSqGle2g2fh:19841:0:99999:7:::
+adjovi:$y$j9T$Yq7WHLiwq4FG9ys2$hq5mCwdZgMHpvGYkwEj.LjD8arYydA.znJ9VvhJhRPi:19811:0:99999:7:::
+straore:$y$j9T$IVajvLRdEdnxUtc/$8m7qnuE3O/aUUzryA7cCtZpI4wjnJXpJsBkuvXrPUlG:19832:0:99999:7:::
+emballa:!:19801:0:99999:7:::
+cfall:!:19860:0:99999:7:::
+nkamga:*:19820:0:99999:7:::
+
+# /etc/group
+sudo:x:27:odiallo,adjovi,svc-backup
+webdev:x:110:nkamga
+backup:x:994:svc-backup
+
+# /etc/sudoers.d/web-maintenance
+odiallo ALL=(ALL) ALL
+nkamga ALL=(root) NOPASSWD: /usr/bin/systemctl reload nginx, /usr/bin/journalctl -u nginx.service
+svc-backup ALL=(root) NOPASSWD: /usr/bin/systemctl start backup-nuit.service, /usr/bin/systemctl stop backup-nuit.service, /usr/bin/systemctl status backup-nuit.service
+
+# sshd -T
+port 22
+protocol 2
+permitrootlogin no
+passwordauthentication yes
+kbdinteractiveauthentication no
+pubkeyauthentication yes
+permitemptypasswords no
+authenticationmethods any
+allowtcpforwarding no
+x11forwarding no
+allowusers odiallo adjovi nkamga svc-backup
+logingracetime 30
+clientaliveinterval 300
+maxauthtries 3
+
+# ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    10.20.0.100
+[ 2] 80/tcp                     ALLOW IN    Anywhere
+[ 3] 443/tcp                    ALLOW IN    Anywhere
+[ 4] 873/tcp                    ALLOW IN    Anywhere
+[ 5] 22/tcp (v6)               DENY IN     Anywhere (v6)
+
+# ufw defaults
+Default: deny (incoming), allow (outgoing), disabled (routed)
+
+# ss -tulpn
+Netid State  Recv-Q Send-Q Local Address:Port Peer Address:Port Process
+tcp   LISTEN 0      128          0.0.0.0:22        0.0.0.0:*     users:(("sshd",pid=812,fd=3))
+tcp   LISTEN 0      511          0.0.0.0:80        0.0.0.0:*     users:(("nginx",pid=1421,fd=6))
+tcp   LISTEN 0      511          0.0.0.0:443       0.0.0.0:*     users:(("nginx",pid=1421,fd=7))
+tcp   LISTEN 0      128          0.0.0.0:873       0.0.0.0:*     users:(("rsync",pid=1788,fd=5))
+tcp   LISTEN 0      128        127.0.0.1:3306      0.0.0.0:*     users:(("mariadbd",pid=1355,fd=22))
+tcp   ESTAB  0      0          10.20.0.20:22       10.20.0.100:44112 users:(("sshd",pid=812,fd=4),("sshd",pid=2144,fd=4))
+tcp   ESTAB  0      0          10.20.0.20:443      203.0.113.18:50116 users:(("nginx",pid=1422,fd=12))
+tcp   ESTAB  0      0          10.20.0.20:443      203.0.113.24:50144 users:(("nginx",pid=1423,fd=13))
+tcp   ESTAB  0      0          10.20.0.20:873      10.20.0.30:53511 users:(("rsync",pid=1788,fd=6))
+udp   UNCONN 0      0       127.0.0.53%lo:53       0.0.0.0:*     users:(("systemd-resolved",pid=655,fd=14))

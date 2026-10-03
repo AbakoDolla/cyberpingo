@@ -1,0 +1,30 @@
+2026-03-15T02:30:11Z | SUCCESS | taille=11.2G duree=00:18:31 cible=/backup/local
+2026-03-16T02:30:08Z | SUCCESS | taille=11.3G duree=00:18:10 cible=/backup/local
+2026-03-17T02:30:19Z | SUCCESS | taille=11.3G duree=00:18:41 cible=/backup/local
+2026-03-18T02:30:03Z | SUCCESS | taille=11.3G duree=00:18:04 cible=/backup/local
+2026-03-19T02:30:15Z | SUCCESS | taille=11.4G duree=00:18:22 cible=/backup/local
+2026-03-20T02:30:14Z | SUCCESS | taille=11.4G duree=00:18:15 cible=/backup/local
+2026-03-21T02:30:17Z | SUCCESS | taille=11.5G duree=00:18:18 cible=/backup/local
+2026-03-22T02:30:28Z | FAIL | etat=rsync erreur=permission denied
+2026-03-23T02:30:16Z | SUCCESS | taille=11.5G duree=00:18:26 cible=/backup/local
+2026-03-24T02:30:09Z | SUCCESS | taille=11.5G duree=00:18:09 cible=/backup/local
+2026-03-25T02:30:12Z | SUCCESS | taille=11.6G duree=00:18:12 cible=/backup/local
+2026-03-26T02:30:21Z | SUCCESS | taille=11.6G duree=00:18:33 cible=/backup/local
+2026-03-27T02:30:22Z | SUCCESS | taille=11.6G duree=00:18:21 cible=/backup/local
+2026-03-28T02:30:12Z | SUCCESS | taille=11.7G duree=00:18:42 cible=/backup/local
+2026-03-29T02:30:24Z | SUCCESS | taille=11.7G duree=00:18:39 cible=/backup/local
+2026-03-30T02:30:19Z | SUCCESS | taille=11.7G duree=00:18:19 cible=/backup/local
+2026-03-31T02:30:11Z | SUCCESS | taille=11.8G duree=00:18:27 cible=/backup/local
+2026-04-01T02:30:15Z | SUCCESS | taille=11.8G duree=00:18:29 cible=/backup/local
+2026-04-02T02:30:14Z | FAIL | etat=restic erreur=transport endpoint is not connected
+2026-04-03T02:30:17Z | SUCCESS | taille=11.9G duree=00:18:31 cible=/backup/local
+2026-04-04T02:30:18Z | SUCCESS | taille=11.9G duree=00:18:18 cible=/backup/local
+2026-04-05T02:30:11Z | SUCCESS | taille=11.9G duree=00:18:24 cible=/backup/local
+2026-04-06T02:30:19Z | SUCCESS | taille=12.0G duree=00:18:21 cible=/backup/local
+2026-04-07T02:30:23Z | SUCCESS | taille=12.0G duree=00:18:16 cible=/backup/local
+2026-04-08T02:30:11Z | SUCCESS | taille=12.0G duree=00:18:17 cible=/backup/local
+2026-04-09T02:30:12Z | SUCCESS | taille=12.1G duree=00:18:11 cible=/backup/local
+2026-04-10T02:30:16Z | SUCCESS | taille=12.1G duree=00:18:28 cible=/backup/local
+2026-04-11T02:30:09Z | FAIL | etat=restic erreur=No space left on device
+2026-04-12T02:30:05Z | FAIL | etat=restic erreur=index write failed
+2026-04-13T02:30:06Z | FAIL | etat=restic erreur=repository is not writable

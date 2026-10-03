@@ -1,0 +1,34 @@
+### df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1        40G   37G  1.9G  96% /
+/dev/vdb1       160G  123G   29G  81% /srv
+/dev/vdc1        12G  4.2G  6.8G  39% /var/log
+/dev/vdd1       200G  191G  6.0G  97% /backup/local
+tmpfs           2.0G   24M  2.0G   2% /tmp
+
+### df -i
+Filesystem      Inodes  IUsed   IFree IUse% Mounted on
+/dev/vda1      2621440 412281 2209159   16% /
+/dev/vdb1      5242880 913220 4329660   18% /srv
+/dev/vdc1       786432 748390   38042   95% /var/log
+/dev/vdd1      2621440 109030 2512410    5% /backup/local
+tmpfs           524288    104  524184    1% /tmp
+
+### lsblk -f
+NAME   FSTYPE FSVER LABEL        UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
+vda                                                                               
+└─vda1 ext4   1.0   rootfs       4b7d0d1d-a4b8-49ce-b8cf-0f8fd73b1111    1.9G    96% /
+vdb                                                                               
+└─vdb1 ext4   1.0   partages     6f8c1e7d-854a-4f7a-b3f8-cf1912342222     29G    81% /srv
+vdc                                                                               
+└─vdc1 xfs          journaux     14587f57-b230-4e22-bbf5-6a2144553333    6.8G    39% /var/log
+vdd                                                                               
+└─vdd1 ext4   1.0   sauvegardes  7fe1b260-83cf-48f1-a2a6-7d0b99884444    6.0G    97% /backup/local
+
+### findmnt
+TARGET         SOURCE    FSTYPE OPTIONS
+/              /dev/vda1 ext4   rw,relatime,errors=remount-ro
+/srv           /dev/vdb1 ext4   rw,relatime
+/var/log       /dev/vdc1 xfs    rw,relatime,nodev,nosuid
+/backup/local  /dev/vdd1 ext4   rw,relatime,nodev,nosuid
+/tmp           tmpfs     tmpfs  rw,nosuid,nodev,relatime,size=2048M

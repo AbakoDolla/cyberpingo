@@ -1,0 +1,26 @@
+### ip -br a
+lo               UNKNOWN        127.0.0.1/8 ::1/128
+ens18            UP             10.20.0.10/24 fe80::5054:ff:fe12:3410/64
+ens19            DOWN
+
+### ip r
+default via 10.20.0.1 dev ens18 proto static
+10.20.0.0/24 dev ens18 proto kernel scope link src 10.20.0.10
+
+### ip neigh
+10.20.0.1 dev ens18 lladdr 52:54:00:11:22:01 REACHABLE
+10.20.0.2 dev ens18 lladdr 52:54:00:11:22:02 STALE
+10.20.0.100 dev ens18 lladdr 52:54:00:11:22:64 REACHABLE
+10.20.0.111 dev ens18 lladdr 52:54:00:11:22:6f DELAY
+
+### /etc/resolv.conf
+search alize.example
+nameserver 10.20.0.2
+nameserver 10.20.0.3
+
+### /etc/hosts
+127.0.0.1 localhost
+127.0.1.1 srv-web01
+10.20.0.10 srv-web01.alize.example srv-web01
+10.20.0.20 srv-fichiers01.alize.example srv-fichiers01
+10.20.0.30 srv-sauvegarde01.alize.example srv-sauvegarde01

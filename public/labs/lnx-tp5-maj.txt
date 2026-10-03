@@ -1,0 +1,26 @@
+### /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.1 LTS (Noble Numbat)"
+ID=ubuntu
+ID_LIKE=debian
+
+### apt list --upgradable
+Listing...
+base-files/noble-updates 13ubuntu10.2 amd64 [upgradable from: 13ubuntu10.1]
+bash/noble-updates 5.2.21-2ubuntu4.1 amd64 [upgradable from: 5.2.21-2ubuntu4]
+ca-certificates/noble-updates,noble-security 20240203 all [upgradable from: 20240110]
+curl/noble-updates 8.5.0-2ubuntu10.5 amd64 [upgradable from: 8.5.0-2ubuntu10.4]
+libarchive13/noble-security 3.7.2-2ubuntu0.3 amd64 [upgradable from: 3.7.2-2ubuntu0.2]
+libpam-modules/noble-updates 1.5.3-5ubuntu5.3 amd64 [upgradable from: 1.5.3-5ubuntu5.2]
+libpam-runtime/noble-updates 1.5.3-5ubuntu5.3 all [upgradable from: 1.5.3-5ubuntu5.2]
+libpam0g/noble-updates 1.5.3-5ubuntu5.3 amd64 [upgradable from: 1.5.3-5ubuntu5.2]
+linux-image-generic/noble-updates 6.8.0-41.41 amd64 [upgradable from: 6.8.0-39.39]
+openssh-client/noble-security 1:9.6p1-3ubuntu13.12 amd64 [upgradable from: 1:9.6p1-3ubuntu13.10]
+openssh-server/noble-security 1:9.6p1-3ubuntu13.12 amd64 [upgradable from: 1:9.6p1-3ubuntu13.10]
+openssl/noble-security 3.0.13-0ubuntu3.6 amd64 [upgradable from: 3.0.13-0ubuntu3.5]
+python3/noble-updates 3.12.3-0ubuntu2 amd64 [upgradable from: 3.12.3-0ubuntu1]
+rsync/noble-updates 3.2.7-1ubuntu1.3 amd64 [upgradable from: 3.2.7-1ubuntu1.2]
+sudo/noble-security 1.9.15p5-3ubuntu5.1 amd64 [upgradable from: 1.9.15p5-3ubuntu5]
+systemd/noble-updates 255.4-1ubuntu8.5 amd64 [upgradable from: 255.4-1ubuntu8.4]

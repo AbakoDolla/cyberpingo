@@ -84,7 +84,7 @@ test("after the seeds, every guide and template of a lab is a PDF that exists, a
   }
   assert.deepEqual([...new Set(pdfs.map((row) => path.basename(row.url, ".pdf")))].sort(), DOCUMENTS.map((doc) => doc.file).sort(), "every PDF is offered by a lab");
   const [{ n }] = (await db.query("select count(*)::int as n from public.lab_assets")).rows;
-  assert.equal(n, 73, "no asset was added or removed");
+  assert.equal(n, 134, "no asset was added or removed");
 });
 
 test("loading the seed again changes nothing, and an address edited in the console is never overwritten", async () => {

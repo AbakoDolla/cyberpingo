@@ -6,6 +6,8 @@
 //   course     reseaux | fondamentaux | linux | logs  (couleur et bandeau)
 //   equipment  identifiants de data/equipment.json montrés dans le bandeau « matériel » : seulement ce
 //              dont le document parle réellement
+//   direct     le document est publié en PDF dès le seed de son parcours (scripts/generate-<parcours>-seed.cjs) : le
+//              seed 07 de conversion .md vers .pdf, déjà appliqué en production, ne le concerne pas
 module.exports = [
   // Réseaux informatiques
   { file: "tp1-guide", kind: "guide", docLabel: "Guide pas à pas", course: "reseaux", lab: "TP 1 · Réseau d’une maison", equipment: ["routeur", "switch", "poste-fixe", "portable", "imprimante-perso"] },
@@ -34,4 +36,17 @@ module.exports = [
   { file: "guide-audit-linux", kind: "guide", docLabel: "Guide d’audit", course: "linux", lab: "Audit des droits Linux", equipment: ["serveur"] },
   { file: "guide-lecture-journaux", kind: "guide", docLabel: "Aide-mémoire", course: "logs", lab: "Lire et recouper des journaux", equipment: ["serveur", "pare-feu"] },
   { file: "modele-rapport-incident", kind: "template", docLabel: "Modèle de rapport", course: "logs", lab: "Investigation d’incident" },
+
+  // Administration Linux : publiés en PDF dès leur seed (08_linux_programme.sql), donc « direct » : pas de conversion dans le seed 07
+  { file: "lnx-tp1-guide", kind: "guide", docLabel: "Guide pas à pas", course: "linux", lab: "TP 1 · Explorer l’arborescence", equipment: ["serveur", "portable"], direct: true },
+  { file: "lnx-tp2-guide", kind: "guide", docLabel: "Guide pas à pas", course: "linux", lab: "TP 2 · Droits, comptes et sudo", equipment: ["serveur"], direct: true },
+  { file: "lnx-tp3-guide", kind: "guide", docLabel: "Guide pas à pas", course: "linux", lab: "TP 3 · Processus et services", equipment: ["serveur"], direct: true },
+  { file: "lnx-tp4-guide", kind: "guide", docLabel: "Guide pas à pas", course: "linux", lab: "TP 4 · Réseau, SSH et pare-feu", equipment: ["serveur", "pare-feu", "routeur"], direct: true },
+  { file: "lnx-tp5-guide", kind: "guide", docLabel: "Guide pas à pas", course: "linux", lab: "TP 5 · Mises à jour et sauvegardes", equipment: ["serveur", "disque-externe", "nas"], direct: true },
+  { file: "lnx-tp6-guide", kind: "guide", docLabel: "Guide pas à pas", course: "linux", lab: "TP 6 · Scripts shell", equipment: ["portable", "raspberry-pi"], direct: true },
+  { file: "lnx-inc-guide", kind: "guide", docLabel: "Guide d’incident", course: "linux", lab: "Évaluation · Serveur web compromis", equipment: ["serveur", "pare-feu"], direct: true },
+  { file: "lnx-inc-chronologie", kind: "template", docLabel: "Modèle de chronologie", course: "linux", lab: "Évaluation · Serveur web compromis", direct: true },
+  { file: "lnx-proj-guide", kind: "guide", docLabel: "Guide du projet final", course: "linux", lab: "Projet final · Audit d’un serveur Linux", equipment: ["serveur", "nas", "pare-feu"], direct: true },
+  { file: "lnx-proj-grille-audit", kind: "grid", docLabel: "Grille d’audit", course: "linux", lab: "Projet final · Audit d’un serveur Linux", direct: true },
+  { file: "lnx-proj-modele-rapport", kind: "template", docLabel: "Modèle de rapport", course: "linux", lab: "Projet final · Audit d’un serveur Linux", direct: true },
 ];

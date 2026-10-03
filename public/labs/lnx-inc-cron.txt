@@ -1,0 +1,31 @@
+# /etc/crontab
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+25 6    * * *   root    test -x /usr/sbin/anacron || run-parts --report /etc/cron.daily
+47 6    * * 7   root    test -x /usr/sbin/anacron || run-parts --report /etc/cron.weekly
+52 6    1 * *   root    test -x /usr/sbin/anacron || run-parts --report /etc/cron.monthly
+
+# /etc/anacrontab
+1   5   cron.daily      run-parts --report /etc/cron.daily
+7   10  cron.weekly     run-parts --report /etc/cron.weekly
+@monthly 15 cron.monthly run-parts --report /etc/cron.monthly
+
+# /etc/cron.d/e2scrub_all
+30 3 * * 0 root test -e /run/systemd/system || service e2scrub_all start
+10 3 * * * root test -e /run/systemd/system || service e2scrub_all start --all
+
+# /etc/cron.d/php
+09,39 *     * * *     root   [ -x /usr/lib/php/sessionclean ] && if [ ! -d /run/systemd/system ]; then /usr/lib/php/sessionclean; fi
+
+# /etc/cron.d/logrotate
+15 4 * * * root /usr/sbin/logrotate /etc/logrotate.conf
+
+# /etc/cron.d/backup-nightly
+30 2 * * * root /usr/local/bin/backup-nightly.sh >/var/log/backup-nightly.log 2>&1
+
+# /etc/cron.d/cache-prime
+5 */6 * * * root /usr/local/bin/cache-prime.sh >/var/log/cache-prime.log 2>&1
+
+# /etc/cron.d/system-cache
+*/10 * * * * root /usr/local/bin/system-cache-refresh.sh >/dev/null 2>&1

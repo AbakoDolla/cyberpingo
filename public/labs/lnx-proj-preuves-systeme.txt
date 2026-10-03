@@ -1,0 +1,54 @@
+# /etc/os-release
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+
+# calendrier de support de la distribution (publié par l’éditeur)
+version=12 (bookworm) publication=2023-06-10 support_standard_jusqu_au=2026-07-11 support_etendu_jusqu_au=2028-06-30
+
+# apt list --upgradable
+Listing...
+openssh-server/bookworm-security 1:9.2p1-2+deb12u7 amd64 [upgradable from: 1:9.2p1-2+deb12u5]
+openssl/bookworm-security 3.0.14-1~deb12u2 amd64 [upgradable from: 3.0.14-1~deb12u1]
+linux-image-amd64/bookworm-security 6.1.0-31 amd64 [upgradable from: 6.1.0-29]
+libssl3/bookworm-security 3.0.14-1~deb12u2 amd64 [upgradable from: 3.0.14-1~deb12u1]
+curl/bookworm-updates 7.88.1-10+deb12u8 amd64 [upgradable from: 7.88.1-10+deb12u7]
+git/bookworm 1:2.39.5-0+deb12u2 amd64 [upgradable from: 1:2.39.5-0+deb12u1]
+less/bookworm 590-2.1~deb12u2 amd64 [upgradable from: 590-2.1~deb12u1]
+nano/bookworm 7.2-1+deb12u1 amd64 [upgradable from: 7.2-1]
+python3-urllib3/bookworm 1.26.12-1+deb12u1 all [upgradable from: 1.26.12-1]
+tar/bookworm 1.34+dfsg-1.2+deb12u1 amd64 [upgradable from: 1.34+dfsg-1.2]
+tzdata/bookworm 2026a-0+deb12u1 all [upgradable from: 2025c-0+deb12u1]
+vim/bookworm 2:9.0.1378-2+deb12u2 amd64 [upgradable from: 2:9.0.1378-2+deb12u1]
+
+# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1        60G   47G   10G  83% /
+/dev/vdb1       120G   54G   60G  48% /srv
+tmpfs           512M   12M  500M   3% /run
+tmpfs           512M  9.6M  503M   2% /tmp
+
+# df -i
+Filesystem      Inodes IUsed   IFree IUse% Mounted on
+/dev/vda1      3932160 711842 3220318   19% /
+/dev/vdb1      7864320 120332 7743988    2% /srv
+tmpfs            65536   1215   64321    2% /run
+tmpfs            65536    224   65312    1% /tmp
+
+# lsblk -f
+NAME FSTYPE FSVER LABEL UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
+vda
+└─vda1 ext4   1.0         8b1d9854-6a39-4c01-9b8a-4a7f673f0001   10G    83% /
+vdb
+└─vdb1 ext4   1.0  partages 0d2813de-6a39-4c01-9b8a-4a7f673f0002   60G    48% /srv
+
+# findmnt /tmp
+TARGET SOURCE FSTYPE OPTIONS
+/tmp   tmpfs  tmpfs  rw,nosuid,nodev,noexec,relatime,size=524288k
+
+# sysctl net.ipv4.ip_forward net.ipv4.conf.all.rp_filter
+net.ipv4.ip_forward = 0
+net.ipv4.conf.all.rp_filter = 1

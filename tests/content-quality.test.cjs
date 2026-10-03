@@ -12,7 +12,6 @@ const { readLessons, templateLessonIds } = require("../scripts/content-snapshot.
 
 // Lessons published before the quality gate existed, per course. Remove a title as soon as its lesson passes.
 const KNOWN_DEBT = {
-  linux: ["Naviguer dans le système de fichiers Linux", "Permissions et gestion des utilisateurs", "Les journaux d’un serveur Linux", "Auditer droits, comptes et tâches planifiées"],
   "securite-web": ["HTTPS : ce que le cadenas protège vraiment", "Protéger ses comptes avec un gestionnaire et la MFA", "Déjouer un message de phishing"],
   "pentest-intro": ["Autorisation et périmètre d’un audit", "Une méthode de test responsable", "Rédiger une recommandation utile"],
   "analyse-logs": [
@@ -98,6 +97,6 @@ test("every skill of a finished course links a lesson, its quiz, a practice lab 
       (select count(*)::int from public.skill_links k where k.skill_id = s.id and k.kind = 'practice' and k.lab_id is not null) as practice,
       (select count(*)::int from public.skill_links k join public.labs l on l.id = k.lab_id where k.skill_id = s.id and k.kind = 'validation' and l.is_assessment) as validation
     from public.skills s join public.domains d on d.id = s.domain_id order by s.position`);
-  assert.ok(skills.length >= 29);
+  assert.ok(skills.length >= 37);
   for (const skill of skills) assert.deepEqual([skill.lessons, skill.quizzes, skill.practice, skill.validation], [1, 1, 1, 1], `${skill.slug} : une compétence se prouve par la leçon, le quiz, la pratique et l’évaluation`);
 });

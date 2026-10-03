@@ -1,0 +1,13 @@
+124013    144 -rwsr-xr-x   1 root     root        72712 2025-11-04 10:20 /usr/bin/passwd
+124014    120 -rwsr-xr-x   1 root     root        59704 2025-11-04 10:20 /usr/bin/su
+124015     84 -rwsr-xr-x   1 root     root        48896 2025-11-04 10:20 /usr/bin/chfn
+124016     76 -rwsr-xr-x   1 root     root        52880 2025-11-04 10:20 /usr/bin/chsh
+124017     52 -rwsr-xr-x   1 root     root        30952 2025-11-04 10:20 /usr/bin/gpasswd
+124018     44 -rwsr-xr-x   1 root     root        43384 2025-11-04 10:20 /usr/bin/mount
+124019     36 -rwsr-xr-x   1 root     root        35128 2025-11-04 10:20 /usr/bin/umount
+124020     28 -rwsr-xr-x   1 root     root        22984 2025-11-04 10:20 /usr/bin/newgrp
+124021     52 -rwsr-xr--   1 root     messagebus 51272 2025-11-04 10:20 /usr/lib/dbus-1.0/dbus-daemon-launch-helper
+124022     20 -rwsr-xr-x   1 root     root        18736 2025-11-04 10:20 /usr/lib/polkit-1/polkit-agent-helper-1
+124023     12 -rwsr-xr-x   1 root     root        14688 2025-11-04 10:20 /usr/lib/openssh/ssh-keysign
+124024     16 -rwsr-xr-x   1 root     root        21944 2025-11-04 10:20 /usr/bin/sudo
+124025      8 -rwsr-xr-x   1 root     root        11280 2026-04-05 06:12 /usr/local/bin/diag-root

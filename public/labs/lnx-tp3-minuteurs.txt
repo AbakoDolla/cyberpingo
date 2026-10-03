@@ -1,0 +1,14 @@
+NEXT                        LEFT          LAST                        PASSED       UNIT                         ACTIVATES
+Wed 2026-04-08 12:10:45 UTC 1h 37min left Wed 2026-04-08 10:33:18 UTC 18min ago   apt-daily.timer              apt-daily.service
+Thu 2026-04-09 06:14:12 UTC 19h left      Wed 2026-04-08 06:14:10 UTC 4h ago       apt-daily-upgrade.timer      apt-daily-upgrade.service
+Sun 2026-04-12 03:10:17 UTC 3 days left   Sun 2026-04-05 03:10:15 UTC 3 days ago    e2scrub_all.timer            e2scrub_all.service
+Mon 2026-04-13 00:00:00 UTC 4 days left   Mon 2026-04-06 00:00:03 UTC 2 days ago    fstrim.timer                 fstrim.service
+Thu 2026-04-09 00:00:00 UTC 13h left      Wed 2026-04-08 00:00:01 UTC 10h ago       logrotate.timer              logrotate.service
+Thu 2026-04-09 05:20:11 UTC 18h left      Wed 2026-04-08 05:20:09 UTC 5h ago        man-db.timer                 man-db.service
+Thu 2026-04-09 07:41:31 UTC 20h left      Wed 2026-04-08 07:41:30 UTC 3h ago        motd-news.timer              motd-news.service
+Thu 2026-04-09 01:33:09 UTC 14h left      Wed 2026-04-08 01:33:08 UTC 9h ago        phpsessionclean.timer        phpsessionclean.service
+Thu 2026-04-09 02:30:00 UTC 15h left      Wed 2026-04-08 02:30:01 UTC 7h ago        backup-nuit.timer            backup-nuit.service
+Thu 2026-04-09 03:40:00 UTC 16h left      Wed 2026-04-08 03:40:04 UTC 6h ago        inventaire-web.timer         inventaire-web.service
+Thu 2026-04-09 03:55:00 UTC 16h left      n/a                         n/a            audit-export.timer           audit-export.service
+Thu 2026-04-09 04:10:00 UTC 17h left      Wed 2026-04-08 04:10:00 UTC 6h ago        systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+n/a                         n/a           n/a                         n/a            telemetry-relay.timer        telemetry-relay.service

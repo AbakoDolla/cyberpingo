@@ -21,7 +21,8 @@ const DOCUMENTS = require("./pdf/documents.cjs");
 
 const LABS = path.join(ROOT, "public", "labs");
 const MANIFEST = path.join(__dirname, "pdf", "manifest.json");
-const ENGINE_FILES = ["markdown.cjs", "design.cjs", "icons.cjs", "highlight.cjs", "assets.cjs", "documents.cjs"].map((name) => path.join(__dirname, "pdf", name));
+// The list of documents (documents.cjs) is not an input of the whole engine: what a document needs from it is hashed with that document.
+const ENGINE_FILES = ["markdown.cjs", "design.cjs", "icons.cjs", "highlight.cjs", "assets.cjs"].map((name) => path.join(__dirname, "pdf", name));
 const SHARED_INPUTS = [
   ...ENGINE_FILES,
   path.join(ROOT, "public", "images", "cyberpingo-transparent.png"),
@@ -29,8 +30,6 @@ const SHARED_INPUTS = [
   path.join(ROOT, "public", "fonts", "space-grotesk-latin.woff2"),
   path.join(ROOT, "public", "fonts", "inter-latin.woff2"),
   path.join(ROOT, "public", "fonts", "jetbrains-mono-latin.woff2"),
-  path.join(ROOT, "data", "equipment.json"),
-  path.join(ROOT, "data", "equipment-credits.json"),
 ];
 
 const sha = (...parts) => crypto.createHash("sha256").update(parts.map((part) => (Buffer.isBuffer(part) ? part : String(part)))
@@ -54,8 +53,18 @@ function equipmentFile(item) {
   return path.join(ROOT, "public", item.photo.replace(/^\//, ""));
 }
 
-function engineHash() {
-  return sha(...SHARED_INPUTS.map(readIfExists));
+/**
+ * What the PDFs show of the equipment catalogue: name, sentence, photo and its credit. The courses and the labs of
+ * data/equipment.json change no PDF, so adding a lab or a course there does not make every document stale.
+ */
+function catalogueFingerprint(catalogue) {
+  return JSON.stringify([...catalogue.items.values()].map((item) => [
+    item.id, item.name, item.pdfSummary ?? item.summary, item.photo, catalogue.credits[item.id]?.altFr ?? "", catalogue.credits[item.id]?.creditShort ?? "",
+  ]));
+}
+
+function engineHash(catalogue = loadCatalogue()) {
+  return sha(...SHARED_INPUTS.map(readIfExists), catalogueFingerprint(catalogue));
 }
 
 function documentHash(doc, engine, catalogue) {

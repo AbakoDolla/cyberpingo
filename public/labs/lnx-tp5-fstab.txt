@@ -1,0 +1,7 @@
+# /etc/fstab
+UUID=4b7d0d1d-a4b8-49ce-b8cf-0f8fd73b1111 /             ext4 defaults,errors=remount-ro 0 1
+UUID=6f8c1e7d-854a-4f7a-b3f8-cf1912342222 /srv          ext4 defaults                  0 2
+UUID=14587f57-b230-4e22-bbf5-6a2144553333 /var/log      xfs  defaults,nodev,nosuid     0 2
+UUID=7fe1b260-83cf-48f1-a2a6-7d0b99884444 /backup/local ext4 defaults,nodev,nosuid     0 2
+tmpfs                                   /tmp          tmpfs rw,nosuid,nodev,size=2G  0 0
+UUID=08A2-1B4C                          /mnt/usb-archive exfat nofail,rw,uid=1001,gid=1001,umask=0077 0 0

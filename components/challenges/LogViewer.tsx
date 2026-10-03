@@ -9,7 +9,13 @@ const MAX_BYTES = 1_000_000;
 
 type Load = { state: "loading" } | { state: "error"; message: string } | { state: "ready"; lines: LogLine[] };
 
-/** Reads a real log file: filter it with search terms and spot the pattern yourself. */
+/** The label names the real file type: labs serve logs, but also exports, configurations, scripts and tables. */
+function downloadLabel(url: string) {
+  const extension = /\.([A-Za-z0-9]{1,8})(?:[?#].*)?$/.exec(url)?.[1]?.toLowerCase();
+  return extension ? `Télécharger le fichier .${extension}` : "Télécharger le fichier";
+}
+
+/** Reads a lab file (a log, an export, a configuration, a script): filter it with search terms and spot the pattern yourself. */
 export default function LogViewer({ url, title }: { url: string; title: string }) {
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const [query, setQuery] = useState("");
@@ -20,13 +26,13 @@ export default function LogViewer({ url, title }: { url: string; title: string }
     setLoad({ state: "loading" });
     fetch(url)
       .then(async (response) => {
-        if (!response.ok) throw new Error("Le fichier de journal est introuvable.");
+        if (!response.ok) throw new Error("Le fichier est introuvable.");
         const text = await response.text();
-        if (text.length > MAX_BYTES) throw new Error("Ce journal est trop volumineux pour l’aperçu.");
+        if (text.length > MAX_BYTES) throw new Error("Ce fichier est trop volumineux pour l’aperçu : télécharge-le.");
         return toLogLines(text);
       })
       .then((lines) => { if (!cancelled) setLoad({ state: "ready", lines }); })
-      .catch((cause: unknown) => { if (!cancelled) setLoad({ state: "error", message: cause instanceof Error ? cause.message : "Journal illisible." }); });
+      .catch((cause: unknown) => { if (!cancelled) setLoad({ state: "error", message: cause instanceof Error ? cause.message : "Fichier illisible." }); });
     return () => { cancelled = true; };
   }, [url]);
 
@@ -34,12 +40,12 @@ export default function LogViewer({ url, title }: { url: string; title: string }
   const visible = useMemo(() => (lines ? filterLogLines(lines, query) : []), [lines, query]);
 
   return (
-    <section className="lab-viewer log-viewer" aria-label={`Journal : ${title}`}>
+    <section className="lab-viewer log-viewer" aria-label={`Fichier : ${title}`}>
       <header className="lab-viewer__bar">
         <strong>{title}</strong>
-        <a className="lab-viewer__download" href={url} download><IconDownload size={14} /> Télécharger le .log</a>
+        <a className="lab-viewer__download" href={url} download><IconDownload size={14} /> {downloadLabel(url)}</a>
       </header>
-      {load.state === "loading" && <p className="lab-viewer__state" role="status">Lecture du journal…</p>}
+      {load.state === "loading" && <p className="lab-viewer__state" role="status">Lecture du fichier…</p>}
       {load.state === "error" && <p className="lab-viewer__state is-error" role="alert"><IconAlert size={15} /> {load.message}</p>}
       {lines && (
         <>
@@ -50,7 +56,7 @@ export default function LogViewer({ url, title }: { url: string; title: string }
             </label>
             <p className="lab-viewer__count" aria-live="polite">{visible.length} / {lines.length} lignes</p>
           </div>
-          <div className="lab-viewer__scroll" tabIndex={0} role="region" aria-label="Lignes du journal">
+          <div className="lab-viewer__scroll" tabIndex={0} role="region" aria-label="Lignes du fichier">
             <ol className="log-lines">
               {visible.slice(0, limit).map((line) => (
                 <li key={line.number} data-tone={line.tone} value={line.number}><code>{line.text}</code></li>

@@ -1,0 +1,5 @@
+nom | support | emplacement | derniere_sync | statut
+production-srv-fichiers01 | disque interne | srv-fichiers01:/srv | 2026-04-13T02:30:06Z | actif
+miroir-usb-technique | disque usb chiffre | armoire-technique | 2026-04-10T02:30:16Z | actif
+depot-restic-local | disque interne | srv-fichiers01:/backup/local/restic-repo | 2026-04-10T02:30:20Z | actif
+copie-restic-hors-site | depot restic distant | srv-sauvegarde01:/var/restic/alize | 2026-03-30T02:30:11Z | echec

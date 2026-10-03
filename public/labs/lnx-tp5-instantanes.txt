@@ -1,0 +1,20 @@
+ID        Time                 Host             Tags     Paths
+-----------------------------------------------------------------------
+f39aa111  2026-04-10 02:30:20  srv-fichiers01  daily   /srv/partage
+f39aa112  2026-04-09 02:30:16  srv-fichiers01  daily   /srv/partage
+f39aa113  2026-04-08 02:30:16  srv-fichiers01  daily   /srv/partage
+f39aa114  2026-04-07 02:30:09  srv-fichiers01  daily   /srv/partage
+f39aa115  2026-04-06 02:30:33  srv-fichiers01  daily   /srv/partage
+f39aa116  2026-04-05 02:30:15  srv-fichiers01  daily   /srv/partage
+f39aa117  2026-04-04 02:30:16  srv-fichiers01  daily   /srv/partage
+f39aa118  2026-04-03 02:30:18  srv-fichiers01  daily   /srv/partage
+w74bb201  2026-03-30 02:30:14  srv-fichiers01  weekly   /srv/partage
+w74bb202  2026-03-23 02:30:19  srv-fichiers01  weekly   /srv/partage
+w74bb203  2026-03-16 02:30:12  srv-fichiers01  weekly   /srv/partage
+w74bb204  2026-03-09 02:30:22  srv-fichiers01  weekly   /srv/partage
+w74bb205  2026-03-02 02:30:12  srv-fichiers01  weekly   /srv/partage
+m88cc301  2026-03-01 02:30:11  srv-fichiers01  monthly   /srv/partage
+m88cc302  2026-02-01 02:30:11  srv-fichiers01  monthly   /srv/partage
+m88cc303  2026-01-01 02:30:11  srv-fichiers01  monthly   /srv/partage
+-----------------------------------------------------------------------
+16 snapshots

@@ -1,0 +1,25 @@
+# ===== /etc/ssh/sshd_config =====
+Include /etc/ssh/sshd_config.d/*.conf
+Port 22
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+X11Forwarding no
+AllowUsers odiallo nkamga cfall
+
+# ===== /etc/ssh/sshd_config.d/10-alize-hardening.conf =====
+Port 2202
+PermitRootLogin prohibit-password
+PasswordAuthentication no
+LoginGraceTime 30
+
+# ===== /etc/ssh/sshd_config.d/20-maintenance.conf =====
+PasswordAuthentication yes
+Match User cfall
+    PasswordAuthentication yes
+    PubkeyAuthentication yes
+Match Address 198.51.100.0/24
+    PasswordAuthentication no
+    PermitRootLogin no
+Match User nkamga Address 10.20.0.100
+    X11Forwarding yes

@@ -1,0 +1,23 @@
+  UNIT                         LOAD   ACTIVE   SUB     DESCRIPTION
+  apparmor.service             loaded active   exited  Load AppArmor profiles
+  auditd.service               loaded active   running Security Auditing Service
+  backup-nuit.service          loaded failed   failed  Sauvegarde nocturne
+  cron.service                 loaded active   running Regular background program processing daemon
+  dbus.service                 loaded active   running D-Bus System Message Bus
+  fail2ban.service             loaded active   running Fail2Ban Service
+  getty@tty1.service           loaded active   running Getty on tty1
+  mariadb.service              loaded active   running MariaDB 10.11 database server
+  nginx.service                loaded active   running A high performance web server
+  php8.3-fpm.service           loaded active   running The PHP 8.3 FastCGI Process Manager
+  redis-server.service         loaded active   running Advanced key-value store
+  rsyslog.service              loaded active   running System Logging Service
+  ssh.service                  loaded active   running OpenBSD Secure Shell server
+  systemd-journald.service     loaded active   running Journal Service
+  systemd-logind.service       loaded active   running User Login Management
+  systemd-networkd.service     loaded inactive dead    Network Configuration
+  systemd-resolved.service     loaded active   running Network Name Resolution
+  systemd-timesyncd.service    loaded active   running Network Time Synchronization
+  telemetry-relay.service      loaded active   running Telemetry relay agent
+  tmp-watch.service            loaded failed   failed  Nettoyage temporaire
+  ufw.service                  loaded active   exited  Uncomplicated firewall
+  unattended-upgrades.service  loaded inactive dead    Unattended Upgrades Shutdown
