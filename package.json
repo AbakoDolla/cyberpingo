@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/database.test.cjs tests/learning.test.cjs tests/academy.test.cjs tests/pcap.test.cjs tests/mascot.test.cjs tests/labview.test.cjs tests/academyview.test.cjs tests/admin-access.test.cjs tests/assets.test.cjs tests/programme.test.cjs tests/fondamentaux.test.cjs tests/fondamentaux-labs-a.test.cjs tests/fondamentaux-labs-b.test.cjs tests/fondamentaux-guides.test.cjs tests/content-quality.test.cjs tests/equipment.test.cjs tests/documents.test.cjs",
+    "test": "node --test tests/database.test.cjs tests/learning.test.cjs tests/academy.test.cjs tests/pcap.test.cjs tests/mascot.test.cjs tests/labview.test.cjs tests/academyview.test.cjs tests/admin-access.test.cjs tests/assets.test.cjs tests/programme.test.cjs tests/fondamentaux.test.cjs tests/fondamentaux-labs-a.test.cjs tests/fondamentaux-labs-b.test.cjs tests/fondamentaux-guides.test.cjs tests/content-quality.test.cjs tests/equipment.test.cjs tests/documents.test.cjs tests/certificate.test.cjs",
     "db:types": "node scripts/generate-db-types.cjs",
     "db:seed": "node scripts/generate-content-seed.cjs",
     "content:report": "node scripts/content-report.cjs"
@@ -25,13 +25,16 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@pdf-lib/fontkit": "^1.1.1",
     "@types/node": "^20.14.15",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-next": "^15.5.26",
+    "pdf-lib": "^1.17.1",
     "postcss": "^8.4.40",
+    "qrcode-generator": "^1.4.4",
     "tailwindcss": "^3.4.7",
     "typescript": "^5.5.4"
   }

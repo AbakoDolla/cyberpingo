@@ -63,7 +63,7 @@ Les **Edge Functions** sont réservées à ce qui exige la service role ou un ru
 | Fonction | Rôle |
 |---|---|
 | `admin-actions` | Actions sur `auth.users` : statut, bannissement, débannissement, lien de réinitialisation, suppression. Vérifie `is_admin()` avec le JWT de l'appelant, protège les comptes du staff (superadmin requis) et journalise dans `admin_logs`. |
-| `generate-certificate` | Génère le PDF d'un certificat avec pdf-lib, le dépose dans le bucket privé `certificates` et renseigne `pdf_path`. L'apprenant le télécharge par URL signée valable 120 secondes. |
+| `generate-certificate` | Génère le PDF d'un certificat avec pdf-lib (logo et mascotte, polices de marque, QR code de vérification : `render.ts` et `brand.ts`), le dépose dans le bucket privé `certificates` et renseigne `pdf_path`. L'apprenant le télécharge par URL signée valable 120 secondes. |
 
 Correspondance avec les fonctions proposées par le cahier des charges :
 
