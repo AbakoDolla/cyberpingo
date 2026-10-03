@@ -120,6 +120,12 @@ Deux fonctions nécessitent la clé `service_role` et vivent donc côté serveur
 npx supabase functions deploy admin-actions generate-certificate
 ```
 
+#### Le certificat de réussite en PDF
+
+`generate-certificate` dessine un certificat A4 paysage aux couleurs de CyberPingo : logo, médaillon de la mascotte, polices Space Grotesk, Inter et JetBrains Mono, et un QR code qui mène à la page de vérification `/certificat/<code>`. Le dessin est dans `supabase/functions/generate-certificate/render.ts` ; le logo et les polices sont dans `brand.ts`, généré par `node scripts/build-certificate-brand.cjs` (polices Fontsource sous licence SIL OFL, converties en TrueType non compressé pour que la fonction n'ait rien à décompresser : environ 0,6 s de CPU par certificat, pour 2 s autorisées). Si les polices de marque ne se chargent pas, le certificat est tout de même produit avec les polices standard.
+
+Le nom du fichier porte la version du dessin (`<identifiant>/CP-2026-000001.v2.pdf`). **Après chaque mise à jour de ces fichiers, redéployez la fonction** (`npx supabase functions deploy generate-certificate`). Un certificat dont le PDF est encore au premier dessin (sans suffixe `.v2`) est redessiné au prochain téléchargement, et l'ancien fichier est supprimé : aucune action manuelle n'est nécessaire pour les certificats déjà délivrés. `tests/certificate.test.cjs` exécute le même code de rendu avec les mêmes bibliothèques (pdf-lib, fontkit, qrcode-generator) pour contrôler le PDF produit.
+
 ### Secrets des fonctions
 
 ```bash

@@ -7,6 +7,13 @@ const ts = require("typescript");
 const root = path.resolve(__dirname, "..");
 const cache = new Map();
 
+const mapNpm = (specifier) => {
+  const name = specifier.replace(/^npm:/, "").replace(/@\d[\w.-]*$/, "");
+  const loaded = require(name);
+  // Deno gives CommonJS packages a default export; mirror it for the packages used by the Edge Functions.
+  return loaded && loaded.__esModule ? loaded : { __esModule: true, default: loaded, ...loaded };
+};
+
 function load(file) {
   const filename = path.resolve(root, `${file}.ts`);
   if (cache.has(filename)) return cache.get(filename);
@@ -16,11 +23,13 @@ function load(file) {
   const module = { exports: {} };
   cache.set(filename, module.exports);
   const localRequire = (specifier) => {
+    if (specifier.startsWith("npm:")) return mapNpm(specifier);
     if (!specifier.startsWith("@/") && !specifier.startsWith(".")) return require(specifier);
     const target = specifier.startsWith("@/") ? path.join(root, specifier.slice(2)) : path.resolve(path.dirname(filename), specifier);
     // `import data from "./file.json"` : the JSON is the default export, as with resolveJsonModule.
     if (target.endsWith(".json")) return { __esModule: true, default: JSON.parse(fs.readFileSync(target, "utf8")) };
-    return load(path.relative(root, target));
+    // Deno wants the extension in a relative import ("./brand.ts"); the loader adds it back itself.
+    return load(path.relative(root, target.replace(/\.ts$/, "")));
   };
   vm.runInThisContext(`(function(require,module,exports){${output}\n})`, { filename })(localRequire, module, module.exports);
   return module.exports;
