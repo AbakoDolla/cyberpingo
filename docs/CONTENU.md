@@ -48,6 +48,10 @@ Un quiz corrige chaque réponse : l'explication dit pourquoi la bonne réponse e
 
 Les cours qui ne passent pas encore la grille sont listés par titre dans `KNOWN_DEBT` (`tests/content-quality.test.cjs`). La liste ne peut que rétrécir : le test échoue si une leçon en dette est améliorée sans sortir de la liste, ou si une leçon nouvelle y entre.
 
+### Fichiers de laboratoire : ne jamais livrer la réponse
+
+Un guide de laboratoire enseigne la méthode avec des commandes et des exemples génériques. Il ne contient jamais une valeur du scénario, un résultat de calcul ni la bonne option d'un choix : l'apprenant doit les trouver dans les fichiers. `tests/fondamentaux-guides.test.cjs` vérifie que, pour chaque laboratoire du parcours Fondamentaux, aucune réponse acceptée ne figure dans un guide, dans le briefing ou dans l'énoncé d'une autre tâche, qu'aucun caractère de contrôle ne s'est glissé dans un fichier et que toute commande d'un guide est dans un bloc de code.
+
 ## Migration sans perte
 
 Les cours déjà publiés se réorganisent sans jamais rien supprimer (`scripts/seed-path-builder.cjs`) :
@@ -56,6 +60,7 @@ Les cours déjà publiés se réorganisent sans jamais rien supprimer (`scripts/
 - une leçon est déplacée vers son nouveau module et sa nouvelle position, avec son quiz ;
 - une leçon de départ est remplacée par sa version complète seulement si son contenu est encore, octet pour octet, celui de départ ; sinon elle est conservée et seule sa position change ;
 - les références ajoutées à une leçon le sont une seule fois ;
+- le quiz que garde une leçon de départ peut être complété (`quizExtension`) : ses explications trop courtes sont remplacées seulement tant qu'elles portent encore le texte de départ, et des questions sont ajoutées après les existantes, sans toucher aux réponses déjà données ;
 - la durée affichée d'un cours devient la somme de ses leçons.
 
 Les identifiants des modules, leçons et quiz ne changent jamais : la progression, les tentatives de quiz et les compétences des apprenants sont conservées. Rejouer une graine ne change rien.
@@ -67,6 +72,7 @@ Les identifiants des modules, leçons et quiz ne changent jamais : la progressio
 | `node scripts/check-path-part.cjs <fichier.ts>` | contrôle une partie de parcours pendant la rédaction |
 | `node scripts/generate-lab-assets.cjs` | écrit les fichiers de laboratoire dans `public/labs/` |
 | `node scripts/generate-reseaux-programme-seed.cjs` | génère `supabase/seed/05_reseaux_programme.sql` |
+| `node scripts/generate-fondamentaux-seed.cjs` | génère `supabase/seed/06_fondamentaux_programme.sql` |
 | `npm run content:report` | état réel du contenu, cours par cours |
 | `npm test` | toute la suite, dont `programme.test.cjs` et `content-quality.test.cjs` |
 
@@ -77,17 +83,17 @@ Pour publier un parcours : déployer le code (les laboratoires pointent vers des
 | Parcours | Modules écrits / prévus | Laboratoires | État |
 |---|---|---|---|
 | Réseaux informatiques | 10 / 9 | 9 dont 3 évaluations, 91 étapes | Terminé selon la grille : 31 leçons conformes, 16 compétences, 6 badges propres au programme |
-| Fondamentaux de la cybersécurité | 2 / 8 | aucun | À construire (3 leçons de départ courtes) |
+| Fondamentaux de la cybersécurité | 8 / 8 | 7 dont 2 évaluations, 88 étapes | Terminé selon la grille : 24 leçons conformes, 8 compétences, 6 badges propres au programme |
 | Administration Linux | 3 / 9 | 1 | À construire (4 leçons, dont 2 détaillées) |
 | Sécurité Web | 2 / 10 | aucun | À construire (3 leçons de départ courtes) |
 | Introduction au Pentest | 2 / 10 | aucun | À construire (3 leçons de départ courtes) |
 | Analyse de logs | 3 / 10 | 3 dont 1 évaluation | À construire (6 leçons, dont 3 détaillées) |
 
-Le nombre de modules prévus vient de la spécification des six parcours. L'ordre de construction recommandé après le Réseaux : Fondamentaux, Linux, Analyse de logs, Sécurité Web, Pentest. Chaque parcours repart du même modèle : leçons au gabarit, une évaluation pratique, des compétences reliées, un laboratoire d'entraînement par compétence.
+Le nombre de modules prévus vient de la spécification des six parcours. L'ordre de construction recommandé après le Réseaux et les Fondamentaux : Linux, Analyse de logs, Sécurité Web, Pentest. Chaque parcours repart du même modèle : leçons au gabarit, une évaluation pratique, des compétences reliées, un laboratoire d'entraînement par compétence.
 
 ## Ce que l'équipe doit encore fournir
 
-- **Vidéos** : chaque leçon du Réseaux annonce sa vidéo (« Vidéo en préparation »). Elles s'ajoutent depuis l'éditeur de cours, par un bloc vidéo.
+- **Vidéos** : chaque leçon du Réseaux et des Fondamentaux annonce sa vidéo (« Vidéo en préparation »). Elles s'ajoutent depuis l'éditeur de cours, par un bloc vidéo.
 - **Fichiers Packet Tracer** (`.pkt`) : facultatifs pour les TP 1 à 3 et le projet final. Les laboratoires se valident sans le logiciel ; un fichier réel s'ajoute comme ressource du laboratoire.
-- **Relecture par une personne du métier** : la grille demande que le contenu soit relu et testé par une personne compétente. Les contrôles faits ici sont automatiques (règles, recalcul des réponses depuis les fichiers, parcours complet d'un apprenant) et des relectures techniques indépendantes ont corrigé plusieurs erreurs, mais une relecture par un formateur reste à faire avant de présenter le parcours comme validé.
+- **Relecture par une personne du métier** : la grille demande que le contenu soit relu et testé par une personne compétente. Les contrôles faits ici sont automatiques (règles, recalcul des réponses depuis les fichiers, absence de réponse dans les guides, parcours complet d'un apprenant), complétés par des relectures techniques indépendantes, une vérification des affirmations des leçons contre des sources officielles et une résolution en aveugle de chaque laboratoire par des apprenants simulés qui ne voyaient que le sujet et les fichiers. Ces contrôles ont corrigé de nombreuses erreurs, mais une relecture par un formateur reste à faire avant de présenter un parcours comme validé.
 - **Voix humaines** : voir `docs/DEPLOYMENT.md`.

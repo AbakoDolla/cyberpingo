@@ -1,0 +1,11 @@
+id	nom	type	donnees_personnelles	c	i	d
+ACT-01	Parc de formation	postes	non	2	3	4
+ACT-02	Boîtes mail du personnel	messagerie	oui	4	3	4
+ACT-03	Dossier comptabilité	partage	oui	4	4	3
+ACT-04	Fiches d’inscription des apprenants	papier	oui	4	3	2
+ACT-05	Liste des donateurs	tableur	oui	4	3	2
+ACT-06	Site web	service	non	2	2	3
+ACT-07	Box internet	equipement	non	2	2	4
+ACT-08	NAS de sauvegarde	equipement	oui	3	4	4
+ACT-09	Dossiers RH papier	papier	oui	4	3	2
+ACT-10	Projecteur de salle	materiel	non	1	1	2

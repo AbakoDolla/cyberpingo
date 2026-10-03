@@ -1,0 +1,14 @@
+Return-Path: <alerte@banque-hor1zon.example>
+From: Banque Horizon <securite@banque-hor1zon.example>
+Reply-To: urgence@banque-securite.example.net
+To: yao.kouassi@soleil.example
+Subject: Validation urgente de votre espace association
+Date: Tue, 24 Mar 2026 15:52:11 +0000
+Authentication-Results: soleil.example; spf=fail; dkim=none; dmarc=fail
+
+Bonjour,
+
+Votre accès Banque Horizon sera suspendu dans 24 heures. Merci de confirmer votre identité via
+https://banque-horizon.example.com.verify-access.example/login
+
+Pièce jointe annoncée : Releve_Mars.pdf.exe

@@ -1,0 +1,13 @@
+poste	type	systeme	derniere_maj	etat_antivirus	date_signatures	disque_chiffre	admins_locaux	derniere_sauvegarde
+SALLE-01	fixe	Système Alpha 10	2026-03-09	actif	2026-03-10	oui	1	2026-03-11
+SALLE-02	fixe	Système Alpha 8	2026-02-01	actif	2026-03-02	oui	2	2026-03-10
+SALLE-03	fixe	Système Alpha 10	2026-03-01	actif	2026-03-01	oui	1	2026-03-10
+SALLE-04	fixe	Système Bêta 3	2026-02-15	actif	2026-03-03	oui	1	2026-03-09
+SALLE-05	fixe	Système Alpha 8	2026-01-28	actif	2026-02-27	non	2	2026-03-04
+SALLE-06	fixe	Système Alpha 8	2026-01-09	actif	2026-02-25	non	3	2026-02-28
+SALLE-07	fixe	Système Gamma 2	2026-03-08	actif	2026-03-08	oui	1	2026-03-11
+SALLE-08	fixe	Système Bêta 3	2026-02-20	actif	2026-03-05	oui	1	2026-03-08
+PC-DIRECTION	portable	Système Alpha 10	2026-03-07	actif	2026-03-07	oui	1	2026-03-11
+PC-COMPTA	portable	Système Alpha 8	2026-01-11	actif	2026-02-20	non	4	2026-02-27
+PC-SECRETARIAT	portable	Système Bêta 3	2026-03-02	actif	2026-03-02	oui	2	2026-03-10
+PC-FORMATION	portable	Système Alpha 10	2026-02-10	actif	2026-02-28	non	2	2026-03-01

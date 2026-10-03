@@ -1,0 +1,6 @@
+Carnet de décodage du 16 mars 2026
+message_base64 = Y2hhbmdlIGxlIG1vdCBkZSBwYXNzZSBjZSBzb2ly
+message_hex = 7361757665676172646520686f7273206c69676e65206f6b
+message_cesar_decalage_7 = clypmpl sl ohzo hchua puzahsshapvu
+empreinte_32 = 9b88507cbd97c68e2fc459697465142e
+empreinte_64 = f7fd6ff42a81838c838fb346a05986b887d8e4bbf0394efc6d5abd25e1ee7fbd

@@ -1,0 +1,4 @@
+nom | support | lieu
+production-postes | stockage interne des postes | salle de formation
+cns-data-nas | nas local sur disques mécaniques | bureau technique
+usb-secours | disque usb chiffré | armoire du bureau technique

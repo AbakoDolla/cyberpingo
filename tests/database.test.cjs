@@ -53,6 +53,33 @@ async function answerKey(quizId, { correct = true } = {}) {
 const ledgerTotal = async (uid) => Number((await sql("select coalesce(sum(amount), 0) as total from public.xp_transactions where user_id = $1", [uid]))[0].total);
 const profile = async (uid) => (await sql("select * from public.profiles where id = $1", [uid]))[0];
 
+// A tiny course created by the test itself (three lessons and a quiz), so that the certificate flows do not depend
+// on the size of any published course: the real courses keep growing as their programmes are written.
+const MINI = { slug: "parcours-eclair", lessons: ["eclair-1", "eclair-2", "eclair-3"], quiz: "eclair-quiz" };
+async function createMiniCourse() {
+  const courseId = course("eclair");
+  const moduleId = contentId("module", "eclair:1");
+  await sql(`insert into public.courses (id, slug, title, short_description, description, level, category, icon, estimated_duration, position)
+    values ($1, $2, 'Parcours éclair', 'Trois leçons et un quiz pour tester la certification.', 'Parcours de test.', 'debutant', 'Fondamentaux', 'fondamentaux', 30, 99)`, [courseId, MINI.slug]);
+  await sql("insert into public.course_modules (id, course_id, title, description, position) values ($1, $2, 'Module éclair', 'Un seul module.', 1)", [moduleId, courseId]);
+  for (const [index, key] of MINI.lessons.entries()) {
+    await sql(`insert into public.lessons (id, course_id, module_id, title, summary, content, duration_minutes, xp_reward, position)
+      values ($1, $2, $3, $4, 'Une leçon de test.', $5, 10, $6, $7)`,
+    [lesson(key), courseId, moduleId, `Leçon éclair ${index + 1}`, { blocks: [{ type: "text", content: "Contenu de la leçon de test." }] }, [40, 45, 40][index], index + 1]);
+  }
+  const quizId = quiz(MINI.quiz);
+  await sql("insert into public.quizzes (id, course_id, module_id, lesson_id, title, pass_percentage, position) values ($1, $2, $3, $4, 'Quiz éclair', 70, 3)", [quizId, courseId, moduleId, lesson(MINI.lessons[2])]);
+  for (const number of [1, 2]) {
+    const questionId = contentId("question", `eclair:${number}`);
+    await sql(`insert into public.quiz_questions (id, quiz_id, position, question_type, prompt, explanation, difficulty, xp_reward)
+      values ($1, $2, $3, 'single_choice', $4, 'Explication de la question de test.', 'facile', 30)`, [questionId, quizId, number, `Question ${number} du quiz éclair ?`]);
+    for (const [position, label] of ["Bonne réponse", "Mauvaise réponse", "Autre mauvaise réponse"].entries()) {
+      await sql("insert into public.quiz_answers (id, question_id, position, label, is_correct) values ($1, $2, $3, $4, $5)", [contentId("answer", `eclair:${number}:${position}`), questionId, position + 1, label, position === 0]);
+    }
+  }
+  await sql("update public.courses set status = 'published' where id = $1", [courseId]);
+}
+
 before(async () => {
   db = await createSupabaseDatabase({ seed: true });
   for (const [name, email, meta] of [
@@ -125,17 +152,17 @@ test("rewards, roles and certificates cannot be forged from the browser", async 
 
 test("the catalogue exposes published outlines publicly and hides answers from everyone", async () => {
   assert.equal((await as(null, "select id from public.courses")).length, 6);
-  assert.equal((await as(null, "select id, title from public.lessons")).length, 50);
+  assert.equal((await as(null, "select id, title from public.lessons")).length, 71);
   await rejects(as(null, "select content from public.lessons"), /permission denied/);
   await rejects(as(null, "select prompt from public.quiz_questions"), /permission denied/);
   assert.equal((await as(ids.bob, "select content from public.lessons where id = $1", [lesson("l1")]))[0].content.blocks.length > 0, true);
-  assert.equal((await as(ids.bob, "select id, prompt from public.quiz_questions")).length, 154);
+  assert.equal((await as(ids.bob, "select id, prompt from public.quiz_questions")).length, 248);
   await rejects(as(ids.bob, "select explanation from public.quiz_questions"), /permission denied/);
   await rejects(as(ids.bob, "select is_correct from public.quiz_answers"), /permission denied/);
   await rejects(as(ids.bob, "select flag from private.lab_flags"), /permission denied/);
-  assert.equal((await as(null, "select slug from public.labs")).length, 19);
+  assert.equal((await as(null, "select slug from public.labs")).length, 26);
   const [{ modules }] = await as(null, "select count(*)::int as modules from public.course_modules");
-  assert.equal(modules, 22);
+  assert.equal(modules, 28);
 });
 
 test("a lesson must be opened and read before it pays XP, and pays only once", async () => {
@@ -209,16 +236,17 @@ test("quizzes are graded server-side and only the improvement pays", async () =>
 });
 
 test("finishing a course issues a verifiable certificate", async () => {
-  for (const key of ["l-c1-1", "l-c1-2", "l-c1-3"]) await studyLesson(ids.dave, key);
+  await createMiniCourse();
+  for (const key of MINI.lessons) await studyLesson(ids.dave, key);
   assert.equal((await as(ids.dave, "select status from public.enrollments"))[0].status, "active");
-  const result = await rpc(ids.dave, "submit_quiz", { p_quiz_id: quiz("review-fundamentaux"), p_answers: await answerKey(quiz("review-fundamentaux")) });
-  assert.equal(result.course_completed.slug, "fondamentaux");
+  const result = await rpc(ids.dave, "submit_quiz", { p_quiz_id: quiz(MINI.quiz), p_answers: await answerKey(quiz(MINI.quiz)) });
+  assert.equal(result.course_completed.slug, MINI.slug);
   assert.match(result.certificate.certificate_number, /^CP-\d{4}-\d{6}$/);
   assert.match(result.certificate.verification_code, /^[A-Z0-9]{16}$/);
   assert.deepEqual(result.new_badges.map((badge) => badge.slug).sort(), ["premier-cours", "premier-quiz", "premiere-certification"]);
 
   const verified = await rpc(null, "verify_certificate", { p_code: result.certificate.verification_code.toLowerCase() });
-  assert.deepEqual([verified.found, verified.valid, verified.recipient_name, verified.course_slug], [true, true, "Dave", "fondamentaux"]);
+  assert.deepEqual([verified.found, verified.valid, verified.recipient_name, verified.course_slug], [true, true, "Dave", MINI.slug]);
   assert.deepEqual(await rpc(null, "verify_certificate", { p_code: "AAAAAAAAAAAAAAAA" }), { found: false, valid: false });
   assert.equal((await as(ids.bob, "select id from public.certificates")).length, 0);
 
@@ -226,10 +254,12 @@ test("finishing a course issues a verifiable certificate", async () => {
   assert.equal(dashboard.stats.courses_completed, 1);
   assert.equal(dashboard.stats.certificates, 1);
   assert.equal(dashboard.challenges.length, 4);
-  assert.equal(dashboard.recommendations.some((item) => item.slug === "fondamentaux"), false);
+  assert.equal(dashboard.recommendations.some((item) => item.slug === MINI.slug), false);
   assert.equal(dashboard.week.length, 7);
   const [progress] = await as(ids.dave, "select progress_percentage, status from public.course_progress");
   assert.deepEqual(progress, { progress_percentage: 100, status: "completed" });
+  // The fixture is only needed for this flow: archived, it no longer counts among the published courses.
+  await sql("update public.courses set status = 'archived' where id = $1", [course("eclair")]);
 });
 
 test("streaks follow the learner’s own calendar day", async () => {

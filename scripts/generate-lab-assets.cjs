@@ -8,6 +8,8 @@ const path = require("node:path");
 const { buildSocAssets } = require("./lab-scenarios-soc.cjs");
 const { buildReseauxLabAssets } = require("./lab-scenarios-reseaux.cjs");
 const { buildKoraAssets } = require("./lab-scenarios-kora.cjs");
+const { buildSecuriteAssetsA } = require("./lab-scenarios-securite-a.cjs");
+const { buildSecuriteAssetsB } = require("./lab-scenarios-securite-b.cjs");
 
 const root = path.resolve(__dirname, "..");
 const OUTPUT_DIR = path.join(root, "public", "labs");
@@ -494,6 +496,8 @@ function buildLabAssets() {
   const soc = buildSocAssets();
   const programmeLabs = buildReseauxLabAssets();
   const kora = buildKoraAssets();
+  const securiteA = buildSecuriteAssetsA();
+  const securiteB = buildSecuriteAssetsB();
   return {
     files: [
       { name: "reseau-instable.pcap", data: instable.file },
@@ -506,10 +510,13 @@ function buildLabAssets() {
       ...soc.files,
       ...programmeLabs.files,
       ...kora.files,
+      ...securiteA.files,
+      ...securiteB.files,
     ],
     facts: {
       instable: instable.facts, evaluation: evaluation.facts, firewall: firewall.facts, packetTracer, soc: soc.facts,
       programme: { ...programmeLabs.facts, ...kora.facts },
+      fondamentaux: { ...securiteA.facts, ...securiteB.facts },
     },
   };
 }

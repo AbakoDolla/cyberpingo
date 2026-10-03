@@ -1,0 +1,13 @@
+id	actif	menace	vulnerabilite	vraisemblance	impact	mesure_existante
+SC-01	ACT-02	hameçonnage	mfa absente	3	4	changement de mot de passe trimestriel
+SC-02	ACT-03	erreur de saisie	double validation absente	2	3	sauvegarde quotidienne
+SC-03	ACT-04	consultation non autorisée	armoire non verrouillée	2	4	bureau fermé le soir
+SC-04	ACT-08	panne matérielle	disque unique	2	4	alerte smart hebdomadaire
+SC-05	ACT-07	coupure électrique	pas d’onduleur	3	2	prise parafoudre
+SC-06	ACT-01	malware usb	ports libres	2	3	sensibilisation affichée
+SC-07	ACT-03	partage de compte	comptes génériques	3	3	mot de passe partagé
+SC-08	ACT-05	vol de téléphone	codes de validation reçus sur un mobile personnel	4	4	aucune
+SC-09	ACT-06	certificat expiré	rappel absent	2	2	agenda papier
+SC-10	ACT-08	suppression accidentelle	droits d’écriture trop larges	2	4	corbeille activée
+SC-11	ACT-04	conservation inutile	durée de conservation non définie	1	3	aucune
+SC-12	ACT-02	prise de contrôle d’admin	absence de double authentification	3	4	mot de passe complexe seul

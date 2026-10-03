@@ -8,13 +8,16 @@
 //   - a lesson `{ key, existing: true }` is only moved to the module and position given by the path;
 //   - a lesson with `upgrade: true` replaces a starter lesson's text, but only while the stored content is
 //     still byte for byte the starter content, so nothing an administrator edited is ever overwritten;
-//   - `appendResources` adds blocks (the references, and an example when one is missing) to a lesson that has no reference yet.
+//   - `appendResources` adds blocks (the references, and an example when one is missing) to a lesson that has no reference yet;
+//   - `quizExtension` on an upgraded lesson completes the starter quiz it keeps: short explanations are replaced (only while
+//     they still carry the starter text) and questions are appended after the existing ones.
 // Learner progress is keyed by lesson and quiz ids, which never change, so it is preserved.
 const { load } = require("./ts-loader.cjs");
 const { contentId } = require("./generate-content-seed.cjs");
 
 const QUIZ_XP = 30;
 const QUIZ_PASS_PERCENTAGE = 70;
+const EXTRA_QUESTION_XP = 20;
 
 const literal = (value) => (value === null || value === undefined ? "null" : `'${String(value).replace(/'/g, "''")}'`);
 const json = (value) => `${literal(JSON.stringify(value))}::jsonb`;
@@ -78,6 +81,22 @@ where domain_id is null and category in (${domain.categories.map(literal).join("
   const quizIds = new Map();
   const positionsByCourse = new Map();
 
+  const pushQuestion = ({ lesson, quizId, question, label, idKey, position, xp }) => {
+    const correct = Array.isArray(question.correct) ? question.correct : [question.correct];
+    check(correct.length > 0 && new Set(correct).size === correct.length && correct.every((value) => Number.isInteger(value) && value >= 0 && value < question.options.length), `${lesson.key} : index de bonne réponse invalide (${label})`);
+    if (question.type === "true_false") check(question.options.length === 2 && correct.length === 1, `${lesson.key} : vrai/faux attend 2 options et une réponse (${label})`);
+    if (question.type === "single_choice") check(correct.length === 1, `${lesson.key} : choix unique attend une seule réponse (${label})`);
+    if (question.type === "multiple_choice") check(correct.length >= 2 && correct.length < question.options.length, `${lesson.key} : choix multiples attend au moins deux bonnes réponses et une mauvaise (${label})`);
+    const questionId = contentId("question", idKey);
+    questionRows.push([
+      literal(questionId), literal(quizId), position, literal(question.type), literal(question.prompt),
+      literal(question.explanation), literal(question.difficulty), xp,
+    ]);
+    question.options.forEach((option, optionIndex) => {
+      answerRows.push([literal(contentId("answer", `${idKey}:${optionIndex}`)), literal(questionId), optionIndex + 1, literal(option), correct.includes(optionIndex)]);
+    });
+  };
+
   const addQuiz = (lesson, courseId, moduleId, lessonId, lessonPosition) => {
     const quizId = contentId("quiz", lesson.key);
     quizIds.set(lesson.key, quizId);
@@ -86,19 +105,24 @@ where domain_id is null and category in (${domain.categories.map(literal).join("
     const base = Math.floor(QUIZ_XP / count);
     const remainder = QUIZ_XP - base * count;
     lesson.quiz.questions.forEach((question, index) => {
-      const correct = Array.isArray(question.correct) ? question.correct : [question.correct];
-      check(correct.length > 0 && new Set(correct).size === correct.length && correct.every((value) => Number.isInteger(value) && value >= 0 && value < question.options.length), `${lesson.key} : index de bonne réponse invalide (${index + 1})`);
-      if (question.type === "true_false") check(question.options.length === 2 && correct.length === 1, `${lesson.key} : vrai/faux attend 2 options et une réponse (${index + 1})`);
-      if (question.type === "single_choice") check(correct.length === 1, `${lesson.key} : choix unique attend une seule réponse (${index + 1})`);
-      if (question.type === "multiple_choice") check(correct.length >= 2 && correct.length < question.options.length, `${lesson.key} : choix multiples attend au moins deux bonnes réponses et une mauvaise (${index + 1})`);
-      const questionId = contentId("question", `${lesson.key}:${index + 1}`);
-      questionRows.push([
-        literal(questionId), literal(quizId), index + 1, literal(question.type), literal(question.prompt),
-        literal(question.explanation), literal(question.difficulty), base + (index < remainder ? 1 : 0),
-      ]);
-      question.options.forEach((option, optionIndex) => {
-        answerRows.push([literal(contentId("answer", `${lesson.key}:${index + 1}:${optionIndex}`)), literal(questionId), optionIndex + 1, literal(option), correct.includes(optionIndex)]);
-      });
+      pushQuestion({ lesson, quizId, question, label: index + 1, idKey: `${lesson.key}:${index + 1}`, position: index + 1, xp: base + (index < remainder ? 1 : 0) });
+    });
+  };
+
+  // A starter quiz is kept, because attempts point at its questions. It can still be completed: the short
+  // explanations are replaced while they carry the starter text, and questions are appended after the existing ones.
+  const quizExplanationUpdates = [];
+  const extendStarterQuiz = (lesson, starterQuiz) => {
+    const { improve = [], add = [] } = lesson.quizExtension;
+    const quizId = contentId("quiz", starterQuiz.id);
+    check(improve.length <= starterQuiz.questions.length, `${lesson.key} : plus de corrections que de questions de départ`);
+    improve.forEach((explanation, index) => {
+      const starter = starterQuiz.questions[index];
+      quizExplanationUpdates.push(`update public.quiz_questions set explanation = ${literal(explanation)}
+where id = ${literal(contentId("question", `${starterQuiz.id}:${starter.id}`))} and explanation = ${literal(starter.explanation)};`);
+    });
+    add.forEach((question, offset) => {
+      pushQuestion({ lesson, quizId, question, label: `ajout ${offset + 1}`, idKey: `${lesson.key}:extra:${offset + 1}`, position: starterQuiz.questions.length + offset + 1, xp: EXTRA_QUESTION_XP });
     });
   };
 
@@ -154,8 +178,10 @@ where id = ${literal(lessonId)} and content = ${original};`);
         if (starterQuiz) {
           check(!lesson.quiz, `${lesson.key} : la leçon de départ a déjà un quiz, il est conservé`);
           quizIds.set(lesson.key, contentId("quiz", starterQuiz.id));
-        } else if (lesson.quiz) {
-          addQuiz(lesson, courseId, moduleId, lessonId, lessonPosition);
+          if (lesson.quizExtension) extendStarterQuiz(lesson, starterQuiz);
+        } else {
+          check(!lesson.quizExtension, `${lesson.key} : pas de quiz de départ à compléter`);
+          if (lesson.quiz) addQuiz(lesson, courseId, moduleId, lessonId, lessonPosition);
         }
         return;
       }
@@ -295,8 +321,9 @@ update public.labs set status = 'published'
 where status = 'draft' and id in (${Array.from(labIds.values()).map(literal).join(", ")});`
     : "";
   const reorganised = moduleUpdates.length / 2 + lessonUpgrades.length + resourceUpdates.length;
+  const quizNote = quizExplanationUpdates.length ? ` ${quizExplanationUpdates.length} short starter quiz explanations completed (guarded).` : "";
   const reorganisedNote = reorganised
-    ? `\n-- Reorganisation of published content, all guarded and never destructive: ${moduleUpdates.length / 2} modules renamed or repositioned, ${lessonUpgrades.length} starter lessons upgraded, ${lessonPlacements.length / 2} lessons placed, ${resourceUpdates.length} lessons given references.`
+    ? `\n-- Reorganisation of published content, all guarded and never destructive: ${moduleUpdates.length / 2} modules renamed or repositioned, ${lessonUpgrades.length} starter lessons upgraded, ${lessonPlacements.length / 2} lessons placed, ${resourceUpdates.length} lessons given references.${quizNote}`
     : "";
 
   const sections = [
@@ -310,6 +337,7 @@ where status = 'draft' and id in (${Array.from(labIds.values()).map(literal).joi
     insertInto("public.quizzes", "id, course_id, module_id, lesson_id, title, pass_percentage, position", quizRows, "(id)"),
     insertInto("public.quiz_questions", "id, quiz_id, position, question_type, prompt, explanation, difficulty, xp_reward", questionRows, "(id)"),
     insertInto("public.quiz_answers", "id, question_id, position, label, is_correct", answerRows, "(id)"),
+    quizExplanationUpdates.join("\n"),
     syncUpdates.join("\n"),
     textUpdates.join("\n"),
     durationBlock,

@@ -1,0 +1,30 @@
+2026-02-12T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-13T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-14T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-15T01:10:00Z | FAIL | Erreur disque USB, aucune copie externe écrite.
+2026-02-16T01:10:00Z | FAIL | Partage NAS indisponible, reprise manuelle demandée.
+2026-02-17T01:10:00Z | SUCCESS | Cycle nocturne terminé, 11 postes sauvegardés, 1 avertissement.
+2026-02-18T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-19T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-20T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-21T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-22T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-23T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-24T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-25T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-26T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-27T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-02-28T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-01T01:10:00Z | FAIL | Alerte réseau, aucune sauvegarde utile n’a été finalisée.
+2026-03-02T01:10:00Z | FAIL | Service arrêté après deux échecs successifs.
+2026-03-03T01:10:00Z | FAIL | Fenêtre expirée, aucune sauvegarde utilisable.
+2026-03-04T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-05T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-06T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-07T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-08T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-09T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-10T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-11T01:10:00Z | SUCCESS | Cycle nocturne terminé, 12 postes sauvegardés.
+2026-03-12T01:10:00Z | WARNING | Test de restauration réussi sur archive-adhérents-2026-02-28.zip.
+2026-03-05T09:30:00Z | RESTORE_OK | Restauration de test réussie sur archive-adhérents-2026-02-28.zip.

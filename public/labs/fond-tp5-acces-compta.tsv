@@ -1,0 +1,7 @@
+compte	role	partage	lecture	ecriture	suppression
+mariam.sow@soleil.example	direction	comptabilite	oui	non	non
+yao.kouassi@soleil.example	comptable	comptabilite	oui	oui	oui
+aissatou.ndiaye@soleil.example	secretariat	comptabilite	oui	non	non
+fatima.bello@soleil.example	animation	comptabilite	oui	oui	oui
+idriss.camara@soleil.example	formation	comptabilite	non	non	non
+jm.tchoumi@soleil.example	technique	comptabilite	oui	non	non

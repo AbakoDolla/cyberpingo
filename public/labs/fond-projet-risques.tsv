@@ -1,0 +1,10 @@
+action	lie_a	mesure	vraisemblance	impact	effort
+A01	AU2	Activer la double authentification pour direction et comptabilité	3	4	1
+A02	RE1	Changer le mot de passe d’administration de la box	4	4	1
+A03	RE2	Séparer le réseau invité du réseau interne	3	3	2
+A04	PO3	Chiffrer les portables restants	3	4	2
+A05	DP1	Créer un registre des traitements	2	3	2
+A06	SA4	Remplacer MD5 par SHA-256 pour les archives	3	3	1
+A07	IN1	Rédiger une procédure d’incident courte et testable	3	4	1
+A08	SA3	Planifier un test de restauration trimestriel	2	3	1
+A09	DP2	Fermer à clé l’armoire des fiches papier	3	3	1
