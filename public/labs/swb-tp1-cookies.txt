@@ -1,0 +1,10 @@
+Set-Cookie: resa_session=sess_demo_a1b2c3; Path=/; Max-Age=5400; HttpOnly; Secure; SameSite=Lax
+Set-Cookie: csrf_token=csrf_demo_4588; Path=/; Max-Age=900; Secure; SameSite=Strict
+Set-Cookie: theme_pref=ambre; Path=/; Max-Age=2592000; Secure; SameSite=Lax
+Set-Cookie: langue=fr; Path=/; Max-Age=604800; SameSite=Lax
+Set-Cookie: promo_guest=oui; Path=/; Max-Age=86400; SameSite=None
+Set-Cookie: analytics_id=ana_demo_4421; Path=/; Max-Age=604800; HttpOnly
+Set-Cookie: partner_pref=canal_mobile; Domain=.partenaires.example; Path=/; Max-Age=172800; Secure; SameSite=None
+Set-Cookie: edge_ab=variante_b; Path=/; Max-Age=1200; Secure; HttpOnly; SameSite=Strict
+Set-Cookie: support_seen=1; Path=/support; Max-Age=3600; Secure; HttpOnly; SameSite=Lax
+Set-Cookie: banner_closed=1; Path=/; Max-Age=43200; Secure; SameSite=Lax

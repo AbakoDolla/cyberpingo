@@ -1,0 +1,13 @@
+chemin;statut;taille_octets;observation
+/;200;2410;page d’accueil
+/index.html;200;2410;page publique normale
+/robots.txt;200;91;indexation
+/.env;200;512;fichier d’environnement
+/.git/HEAD;200;23;métadonnées Git
+/phpinfo.php;200;1834;page de diagnostic
+/sauvegarde.zip;200;2481190;archive de sauvegarde
+/security.txt;404;0;politique de divulgation absente
+/assets/app.js;200;84112;script public
+/uploads/;403;0;listage désactivé
+/exports/;200;362;listage visible
+/favicon.ico;200;1150;icône

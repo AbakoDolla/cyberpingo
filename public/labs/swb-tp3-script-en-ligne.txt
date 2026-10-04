@@ -1,0 +1,1 @@
+document.querySelector('#price-preview').textContent = window.demoPrice + ' F CFA';

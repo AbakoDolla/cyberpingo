@@ -1,0 +1,4 @@
+id;package;affected_from;affected_to_excluded;fixed_version;cvss_vector
+AV-2026-001;express-fileupload;1.3.0;1.5.0;1.5.0;CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H
+AV-2026-002;node-fetch;2.6.0;2.6.10;2.6.10;CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N
+AV-2026-003;multer;1.3.0;1.4.6;1.4.6;CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:L

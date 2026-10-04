@@ -1,0 +1,65 @@
+===== Page 01 =====
+Page: /accueil
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Server: nginx
+
+===== Page 02 =====
+Page: /connexion
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; form-action 'self'; frame-ancestors 'self'
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Server: nginx
+
+===== Page 03 =====
+Page: /espace-client/tableau-de-bord
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; connect-src 'self' https://api.palmier-or.example; frame-ancestors 'self'
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+Server: nginx
+
+===== Page 04 =====
+Page: /assets/app.css
+Cache-Control: public, max-age=86400
+Server: nginx
+
+===== Page 05 =====
+Page: /images/logo.svg
+Cache-Control: public, max-age=86400
+Server: nginx
+
+===== Page 06 =====
+Page: /api/ping
+Content-Security-Policy: default-src 'none'
+X-Content-Type-Options: nosniff
+Server: nginx
+
+===== Page 07 =====
+Page: /maintenance
+Content-Security-Policy: default-src 'self'; frame-ancestors 'none'
+X-Content-Type-Options: nosniff
+Server: nginx/1.24.0
+
+===== Page 08 =====
+Page: /support/aide
+Content-Security-Policy: default-src 'self'; frame-ancestors 'self'
+Permissions-Policy: geolocation=(), microphone=()
+Server: nginx
+
+===== Page 09 =====
+Page: /recherche
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+X-Powered-By: Express 4.19.2
+Server: nginx
+
+===== Page 10 =====
+Page: /partenaires/widget
+Content-Security-Policy: default-src 'self' https://cdn-exemple.example; frame-ancestors 'self'
+Server: nginx
+

@@ -1,0 +1,13 @@
+identifiant;paquet;plage_touchee;version_corrigee;vecteur_cvss31;exploitation_connue;exposition
+swb-adv-2026-001;express-lite;<4.18.3;4.18.3;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N;non;internet
+swb-adv-2026-002;template-fast;<3.0.2;3.0.2;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:L;oui;internet
+swb-adv-2026-003;resafetch;<2.4.3;2.4.3;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N;non;internet
+swb-adv-2026-004;session-kit;<1.7.4;1.7.4;CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L;non;internet
+swb-adv-2026-005;multer-lite;<1.3.2;1.3.2;CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N;non;internet
+swb-adv-2026-006;jwt-helper;<0.9.9;0.9.9;CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H;oui;internet
+swb-adv-2026-007;yaml-mini;<3.0.9;3.0.9;CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N;non;interne
+swb-adv-2026-008;cache-layer;<5.0.5;5.0.5;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L;non;interne
+swb-adv-2026-009;audit-trail;<1.9.8;1.9.8;CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N;non;interne
+swb-adv-2026-010;image-thumb;<4.2.1;4.2.1;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H;oui;internet
+swb-adv-2026-011;resafetch;>=2.4.0 <2.4.5;2.4.5;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L;non;internet
+swb-adv-2026-012;ws-lite;<3.2.0;3.2.0;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N;non;interne

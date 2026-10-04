@@ -1,0 +1,10 @@
+id;titre;emplacement;source;actif;criticite_actif;certitude;vecteur_cvss;qualification_cvss
+F01;Recherche de chambres concaténée dans une requête SQL;/api/chambres/recherche;revue;application;4;démontrée;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:L;critique
+F02;Commentaires stockés réinjectés sans échappement HTML;/commentaires;revue;front-web;3;démontrée;CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:L/I:L/A:N;moyenne
+F03;Détails de réservation exposés à tout client authentifié;/api/reservations/:id;revue;application;4;démontrée;CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N;élevée
+F04;Secret de signature de session codé en dur;swb-proj-code.js:13;revue;application;4;démontrée;CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N;élevée
+F05;Aperçu d’URL capable de joindre des destinations internes;/api/apercu;revue;application;4;démontrée;CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:L;élevée
+F06;Téléversement d’un script exécuté sous la racine web;/espace-partenaires/upload;journal+revue;front-web;4;confirmée;CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:C/C:H/I:H/A:H;critique
+F07;Dépendance express-fileupload 1.4.0 touchée par un avis critique;express-fileupload@1.4.0;scanner+revue;application;4;confirmée;CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H;élevée
+F08;HSTS absent sur la page de connexion;/connexion;scanner;front-web;3;scanner;;
+F09;Le serveur TLS accepte encore TLS 1.0 et TLS 1.1;reservation.palmier-or.example:443;analyse-tls;front-web;4;démontrée;CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N;moyenne

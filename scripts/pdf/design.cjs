@@ -10,6 +10,8 @@ const THEMES = {
   fondamentaux: { name: "Fondamentaux de la cybersécurité", accent: "#10b981", soft: "#d1fae5", ink: "#065f46", glow: "16,224,138" },
   linux: { name: "Administration Linux", accent: "#f59e0b", soft: "#fef3c7", ink: "#92400e", glow: "245,158,11" },
   logs: { name: "Analyse de logs et investigation", accent: "#8b5cf6", soft: "#ede9fe", ink: "#5b21b6", glow: "139,92,246" },
+  web: { name: "Sécurité des applications web", accent: "#f43f5e", soft: "#ffe4e6", ink: "#9f1239", glow: "244,63,94" },
+  pentest: { name: "Introduction au test d’intrusion", accent: "#84cc16", soft: "#ecfccb", ink: "#3f6212", glow: "132,204,22" },
 };
 
 const SITE = "https://cyberpingo.vercel.app";

@@ -33,7 +33,7 @@ test("the list of documents is consistent: unique files, known kinds and courses
   assert.equal(new Set(DOCUMENTS.map((doc) => doc.file)).size, DOCUMENTS.length);
   for (const doc of DOCUMENTS) {
     assert.ok(["guide", "template", "brief", "grid"].includes(doc.kind), `${doc.file}: kind`);
-    assert.ok(["reseaux", "fondamentaux", "linux", "logs"].includes(doc.course), `${doc.file}: course`);
+    assert.ok(["reseaux", "fondamentaux", "linux", "logs", "web", "pentest"].includes(doc.course), `${doc.file}: course`);
     assert.ok(doc.docLabel.length >= 6 && doc.lab.length >= 6, `${doc.file}: labels`);
     for (const id of doc.equipment ?? []) assert.ok(ids.has(id), `${doc.file}: ${id} is a device of the catalogue`);
     if (doc.kind === "template" || doc.kind === "grid") assert.equal(doc.equipment, undefined, `${doc.file}: a form to fill has no photo strip`);
@@ -84,7 +84,7 @@ test("after the seeds, every guide and template of a lab is a PDF that exists, a
   }
   assert.deepEqual([...new Set(pdfs.map((row) => path.basename(row.url, ".pdf")))].sort(), DOCUMENTS.map((doc) => doc.file).sort(), "every PDF is offered by a lab");
   const [{ n }] = (await db.query("select count(*)::int as n from public.lab_assets")).rows;
-  assert.equal(n, 168, "no asset was added or removed");
+  assert.equal(n, 208, "no asset was added or removed");
 });
 
 test("loading the seed again changes nothing, and an address edited in the console is never overwritten", async () => {

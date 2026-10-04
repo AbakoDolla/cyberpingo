@@ -1,0 +1,6 @@
+P1 | default-src 'self'; script-src 'self' https://cdn.palmier-or.example; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'
+P2 | default-src 'self'; script-src 'self' https://cdn.palmier-or.example https://widgets.partenaires.example; style-src 'self'; img-src 'self' data:; connect-src 'self' https://api.palmier-or.example; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+P3 | default-src 'self' 'unsafe-inline' https://cdn.palmier-or.example; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.palmier-or.example
+P4 | default-src 'self'; script-src 'self' 'nonce-r4nd0m-mai-2026' https://cdn.palmier-or.example https://widgets.partenaires.example; style-src 'self'; img-src 'self' data:; connect-src 'self' https://api.palmier-or.example; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; report-to csp-endpoint
+P5 | default-src 'self'; script-src 'self' 'sha256-9k1ALd9cD3rsifAtBlowKOUBce63Qy13e2ssZ+LHZZQ=' https://cdn.palmier-or.example; style-src 'self'; img-src 'self' data:; connect-src 'self' https://api.palmier-or.example; object-src 'none'; base-uri 'none'
+P6 | default-src 'self'; script-src 'self' https://cdn.palmier-or.example; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'

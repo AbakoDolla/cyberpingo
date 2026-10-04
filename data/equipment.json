@@ -596,6 +596,37 @@
       "serveur",
       "pare-feu",
       "poste-fixe"
+    ],
+    "tp-web-http": [
+      "portable",
+      "serveur"
+    ],
+    "tp-web-injection": [
+      "serveur",
+      "poste-fixe"
+    ],
+    "tp-web-xss-csp": [
+      "portable",
+      "smartphone",
+      "serveur"
+    ],
+    "tp-web-sessions-jwt": [
+      "serveur",
+      "smartphone",
+      "cle-securite"
+    ],
+    "tp-web-acces-api": [
+      "serveur",
+      "pare-feu"
+    ],
+    "tp-web-config-cvss": [
+      "serveur",
+      "raspberry-pi"
+    ],
+    "projet-web-audit": [
+      "serveur",
+      "pare-feu",
+      "portable"
     ]
   }
 }

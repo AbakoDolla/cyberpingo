@@ -1,0 +1,11 @@
+page;csp;hsts;x_content_type_options;referrer_policy;x_frame_options;permissions_policy
+/;P4;"max-age=31536000; includeSubDomains";nosniff;strict-origin-when-cross-origin;SAMEORIGIN;"geolocation=(), camera=()"
+/recherche;P4;"max-age=31536000; includeSubDomains";nosniff;strict-origin-when-cross-origin;SAMEORIGIN;"geolocation=(), camera=()"
+/reservation;P2;"max-age=31536000; includeSubDomains";nosniff;strict-origin;DENY;"geolocation=()"
+/paiement;P4;"max-age=31536000; includeSubDomains";nosniff;strict-origin-when-cross-origin;DENY;"payment=()"
+/profil;P5;"max-age=31536000; includeSubDomains";;strict-origin-when-cross-origin;SAMEORIGIN;"camera=()"
+/aide;;"";nosniff;no-referrer;;""
+/admin/dashboard;P2;"max-age=31536000; includeSubDomains";nosniff;strict-origin;DENY;"geolocation=(), microphone=()"
+/admin/import;;"";;;;""
+/api/search;P6;"max-age=31536000; includeSubDomains";;strict-origin-when-cross-origin;;""
+/widgets/chat;P3;"";nosniff;;SAMEORIGIN;"microphone=()"

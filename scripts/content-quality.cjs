@@ -48,6 +48,7 @@ function textHygiene(strings, where) {
     if (/\p{L}'\p{L}/u.test(value)) issues.push(`${where} : apostrophe droite dans « ${value.slice(0, 50)}… » (utilise ’)`);
     if (/lorem|todo|à compléter|xxx/iu.test(value)) issues.push(`${where} : texte provisoire dans « ${value.slice(0, 50)}… »`);
     if (value.includes("`")) issues.push(`${where} : accent grave dans « ${value.slice(0, 50)}… » (le texte n’est pas interprété comme du Markdown : écris « commande » entre guillemets ou utilise un bloc code)`);
+    if (/\*{4,}/u.test(value)) issues.push(`${where} : suite d’astérisques dans « ${value.slice(0, 50)}… » (un secret masqué à l’écran a été recopié : rétablis le texte d’origine)`);
     const stripped = STRIPPED.exec(value);
     if (stripped) issues.push(`${where} : accent manquant sur « ${stripped[0]} » dans « ${value.slice(Math.max(0, stripped.index - 25), stripped.index + 40)} »`);
   });
@@ -103,6 +104,9 @@ function lessonIssues(lesson, { level = "base", allowedUrls, quizInherited = fal
   });
   if (!quizInherited) issues.push(...quizIssues(lesson, level));
   issues.push(...textHygiene(proseOf(lesson, !quizInherited), where));
+  for (const block of blocks) {
+    if (!PROSE.has(block.type) && /\*{6}/u.test(block.content)) issues.push(`${where} : suite d’astérisques dans un bloc ${block.type} (un secret masqué à l’écran a été recopié : rétablis le texte d’origine)`);
+  }
 
   if (level === "template") {
     if (blocks.length < 2 || !startsWith(blocks[1], "Prérequis")) issues.push(`${where} : le deuxième bloc doit être « Prérequis : … »`);
@@ -167,7 +171,7 @@ function allowedReferenceUrls(references) {
 }
 
 /** Courses whose lessons must all meet the checklist: they are the ones declared finished. */
-const ENFORCED_COURSES = ["reseaux", "fondamentaux", "linux", "analyse-logs"];
+const ENFORCED_COURSES = ["reseaux", "fondamentaux", "linux", "analyse-logs", "securite-web"];
 
 /** The programme planned for each course in the specification of the six paths (modules and indicative hours). */
 const PLAN = {
