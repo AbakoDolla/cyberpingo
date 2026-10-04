@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun SYSTEM "https://svn.nmap.org/nmap/docs/nmap.dtd">
+<nmaprun scanner="nmap" args="nmap -Pn -sS -sV -p 22,25,80,443,465,587,993,995,1194,3306,6514,8080,8443 -oX pt-proj-nmap.xml 203.0.113.10-17 172.31.20.14 10.50.4.23" start="1780362000" startstr="Wed Jun 11 08:20:00 2026" version="7.991" xmloutputversion="1.05">
+  <scaninfo type="syn" protocol="tcp" numservices="13" services="22,25,80,443,465,587,993,995,1194,3306,6514,8080,8443"/>
+  <verbose level="0"/>
+  <debugging level="0"/>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.10" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="www.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="http" product="nginx" version="1.24.0" method="probed" conf="10"/>
+        <script id="http-title" output="Service www.sahel-vert.example confirmé par lecture de bannière inoffensive"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="22">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="ssh" product="OpenSSH" version="9.6" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="8080">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="http-proxy" product="squid" version="6.7" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <hostscript>
+      <script id="http-server-header" output="Produit web observé sur www.sahel-vert.example"/>
+    </hostscript>
+    <times srtt="14500" rttvar="2200" to="100000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.11" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="portail.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+        <script id="http-title" output="Service portail.sahel-vert.example confirmé par lecture de bannière inoffensive"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="http" product="nginx" version="1.24.0" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="22">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="ssh" product="OpenSSH" version="9.6" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="8443">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <hostscript>
+      <script id="http-server-header" output="Produit web observé sur portail.sahel-vert.example"/>
+    </hostscript>
+    <times srtt="15200" rttvar="2310" to="101000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.12" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="mail.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="25">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="smtp" product="Postfix" version="3.8.2" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="465">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="submissions" product="Postfix" version="3.8.2" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="587">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="submission" product="Postfix" version="3.8.2" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="993">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="imaps" product="Dovecot" version="2.3.21" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="995">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="pop3s" product="Dovecot" version="2.3.21" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <hostscript>
+      <script id="smtp-commands" output="PIPELINING SIZE STARTTLS AUTH confirmés côté messagerie"/>
+    </hostscript>
+    <times srtt="15900" rttvar="2420" to="102000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.13" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="vpn.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="nginx" version="1.22.1" method="probed" conf="10"/>
+        <script id="http-title" output="Service vpn.sahel-vert.example confirmé par lecture de bannière inoffensive"/>
+      </port>
+      <port protocol="tcp" portid="1194">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="openvpn" product="OpenVPN" version="2.6.7" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="22">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="ssh" product="OpenSSH" version="9.3" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <hostscript>
+      <script id="http-server-header" output="Produit web observé sur vpn.sahel-vert.example"/>
+      <script id="ssl-cert" output="Certificat public cohérent avec le FQDN du portail VPN"/>
+    </hostscript>
+    <times srtt="16600" rttvar="2530" to="103000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.14" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="stock.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="ssh" product="OpenSSH" version="9.2" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+        <script id="http-title" output="Service stock.sahel-vert.example confirmé par lecture de bannière inoffensive"/>
+      </port>
+      <port protocol="tcp" portid="8080">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="http-proxy" product="Jetty" version="10.0.18" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="8443">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="Jetty" version="10.0.18" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <hostscript>
+      <script id="http-server-header" output="Produit web observé sur stock.sahel-vert.example"/>
+    </hostscript>
+    <times srtt="17300" rttvar="2640" to="104000"/>
+  </host>
+  <host>
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="203.0.113.15" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="paie.sahel-vert.example" type="user"/>
+    </hostnames>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.16" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="api.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+        <script id="http-title" output="Service api.sahel-vert.example confirmé par lecture de bannière inoffensive"/>
+      </port>
+      <port protocol="tcp" portid="8443">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="http" tunnel="ssl" product="gunicorn" version="21.2" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <hostscript>
+      <script id="http-server-header" output="Produit web observé sur api.sahel-vert.example"/>
+    </hostscript>
+    <times srtt="18700" rttvar="2860" to="106000"/>
+  </host>
+  <host>
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="203.0.113.17" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="stats.sahel-vert.example" type="user"/>
+    </hostnames>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="172.31.20.14" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="srv-relai.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="ssh" product="OpenSSH" version="9.2" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="3306">
+        <state state="closed" reason="reset" reason_ttl="0"/>
+        <service name="mysql" product="MariaDB" version="10.11" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <times srtt="20100" rttvar="3080" to="108000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="10.50.4.23" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="srv-journal.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="ssh" product="OpenSSH" version="9.2" method="probed" conf="10"/>
+      </port>
+      <port protocol="tcp" portid="6514">
+        <state state="open" reason="syn-ack" reason_ttl="0"/>
+        <service name="syslog-tls" product="rsyslog" version="8.2302" method="probed" conf="10"/>
+      </port>
+    </ports>
+    <times srtt="20800" rttvar="3190" to="109000"/>
+  </host>
+  <runstats>
+    <finished time="1780362900" timestr="Thu Jun 11 08:35:00 2026" elapsed="900.11" summary="Nmap done at 2026-06-11 08:35:00 UTC; 10 IP addresses (8 hosts up) scanned in 900.11 seconds" exit="success"/>
+    <hosts up="8" down="2" total="10"/>
+  </runstats>
+</nmaprun>

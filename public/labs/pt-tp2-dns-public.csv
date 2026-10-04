@@ -1,0 +1,50 @@
+name,type,value,ttl,observation
+sahel-vert.example,A,198.51.100.10,3600,site racine
+sahel-vert.example,AAAA,2001:db8:51:100::10,3600,site racine v6
+sahel-vert.example,MX,10 mail.sahel-vert.example,3600,mx principal
+sahel-vert.example,MX,30 smtp.sahel-vert.example,3600,mx secours
+sahel-vert.example,TXT,v=spf1 include:mail.sahel-vert.example -all,3600,spf
+sahel-vert.example,TXT,site-verification=sv-demo-public-2026,3600,vérification
+www.sahel-vert.example,A,198.51.100.11,1800,vitrine
+www.sahel-vert.example,AAAA,2001:db8:51:100::11,1800,vitrine v6
+www.sahel-vert.example,TXT,cache-tag=front-public,1800,cache
+portail.sahel-vert.example,A,198.51.100.12,900,portail public
+portail.sahel-vert.example,TXT,expose=portail-partenaires,900,note
+mail.sahel-vert.example,A,203.0.113.25,3600,courriel
+mail.sahel-vert.example,AAAA,2001:db8:203:113::25,3600,courriel v6
+mail.sahel-vert.example,TXT,policy=mail-public,3600,note
+vpn.sahel-vert.example,A,198.51.100.13,600,accès distant
+vpn.sahel-vert.example,TXT,portal=auth,600,note
+paie.sahel-vert.example,A,198.51.100.14,1200,portail métier
+paie.sahel-vert.example,TXT,owner=finance,1200,note
+stock.sahel-vert.example,A,198.51.100.15,1200,portail métier
+stock.sahel-vert.example,TXT,owner=logistique,1200,note
+api.sahel-vert.example,A,198.51.100.16,900,api publique
+api.sahel-vert.example,AAAA,2001:db8:51:100::16,900,api publique v6
+api.sahel-vert.example,TXT,docs=public,900,note
+docs.sahel-vert.example,A,203.0.113.80,1800,documentation
+docs.sahel-vert.example,TXT,robots=allow,1800,note
+cdn.sahel-vert.example,CNAME,www.sahel-vert.example,900,réutilise le front
+status.sahel-vert.example,A,198.51.100.17,300,état des services
+status.sahel-vert.example,TXT,page=status,300,note
+support.sahel-vert.example,CNAME,portail.sahel-vert.example,900,renvoi support
+autodiscover.sahel-vert.example,CNAME,mail.sahel-vert.example,3600,autodiscover
+mta-sts.sahel-vert.example,CNAME,mail.sahel-vert.example,3600,politique mail
+smtp.sahel-vert.example,A,203.0.113.26,3600,relais smtp
+imap.sahel-vert.example,A,203.0.113.27,3600,lecture mail
+_dmarc.sahel-vert.example,TXT,v=DMARC1; p=quarantine; rua=mailto:contact@sahel-vert.example,3600,dmarc
+selector1._domainkey.sahel-vert.example,TXT,v=DKIM1; k=rsa; p=demo-cle-selector1,3600,dkim
+selector2._domainkey.sahel-vert.example,TXT,v=DKIM1; k=rsa; p=demo-cle-selector2,3600,dkim
+media.sahel-vert.example,A,203.0.113.90,1200,médias
+media.sahel-vert.example,TXT,cache=media,1200,note
+carte.sahel-vert.example,A,203.0.113.91,1200,cartographie
+carte.sahel-vert.example,TXT,tile=public,1200,note
+jobs.sahel-vert.example,CNAME,www.sahel-vert.example,1800,carrière
+www.sahel-vert.example,TXT,favicons=ok,1800,note
+docs.sahel-vert.example,TXT,search=enabled,1800,note
+status.sahel-vert.example,TXT,lang=fr,300,note
+mail.sahel-vert.example,TXT,tls-report=contact@sahel-vert.example,3600,rapport
+vpn.sahel-vert.example,TXT,captcha=enabled,600,note
+api.sahel-vert.example,TXT,version=public-v2,900,note
+media.sahel-vert.example,TXT,format=webp,1200,note
+carte.sahel-vert.example,TXT,tiles=public,1200,note

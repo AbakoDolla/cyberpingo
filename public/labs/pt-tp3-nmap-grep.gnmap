@@ -1,0 +1,25 @@
+# Nmap 7.94 scan initiated Jun  8 08:14:37 2026 as: nmap -Pn -sS -sV -p 22,25,80,110,143,443,587,993,3389,5432,8080,8443 -oG pt-tp3-nmap-grep.gnmap 198.51.100.0/24 203.0.113.0/24
+# Host order matters for the analysts who only have this grepable view.
+# Status and Ports lines describe the same host.
+# Down hosts stay listed to preserve read order.
+# Service names follow the grepable output conventions.
+# Version fragments are abbreviated in this view.
+# Reviewers compare this file with the memo and the XML.
+Host: 198.51.100.18 ()	Status: Down
+Host: 198.51.100.5 (sahel-vert.example)	Status: Up
+Host: 198.51.100.5 (sahel-vert.example)	Ports: 80/open/tcp//http//nginx 1.24.0/, 443/open/tcp//ssl|http//nginx 1.24.0/, 22/closed/tcp//ssh///	Ignored State: closed (9)
+Host: 198.51.100.10 (www.sahel-vert.example)	Status: Up
+Host: 198.51.100.10 (www.sahel-vert.example)	Ports: 22/open/tcp//ssh//OpenSSH 9.7p1 Ubuntu 24.04/, 80/open/tcp//http//nginx 1.24.0/, 443/open/tcp//ssl|http//nginx 1.24.0/, 8080/open/tcp//http-proxy//Jetty 12.0.9/	Ignored State: closed (8)
+Host: 198.51.100.22 (vpn.sahel-vert.example)	Status: Up
+Host: 198.51.100.22 (vpn.sahel-vert.example)	Ports: 443/open/tcp//ssl|http//OpenResty 1.25.3.1/, 8443/open/tcp//ssl|http//Jetty 10.0.20/, 22/filtered/tcp//ssh///	Ignored State: closed (8)
+Host: 198.51.100.30 (mail.sahel-vert.example)	Status: Up
+Host: 198.51.100.30 (mail.sahel-vert.example)	Ports: 25/open/tcp//smtp//Postfix smtpd 3.8.6/, 110/closed/tcp//pop3///, 143/open/tcp//imap//Dovecot imapd 2.3.21/, 587/filtered/tcp//submission///, 993/open/tcp//ssl|imap//Dovecot imapd 2.3.21/	Ignored State: closed (7)
+Host: 198.51.100.44 (portail.sahel-vert.example)	Status: Up
+Host: 198.51.100.44 (portail.sahel-vert.example)	Ports: 443/open/tcp//ssl|http//nginx 1.24.0/, 22/closed/tcp//ssh///, 8443/filtered/tcp//ssl|http///	Ignored State: closed (8)
+Host: 203.0.113.60 (paie.sahel-vert.example)	Status: Up
+Host: 203.0.113.60 (paie.sahel-vert.example)	Ports: 443/open/tcp//ssl|http//Apache httpd 2.4.58/, 22/filtered/tcp//ssh///, 3389/filtered/tcp//ms-wbt-server///, 8443/closed/tcp//ssl|http///	Ignored State: closed (7)
+Host: 203.0.113.75 (stock.sahel-vert.example)	Status: Up
+Host: 203.0.113.75 (stock.sahel-vert.example)	Ports: 80/open/tcp//http//nginx 1.22.1/, 5432/open/tcp//postgresql//PostgreSQL DB 15.6/, 22/filtered/tcp//ssh///	Ignored State: closed (8)
+Host: 203.0.113.77 ()	Status: Down
+Host: 198.51.100.250 ()	Status: Down
+# Nmap done: 10 IP addresses (7 hosts up) scanned in 268.40 seconds

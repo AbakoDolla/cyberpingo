@@ -1,0 +1,22 @@
+{"avis":"PT-AVIS-01","produit":"Baobab Portal","version_touchee":"<=5.4.1","version_corrigee":"5.4.2","contexte":"jeton signé insuffisamment isolé sur portail public"}
+{"avis":"PT-AVIS-02","produit":"Canopee API","version_touchee":"<=3.2.0","version_corrigee":"3.2.1","contexte":"en-tête debug actif sur API exposée"}
+{"avis":"PT-AVIS-03","produit":"Sirocco Gateway","version_touchee":"<4.2.4","version_corrigee":"4.2.4","contexte":"console legacy encore référencée dans les modèles de scan"}
+{"avis":"PT-AVIS-04","produit":"Atlas Vault","version_touchee":"<=6.2.1","version_corrigee":"6.2.4","contexte":"coffre de secrets publié via reverse proxy"}
+{"avis":"PT-AVIS-05","produit":"Nimbus Queue","version_touchee":"<=4.4.1","version_corrigee":"4.4.3","contexte":"files d’attente exposées sans durcissement strict"}
+{"avis":"PT-AVIS-06","produit":"Savane Reports","version_touchee":"<=2.8.0","version_corrigee":"2.8.2","contexte":"moteur de rapports à headers verbeux"}
+{"avis":"PT-AVIS-07","produit":"Monsoon VPN","version_touchee":"<=7.1.0","version_corrigee":"7.1.4","contexte":"portail VPN avec politique TLS incomplète"}
+{"avis":"PT-AVIS-08","produit":"Delta Mail Hub","version_touchee":"<=5.1.2","version_corrigee":"5.1.5","contexte":"service de courrier avec page de diagnostic résiduelle"}
+{"avis":"PT-AVIS-09","produit":"Kora Upload","version_touchee":"<=1.9.2","version_corrigee":"1.9.3","contexte":"passerelle de dépôt de fichiers détectée par signature"}
+{"avis":"PT-AVIS-10","produit":"EpiStore","version_touchee":"<=3.6.4","version_corrigee":"3.6.6","contexte":"stockage de catalogue avec répertoire de santé exposé"}
+{"avis":"PT-AVIS-11","produit":"Harmattan Sync","version_touchee":"<=2.1.3","version_corrigee":"2.1.5","contexte":"synchronisation inter-sites au durcissement incomplet"}
+{"avis":"PT-AVIS-12","produit":"Brousse Admin","version_touchee":"<=8.0.0","version_corrigee":"8.0.2","contexte":"console d’administration laissée en frontal"}
+{"avis":"PT-AVIS-13","produit":"Palmeraie SSO","version_touchee":"<=4.7.0","version_corrigee":"4.7.2","contexte":"fédération interne avec assertion trop bavarde"}
+{"avis":"PT-AVIS-14","produit":"Sahel Queue","version_touchee":"<=1.2.0","version_corrigee":"1.2.3","contexte":"agent de file embarqué dans le portail"}
+{"avis":"PT-AVIS-15","produit":"Coton Cache","version_touchee":"<=6.6.1","version_corrigee":"6.6.4","contexte":"cache applicatif avec endpoint de purge annoncé"}
+{"avis":"PT-AVIS-16","produit":"Moringa Mail Gateway","version_touchee":"<=9.1.1","version_corrigee":"9.1.3","contexte":"passerelle mail avec réponse SMTP trop bavarde"}
+{"avis":"PT-AVIS-17","produit":"Oasis Files","version_touchee":"<=5.0.0","version_corrigee":"5.0.2","contexte":"transfert de fichiers interne réutilisé en frontal"}
+{"avis":"PT-AVIS-18","produit":"Khepri Console","version_touchee":"<=3.0.5","version_corrigee":"3.0.7","contexte":"console de supervision encore visible"}
+{"avis":"PT-AVIS-19","produit":"Sable CDN","version_touchee":"<=2.4.0","version_corrigee":"2.4.3","contexte":"cache web avec règles d’administration résiduelles"}
+{"avis":"PT-AVIS-20","produit":"Lagune Bridge","version_touchee":"<=7.8.2","version_corrigee":"7.8.4","contexte":"pont d’intégration interne référencé par signature"}
+{"avis":"PT-AVIS-21","produit":"Tamarin Search","version_touchee":"<=1.4.9","version_corrigee":"1.5.1","contexte":"moteur de recherche embarqué, état debug non désactivé"}
+{"avis":"PT-AVIS-22","produit":"Dune Metrics","version_touchee":"<=2.2.4","version_corrigee":"2.2.6","contexte":"module de métriques avec endpoint détaillé"}

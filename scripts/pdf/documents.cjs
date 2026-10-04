@@ -74,4 +74,21 @@ module.exports = [
   { file: "swb-proj-mission", kind: "brief", docLabel: "Lettre de mission", course: "web", lab: "Projet final · Auditer l’application de réservation", direct: true },
   { file: "swb-proj-grille", kind: "grid", docLabel: "Grille d’évaluation", course: "web", lab: "Projet final · Auditer l’application de réservation", direct: true },
   { file: "swb-proj-modele-rapport", kind: "template", docLabel: "Modèle de rapport", course: "web", lab: "Projet final · Auditer l’application de réservation", direct: true },
+
+  // Introduction au Pentest : publiés en PDF dès leur seed (11_pentest_programme.sql), donc « direct »
+  { file: "pt-tp1-guide", kind: "guide", docLabel: "Guide pas à pas", course: "pentest", lab: "TP 1 · Lire une lettre de mission", equipment: ["portable", "serveur"], direct: true },
+  { file: "pt-tp1-lettre-mission", kind: "brief", docLabel: "Lettre de mission", course: "pentest", lab: "TP 1 · Lire une lettre de mission", direct: true },
+  { file: "pt-tp1-regles-engagement", kind: "brief", docLabel: "Règles d’engagement", course: "pentest", lab: "TP 1 · Lire une lettre de mission", direct: true },
+  { file: "pt-tp2-guide", kind: "guide", docLabel: "Guide pas à pas", course: "pentest", lab: "TP 2 · Reconnaissance passive", equipment: ["portable", "serveur"], direct: true },
+  { file: "pt-tp3-guide", kind: "guide", docLabel: "Guide pas à pas", course: "pentest", lab: "TP 3 · Lire un scan réseau", equipment: ["serveur", "pare-feu", "routeur"], direct: true },
+  { file: "pt-tp4-guide", kind: "guide", docLabel: "Guide pas à pas", course: "pentest", lab: "TP 4 · Trier un rapport de scanner", equipment: ["serveur", "nas"], direct: true },
+  { file: "pt-tp5-guide", kind: "guide", docLabel: "Guide pas à pas", course: "pentest", lab: "TP 5 · Analyser un test web", equipment: ["portable", "serveur", "smartphone"], direct: true },
+  { file: "pt-tp5-owasp-top10-2025", kind: "grid", docLabel: "Mémo OWASP Top 10:2025", course: "pentest", lab: "TP 5 · Analyser un test web", direct: true },
+  { file: "pt-tp6-guide", kind: "guide", docLabel: "Guide pas à pas", course: "pentest", lab: "TP 6 · Relire une mission", equipment: ["portable", "serveur"], direct: true },
+  { file: "pt-tp6-regles-engagement", kind: "brief", docLabel: "Règles d’engagement", course: "pentest", lab: "TP 6 · Relire une mission", direct: true },
+  { file: "pt-tp6-modele-cloture", kind: "template", docLabel: "Modèle de note de clôture", course: "pentest", lab: "TP 6 · Relire une mission", direct: true },
+  { file: "pt-proj-guide", kind: "guide", docLabel: "Guide du projet final", course: "pentest", lab: "Projet final · Conduire une mission sur dossier", equipment: ["portable", "serveur", "pare-feu"], direct: true },
+  { file: "pt-proj-cadrage", kind: "brief", docLabel: "Synthèse de cadrage", course: "pentest", lab: "Projet final · Conduire une mission sur dossier", direct: true },
+  { file: "pt-proj-grille-risque", kind: "grid", docLabel: "Grille de risque", course: "pentest", lab: "Projet final · Conduire une mission sur dossier", direct: true },
+  { file: "pt-proj-modele-rapport", kind: "template", docLabel: "Modèle de rapport", course: "pentest", lab: "Projet final · Conduire une mission sur dossier", direct: true },
 ];

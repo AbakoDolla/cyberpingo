@@ -1,0 +1,40 @@
+Fiche actifs de la Coopérative Sahel-Vert
+Lecture : un actif est le couple hôte + service ; rang 5 = plus critique ; les rangs ne servent qu’à la priorisation interne du dossier
+Format : ACTIF|hote=...|service=...|criticite=...|rang=...|justification=...
+Note : un même hôte peut porter plusieurs services de criticité différente
+ACTIF|hote=paie.sahel-vert.example|service=https|criticite=critique|rang=5|justification=portail de paie des coopérateurs et des salariés
+ACTIF|hote=paie.sahel-vert.example|service=api|criticite=élevée|rang=4|justification=api de bulletins et de virements internes
+ACTIF|hote=paie.sahel-vert.example|service=admin|criticite=élevée|rang=4|justification=console RH réservée à l’équipe finance
+ACTIF|hote=paie.sahel-vert.example|service=sso|criticite=élevée|rang=4|justification=entrée unique des agents paie
+ACTIF|hote=paie.sahel-vert.example|service=backup|criticite=moyenne|rang=3|justification=export nocturne des journaux de paie
+ACTIF|hote=portail.sahel-vert.example|service=https|criticite=élevée|rang=4|justification=portail principal des adhérents et des coopérateurs
+ACTIF|hote=portail.sahel-vert.example|service=api|criticite=élevée|rang=4|justification=api métier du portail public
+ACTIF|hote=portail.sahel-vert.example|service=sso|criticite=moyenne|rang=3|justification=fédération des comptes du portail
+ACTIF|hote=portail.sahel-vert.example|service=search|criticite=moyenne|rang=3|justification=moteur interne de recherche de contenus
+ACTIF|hote=portail.sahel-vert.example|service=metrics|criticite=limitée|rang=2|justification=métriques exposées pour la supervision
+ACTIF|hote=stock.sahel-vert.example|service=https|criticite=élevée|rang=4|justification=extranet de stock et de mouvements coopératifs
+ACTIF|hote=stock.sahel-vert.example|service=api|criticite=élevée|rang=4|justification=api de mouvements de stock et commandes
+ACTIF|hote=stock.sahel-vert.example|service=sftp|criticite=moyenne|rang=3|justification=dépôt de fichiers avec partenaires logistiques
+ACTIF|hote=stock.sahel-vert.example|service=admin|criticite=moyenne|rang=3|justification=console de paramétrage d’inventaire
+ACTIF|hote=stock.sahel-vert.example|service=sync|criticite=moyenne|rang=3|justification=synchronisation quotidienne des catalogues
+ACTIF|hote=vpn.sahel-vert.example|service=vpn|criticite=élevée|rang=4|justification=accès distant des prestataires et techniciens
+ACTIF|hote=vpn.sahel-vert.example|service=https|criticite=moyenne|rang=3|justification=portail web d’entrée du VPN
+ACTIF|hote=vpn.sahel-vert.example|service=admin|criticite=moyenne|rang=3|justification=diagnostic réservé aux administrateurs réseau
+ACTIF|hote=vpn.sahel-vert.example|service=sso|criticite=moyenne|rang=3|justification=relais des jetons d’accès distants
+ACTIF|hote=vpn.sahel-vert.example|service=metrics|criticite=limitée|rang=2|justification=indicateurs techniques sans données métier
+ACTIF|hote=mail.sahel-vert.example|service=smtp|criticite=moyenne|rang=3|justification=passerelle d’envoi pour messagerie interne
+ACTIF|hote=mail.sahel-vert.example|service=imaps|criticite=moyenne|rang=3|justification=lecture sécurisée de la messagerie
+ACTIF|hote=mail.sahel-vert.example|service=admin|criticite=moyenne|rang=3|justification=console d’administration mail réservée
+ACTIF|hote=mail.sahel-vert.example|service=webmail|criticite=moyenne|rang=3|justification=webmail des agents terrain
+ACTIF|hote=mail.sahel-vert.example|service=sync|criticite=limitée|rang=2|justification=synchronisation de carnets d’adresses
+ACTIF|hote=www.sahel-vert.example|service=https|criticite=limitée|rang=2|justification=site vitrine sans action métier critique
+ACTIF|hote=www.sahel-vert.example|service=admin|criticite=limitée|rang=2|justification=back office de publication
+ACTIF|hote=www.sahel-vert.example|service=cdn|criticite=limitée|rang=2|justification=cache de contenus publics
+ACTIF|hote=www.sahel-vert.example|service=search|criticite=limitée|rang=2|justification=recherche de pages publiques
+ACTIF|hote=www.sahel-vert.example|service=metrics|criticite=limitée|rang=2|justification=métriques web destinées à la supervision
+Synthèse : le portail de paie en https est le seul actif noté rang 5 dans ce dossier.
+Synthèse : le portail adhérents et l’extranet de stock portent des données métier mais restent derrière la paie.
+Synthèse : le site www sert surtout de vitrine publique et ne doit pas passer devant un actif métier à bande EPSS équivalente.
+Synthèse : les actifs de supervision n’emportent jamais la priorité face à un service métier de même bande EPSS.
+Synthèse : les justifications de criticité sont internes au client et n’expriment pas une sévérité CVSS.
+Synthèse : un actif KEV faux positif ne remonte pas dans le tri tant que le faux positif est documenté.

@@ -1,0 +1,33 @@
+id,action,cible_id,cible,famille,validation_requise,intensite,horaire_utc,justification
+A01,consulter les DNS publics de l apex,T01,sahel-vert.example,passive,aucune,basse,09:00,lecture documentaire sans authentification
+A02,lire les en-têtes HTTP du site vitrine,T02,www.sahel-vert.example,passive,aucune,basse,09:05,contrôle léger de la surface exposée
+A03,relever le certificat TLS du portail,T03,portail.sahel-vert.example,passive,aucune,basse,09:10,preuve minimale sur un service public
+A04,relever la bannière SMTP visible,T04,mail.sahel-vert.example,passive,aucune,basse,09:12,lecture légère du service de messagerie
+A05,ouvrir la page d’accueil du site,T01,sahel-vert.example,passive,aucune,basse,09:14,vérifier la publication publique
+A06,lire robots txt du site vitrine,T02,www.sahel-vert.example,passive,aucune,basse,09:16,collecte passive du plan visible
+A07,ouvrir le portail avec le compte de test fourni,T03,portail.sahel-vert.example,authentifie,aucune,basse,09:30,compte de test déjà livré
+A08,parcourir l’inventaire du stock avec le compte fourni,T07,stock.sahel-vert.example,authentifie,aucune,basse,09:40,compte de test déjà livré
+A09,scanner légèrement les ports 80 et 443 de l’hôte du portail,T09,198.51.100.21,scan_leger,aucune,moyenne,10:00,deux ports publics dans la plage autorisée
+A10,scanner légèrement le segment public à faible volume,T11,198.51.100.48/29,scan_leger,aucune,moyenne,10:20,segment compris dans le bloc public autorisé
+A11,consulter l’API découverte dans le journal CT,T12,api.sahel-vert.example,passive,aucune,basse,10:30,sous-domaine non confirmé par la lettre
+A12,exporter un échantillon de fiches de paie de démonstration,T06,paie.sahel-vert.example,preuve_minimale,Rokia Bamba,basse,11:00,preuve à valider par la responsable juridique
+A13,se connecter à la paie avec un compte à fournir,T06,paie.sahel-vert.example,authentifie,Ibrahim Sanou,basse,11:20,aucun compte de test encore livré
+A14,ouvrir une session VPN avec un compte à fournir,T05,vpn.sahel-vert.example,authentifie,Ibrahim Sanou,basse,11:40,aucun compte de test encore livré
+A15,lancer une campagne de phishing MFA,T03,portail.sahel-vert.example,ingenierie_sociale,aucune,basse,13:00,action explicitement jamais autorisée
+A16,forcer une série de mots de passe sur le VPN,T05,vpn.sahel-vert.example,force_brute,aucune,moyenne,13:10,action explicitement jamais autorisée
+A17,supprimer une commande de test dans le stock,T07,stock.sahel-vert.example,modification_metier,aucune,basse,13:20,modification métier interdite
+A18,scanner tous les ports de l’hôte du stock,T10,198.51.100.42,scan_leger,aucune,forte,13:30,intensité supérieure au plafond autorisé
+A19,consulter le site RH externe,T16,rh-externe.example,passive,aucune,basse,13:40,cible explicitement hors mission
+A20,consulter le WHOIS du partenaire fournisseur,T17,fournisseur-sahel.example,passive,aucune,basse,13:45,partenaire tiers hors mission
+A21,relever le certificat du CDN tiers,T13,cdn-partenaire.example,passive,aucune,basse,13:50,nom tiers non confié par le client
+A22,scanner légèrement l’hôte tiers 203 0 113 54,T24,203.0.113.54,scan_leger,aucune,moyenne,14:00,hébergement tiers hors mission
+A23,scanner légèrement le réseau interne 172 31 20 0 24,T19,172.31.20.0/24,scan_leger,aucune,moyenne,14:05,réseau interne exclu du test externe
+A24,relever le WHOIS du domaine sahelvert sans tiret,T15,sahelvert.example,passive,aucune,basse,14:10,nom fautif hors liste de mission
+A25,lire les en-têtes HTTP de 198 51 99 44,T22,198.51.99.44,passive,aucune,basse,14:20,bloc voisin non confié
+A26,scanner légèrement l’hôte du portail avant la fenêtre,T09,198.51.100.21,scan_leger,aucune,basse,06:45,horaire en dehors de la fenêtre quotidienne
+A27,consulter le certificat du partenaire commercial,T29,partenaire-coop.example,passive,aucune,basse,14:25,partenaire hors mission signée
+A28,lire la page du stock résolu hors bloc,T14,stock.sahel-vert.example,passive,aucune,basse,14:30,nom correct mais IP hors de la plage autorisée
+A29,consulter le fichier MX publié pour la messagerie,T04,mail.sahel-vert.example,passive,aucune,basse,14:40,lecture passive du service mail
+A30,ouvrir la page d’accueil du VPN sans se connecter,T05,vpn.sahel-vert.example,passive,aucune,basse,14:50,vérification passive de la présence du service
+A31,consulter les mentions légales du site vitrine,T02,www.sahel-vert.example,passive,aucune,basse,15:00,lecture passive d’une page publique
+A32,relever le certificat TLS du webmail,T04,mail.sahel-vert.example,passive,aucune,basse,15:10,preuve minimale sur un service public

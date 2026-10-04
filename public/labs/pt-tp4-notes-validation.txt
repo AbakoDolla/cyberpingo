@@ -1,0 +1,106 @@
+Dossier de validation minimale du Cabinet Harmattan
+Mission : Coopérative Sahel-Vert - tri du rapport du 10 juin 2026
+Rappel : statut confirme = preuve minimale suffisante ; faux_positif = produit ou version non touchés ; preuve_insuffisante = signature sans preuve minimale exploitable
+Rappel : decision_vecteur=conserve garde le vecteur du scanner ; decision_vecteur=ajuste le révise ; decision_vecteur=rejete ou non_evaluable sort le constat du tri prioritaire
+[V01] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+[V01] version_reelle=5.4.1 produit=Baobab Portal validation=version observée et endpoint concordants
+[V01] commentaire=preuve minimale suffisante via bannière et endpoint d’authentification
+[V02] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+[V02] version_reelle=3.2.0 produit=Canopee API validation=en-tête debug vu en production mais sans voie de modification
+[V02] commentaire=confirmé mais impact intégrité revu à la baisse après lecture de la réponse
+[V03] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+[V03] version_reelle=1.2.0 produit=Sahel Queue validation=preuve textuelle suffisante et version touchée
+[V03] commentaire=le compte lecture queue existe encore sur l’actif public
+[V04] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+[V04] version_reelle=4.7.0 produit=Palmeraie SSO validation=page d’erreur et marqueur de version visibles
+[V04] commentaire=la fuite d’information reste exploitable sans ambiguïté fonctionnelle
+[V05] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+[V05] version_reelle=1.4.9 produit=Tamarin Search validation=la page existe mais exige un clic explicite de l’opérateur
+[V05] commentaire=impact confirmé mais interaction utilisateur nécessaire pour afficher le détail
+[V06] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+[V06] version_reelle=2.2.4 produit=Dune Metrics validation=endpoint et version observés en clair
+[V06] commentaire=la métrique révèle trop de détail sur les composants exposés
+[V07] statut=faux_positif preuve=suffisante decision_vecteur=rejete vecteur_final=-
+[V07] version_reelle=4.2.6 produit=Sirocco Gateway validation=version observée 4.2.6 hors plage touchée <4.2.4
+[V07] commentaire=signature du scanner trop large pour les versions déjà corrigées
+[V08] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N
+[V08] version_reelle=5.4.1 produit=Baobab Portal validation=jeton legacy confirmé sur service de paie
+[V08] commentaire=actif sensible avec version encore touchée et preuve directe
+[V09] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N
+[V09] version_reelle=4.4.1 produit=Nimbus Queue validation=preuve de version et sortie d’exemple suffisantes
+[V09] commentaire=révèle une file de traitement sur un actif financier
+[V10] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N
+[V10] version_reelle=2.8.0 produit=Savane Reports validation=preuve valide mais aucune interruption de service constatée
+[V10] commentaire=le scanner surévaluait la composante disponibilité sans preuve de panne
+[V11] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H
+[V11] version_reelle=6.2.1 produit=Atlas Vault validation=version et endpoint critiques confirmés
+[V11] commentaire=constat le plus fort sur l’actif le plus critique du dossier
+[V12] statut=preuve_insuffisante preuve=insuffisante decision_vecteur=non_evaluable vecteur_final=-
+[V12] version_reelle=inconnue produit=Kora Upload validation=signature générique sans version ni action observable
+[V12] commentaire=preuve minimale absente, donc aucun classement défendable
+[V13] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+[V13] version_reelle=3.6.4 produit=EpiStore validation=version et endpoint visibles sans ambiguïté
+[V13] commentaire=service logistique sensible avec exposition confirmée
+[V14] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:L
+[V14] version_reelle=2.1.3 produit=Harmattan Sync validation=exposition réelle mais aucune capacité d’écriture démontrée
+[V14] commentaire=impact intégrité retiré après validation minimale
+[V15] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+[V15] version_reelle=5.0.0 produit=Oasis Files validation=bannière et port concordants
+[V15] commentaire=service partenaire encore à jour imparfaitement
+[V16] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+[V16] version_reelle=8.0.0 produit=Brousse Admin validation=page de diagnostic observée après redirection interne
+[V16] commentaire=preuve suffisante mais nécessite une interaction utilisateur
+[V17] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+[V17] version_reelle=7.8.2 produit=Lagune Bridge validation=diagnostic exposé et version affichée
+[V17] commentaire=faible priorité car signal externe bas et actif moins sensible
+[V18] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:N/A:N
+[V18] version_reelle=6.6.1 produit=Coton Cache validation=fonction visible mais aucune purge réalisée pendant la validation
+[V18] commentaire=priorité rehaussée par le contexte métier du portail principal
+[V19] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+[V19] version_reelle=2.4.0 produit=Sable CDN validation=endpoint confirmé sur site vitrine uniquement
+[V19] commentaire=epss légèrement plus haut mais actif moins critique que le portail adhérents
+[V20] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N
+[V20] version_reelle=4.7.0 produit=Palmeraie SSO validation=exposition réelle et impact métier élevé
+[V20] commentaire=kev sur actif financier même sans coffre de secrets
+[V21] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+[V21] version_reelle=3.0.5 produit=Khepri Console validation=preuve minimale suffisante et version exacte
+[V21] commentaire=service réservé mais encore visible depuis le frontal interne
+[V22] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+[V22] version_reelle=7.1.0 produit=Monsoon VPN validation=configuration observée directement sur le portail
+[V22] commentaire=exposition internet claire sur service d’accès distant
+[V23] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:L
+[V23] version_reelle=8.0.0 produit=Brousse Admin validation=aucune modification observée lors de la validation minimale
+[V23] commentaire=kev confirmé mais impact intégrité réduit faute de preuve de changement
+[V24] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N
+[V24] version_reelle=7.8.2 produit=Lagune Bridge validation=version et page de statut visibles
+[V24] commentaire=reste à corriger mais passe derrière les constats kev
+[V25] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+[V25] version_reelle=2.2.4 produit=Dune Metrics validation=métriques confirmées sans impact écriture
+[V25] commentaire=signal externe faible et actif non métier
+[V26] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+[V26] version_reelle=5.1.2 produit=Delta Mail Hub validation=version et rôle observés via bannière
+[V26] commentaire=information utile à corriger mais sans effet direct sur l’intégrité
+[V27] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N
+[V27] version_reelle=9.1.1 produit=Moringa Mail Gateway validation=page de diagnostic observée et version touchée
+[V27] commentaire=kev confirmé mais actif métier moins critique que la paie
+[V28] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:N/A:N
+[V28] version_reelle=3.0.5 produit=Khepri Console validation=le détail observé ne prouve pas une modification à distance
+[V28] commentaire=constat retenu avec impact intégrité retiré
+[V29] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+[V29] version_reelle=5.4.1 produit=Baobab Portal validation=version visible mais contexte moins critique
+[V29] commentaire=même famille que le portail mais actif de criticité moyenne
+[V30] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+[V30] version_reelle=2.8.0 produit=Savane Reports validation=trace visible sans preuve d’écriture
+[V30] commentaire=site vitrine donc priorité plus basse malgré le même produit
+[V31] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N
+[V31] version_reelle=2.4.0 produit=Sable CDN validation=règles d’administration exposées en lecture
+[V31] commentaire=kev confirmé mais actif limité à la vitrine publique
+[V32] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+[V32] version_reelle=1.4.9 produit=Tamarin Search validation=page debug visible sans autre privilège
+[V32] commentaire=utile à corriger mais très en dessous des services métier
+[V33] statut=confirme preuve=suffisante decision_vecteur=ajuste vecteur_final=CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N
+[V33] version_reelle=6.6.1 produit=Coton Cache validation=la purge exige une action non observée pendant la validation
+[V33] commentaire=le scanner surestimait la facilité d’exploitation
+[V34] statut=confirme preuve=suffisante decision_vecteur=conserve vecteur_final=CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+[V34] version_reelle=2.2.4 produit=Dune Metrics validation=sortie de supervision publique encore présente
+[V34] commentaire=plus faible priorité du lot confirmé

@@ -1,0 +1,25 @@
+identifiant;artefact;emplacement;doit_etre_supprime;statut;justification
+A01;compte-demo-user-01;/srv/harmattan/comptes/demo-user-01.txt;oui;supprime;retire en fin de revue
+A02;compte-demo-user-02;/srv/harmattan/comptes/demo-user-02.txt;oui;supprime;retiré après le second scénario
+A03;compte-demo-user-03;/srv/harmattan/comptes/demo-user-03.txt;oui;supprime;retiré après validation du quota
+A04;compte-demo-user-04;/srv/harmattan/comptes/demo-user-04.txt;oui;supprime;retiré après correction de notification
+A05;capture-portail-auth.png;/srv/harmattan/preuves/capture-portail-auth.png;oui;supprime;preuve remplacée par extrait texte
+A06;notes-brutes-mail.txt;/srv/harmattan/preuves/notes-brutes-mail.txt;oui;supprime;notes de travail locales
+A07;export-entetes-vpn.txt;/srv/harmattan/preuves/export-entetes-vpn.txt;oui;supprime;export de revue ponctuelle
+A08;journal-temp-stock.txt;/srv/harmattan/tmp/journal-temp-stock.txt;oui;supprime;tampon de comparaison
+A09;archive-note-cloture.txt;/srv/harmattan/tmp/archive-note-cloture.txt;oui;oublie;copie locale restée après relecture
+A10;preuve-certificat-mail.txt;/srv/harmattan/preuves/preuve-certificat-mail.txt;oui;supprime;preuve recopiée dans le rapport
+A11;inventaire-cibles.csv;/srv/harmattan/tmp/inventaire-cibles.csv;oui;supprime;export de travail interne
+A12;cache-requetes-portail.txt;/srv/harmattan/tmp/cache-requetes-portail.txt;oui;supprime;cache local non nécessaire
+A13;trace-retest-auth.log;/srv/harmattan/tmp/trace-retest-auth.log;oui;supprime;journal temporaire de contrôle
+A14;token-demo-0012;/srv/harmattan/tokens/token-demo-0012.txt;oui;a_revoquer;jeton encore actif après création de test
+A15;jeton-partage-mail.txt;/srv/harmattan/tokens/jeton-partage-mail.txt;oui;supprime;jeton de démonstration déjà retiré
+A16;compte-vpn-demo.txt;/srv/harmattan/vpn/compte-vpn-demo.txt;oui;supprime;compte de test ferme
+A17;token-demo-0007;/srv/harmattan/retest/token-demo-0007.txt;non;laisse-pour-retest;exception RE-08 documentée jusqu’au retrait prévu
+A18;memo-lecture-roe.md;/srv/harmattan/docs/memo-lecture-roe.md;non;conserve;document interne de méthode
+A19;tableau-suivi-retest.csv;/srv/harmattan/docs/tableau-suivi-retest.csv;non;conserve;suivi du re-test client
+A20;preuve-hash-portail.txt;/srv/harmattan/preuves/preuve-hash-portail.txt;non;conserve;preuve minimale à archiver
+A21;preuve-http-mail.txt;/srv/harmattan/preuves/preuve-http-mail.txt;non;conserve;preuve minimale à archiver
+A22;matrice-constats.ods;/srv/harmattan/docs/matrice-constats.ods;non;conserve;support de rapport
+A23;ordre-de-mission.pdf;/srv/harmattan/docs/ordre-de-mission.pdf;non;conserve;document contractuel
+A24;liste-contacts-astreinte.txt;/srv/harmattan/docs/liste-contacts-astreinte.txt;non;conserve;coordonnées contractuelles
