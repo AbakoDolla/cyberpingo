@@ -335,10 +335,11 @@
       "title": "Protéger ses comptes avec un gestionnaire et la MFA",
       "placements": [
         {
-          "after": "La double authentification ajoute une seconde preuve.",
-          "title": "La clé de sécurité matérielle",
+          "after": "La MFA ajoute une seconde preuve.",
+          "title": "Une clé de sécurité matérielle, un second facteur",
           "devices": [
-            "cle-securite"
+            "cle-securite",
+            "smartphone"
           ]
         }
       ]
@@ -558,6 +559,139 @@
           "devices": [
             "nas",
             "disque-externe"
+          ]
+        }
+      ]
+    },
+    "0439a7a3-c56b-f42b-2098-752c25a889c4": {
+      "title": "HTTP pour la sécurité : requêtes, réponses, méthodes et codes d’état",
+      "placements": [
+        {
+          "after": "HTTP est le langage de base du web.",
+          "title": "Le client et le serveur qui échangent ces messages",
+          "devices": [
+            "portable",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "eadc6ced-16dc-90ec-e1d1-297bc8b0202b": {
+      "title": "HTTPS : ce que le cadenas protège vraiment",
+      "placements": [
+        {
+          "after": "Le certificat X.509 contient plusieurs repères.",
+          "title": "Le serveur et le routeur entre toi et le site",
+          "devices": [
+            "serveur",
+            "routeur"
+          ]
+        }
+      ]
+    },
+    "b947a3cc-f0fe-3ceb-a97f-d8d400e7b98d": {
+      "title": "Le navigateur : origine, même origine et ce qu’il protège",
+      "placements": [
+        {
+          "after": "Le navigateur ne fait pas qu’afficher du texte.",
+          "title": "Les appareils où tourne un navigateur",
+          "devices": [
+            "portable",
+            "smartphone",
+            "tablette"
+          ]
+        }
+      ]
+    },
+    "fd1598af-3d9d-1412-b123-7b76e96ee6d3": {
+      "title": "Déjouer un message de phishing",
+      "placements": [
+        {
+          "after": "Un message de phishing cherche presque toujours une action",
+          "title": "Où le message arrive : téléphone et ordinateur",
+          "devices": [
+            "smartphone",
+            "portable"
+          ]
+        }
+      ]
+    },
+    "b3f2d856-7c5d-2169-ae53-175cc32fb4ce": {
+      "title": "Stocker les mots de passe côté serveur : hachage, sel et politiques",
+      "placements": [
+        {
+          "after": "Un serveur ne garde jamais un mot de passe en clair.",
+          "title": "Le serveur qui garde les empreintes",
+          "devices": [
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "a0523f46-076e-f08d-8acf-2198afcb66dd": {
+      "title": "Sessions et cookies : identifiant, fixation, expiration et déconnexion",
+      "placements": [
+        {
+          "after": "HTTP est sans état",
+          "title": "L’appareil qui garde le cookie, le serveur qui le reconnaît",
+          "devices": [
+            "poste-fixe",
+            "smartphone",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "a1a1c2ef-9afc-8a84-c92b-fe83daa3f7d2": {
+      "title": "Téléversement de fichiers et traversée de chemin",
+      "placements": [
+        {
+          "after": "Un téléversement n’est jamais « juste un fichier ».",
+          "title": "Où atterrissent les fichiers téléversés",
+          "devices": [
+            "serveur",
+            "nas"
+          ]
+        }
+      ]
+    },
+    "a4f419b8-7ceb-5ebc-2654-b1396bae5a86": {
+      "title": "SSRF, XXE et désérialisation : quand le serveur fait ce qu’on lui souffle",
+      "placements": [
+        {
+          "after": "Une SSRF, ou falsification de requête côté serveur, apparaît",
+          "title": "Le serveur applicatif et le réseau interne derrière lui",
+          "devices": [
+            "serveur",
+            "pare-feu",
+            "routeur"
+          ]
+        }
+      ]
+    },
+    "375df27a-a6f0-4ece-a112-6c3fa81228fd": {
+      "title": "Configuration, secrets et erreurs : durcir sans rien laisser traîner",
+      "placements": [
+        {
+          "after": "Un secret n’est pas seulement un mot de passe.",
+          "title": "Un petit serveur d’association : là où traînent les fichiers de configuration",
+          "devices": [
+            "serveur",
+            "raspberry-pi"
+          ]
+        }
+      ]
+    },
+    "5e3fa110-5967-6ae6-81c2-46ec51d36e07": {
+      "title": "Se défendre en profondeur : pare-feu applicatif, limitation de débit, journaux et détection",
+      "placements": [
+        {
+          "after": "La défense en profondeur ajoute des couches",
+          "title": "Les équipements sur le chemin d’une requête",
+          "devices": [
+            "pare-feu",
+            "serveur",
+            "routeur"
           ]
         }
       ]

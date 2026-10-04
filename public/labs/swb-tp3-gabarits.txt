@@ -1,0 +1,12 @@
+G01 | corps HTML échappé | <h2><%= room.name %></h2>
+G02 | corps HTML brut | <div class="flash"><%- flashMessage %></div>
+G03 | attribut entre guillemets | <img alt="<%= guest.displayName %>" src="/img/logo.png">
+G04 | attribut sans guillemets | <input value=<%- query.term %> data-kind="search">
+G05 | bloc script | <script>window.currentGuest = '<%- guest.username %>';</script>
+G06 | url encodée par le code | <a href="/rooms/<%= room.id %>">Voir</a>
+G07 | corps HTML échappé | <p><%= booking.note %></p>
+G08 | attribut entre guillemets | <div data-city="<%= booking.city %>"></div>
+G09 | url brute | <a href="<%- returnUrl %>">Retour</a>
+G10 | corps HTML brut | <section><%- marketingSnippet %></section>
+G11 | bloc script avec JSON | <script>const opts = <%- JSON.stringify(options) %>;</script>
+G12 | corps HTML échappé | <span><%= room.statusLabel %></span>

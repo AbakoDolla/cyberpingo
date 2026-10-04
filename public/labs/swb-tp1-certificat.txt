@@ -1,0 +1,29 @@
+=== Certificat principal : reservation.palmier-or.example ===
+Requested host: reservation.palmier-or.example
+Protocol  : TLSv1.3
+Cipher    : TLS_AES_256_GCM_SHA384
+subject=CN = reservation.palmier-or.example
+issuer=C = FR, O = Example Issuing CA, CN = Example RSA OV CA 2026
+notBefore=Apr 04 00:00:00 2026 GMT
+notAfter=Jul 03 00:00:00 2026 GMT
+X509v3 Subject Alternative Name: DNS:reservation.palmier-or.example, DNS:www.palmier-or.example, DNS:palmier-or.example
+
+=== Certificat secondaire : api.reservation.palmier-or.example ===
+Requested host: api.reservation.palmier-or.example
+Protocol  : TLSv1.2
+Cipher    : ECDHE-RSA-AES256-GCM-SHA384
+subject=CN = api.reservation.palmier-or.example
+issuer=C = FR, O = Example Issuing CA, CN = Example RSA OV CA 2026
+notBefore=Apr 18 00:00:00 2026 GMT
+notAfter=Jul 17 00:00:00 2026 GMT
+X509v3 Subject Alternative Name: DNS:api.reservation.palmier-or.example, DNS:api-admin.palmier-or.example
+
+=== Certificat secondaire : paiement.palmier-or.example ===
+Requested host: paiement.palmier-or.example
+Protocol  : TLSv1.3
+Cipher    : TLS_CHACHA20_POLY1305_SHA256
+subject=CN = paiement.palmier-or.example
+issuer=C = FR, O = Example Issuing CA, CN = Example RSA OV CA 2026
+notBefore=Apr 28 00:00:00 2026 GMT
+notAfter=Jul 27 00:00:00 2026 GMT
+X509v3 Subject Alternative Name: DNS:paiement.palmier-or.example, DNS:checkout.palmier-or.example

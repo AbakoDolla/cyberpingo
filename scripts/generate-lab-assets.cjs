@@ -16,6 +16,13 @@ const { buildLinuxAssetsC } = require("./lab-scenarios-linux-c.cjs");
 const { buildLogsAssetsA } = require("./lab-scenarios-logs-a.cjs");
 const { buildLogsAssetsB } = require("./lab-scenarios-logs-b.cjs");
 const { buildLogsAssetsC } = require("./lab-scenarios-logs-c.cjs");
+const { buildSwbAssetsTp1 } = require("./lab-scenarios-swb-tp1.cjs");
+const { buildSwbAssetsTp2 } = require("./lab-scenarios-swb-tp2.cjs");
+const { buildSwbAssetsTp3 } = require("./lab-scenarios-swb-tp3.cjs");
+const { buildSwbAssetsTp4 } = require("./lab-scenarios-swb-tp4.cjs");
+const { buildSwbAssetsTp5 } = require("./lab-scenarios-swb-tp5.cjs");
+const { buildSwbAssetsTp6 } = require("./lab-scenarios-swb-tp6.cjs");
+const { buildSwbAssetsProj } = require("./lab-scenarios-swb-proj.cjs");
 
 const root = path.resolve(__dirname, "..");
 const OUTPUT_DIR = path.join(root, "public", "labs");
@@ -510,6 +517,7 @@ function buildLabAssets() {
   const logsA = buildLogsAssetsA();
   const logsB = buildLogsAssetsB();
   const logsC = buildLogsAssetsC();
+  const swb = [buildSwbAssetsTp1(), buildSwbAssetsTp2(), buildSwbAssetsTp3(), buildSwbAssetsTp4(), buildSwbAssetsTp5(), buildSwbAssetsTp6(), buildSwbAssetsProj()];
   return {
     files: [
       { name: "reseau-instable.pcap", data: instable.file },
@@ -530,6 +538,7 @@ function buildLabAssets() {
       ...logsA.files,
       ...logsB.files,
       ...logsC.files,
+      ...swb.flatMap((lab) => lab.files),
     ],
     facts: {
       instable: instable.facts, evaluation: evaluation.facts, firewall: firewall.facts, packetTracer, soc: soc.facts,
@@ -537,6 +546,7 @@ function buildLabAssets() {
       fondamentaux: { ...securiteA.facts, ...securiteB.facts },
       linux: { ...linuxA.facts, ...linuxB.facts, ...linuxC.facts },
       logs: { ...logsA.facts, ...logsB.facts, ...logsC.facts },
+      swb: Object.assign({}, ...swb.map((lab) => lab.facts)),
     },
   };
 }

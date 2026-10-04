@@ -24,6 +24,7 @@ const PROGRAMME_SKILLS = ["modeles-reseau", "plan-vlsm", "adressage-ipv6", "serv
 const FONDAMENTAUX_SKILLS = ["principes-securite", "ingenierie-sociale", "authentification-forte", "hygiene-numerique", "bases-cryptographie", "analyse-risques", "protection-donnees", "reponse-incident"];
 const LINUX_SKILLS = ["ligne-de-commande", "droits-et-comptes", "processus-services", "logiciels-correctifs", "reseau-ssh-pare-feu", "sauvegarde-chiffrement-linux", "scripts-shell", "durcissement-linux"];
 const LOGS_SKILLS = ["formats-horodatage", "outils-analyse-logs", "journaux-windows", "journaux-reseau", "correlation-sources", "regles-detection", "triage-alertes", "rapport-investigation"];
+const SWB_SKILLS = ["lire-http-securite", "reperer-injections", "prevenir-xss-csp", "securiser-sessions-jetons", "controler-acces-api", "durcir-configuration", "noter-prioriser-vulnerabilites", "auditer-application-web"];
 
 async function as(uid, sql, params = []) {
   await db.exec("reset role");
@@ -111,11 +112,11 @@ test("the Réseaux path seeds a complete, published, end-to-end learning path", 
     (select count(*) from public.courses where domain_id is null) as orphan_courses,
     (select count(*) from public.domains) as domains`, [labs.length ? (await sql("select array_agg(id) as ids from public.labs where course_id = $1", [course("c2")]))[0].ids : []]);
   assert.deepEqual(Object.fromEntries(Object.entries(counts).map(([key, value]) => [key, Number(value)])), {
-    tasks: 91, keys: 91, skills: 45, links: 180, orphan_courses: 0, domains: 6,
+    tasks: 91, keys: 91, skills: 53, links: 212, orphan_courses: 0, domains: 6,
   });
 
   const assets = await sql("select kind, url from public.lab_assets");
-  assert.equal(assets.length, 168);
+  assert.equal(assets.length, 208);
   assert.ok(assets.every((row) => row.url.startsWith("/labs/") && fs.existsSync(path.join(LAB_DIR, path.basename(row.url)))), "every asset points to a real file");
 
   const events = await sql("select distinct event from public.mascot_lines where is_active");
@@ -214,7 +215,7 @@ test("an admin previews an unpublished lab without earning anything, learners ca
 
 test("skills advance from learning to validated, never on a quiz alone", async () => {
   const states = await skillStates(ids.ana);
-  assert.equal(Object.keys(states).length, 45);
+  assert.equal(Object.keys(states).length, 53);
   assert.ok(Object.values(states).every((state) => state === "not_studied"));
 
   await rpc(ids.ana, "start_lesson", { p_lesson_id: lesson("reseaux-ipv4") });
@@ -236,13 +237,14 @@ test("skills advance from learning to validated, never on a quiz alone", async (
   await passQuiz(ids.ana, "reseaux-cidr");
   const validation = await solveLab(ids.ana, "evaluation-reseaux");
   const states2 = await skillStates(ids.ana);
-  const reseauxSkills = Object.keys(states2).filter((slug) => !SOC_SKILLS.includes(slug) && !PROGRAMME_SKILLS.includes(slug) && !FONDAMENTAUX_SKILLS.includes(slug) && !LINUX_SKILLS.includes(slug) && !LOGS_SKILLS.includes(slug));
+  const reseauxSkills = Object.keys(states2).filter((slug) => !SOC_SKILLS.includes(slug) && !PROGRAMME_SKILLS.includes(slug) && !FONDAMENTAUX_SKILLS.includes(slug) && !LINUX_SKILLS.includes(slug) && !LOGS_SKILLS.includes(slug) && !SWB_SKILLS.includes(slug));
   assert.equal(reseauxSkills.length, 6);
   assert.ok(reseauxSkills.every((slug) => states2[slug] === "validated"), JSON.stringify(states2));
   assert.ok(SOC_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a SOC skill");
   assert.ok(FONDAMENTAUX_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a Fondamentaux skill");
   assert.ok(LINUX_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a Linux skill");
   assert.ok(LOGS_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a log-analysis skill");
+  assert.ok(SWB_SKILLS.every((slug) => states2[slug] === "not_studied"), "the Réseaux path never validates a web-security skill");
   assert.ok(PROGRAMME_SKILLS.every((slug) => states2[slug] !== "validated"), "the first Réseaux assessment never validates a skill of the programme");
   assert.equal(states2["plan-vlsm"], "learning", "its practice lab was solved, its lesson was not");
   assert.equal(validation.new_skills.length, 6);

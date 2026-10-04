@@ -1,0 +1,11 @@
+Analyse TLS de reservation.palmier-or.example
+Date du test : 2026-05-12T07:40:00Z
+Protocoles acceptés : TLSv1.0, TLSv1.1, TLSv1.2, TLSv1.3
+Suites fortes observées : TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256
+Suite héritée observée : TLS_RSA_WITH_AES_128_CBC_SHA
+Redirection HTTP vers HTTPS : oui, 301 permanente
+Certificat serveur : CN=reservation.palmier-or.example
+SAN : reservation.palmier-or.example, palmier-or.example
+Émetteur : R11 Example Trust
+Validité : notBefore=2026-04-18T00:00:00Z ; notAfter=2026-07-17T23:59:59Z
+HSTS global : présent sur les réponses exportées

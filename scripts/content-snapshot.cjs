@@ -9,7 +9,7 @@ const { contentId } = require("./generate-content-seed.cjs");
 const rows = async (db, text, params = []) => (await db.query(text, params)).rows;
 
 /** The authoring files of every finished programme: each one is split in parts "a" to "e" (see docs/CONTENU.md). */
-const PROGRAMMES = ["reseaux-programme", "fondamentaux-programme", "linux-programme", "logs-programme"];
+const PROGRAMMES = ["reseaux-programme", "fondamentaux-programme", "linux-programme", "logs-programme", "swb-programme"];
 
 /** Lessons written with the full lesson template (the programme parts), found by their id. */
 function templateLessonIds() {

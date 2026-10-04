@@ -1,0 +1,47 @@
+### Réponse 1 : /connexion
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: no-store
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Set-Cookie: resa.sid=faux-session-1001; Path=/; Secure
+
+### Réponse 2 : /commentaires
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: public, max-age=120
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+### Réponse 3 : /api/reservations/1042
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Cache-Control: no-store
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+
+### Réponse 4 : /api/apercu
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+
+### Réponse 5 : /espace-partenaires/upload
+HTTP/1.1 201 Created
+Content-Type: application/json; charset=utf-8
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'
+X-Content-Type-Options: nosniff
+
+### Réponse 6 : /admin/dashboard
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Cache-Control: no-store
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy: default-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'none'
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin

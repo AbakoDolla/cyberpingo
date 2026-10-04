@@ -23,7 +23,7 @@ Dans la visionneuse, tape un mot ou un nombre pour ne garder que les lignes qui 
 cat > demo-auth.log <<'EOF'
 Jun 14 08:15:00 lab sshd[1201]: Failed password for invalid user demo from 192.168.70.8 port 41000 ssh2
 Jun 14 08:16:10 lab sshd[1202]: Accepted password for demo from 192.168.70.9 port 41010 ssh2
-Jun 14 08:20:00 lab sudo[1210]: demo : TTY=pts/0 ; ****** ; USER=root ; COMMAND=/usr/bin/id
+Jun 14 08:20:00 lab sudo[1210]: demo : TTY=pts/0 ; PWD=/home/demo ; USER=root ; COMMAND=/usr/bin/id
 EOF
 auth_demo=$(grep -nE 'Failed password|Accepted password|sudo' demo-auth.log | wc -l)
 cat > demo-acces.log <<'EOF'
@@ -40,7 +40,7 @@ printf 'Démo incident prête pour relier des événements auth : %s ligne(s).\n
 @'
 Jun 14 08:15:00 lab sshd[1201]: Failed password for invalid user demo from 192.168.70.8 port 41000 ssh2
 Jun 14 08:16:10 lab sshd[1202]: Accepted password for demo from 192.168.70.9 port 41010 ssh2
-Jun 14 08:20:00 lab sudo[1210]: demo : TTY=pts/0 ; ****** ; USER=root ; COMMAND=/usr/bin/id
+Jun 14 08:20:00 lab sudo[1210]: demo : TTY=pts/0 ; PWD=/home/demo ; USER=root ; COMMAND=/usr/bin/id
 '@ | Set-Content -Encoding UTF8 demo-auth.log
 $authDemo = (Get-Content -Encoding UTF8 "demo-auth.log" | Select-String 'Failed password|Accepted password|sudo').Count
 @'

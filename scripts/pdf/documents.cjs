@@ -3,7 +3,7 @@
 // scripts/generate-lab-assets.cjs) ; le PDF est ce que l’apprenant télécharge.
 //
 //   kind       guide | template | brief | grid  (template = modèle à remplir : lignes d’écriture, champs)
-//   course     reseaux | fondamentaux | linux | logs  (couleur et bandeau)
+//   course     reseaux | fondamentaux | linux | logs | web | pentest  (couleur et bandeau)
 //   equipment  identifiants de data/equipment.json montrés dans le bandeau « matériel » : seulement ce
 //              dont le document parle réellement
 //   direct     le document est publié en PDF dès le seed de son parcours (scripts/generate-<parcours>-seed.cjs) : le
@@ -61,4 +61,17 @@ module.exports = [
   { file: "slg-proj-guide", kind: "guide", docLabel: "Guide du projet final", course: "logs", lab: "Projet final · Trier une semaine d’alertes", equipment: ["serveur", "pare-feu", "poste-fixe"], direct: true },
   { file: "slg-proj-grille-triage", kind: "grid", docLabel: "Grille de triage", course: "logs", lab: "Projet final · Trier une semaine d’alertes", direct: true },
   { file: "slg-proj-modele-rapport", kind: "template", docLabel: "Modèle de rapport", course: "logs", lab: "Projet final · Trier une semaine d’alertes", direct: true },
+
+  // Sécurité Web : publiés en PDF dès leur seed (10_securite_web_programme.sql), donc « direct »
+  { file: "swb-tp1-guide", kind: "guide", docLabel: "Guide pas à pas", course: "web", lab: "TP 1 · HTTP, cookies et en-têtes", equipment: ["portable", "serveur"], direct: true },
+  { file: "swb-tp2-guide", kind: "guide", docLabel: "Guide pas à pas", course: "web", lab: "TP 2 · Les injections", equipment: ["serveur", "poste-fixe"], direct: true },
+  { file: "swb-tp3-guide", kind: "guide", docLabel: "Guide pas à pas", course: "web", lab: "TP 3 · XSS, CSP et en-têtes", equipment: ["portable", "smartphone", "serveur"], direct: true },
+  { file: "swb-tp4-guide", kind: "guide", docLabel: "Guide pas à pas", course: "web", lab: "TP 4 · Sessions, jetons et mots de passe", equipment: ["serveur", "smartphone", "cle-securite"], direct: true },
+  { file: "swb-tp4-politique", kind: "brief", docLabel: "Politique à appliquer", course: "web", lab: "TP 4 · Sessions, jetons et mots de passe", direct: true },
+  { file: "swb-tp5-guide", kind: "guide", docLabel: "Guide pas à pas", course: "web", lab: "TP 5 · Contrôle d’accès, API et SSRF", equipment: ["serveur", "pare-feu"], direct: true },
+  { file: "swb-tp6-guide", kind: "guide", docLabel: "Guide pas à pas", course: "web", lab: "TP 6 · Configuration, dépendances et CVSS", equipment: ["serveur", "raspberry-pi"], direct: true },
+  { file: "swb-proj-guide", kind: "guide", docLabel: "Guide du projet final", course: "web", lab: "Projet final · Auditer l’application de réservation", equipment: ["serveur", "pare-feu", "portable"], direct: true },
+  { file: "swb-proj-mission", kind: "brief", docLabel: "Lettre de mission", course: "web", lab: "Projet final · Auditer l’application de réservation", direct: true },
+  { file: "swb-proj-grille", kind: "grid", docLabel: "Grille d’évaluation", course: "web", lab: "Projet final · Auditer l’application de réservation", direct: true },
+  { file: "swb-proj-modele-rapport", kind: "template", docLabel: "Modèle de rapport", course: "web", lab: "Projet final · Auditer l’application de réservation", direct: true },
 ];

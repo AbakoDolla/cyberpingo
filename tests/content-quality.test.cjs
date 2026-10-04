@@ -7,12 +7,11 @@ const assert = require("node:assert/strict");
 const { load } = require("../scripts/ts-loader.cjs");
 const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
 const { contentId } = require("../scripts/generate-content-seed.cjs");
-const { lessonIssues, labIssues, moduleIssues, allowedReferenceUrls, ENFORCED_COURSES, PLAN } = require("../scripts/content-quality.cjs");
+const { lessonIssues, labIssues, moduleIssues, textHygiene, allowedReferenceUrls, ENFORCED_COURSES, PLAN } = require("../scripts/content-quality.cjs");
 const { readLessons, templateLessonIds } = require("../scripts/content-snapshot.cjs");
 
 // Lessons published before the quality gate existed, per course. Remove a title as soon as its lesson passes.
 const KNOWN_DEBT = {
-  "securite-web": ["HTTPS : ce que le cadenas protège vraiment", "Protéger ses comptes avec un gestionnaire et la MFA", "Déjouer un message de phishing"],
   "pentest-intro": ["Autorisation et périmètre d’un audit", "Une méthode de test responsable", "Rédiger une recommandation utile"],
 };
 
@@ -20,6 +19,16 @@ let db;
 before(async () => { db = await createSupabaseDatabase({ seed: true }); });
 after(async () => { await db?.close(); });
 const rows = async (text, params = []) => (await db.query(text, params)).rows;
+
+test("a secret masked on screen and pasted back as asterisks is caught, in prose and in code", () => {
+  assert.equal(textHygiene(["Un jeton ****** n’est pas envoyé"], "x").length, 1);
+  assert.deepEqual(textHygiene(["Un jeton Bearer n’est pas envoyé"], "x"), []);
+  const blocks = [
+    { type: "callout", content: "Objectifs : lire un en-tête Authorization et comprendre pourquoi un jeton ne part pas tout seul, comme un cookie." },
+    { type: "code", content: "Authorization: ******" },
+  ];
+  assert.ok(lessonIssues({ key: "x", title: "x", blocks }).some((issue) => issue.includes("suite d’astérisques")));
+});
 
 test("the lessons of a finished course meet the whole checklist, and the debt of the others only shrinks", async () => {
   const { REFERENCES } = load("supabase/seed/content/path-kit");

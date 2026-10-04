@@ -1,0 +1,9 @@
+methode;route;roles_autorises;proprietaire_requis
+GET;/api/chambres;client|staff|admin;non
+GET;/api/me;client|staff|admin;non
+GET;/api/reservations/{id};client;oui
+GET;/api/factures/{id};client;oui
+GET;/api/staff/arrivees;staff|admin;non
+POST;/api/staff/remises;staff|admin;non
+GET;/api/admin/rapports/journalier;admin;non
+GET;/api/apercu;client|staff|admin;non
