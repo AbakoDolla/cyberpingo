@@ -695,6 +695,157 @@
           ]
         }
       ]
+    },
+    "13a2304d-16e3-55cb-0a26-88939a4a3a9d": {
+      "title": "Monter un laboratoire personnel légal avec peu de moyens",
+      "placements": [
+        {
+          "after": "Un laboratoire personnel n’a pas besoin d’être spectaculaire",
+          "title": "Un ordinateur portable et un Raspberry Pi suffisent pour un premier labo",
+          "devices": [
+            "portable",
+            "raspberry-pi"
+          ]
+        },
+        {
+          "after": "Sur téléphone Android, un terminal comme Termux",
+          "title": "Un smartphone peut servir de terminal léger",
+          "devices": [
+            "smartphone"
+          ]
+        }
+      ]
+    },
+    "b0b98751-5df0-e21b-4e8c-737003c10d9e": {
+      "title": "Lettre de mission, règles d’engagement et gestion des données",
+      "placements": [
+        {
+          "after": "Donnée de mission",
+          "title": "Où ranger les données de mission : un disque chiffré, pas un dossier partagé",
+          "devices": [
+            "disque-externe",
+            "nas"
+          ]
+        }
+      ]
+    },
+    "0225e562-116c-d84c-b86e-09c220ffbbb0": {
+      "title": "Scanner des ports avec Nmap : concepts, options et lecture d’une sortie",
+      "placements": [
+        {
+          "after": "Un scan de ports est une observation active",
+          "title": "Un scan s’adresse à des machines bien réelles : serveur et pare-feu",
+          "devices": [
+            "serveur",
+            "pare-feu"
+          ]
+        }
+      ]
+    },
+    "beaa4028-018e-e199-7bf2-136c6f35c3fa": {
+      "title": "Énumérer les services : bannières, versions et protocoles courants",
+      "placements": [
+        {
+          "after": "Une bannière peut venir directement du service",
+          "title": "Un équipement intermédiaire peut répondre à la place du service",
+          "devices": [
+            "serveur",
+            "routeur",
+            "pare-feu"
+          ]
+        }
+      ]
+    },
+    "923f6fea-bc14-7133-bf02-d16db0bf61f5": {
+      "title": "Impact, bruit et prudence : tester sans casser",
+      "placements": [
+        {
+          "after": "Dans un test d’intrusion défensif, la discrétion signifie",
+          "title": "Ce qu’un test trop bruyant risque de faire tomber : serveur et onduleur",
+          "devices": [
+            "serveur",
+            "onduleur"
+          ]
+        }
+      ]
+    },
+    "44fc36c1-ed95-116d-1263-02a1ff01bfbc": {
+      "title": "Cartographier une application web : proxy d’interception et plan du site",
+      "placements": [
+        {
+          "after": "La première valeur d’un proxy d’interception",
+          "title": "Le navigateur et le serveur que ton proxy met en relation",
+          "devices": [
+            "portable",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "4d44ddf9-81b3-d1d3-6631-4763b9d996f4": {
+      "title": "Auditer une politique de mots de passe et des empreintes",
+      "placements": [
+        {
+          "after": "La référence la plus utile pour ce cours reste NIST SP 800-63B-4",
+          "title": "Une clé de sécurité matérielle, second facteur résistant à l’hameçonnage",
+          "devices": [
+            "cle-securite"
+          ]
+        }
+      ]
+    },
+    "a3218882-f4b2-4d34-1da7-c6e638ada54f": {
+      "title": "Nettoyer, restituer les accès et clôturer la mission",
+      "placements": [
+        {
+          "after": "La fin d’un pentest défensif n’est pas un détail administratif",
+          "title": "Clés USB et disques de test : ce qu’il faut retirer ou détruire avant la clôture",
+          "devices": [
+            "cle-usb",
+            "disque-externe"
+          ]
+        }
+      ]
+    },
+    "3cf8c98e-6b15-4569-0f37-1f89ad4f2efb": {
+      "title": "Tester un réseau interne : segmentation, filtrage et services exposés",
+      "placements": [
+        {
+          "after": "La segmentation sépare par exemple les postes utilisateurs",
+          "title": "Segmenter, c’est séparer postes, serveurs et invités",
+          "devices": [
+            "switch",
+            "pare-feu",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "6ab1e7ee-4e17-61c1-159d-074c813ecc86": {
+      "title": "Auditer le Wi-Fi de son propre réseau",
+      "placements": [
+        {
+          "after": "Dans ce parcours, l’audit Wi-Fi reste strictement défensif",
+          "title": "Le point d’accès Wi-Fi et la box de ton propre réseau",
+          "devices": [
+            "point-acces-wifi",
+            "box-internet"
+          ]
+        }
+      ]
+    },
+    "c371460c-c036-53e8-80d4-a4af8ebb69be": {
+      "title": "Campagnes d’hameçonnage autorisées : cadre, consentement et indicateurs",
+      "placements": [
+        {
+          "after": "L’ingénierie sociale n’est acceptable ici que dans un cadre défensif",
+          "title": "Le smartphone, cible fréquente des campagnes d’hameçonnage",
+          "devices": [
+            "smartphone",
+            "portable"
+          ]
+        }
+      ]
     }
   }
 }

@@ -1,0 +1,124 @@
+Starting Nmap 7.94 ( https://nmap.org ) at 2026-06-08 08:14:37 UTC
+
+Nmap scan report for 198.51.100.18
+Host is down.
+
+Nmap scan report for sahel-vert.example (198.51.100.5)
+Host is up (0.012s latency).
+PORT     STATE     SERVICE      VERSION
+80/tcp   open     http        nginx 1.24.0
+443/tcp  open     ssl/http    nginx 1.24.0
+22/tcp   closed   ssh
+Service Info: Host: sahel-vert.example; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| http-title: Coopérative Sahel-Vert
+| http-server-header: nginx/1.24.0
+| ssl-cert: Subject: commonName=sahel-vert.example
+| ssl-cert: Subject Alternative Name: DNS:sahel-vert.example
+| ssl-cert: Not valid before: 2026-05-20T00:00:00
+| ssl-cert: Not valid after:  2027-05-20T23:59:59
+
+Nmap scan report for www.sahel-vert.example (198.51.100.10)
+Host is up (0.018s latency).
+PORT     STATE     SERVICE      VERSION
+22/tcp   open     ssh         OpenSSH 9.7p1 Ubuntu 24.04
+80/tcp   open     http        nginx 1.24.0
+443/tcp  open     ssl/http    nginx 1.24.0
+8080/tcp open     http-proxy  Jetty 12.0.9
+Service Info: Host: www.sahel-vert.example; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| http-title: Vitrine Sahel-Vert
+| http-server-header: nginx/1.24.0
+| ssl-cert: Subject: commonName=www.sahel-vert.example
+| ssl-cert: Subject Alternative Name: DNS:www.sahel-vert.example
+| ssl-cert: Not valid before: 2026-05-18T00:00:00
+| ssl-cert: Not valid after:  2027-05-18T23:59:59
+
+Nmap scan report for vpn.sahel-vert.example (198.51.100.22)
+Host is up (0.024s latency).
+PORT     STATE     SERVICE      VERSION
+443/tcp  open     ssl/http    OpenResty 1.25.3.1
+8443/tcp open     ssl/http    Jetty 10.0.20
+22/tcp   filtered ssh
+Service Info: Host: vpn.sahel-vert.example; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| http-title: Portail VPN Sahel-Vert
+| http-server-header: openresty/1.25.3.1
+| banner: Ancienne page d’accueil Ubuntu conservée pendant une maintenance
+| ssl-cert: Subject: commonName=vpn.sahel-vert.example
+| ssl-cert: Subject Alternative Name: DNS:vpn.sahel-vert.example
+| ssl-cert: Not valid before: 2026-05-25T00:00:00
+
+Nmap scan report for mail.sahel-vert.example (198.51.100.30)
+Host is up (0.021s latency).
+PORT     STATE     SERVICE      VERSION
+25/tcp   open     smtp        Postfix smtpd 3.8.6
+110/tcp  closed   pop3
+143/tcp  open     imap        Dovecot imapd 2.3.21
+587/tcp  filtered submission
+993/tcp  open     ssl/imap    Dovecot imapd 2.3.21
+Service Info: Host: mail.sahel-vert.example; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| smtp-commands: sahel-vert.example, PIPELINING, SIZE 52428800, VRFY, ETRN, STARTTLS
+| ssl-cert: Subject: commonName=mail.sahel-vert.example
+| ssl-cert: Subject Alternative Name: DNS:mail.sahel-vert.example
+| imap-capabilities: IMAP4rev1 SASL-IR AUTH=PLAIN IDLE MOVE
+| banner: Hôte de messagerie Coopérative Sahel-Vert
+| tls-nextproto: mail only
+
+Nmap scan report for portail.sahel-vert.example (198.51.100.44)
+Host is up (0.017s latency).
+PORT     STATE     SERVICE      VERSION
+443/tcp  open     ssl/http    nginx 1.24.0
+22/tcp   closed   ssh
+8443/tcp filtered ssl/http
+Service Info: Host: portail.sahel-vert.example; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| http-title: Espace adhérents
+| http-server-header: nginx/1.24.0
+| ssl-cert: Subject: commonName=portail.sahel-vert.example
+| ssl-cert: Subject Alternative Name: DNS:portail.sahel-vert.example
+| ssl-cert: Not valid before: 2026-05-22T00:00:00
+| ssl-cert: Not valid after:  2027-05-22T23:59:59
+
+Nmap scan report for paie.sahel-vert.example (203.0.113.60)
+Host is up (0.026s latency).
+PORT     STATE     SERVICE      VERSION
+443/tcp  open     ssl/http    Apache httpd 2.4.58
+22/tcp   filtered ssh
+3389/tcp filtered ms-wbt-server
+8443/tcp closed   ssl/http
+Service Info: Host: paie.sahel-vert.example; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| http-title: Portail paie
+| http-server-header: Apache/2.4.58 (Unix)
+| ssl-cert: Subject: commonName=paie.sahel-vert.example
+| ssl-cert: Subject Alternative Name: DNS:paie.sahel-vert.example
+| ssl-cert: Not valid before: 2026-05-21T00:00:00
+| ssl-cert: Not valid after:  2027-05-21T23:59:59
+| banner: Aucun bureau distant public attendu
+
+Nmap scan report for stock.sahel-vert.example (203.0.113.75)
+Host is up (0.030s latency).
+PORT     STATE     SERVICE      VERSION
+80/tcp   open     http        nginx 1.22.1
+5432/tcp open     postgresql  PostgreSQL DB 15.6
+22/tcp   filtered ssh
+Service Info: Host: stock.sahel-vert.example; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+Host script results:
+| clock-skew: 0s
+| http-title: Gestion de stock
+| http-server-header: nginx/1.22.1
+| pgsql-info: PostgreSQL 15.6
+| pgsql-info: Base visible depuis l’adresse publique de l’hôte
+| banner: Accès public limité au frontal web attendu
+| ssl-cert: absent
+
+Nmap scan report for 203.0.113.77
+Host is down.
+
+Nmap scan report for 198.51.100.250
+Host is down.
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 10 IP addresses (7 hosts up) scanned in 268.40 seconds

@@ -1,0 +1,73 @@
+% WHOIS/RDAP-like text export rendered as plain text for training
+Domain Name: SAHEL-VERT.EXAMPLE
+Object Class Name: domain
+Registry Domain ID: D2026-OSINT-SAHEL-VERT
+Registrar WHOIS Server: whois.savanna-names.example
+Registrar URL: https://savanna-names.example/registry
+Updated Date: 2026-06-03T08:10:00Z
+Creation Date: 2024-02-17T10:22:00Z
+Registry Expiry Date: 2027-02-17T10:22:00Z
+Registrar: Savanna Names Registry
+Registrar IANA ID: 42424
+Registrar Abuse Contact Email: abuse@savanna-names.example
+Registrar Abuse Contact Phone: REDACTED
+Registrant Organization: Coopérative Sahel-Vert
+Registrant Street: REDACTED
+Registrant City: REDACTED
+Registrant Country: BF
+Registrant Email: contact@sahel-vert.example
+Registrant Phone: REDACTED
+Admin Name: Ibrahim Sanou
+Admin Organization: Coopérative Sahel-Vert
+Admin Email: contact@sahel-vert.example
+Tech Name: Mariam Diallo
+Tech Organization: Cabinet Harmattan
+Tech Email: mission@harmattan.example
+Tech Phone: REDACTED
+Name Server: ns1.sahel-vert.example
+Name Server: ns2.sahel-vert.example
+Name Server: ns3.sahel-vert.example
+DNSSEC: unsigned
+Status: active
+Remarks: This training export is fictional and safe to share.
+Object: org-sv-001
+Object Class Name: entity
+Handle: ORG-SAHEL-VERT-EXAMPLE
+Role: registrant
+Entity Name: Coopérative Sahel-Vert
+Entity Email: contact@sahel-vert.example
+Entity Address: REDACTED
+Entity Country: BF
+Entity Remark: Agricultural cooperative of the fictional world
+Object: registrar-42424
+Object Class Name: entity
+Handle: REG-SAVANNA-42424
+Role: registrar of record
+Entity Name: Savanna Names Registry
+Entity Email: registry@savanna-names.example
+Entity Country: BF
+Entity Remark: Registrar and not the client
+Network Name: SV-PUBLIC-BLOCK
+Object Class Name: ip network
+CIDR: 198.51.100.0/24
+Start Address: 198.51.100.0
+End Address: 198.51.100.255
+Type: ALLOCATED PORTABLE
+Parent Handle: UPSTREAM-198-51-100
+Country: BF
+Org Name: Coopérative Sahel-Vert
+NetName: SAHEL-VERT-PUBLIC
+Comment: Public services published by the cooperative
+Comment: Training data only
+Event: registration 2024-02-17T10:22:00Z
+Event: last changed 2026-06-03T08:10:00Z
+Event: nameserver check 2026-06-04T07:00:00Z
+Abuse Email: abuse@savanna-names.example
+Abuse Mailbox Status: monitored
+RDAP Conformance: rdap_level_0
+Link: https://rdap.savanna-names.example/domain/sahel-vert.example
+Link: https://rdap.savanna-names.example/ip/198.51.100.0/24
+Notice: Personal data is redacted in this fictional export.
+Notice: Reproduction outside the lab is not needed.
+Notice: Use only for passive inventory in the mission window.
+Footer: end of fictional export

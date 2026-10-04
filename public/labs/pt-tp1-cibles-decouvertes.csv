@@ -1,0 +1,31 @@
+id,cible,type,source,ip_observee,justification,doute
+T01,sahel-vert.example,site_vitrine,registre-dns,198.51.100.10,apex public annonce par le client,no
+T02,www.sahel-vert.example,site_vitrine,registre-dns,198.51.100.10,alias public du site vitrine,no
+T03,portail.sahel-vert.example,application_auth,registre-dns,198.51.100.21,portail adhérents explicitement confié,no
+T04,mail.sahel-vert.example,messagerie,registre-dns,198.51.100.25,webmail cité dans la lettre,no
+T05,vpn.sahel-vert.example,vpn,registre-dns,198.51.100.30,passerelle VPN du client,no
+T06,paie.sahel-vert.example,application_auth,registre-dns,198.51.100.41,application paie explicitement citée,no
+T07,stock.sahel-vert.example,application_auth,registre-dns,198.51.100.42,gestion de stock confiée au test,no
+T08,198.51.100.0/28,plage_publique,inventaire-yao,198.51.100.0/28,petite DMZ publique confirmée,no
+T09,198.51.100.21,hote_public,inventaire-yao,198.51.100.21,hôte du portail relevé par Yao,no
+T10,198.51.100.42,hote_public,inventaire-yao,198.51.100.42,hôte du stock relevé par Yao,no
+T11,198.51.100.48/29,plage_publique,inventaire-yao,198.51.100.48/29,segment public à faible volumétrie,no
+T12,api.sahel-vert.example,api,journal-ct,198.51.100.60,sous-domaine non cité dans la lettre,yes
+T13,cdn-partenaire.example,proxy,en-tete-http,203.0.113.60,nom tiers hors de la liste du client,no
+T14,stock.sahel-vert.example,application_auth,tableur-client,198.51.101.44,nom correct mais bloc voisin non autorisé,no
+T15,sahelvert.example,site_vitrine,note-ancienne,198.51.100.200,faute de frappe sans tiret,no
+T16,rh-externe.example,tiers_rh,mail-client,203.0.113.88,prestataire RH hors mission,no
+T17,fournisseur-sahel.example,partenaire,whois,203.0.113.77,portail partenaire non confié,no
+T18,203.0.113.0/24,plage_tierce,inventaire-yao,203.0.113.0/24,bloc tiers réservé à la messagerie gérée,no
+T19,172.31.20.0/24,reseau_interne,inventaire-client,172.31.20.0/24,réseau interne explicitement exclu,no
+T20,10.50.8.0/24,reseau_interne,inventaire-client,10.50.8.0/24,segment paie interne exclu,no
+T21,mailsahel-vert.example,site_vitrine,tableur-client,198.51.100.125,nom incohérent sans point,no
+T22,198.51.99.44,hote_public,inventaire-yao,198.51.99.44,bloc voisin non cité,no
+T23,paie-rh.example,tiers_rh,whois,203.0.113.91,prestataire tiers distinct du client,no
+T24,203.0.113.54,hote_tiers,note-yao,203.0.113.54,hébergement tiers hors mission,no
+T25,10.50.99.10,hote_interne,note-yao,10.50.99.10,hôte interne du client hors test externe,no
+T26,extranet-harmattan.example,prestataire,mail-client,198.51.100.170,outil du prestataire pas cible du client,no
+T27,paie-support.example,tiers_support,whois,203.0.113.41,support externe non signé,no
+T28,198.51.101.0/28,plage_publique,inventaire-yao,198.51.101.0/28,plage voisine hors du bloc autorisé,no
+T29,partenaire-coop.example,partenaire,mail-client,203.0.113.142,partenaire commercial hors signature,no
+T30,old-sahel-vert.net,site_archive,archive-web,203.0.113.151,ancien domaine non confié,no

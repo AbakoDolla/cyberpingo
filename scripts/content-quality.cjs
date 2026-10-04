@@ -171,7 +171,7 @@ function allowedReferenceUrls(references) {
 }
 
 /** Courses whose lessons must all meet the checklist: they are the ones declared finished. */
-const ENFORCED_COURSES = ["reseaux", "fondamentaux", "linux", "analyse-logs", "securite-web"];
+const ENFORCED_COURSES = ["reseaux", "fondamentaux", "linux", "analyse-logs", "securite-web", "pentest-intro"];
 
 /** The programme planned for each course in the specification of the six paths (modules and indicative hours). */
 const PLAN = {

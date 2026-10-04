@@ -627,6 +627,41 @@
       "serveur",
       "pare-feu",
       "portable"
+    ],
+    "tp-pt-cadrage": [
+      "portable",
+      "serveur",
+      "pare-feu"
+    ],
+    "tp-pt-osint": [
+      "portable",
+      "serveur"
+    ],
+    "tp-pt-nmap": [
+      "serveur",
+      "pare-feu",
+      "routeur"
+    ],
+    "tp-pt-vulns": [
+      "serveur",
+      "nas",
+      "pare-feu"
+    ],
+    "tp-pt-web": [
+      "portable",
+      "serveur",
+      "smartphone"
+    ],
+    "tp-pt-mission": [
+      "portable",
+      "serveur",
+      "poste-fixe"
+    ],
+    "projet-pt-rapport": [
+      "portable",
+      "serveur",
+      "pare-feu",
+      "routeur"
     ]
   }
 }

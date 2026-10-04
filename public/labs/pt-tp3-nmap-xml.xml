@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun SYSTEM "https://svn.nmap.org/nmap/docs/nmap.dtd">
+<nmaprun scanner="nmap" args="nmap -Pn -sS -sV -p 22,25,80,110,143,443,587,993,3389,5432,8080,8443 -oX pt-tp3-nmap-xml.xml 198.51.100.0/24 203.0.113.0/24" start="1780906477" startstr="Mon Jun 08 08:14:37 2026" version="7.94" xmloutputversion="1.05">
+  <scaninfo type="syn" protocol="tcp" numservices="12" services="22,25,80,110,143,443,587,993,3389,5432,8080,8443"/>
+  <verbose level="0"/>
+  <debugging level="0"/>
+  <host>
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="198.51.100.18" addrtype="ipv4"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="198.51.100.5" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+    <port protocol="tcp" portid="80">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" product="nginx" version="1.24.0" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="22">
+      <state state="closed" reason="reset" reason_ttl="0"/>
+      <service name="ssh" method="probed" conf="10"/>
+    </port>
+    </ports>
+    <hostscript>
+      <script id="note-1" output="http-title: Coopérative Sahel-Vert"/>
+      <script id="note-2" output="http-server-header: nginx/1.24.0"/>
+      <script id="note-3" output="ssl-cert: Subject: commonName=sahel-vert.example"/>
+      <script id="note-4" output="ssl-cert: Subject Alternative Name: DNS:sahel-vert.example"/>
+      <script id="note-5" output="ssl-cert: Not valid before: 2026-05-20T00:00:00"/>
+      <script id="note-6" output="ssl-cert: Not valid after:  2027-05-20T23:59:59"/>
+    </hostscript>
+    <times srtt="12000" rttvar="1200" to="100000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="198.51.100.10" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="www.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+    <port protocol="tcp" portid="22">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="ssh" product="OpenSSH" version="9.7p1" extrainfo="Ubuntu 24.04" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="80">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" product="nginx" version="1.24.0" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="8080">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http-proxy" product="Jetty" version="12.0.9" method="probed" conf="10"/>
+    </port>
+    </ports>
+    <hostscript>
+      <script id="note-1" output="http-title: Vitrine Sahel-Vert"/>
+      <script id="note-2" output="http-server-header: nginx/1.24.0"/>
+      <script id="note-3" output="ssl-cert: Subject: commonName=www.sahel-vert.example"/>
+      <script id="note-4" output="ssl-cert: Subject Alternative Name: DNS:www.sahel-vert.example"/>
+      <script id="note-5" output="ssl-cert: Not valid before: 2026-05-18T00:00:00"/>
+      <script id="note-6" output="ssl-cert: Not valid after:  2027-05-18T23:59:59"/>
+    </hostscript>
+    <times srtt="18000" rttvar="1200" to="100000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="198.51.100.22" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="vpn.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" product="OpenResty" version="1.25.3.1" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="8443">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" product="Jetty" version="10.0.20" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="22">
+      <state state="filtered" reason="no-response" reason_ttl="0"/>
+      <service name="ssh" method="probed" conf="10"/>
+    </port>
+    </ports>
+    <hostscript>
+      <script id="note-1" output="http-title: Portail VPN Sahel-Vert"/>
+      <script id="note-2" output="http-server-header: openresty/1.25.3.1"/>
+      <script id="note-3" output="banner: Ancienne page d’accueil Ubuntu conservée pendant une maintenance"/>
+      <script id="note-4" output="ssl-cert: Subject: commonName=vpn.sahel-vert.example"/>
+      <script id="note-5" output="ssl-cert: Subject Alternative Name: DNS:vpn.sahel-vert.example"/>
+      <script id="note-6" output="ssl-cert: Not valid before: 2026-05-25T00:00:00"/>
+    </hostscript>
+    <times srtt="24000" rttvar="1200" to="100000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="198.51.100.30" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="mail.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+    <port protocol="tcp" portid="25">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="smtp" product="Postfix smtpd" version="3.8.6" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="110">
+      <state state="closed" reason="reset" reason_ttl="0"/>
+      <service name="pop3" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="143">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="imap" product="Dovecot imapd" version="2.3.21" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="587">
+      <state state="filtered" reason="no-response" reason_ttl="0"/>
+      <service name="submission" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="993">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="imap" tunnel="ssl" product="Dovecot imapd" version="2.3.21" method="probed" conf="10"/>
+    </port>
+    </ports>
+    <hostscript>
+      <script id="note-1" output="smtp-commands: sahel-vert.example, PIPELINING, SIZE 52428800, VRFY, ETRN, STARTTLS"/>
+      <script id="note-2" output="ssl-cert: Subject: commonName=mail.sahel-vert.example"/>
+      <script id="note-3" output="ssl-cert: Subject Alternative Name: DNS:mail.sahel-vert.example"/>
+      <script id="note-4" output="imap-capabilities: IMAP4rev1 SASL-IR AUTH=PLAIN IDLE MOVE"/>
+      <script id="note-5" output="banner: Hôte de messagerie Coopérative Sahel-Vert"/>
+      <script id="note-6" output="tls-nextproto: mail only"/>
+    </hostscript>
+    <times srtt="21000" rttvar="1200" to="100000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="198.51.100.44" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="portail.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" product="nginx" version="1.24.0" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="22">
+      <state state="closed" reason="reset" reason_ttl="0"/>
+      <service name="ssh" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="8443">
+      <state state="filtered" reason="no-response" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" method="probed" conf="10"/>
+    </port>
+    </ports>
+    <hostscript>
+      <script id="note-1" output="http-title: Espace adhérents"/>
+      <script id="note-2" output="http-server-header: nginx/1.24.0"/>
+      <script id="note-3" output="ssl-cert: Subject: commonName=portail.sahel-vert.example"/>
+      <script id="note-4" output="ssl-cert: Subject Alternative Name: DNS:portail.sahel-vert.example"/>
+      <script id="note-5" output="ssl-cert: Not valid before: 2026-05-22T00:00:00"/>
+      <script id="note-6" output="ssl-cert: Not valid after:  2027-05-22T23:59:59"/>
+    </hostscript>
+    <times srtt="17000" rttvar="1200" to="100000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.60" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="paie.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" product="Apache httpd" version="2.4.58" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="22">
+      <state state="filtered" reason="no-response" reason_ttl="0"/>
+      <service name="ssh" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="3389">
+      <state state="filtered" reason="no-response" reason_ttl="0"/>
+      <service name="ms-wbt-server" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="8443">
+      <state state="closed" reason="reset" reason_ttl="0"/>
+      <service name="http" tunnel="ssl" method="probed" conf="10"/>
+    </port>
+    </ports>
+    <hostscript>
+      <script id="note-1" output="http-title: Portail paie"/>
+      <script id="note-2" output="http-server-header: Apache/2.4.58 (Unix)"/>
+      <script id="note-3" output="ssl-cert: Subject: commonName=paie.sahel-vert.example"/>
+      <script id="note-4" output="ssl-cert: Subject Alternative Name: DNS:paie.sahel-vert.example"/>
+      <script id="note-5" output="ssl-cert: Not valid before: 2026-05-21T00:00:00"/>
+      <script id="note-6" output="ssl-cert: Not valid after:  2027-05-21T23:59:59"/>
+      <script id="note-7" output="banner: Aucun bureau distant public attendu"/>
+    </hostscript>
+    <times srtt="26000" rttvar="1200" to="100000"/>
+  </host>
+  <host>
+    <status state="up" reason="syn-ack" reason_ttl="0"/>
+    <address addr="203.0.113.75" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="stock.sahel-vert.example" type="user"/>
+    </hostnames>
+    <ports>
+    <port protocol="tcp" portid="80">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="http" product="nginx" version="1.22.1" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="5432">
+      <state state="open" reason="syn-ack" reason_ttl="0"/>
+      <service name="postgresql" product="PostgreSQL DB" version="15.6" method="probed" conf="10"/>
+    </port>
+    <port protocol="tcp" portid="22">
+      <state state="filtered" reason="no-response" reason_ttl="0"/>
+      <service name="ssh" method="probed" conf="10"/>
+    </port>
+    </ports>
+    <hostscript>
+      <script id="note-1" output="clock-skew: 0s"/>
+      <script id="note-2" output="http-title: Gestion de stock"/>
+      <script id="note-3" output="http-server-header: nginx/1.22.1"/>
+      <script id="note-4" output="pgsql-info: PostgreSQL 15.6"/>
+      <script id="note-5" output="pgsql-info: Base visible depuis l’adresse publique de l’hôte"/>
+      <script id="note-6" output="banner: Accès public limité au frontal web attendu"/>
+      <script id="note-7" output="ssl-cert: absent"/>
+    </hostscript>
+    <times srtt="30000" rttvar="1200" to="100000"/>
+  </host>
+  <host>
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="203.0.113.77" addrtype="ipv4"/>
+  </host>
+  <host>
+    <status state="down" reason="no-response" reason_ttl="0"/>
+    <address addr="198.51.100.250" addrtype="ipv4"/>
+  </host>
+  <runstats>
+    <finished time="1780906745" timestr="Mon Jun 08 08:19:05 2026" elapsed="268.40" summary="Nmap done at 2026-06-08 08:19:05 UTC; 10 IP addresses (7 hosts up) scanned in 268.40 seconds" exit="success"/>
+    <hosts up="7" down="3" total="10"/>
+  </runstats>
+</nmaprun>

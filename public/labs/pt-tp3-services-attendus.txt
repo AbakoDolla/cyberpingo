@@ -1,0 +1,46 @@
+Mémo interne : services attendus sur les hôtes publics Sahel-Vert
+Source : cabinet Harmattan, préparation de la revue du 8 juin 2026.
+Usage : comparer les résultats d’un scan déjà réalisé avec la surface publiée attendue.
+Rappel : ce document décrit la politique voulue, pas ce que montre le scan.
+
+Format des lignes de référence :
+hote | publics=liste | internes=liste | note=justification
+
+Catalogue des hôtes :
+sahel-vert.example | publics=80/http, 443/https | internes=aucun | note=Accueil public institutionnel.
+www.sahel-vert.example | publics=22/ssh, 80/http, 443/https, 8080/http-alt | internes=aucun | note=Site vitrine avec console technique assumée pendant la migration de juin.
+vpn.sahel-vert.example | publics=443/https | internes=aucun | note=Une seule interface publique doit rester visible ; tout autre port repéré doit être traité comme inattendu.
+mail.sahel-vert.example | publics=25/smtp, 143/imap, 993/imap-tls-implicite | internes=aucun | note=La relève POP3 historique n’est plus publiée.
+portail.sahel-vert.example | publics=443/https | internes=aucun | note=Portail adhérents exposé uniquement en HTTPS.
+paie.sahel-vert.example | publics=443/https | internes=22/ssh, 3389/rdp | note=Administration interne uniquement ; aucun accès distant public hors HTTPS.
+stock.sahel-vert.example | publics=80/http | internes=5432/postgresql | note=Le frontal web est public ; la base PostgreSQL doit rester strictement interne.
+
+Règles de lecture pour ce TP :
+- Un port « public attendu » peut apparaître open sans alerte supplémentaire.
+- Un port listé dans « internes » ne doit pas apparaître open sur une adresse publique.
+- Si un port n’est ni dans « publics » ni dans « internes », traite-le comme inattendu et vérifie la note avant de conclure.
+- Les hôtes marqués down dans le scan ne comptent pas comme actifs.
+- Une ligne du scan compte une fois par couple hôte:port.
+
+Repères utiles pour les questions :
+- Ports web à regrouper ensemble dans ce dossier : 80, 443, 8443.
+- Ports d’administration ou de données à regrouper ensemble dans ce dossier : 22, 3306, 5432.
+- Le port 993 correspond à l’IMAP avec chiffrement implicite.
+- Un port silencieux derrière un filtrage n’est ni open ni closed.
+
+Notes d’exploitation :
+- La ligne vpn rappelle qu’une interface de secours sur 8443 doit rester non publiée.
+- La ligne mail confirme que 25, 143 et 993 sont attendus ensemble.
+- La ligne stock sépare le frontal HTTP public de la base PostgreSQL interne.
+- La ligne paie interdit toute administration distante publique hors HTTPS.
+- La ligne www tolère un port 8080 lié à la migration en cours.
+- Le site institutionnel simple n’expose pas de service d’administration.
+- Une absence dans « publics » ne suffit pas seule : relis aussi la note de la ligne concernée.
+- Les exports Nmap ne prouvent qu’une surface observée à l’instant du scan du 8 juin 2026.
+- Les mentions « interne uniquement » priment sur les habitudes supposées du lecteur.
+- Le fichier greppable conserve l’ordre des hôtes et sépare ses champs par tabulations.
+- Le XML porte explicitement l’état, le service, le produit et les versions détectées.
+- Une bannière parlant d’Ubuntu peut venir d’un script ou d’une page d’accueil, pas du service ciblé.
+- Un port fermé n’est pas actif, même s’il répond négativement à la sonde.
+
+Fin du mémo.

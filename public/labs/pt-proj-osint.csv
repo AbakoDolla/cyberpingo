@@ -1,0 +1,73 @@
+ligne;fqdn;source;dns_statut;technologie;observation
+O01;www.sahel-vert.example;dns_zone;actif;nginx;A public vu dans la zone publique.
+O02;www.sahel-vert.example;archive_page;actif;nginx;Bannière Server reprise dans une page archivée.
+O03;www.sahel-vert.example;capture_entete;actif;nginx;En-tête Server observé sur la page d’accueil.
+O04;www.sahel-vert.example;robots_txt;actif;nginx;Fichier robots encore servi par le frontal public.
+O05;www.sahel-vert.example;guide_api;actif;nginx;Exemple d’URL publique documenté dans une note interne.
+O06;www.sahel-vert.example;ct_log;actif;nginx;Certificat public du frontal web.
+O07;portail.sahel-vert.example;dns_zone;actif;laravel;Portail listé dans la zone publique.
+O08;portail.sahel-vert.example;ct_log;actif;laravel;Certificat public réémis pour le portail.
+O09;portail.sahel-vert.example;archive_page;actif;vuejs;Archive d’un tableau de bord rendu côté client.
+O10;portail.sahel-vert.example;capture_entete;actif;vuejs;Chargement du bundle principal côté navigateur.
+O11;portail.sahel-vert.example;guide_api;actif;laravel;Documentation de l’API partenaire.
+O12;vpn.sahel-vert.example;dns_zone;actif;openvpn;Nom VPN listé dans la zone publique.
+O13;vpn.sahel-vert.example;ct_log;actif;openvpn;Certificat dédié au portail VPN.
+O14;mail.sahel-vert.example;dns_zone;actif;postfix;MX public principal.
+O15;mail.sahel-vert.example;ct_log;actif;dovecot;Certificat de messagerie avec SAN IMAPS.
+O16;stock.sahel-vert.example;dns_zone;actif;nginx;Entrée publique pour l’extranet logistique.
+O17;stock.sahel-vert.example;capture_entete;actif;nginx;En-tête Server observé sur l’extranet.
+O18;stock.sahel-vert.example;annonce_recrutement;actif;nextcloud;Référence à un extranet documenté dans une fiche de poste.
+O19;extranet.sahel-vert.example;ct_log;absent;apache;Ancien certificat encore visible dans les journaux CT.
+O20;extranet.sahel-vert.example;archive_page;absent;apache;Page historique archivée en 2025.
+O21;extranet.sahel-vert.example;ticket_support;absent;apache;Nom cité dans un ticket de migration fermé.
+O22;docs.sahel-vert.example;archive_page;absent;mkdocs;Documentation retirée de la production.
+O23;mobile.sahel-vert.example;annonce_recrutement;absent;flutter;Ancienne piste mobile non active.
+O24;vpn.sahel-vert.example;ct_log;actif;mkdocs;Recoupement passif issu de ct log.
+O25;mobile.sahel-vert.example;ticket_support;absent;laravel;Recoupement passif issu de ticket support.
+O26;mobile.sahel-vert.example;ticket_support;absent;nginx;Recoupement passif issu de ticket support.
+O27;www.sahel-vert.example;capture_entete;actif;mkdocs;Recoupement passif issu de capture entête.
+O28;vpn.sahel-vert.example;dns_zone;actif;nginx;Recoupement passif issu de dns zone.
+O29;docs.sahel-vert.example;annonce_recrutement;absent;mkdocs;Recoupement passif issu de annonce recrutement.
+O30;api.sahel-vert.example;annonce_recrutement;actif;postfix;Recoupement passif issu de annonce recrutement.
+O31;www.sahel-vert.example;ct_log;actif;mkdocs;Recoupement passif issu de ct log.
+O32;stock.sahel-vert.example;guide_api;actif;apache;Recoupement passif issu de guide api.
+O33;api.sahel-vert.example;dns_zone;actif;dovecot;Recoupement passif issu de dns zone.
+O34;stock.sahel-vert.example;capture_entete;actif;mkdocs;Recoupement passif issu de capture entête.
+O35;api.sahel-vert.example;ct_log;actif;dovecot;Recoupement passif issu de ct log.
+O36;vpn.sahel-vert.example;dns_zone;actif;nextcloud;Recoupement passif issu de dns zone.
+O37;www.sahel-vert.example;ct_log;actif;laravel;Recoupement passif issu de ct log.
+O38;mobile.sahel-vert.example;ticket_support;absent;nextcloud;Recoupement passif issu de ticket support.
+O39;docs.sahel-vert.example;ct_log;absent;nextcloud;Recoupement passif issu de ct log.
+O40;stock.sahel-vert.example;guide_api;actif;nextcloud;Recoupement passif issu de guide api.
+O41;stock.sahel-vert.example;annonce_recrutement;actif;dovecot;Recoupement passif issu de annonce recrutement.
+O42;docs.sahel-vert.example;ticket_support;absent;postfix;Recoupement passif issu de ticket support.
+O43;stock.sahel-vert.example;dns_zone;actif;dovecot;Recoupement passif issu de dns zone.
+O44;portail.sahel-vert.example;ct_log;actif;dovecot;Recoupement passif issu de ct log.
+O45;vpn.sahel-vert.example;annonce_recrutement;actif;nextcloud;Recoupement passif issu de annonce recrutement.
+O46;www.sahel-vert.example;dns_zone;actif;vuejs;Recoupement passif issu de dns zone.
+O47;mobile.sahel-vert.example;dns_zone;absent;nginx;Recoupement passif issu de dns zone.
+O48;docs.sahel-vert.example;guide_api;absent;mkdocs;Recoupement passif issu de guide api.
+O49;docs.sahel-vert.example;dns_zone;absent;vuejs;Recoupement passif issu de dns zone.
+O50;portail.sahel-vert.example;ct_log;actif;postfix;Recoupement passif issu de ct log.
+O51;portail.sahel-vert.example;guide_api;actif;apache;Recoupement passif issu de guide api.
+O52;stock.sahel-vert.example;ct_log;actif;vuejs;Recoupement passif issu de ct log.
+O53;api.sahel-vert.example;ticket_support;actif;laravel;Recoupement passif issu de ticket support.
+O54;vpn.sahel-vert.example;guide_api;actif;laravel;Recoupement passif issu de guide api.
+O55;mobile.sahel-vert.example;dns_zone;absent;vuejs;Recoupement passif issu de dns zone.
+O56;mobile.sahel-vert.example;ct_log;absent;laravel;Recoupement passif issu de ct log.
+O57;portail.sahel-vert.example;annonce_recrutement;actif;laravel;Recoupement passif issu de annonce recrutement.
+O58;docs.sahel-vert.example;annonce_recrutement;absent;nextcloud;Recoupement passif issu de annonce recrutement.
+O59;mail.sahel-vert.example;ticket_support;actif;apache;Recoupement passif issu de ticket support.
+O60;mail.sahel-vert.example;guide_api;actif;laravel;Recoupement passif issu de guide api.
+O61;api.sahel-vert.example;annonce_recrutement;actif;nextcloud;Recoupement passif issu de annonce recrutement.
+O62;api.sahel-vert.example;annonce_recrutement;actif;postfix;Recoupement passif issu de annonce recrutement.
+O63;mail.sahel-vert.example;capture_entete;actif;nginx;Recoupement passif issu de capture entête.
+O64;vpn.sahel-vert.example;archive_page;actif;vuejs;Recoupement passif issu de archive page.
+O65;vpn.sahel-vert.example;ct_log;actif;postfix;Recoupement passif issu de ct log.
+O66;stock.sahel-vert.example;dns_zone;actif;apache;Recoupement passif issu de dns zone.
+O67;mail.sahel-vert.example;dns_zone;actif;mkdocs;Recoupement passif issu de dns zone.
+O68;portail.sahel-vert.example;archive_page;actif;dovecot;Recoupement passif issu de archive page.
+O69;mail.sahel-vert.example;ct_log;actif;apache;Recoupement passif issu de ct log.
+O70;portail.sahel-vert.example;ticket_support;actif;laravel;Recoupement passif issu de ticket support.
+O71;vpn.sahel-vert.example;guide_api;actif;mkdocs;Recoupement passif issu de guide api.
+O72;docs.sahel-vert.example;capture_entete;absent;vuejs;Recoupement passif issu de capture entête.

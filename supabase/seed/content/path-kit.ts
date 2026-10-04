@@ -719,6 +719,24 @@ export const REFERENCES = {
   fips1804: { title: "NIST : le standard de hachage sécurisé FIPS 180-4", url: "https://csrc.nist.gov/pubs/fips/180-4/upd1/final", lang: "en" },
   githubSecretScanning: { title: "GitHub : la détection de secrets dans le code", url: "https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning", lang: "en" },
   gophishRepo: { title: "Gophish : le dépôt du projet de simulation d’hameçonnage", url: "https://github.com/gophish/gophish", lang: "en" },
+  // Pentest (compléments issus des vérifications des leçons).
+  ianaDnsParameters: { title: "IANA : les paramètres DNS et les types d’enregistrements", url: "https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml", lang: "en" },
+  rfc3912: { title: "RFC 3912 : le protocole WHOIS", url: "https://www.rfc-editor.org/rfc/rfc3912.txt", lang: "en" },
+  rfc7480: { title: "RFC 7480 : l’usage de HTTP dans RDAP", url: "https://www.rfc-editor.org/rfc/rfc7480.txt", lang: "en" },
+  rfc7481: { title: "RFC 7481 : les services de sécurité de RDAP", url: "https://www.rfc-editor.org/rfc/rfc7481.txt", lang: "en" },
+  rfc7484: { title: "RFC 7484 : trouver le service RDAP qui fait autorité", url: "https://www.rfc-editor.org/rfc/rfc7484.txt", lang: "en" },
+  nmapTimingTemplates: { title: "Nmap : les profils de vitesse (-T0 à -T5)", url: "https://nmap.org/book/performance-timing-templates.html", lang: "en" },
+  nseCategories: { title: "Nmap : les catégories de scripts NSE", url: "https://nmap.org/nsedoc/categories/", lang: "en" },
+  nmapExamples: { title: "Nmap : des exemples d’utilisation du guide de référence", url: "https://nmap.org/book/man-examples.html", lang: "en" },
+  cwe209: { title: "CWE-209 : message d’erreur qui contient des informations sensibles", url: "https://cwe.mitre.org/data/definitions/209.html", lang: "en" },
+  owaspApi1Bola2023: { title: "OWASP API Security 2023 : API1, autorisation défaillante au niveau de l’objet (BOLA)", url: "https://api-security.owasp.org/editions/2023/en/0xa1-broken-object-level-authorization/", lang: "en" },
+  firstEpssFaq: { title: "FIRST : la foire aux questions d’EPSS (score et percentile)", url: "https://www.first.org/epss/faq.html", lang: "en" },
+  msWindowsWifiSecurity: { title: "Microsoft : la sécurité des connexions Wi-Fi dans Windows (WPA3, WPA2)", url: "https://learn.microsoft.com/en-us/windows/security/book/operating-system-security-network-security", lang: "en" },
+  msWirelessSetupWps: { title: "Microsoft : configurer un réseau sans fil (WPS et choix du chiffrement)", url: "https://support.microsoft.com/en-us/windows/experience/connectivity-networking/setting-up-a-wireless-network-in-windows", lang: "en" },
+  cisaHomeNetworkSecurity: { title: "CISA : la sécurité d’un réseau domestique", url: "https://www.cisa.gov/news-events/news/home-network-security", lang: "en" },
+  gophishCampaigns: { title: "Gophish : la documentation des campagnes", url: "https://docs.getgophish.com/user-guide/documentation/campaigns", lang: "en" },
+  gophishEmailReporting: { title: "Gophish : le signalement des courriels par les utilisateurs", url: "https://docs.getgophish.com/user-guide/documentation/email-reporting", lang: "en" },
+  gophishReports: { title: "Gophish : la génération des rapports de campagne", url: "https://docs.getgophish.com/user-guide/documentation/generating-reports", lang: "en" },
 
 } as const satisfies Record<string, { title: string; url: string; lang: "fr" | "en" }>;
 

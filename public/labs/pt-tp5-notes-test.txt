@@ -1,0 +1,89 @@
+N01
+Statut : confirmé
+Type : divulgation-technique
+Priorité : faible
+Preuves proxy : H108
+OWASP pressenti : a02
+Synthèse : L’en-tête X-Powered-By expose Express sur une réponse 200. C’est une information technique utile à corriger, mais elle ne prouve pas une compromission.
+Décision : Conserver comme constat non critique, avec une formulation proportionnée.
+
+N02
+Statut : réfuté
+Type : fonction-admin-bloquee
+Priorité : nulle
+Preuves proxy : H117
+OWASP pressenti : -
+Synthèse : La tentative d’accès à /api/admin/export répond 403 pour un compte non autorisé. Le contrôle vu dans le dossier joue bien son rôle.
+Décision : Classer comme rejet légitime, pas comme défaut d’accès.
+
+N03
+Statut : réfuté
+Type : redirection
+Priorité : nulle
+Preuves proxy : H118
+OWASP pressenti : -
+Synthèse : Le paramètre next est refusé avec un 400. Le dossier ne montre pas de redirection ouverte exploitable.
+Décision : Classer comme piste invalidée par la réponse serveur.
+
+N04
+Statut : confirmé
+Type : controle-acces-horizontal
+Priorité : haute
+Preuves proxy : H119, H120, H121, H122
+OWASP pressenti : a01
+Synthèse : Quatre réponses 200 montrent qu’un compte lit un dossier ou un document appartenant à une autre coopérative. La preuve combine identifiant manipulé, propriétaire différent et succès serveur.
+Décision : Présenter en premier : l’exposition de données est immédiate et déjà prouvée.
+
+N05
+Statut : confirmé
+Type : faiblesse-session
+Priorité : moyenne
+Preuves proxy : H109, H115, H116
+OWASP pressenti : a07
+Synthèse : La session sess-demo-5101 est semée avant authentification puis conservée telle quelle après le login réussi. Le cycle de session ne régénère pas l’identifiant.
+Décision : Conserver comme faiblesse de session défendable sur dossier.
+
+N06
+Statut : réfuté
+Type : role-query-bloquee
+Priorité : nulle
+Preuves proxy : H123
+OWASP pressenti : -
+Synthèse : Le changement d’identifiant vise DOS-5112, mais le serveur renvoie 403. La lecture d’un autre dossier n’est pas obtenue dans cette ligne.
+Décision : Classer en rejet correct, même si la ligne ressemble à la vraie faille.
+
+N07
+Statut : hypothèse
+Type : televersement
+Priorité : a-surveiller
+Preuves proxy : H132, H133, H134
+OWASP pressenti : -
+Synthèse : Trois téléversements sont testés sur la route d’upload, mais tous sont refusés avec 415 ou 422. Aucune preuve d’acceptation ni de restitution n’apparaît.
+Décision : Laisser au statut hypothèse tant qu’aucune acceptation n’est visible.
+
+N08
+Statut : hypothèse
+Type : previsualisation-export
+Priorité : faible
+Preuves proxy : H135
+OWASP pressenti : -
+Synthèse : Le paramètre role=finance attire l’attention, mais la réponse 403 ne prouve pas une fuite. Il manque un succès ou un contenu lisible.
+Décision : Garder en hypothèse faute de preuve d’effet.
+
+N09
+Statut : réfuté
+Type : document-inexistant
+Priorité : nulle
+Preuves proxy : H124
+OWASP pressenti : -
+Synthèse : La demande sur DOC-6104-PDF rend 404, ce qui correspond à un rejet cohérent d’identifiant non accessible.
+Décision : Classer comme contrôle correct ou ressource absente, pas comme fuite.
+
+N10
+Statut : confirmé
+Type : enumeration-authentification
+Priorité : faible
+Preuves proxy : H110, H111, H112, H113
+OWASP pressenti : a07
+Synthèse : Les réponses d’authentification distinguent « compte inconnu » de « mot de passe incorrect ». Le dossier suffit à prouver une énumération de comptes.
+Décision : Conserver comme constat confirmé, mais moins urgent que l’exposition de données.

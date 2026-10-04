@@ -1,0 +1,74 @@
+=== Annonce J01 ===
+Titre: Ingénieur plateforme front et contenu
+Équipe: Communication numérique
+Lieu: Ouagadougou
+Contrat: CDD de 12 mois
+Contexte: La coopérative publie des actualités de campagne et des cartes de points de collecte.
+Mission: Maintenir le front public et la mise en ligne des contenus institutionnels.
+Mission: Relire les intégrations publiques avant mise en production.
+Mission: Coordonner les évolutions visibles avec les équipes terrain.
+Technologies: next.js; nginx; directus
+Base de données: postgresql
+Outil interne mentionné: aucun
+Contrainte: Écrire une documentation claire pour les équipes non techniques.
+Contrainte: Accepter une relecture juridique des pages publiques.
+Contrainte: Travailler en horaires de bureau.
+Profil: Bonne maîtrise de JavaScript et de la publication headless.
+Profil: Sens de la vulgarisation technique.
+Profil: Expérience en cache HTTP souhaitée.
+Livrable: Front public stable et simple à maintenir.
+Livrable: Mode opératoire pour les mises en ligne.
+Note: Une partie du trafic passe par des cartes et des contenus publics.
+Note: Les contacts publics restent centralisés.
+Note: Les journaux publics doivent rester lisibles.
+Clôture: Candidatures ouvertes jusqu’au 22 juin 2026.
+
+=== Annonce J02 ===
+Titre: Administrateur données et observabilité
+Équipe: Données et opérations
+Lieu: Bobo-Dioulasso
+Contrat: CDI
+Contexte: La coopérative suit ses services visibles et ses flux de prix.
+Mission: Surveiller la base de données des services publics et fiabiliser les tableaux de bord.
+Mission: Améliorer les exports de supervision destinés aux équipes métier.
+Mission: Tenir à jour les tableaux de bord partagés avec les responsables de campagne.
+Technologies: postgresql; matomo; nginx
+Base de données: postgresql
+Outil interne mentionné: grafana
+Contrainte: Fournir des tableaux lisibles par les équipes métier.
+Contrainte: Rester sobre sur les accès de démonstration.
+Contrainte: Documenter les changements d’indicateurs.
+Profil: Bonne maîtrise SQL et culture de supervision.
+Profil: Aisance sur la qualité de données et la restitution.
+Profil: Capacité à expliquer une métrique à un non spécialiste.
+Livrable: Tableaux de bord de pilotage et fiches de composants.
+Livrable: Documentation de sauvegarde et de restauration.
+Note: L’outil interne sert au suivi opérationnel et n’est pas annoncé publiquement.
+Note: Les exports partagés restent limités au strict besoin.
+Note: Les valeurs publiées doivent être anonymisées.
+Clôture: Candidatures ouvertes jusqu’au 24 juin 2026.
+
+=== Annonce J03 ===
+Titre: Coordinateur support partenaires
+Équipe: Services partenaires
+Lieu: Koudougou
+Contrat: CDD de 9 mois
+Contexte: Les partenaires terrain utilisent un accès distant et un extranet de commandes.
+Mission: Accompagner les partenaires sur les parcours de connexion et les commandes.
+Mission: Centraliser les questions liées aux habilitations et aux retours terrain.
+Mission: Remonter les irritants de navigation à l’équipe produit.
+Technologies: keycloak; next.js; matomo
+Base de données: non précisée
+Outil interne mentionné: aucun
+Contrainte: Rédiger des réponses en français simple.
+Contrainte: Ne pas exposer d’information client au support public.
+Contrainte: Organiser une permanence pendant les campagnes.
+Profil: Expérience d’accompagnement utilisateurs.
+Profil: Bonne expression écrite et orale.
+Profil: Habitude des parcours d’authentification fédérés.
+Livrable: Réponses types et base de connaissance support.
+Livrable: Synthèse mensuelle des points de blocage.
+Note: Le poste travaille avec les retours de commandes et les habilitations.
+Note: Les captures d’écran restent anonymisées.
+Note: Le poste n’administre pas les briques internes.
+Clôture: Candidatures ouvertes jusqu’au 26 juin 2026.

@@ -11,9 +11,8 @@ const { lessonIssues, labIssues, moduleIssues, textHygiene, allowedReferenceUrls
 const { readLessons, templateLessonIds } = require("../scripts/content-snapshot.cjs");
 
 // Lessons published before the quality gate existed, per course. Remove a title as soon as its lesson passes.
-const KNOWN_DEBT = {
-  "pentest-intro": ["Autorisation et périmètre d’un audit", "Une méthode de test responsable", "Rédiger une recommandation utile"],
-};
+// Every course is now enforced: the list stays here so that a future course can be declared with its debt.
+const KNOWN_DEBT = {};
 
 let db;
 before(async () => { db = await createSupabaseDatabase({ seed: true }); });

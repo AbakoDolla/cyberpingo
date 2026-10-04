@@ -1,0 +1,35 @@
+id,hote,service,produit,version_observee,titre,preuve,vecteur_cvss
+V01,portail.sahel-vert.example,https,Baobab Portal,5.4.1,Jeton signé d’ancienne génération encore accepté,banner=Baobab Portal/5.4.1; endpoint=/auth/status,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+V02,portail.sahel-vert.example,api,Canopee API,3.2.0,En-tête debug hérité encore actif,header=X-Canopee-Debug:on; path=/api/v2/health,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N
+V03,portail.sahel-vert.example,api,Sahel Queue,1.2.0,Console de file d’attente référencée dans l’api,body=queue monitor enabled; path=/api/v2/queues/status,CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N
+V04,portail.sahel-vert.example,sso,Palmeraie SSO,4.7.0,Assertion de fédération trop bavarde sur erreur,body=stack marker palmeraie-sso; path=/sso/callback,CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+V05,portail.sahel-vert.example,search,Tamarin Search,1.4.9,État debug du moteur de recherche exposé,header=X-Tamarin-Debug:search; path=/recherche/debug,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:N
+V06,portail.sahel-vert.example,metrics,Dune Metrics,2.2.4,Endpoint de métriques détaillées sans filtrage de rôle,path=/metrics/details; body=collector dune-metrics 2.2.4,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+V07,paie.sahel-vert.example,https,Sirocco Gateway,4.2.6,Console legacy référencée par signature ancienne,header=X-App-Version:4.2.6; path=/legacy/login,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N
+V08,paie.sahel-vert.example,https,Baobab Portal,5.4.1,Jeton signé d’ancienne génération sur portail paie,banner=Baobab Portal/5.4.1; endpoint=/session/info,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N
+V09,paie.sahel-vert.example,api,Nimbus Queue,4.4.1,Attente de traitement lisible depuis l’api de paie,path=/api/jobs/peek; body=nimbus queue 4.4.1,CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N
+V10,paie.sahel-vert.example,api,Savane Reports,2.8.0,Génération de rapports avec trace métier trop verbeuse,header=X-Savane-Trace:on; path=/api/report/export,CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N
+V11,paie.sahel-vert.example,https,Atlas Vault,6.2.1,Coffre de secrets publié via reverse proxy sans isolation,path=/vault/status; body=atlas vault 6.2.1,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H
+V12,portail.sahel-vert.example,https,Kora Upload,inconnue,Passerelle de dépôt détectée sans version exploitable,header=X-Kora-Upload:present; path=/upload/status,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L
+V13,stock.sahel-vert.example,https,EpiStore,3.6.4,Dossier de santé du stockage encore exposé,path=/health/storage; body=epistore 3.6.4,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+V14,stock.sahel-vert.example,api,Harmattan Sync,2.1.3,Synchronisation inter-sites encore verbeuse,path=/api/sync/ping; body=harmattan sync 2.1.3,CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:L
+V15,stock.sahel-vert.example,sftp,Oasis Files,5.0.0,Dépôt de fichiers encore annoncé par bannière ancienne,banner=Oasis Files/5.0.0; port=22/tcp,CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+V16,stock.sahel-vert.example,admin,Brousse Admin,8.0.0,Console d’inventaire en frontal sans durcissement,path=/admin/diag; body=brousse admin 8.0.0,CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+V17,stock.sahel-vert.example,sync,Lagune Bridge,7.8.2,Pont d’intégration de catalogue mal isolé,path=/sync/diag; body=lagune bridge 7.8.2,CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+V18,portail.sahel-vert.example,https,Coton Cache,6.6.1,Endpoint de purge annoncé sur le portail principal,header=X-Coton-Cache:6.6.1; path=/cache/status,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+V19,www.sahel-vert.example,https,Sable CDN,2.4.0,Règles d’administration du cache encore visibles,header=X-Sable-CDN:2.4.0; path=/cdn/diag,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+V20,paie.sahel-vert.example,api,Palmeraie SSO,4.7.0,Assertion d’identité trop bavarde sur l’api de paie,path=/api/sso/debug; body=palmeraie sso 4.7.0,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N
+V21,paie.sahel-vert.example,admin,Khepri Console,3.0.5,Console de supervision RH encore joignable,path=/admin/console/status; body=khepri console 3.0.5,CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+V22,vpn.sahel-vert.example,vpn,Monsoon VPN,7.1.0,Portail VPN avec politique TLS incomplète,banner=Monsoon VPN/7.1.0; tls=legacy-policy,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+V23,vpn.sahel-vert.example,admin,Brousse Admin,8.0.0,Diagnostic d’administration VPN encore publié,path=/diag/admin; body=brousse admin 8.0.0,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:L
+V24,vpn.sahel-vert.example,https,Lagune Bridge,7.8.2,Pont d’intégration encore visible depuis la mire VPN,path=/bridge/status; body=lagune bridge 7.8.2,CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N
+V25,vpn.sahel-vert.example,metrics,Dune Metrics,2.2.4,Endpoint de métriques du VPN trop descriptif,path=/metrics/full; body=dune metrics 2.2.4,CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
+V26,mail.sahel-vert.example,smtp,Delta Mail Hub,5.1.2,Bannière SMTP trop bavarde sur versions internes,banner=Delta Mail Hub/5.1.2; port=25/tcp,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
+V27,mail.sahel-vert.example,imaps,Moringa Mail Gateway,9.1.1,Passerelle mail avec panneau de diagnostic IMAPS,path=/imaps/diag; body=moringa mail gateway 9.1.1,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:L/A:N
+V28,mail.sahel-vert.example,admin,Khepri Console,3.0.5,Console d’administration mail trop verbeuse,path=/admin/mail/status; body=khepri console 3.0.5,CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+V29,mail.sahel-vert.example,webmail,Baobab Portal,5.4.1,Moteur webmail encore sur génération de jeton legacy,banner=Baobab Portal/5.4.1; path=/webmail/status,CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+V30,www.sahel-vert.example,admin,Savane Reports,2.8.0,Back office de publication avec traces de rapports,path=/admin/reports/diag; body=savane reports 2.8.0,CVSS:3.1/AV:N/AC:H/PR:L/UI:R/S:C/C:L/I:L/A:N
+V31,www.sahel-vert.example,cdn,Sable CDN,2.4.0,Cache public encore avec règles d’administration actives,path=/cdn/rules; body=sable cdn 2.4.0,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:N
+V32,www.sahel-vert.example,search,Tamarin Search,1.4.9,Recherche publique avec endpoint debug conservé,path=/search/diag; body=tamarin search 1.4.9,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+V33,www.sahel-vert.example,https,Coton Cache,6.6.1,Purge de cache annoncée sur le site vitrine,header=X-Coton-Cache:6.6.1; path=/cache/info,CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N
+V34,www.sahel-vert.example,metrics,Dune Metrics,2.2.4,Détails de supervision du site vitrine exposés,path=/metrics/site; body=dune metrics 2.2.4,CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N
