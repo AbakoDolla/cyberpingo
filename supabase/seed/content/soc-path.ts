@@ -4,6 +4,8 @@
 // supabase/seed/03_soc_path.sql. The expected lab answers come from `facts`, computed by
 // scripts/lab-scenarios-soc.cjs from the very files learners download, so they cannot drift.
 
+import { figure } from "./path-kit";
+
 export interface SocFacts {
   audit: {
     worldWritableScript: string; worldWritableMode: string; scriptOwner: string; cronSchedule: string; cronUser: string;
@@ -76,7 +78,20 @@ export function buildSocPath(facts: SocFacts) {
             text("Un serveur Linux raconte tout ce qui lui arrive : connexions, commandes administrateur, démarrages de services, erreurs. Ce récit s’écrit dans des journaux. Pour un analyste, ce sont les premières preuves en cas d’incident : sans eux, impossible de savoir qui est entré, quand et ce qu’il a fait."),
             videoSlot("Où sont les journaux sous Linux et comment les lire"),
             text("Les fichiers de journaux sont rangés dans /var/log. Leur nom varie un peu d’une distribution à l’autre, mais les rôles sont toujours les mêmes : un fichier pour les connexions et l’authentification, un pour les messages généraux, un par service important (serveur web, base de données)."),
-            { type: "schema", content: "/var/log/\n  auth.log      connexions SSH, sudo, changements de compte   (Debian, Ubuntu)\n  secure        même rôle sur Red Hat, CentOS, Fedora\n  syslog        messages généraux du système\n  kern.log      noyau et matériel\n  nginx/        access.log et error.log du serveur web\n  apache2/      access.log et error.log d'Apache\n  wtmp, btmp    connexions réussies et échouées (binaires : lastb, last)" },
+            { type: "schema", content: figure({
+              kind: "cards",
+              title: "Les journaux clés sous `/var/log`",
+              columns: 3,
+              items: [
+                { term: "auth.log", text: "connexions SSH, sudo, changements de compte. Debian, Ubuntu", icon: "lock", tone: "blue" },
+                { term: "secure", text: "même rôle sur Red Hat, CentOS, Fedora", icon: "lock", tone: "blue" },
+                { term: "syslog", text: "messages généraux du système", icon: "document" },
+                { term: "kern.log", text: "noyau et matériel", icon: "chip" },
+                { term: "nginx/", text: "`access.log` et `error.log` du serveur web", icon: "globe", tone: "green" },
+                { term: "apache2/", text: "`access.log` et `error.log` d’Apache", icon: "globe", tone: "green" },
+                { term: "wtmp, btmp", text: "connexions réussies et échouées. Binaires : `lastb`, `last`", icon: "history", tone: "amber" },
+              ],
+            }).content },
             text("Une ligne syslog a toujours la même forme : la date, le nom de la machine, le programme qui parle (avec son numéro de processus entre crochets), puis le message. Apprendre à découper une ligne en quatre morceaux vous permet de lire un journal inconnu en quelques secondes."),
             { type: "code", language: "text", content: "Mar 14 09:12:44 srv-app01 sshd[2210]: Failed password for invalid user guest from 198.51.100.7 port 52310 ssh2\n|______________| |________| |_______| |________________________________________________________|\n    date          machine    programme                       message" },
             text("Deux outils font l’essentiel du travail. grep filtre les lignes qui contiennent un motif. journalctl interroge le journal de systemd, qui centralise les messages sur les systèmes récents : on peut y filtrer par service, par priorité ou par période. Les heures des journaux sont souvent en UTC : vérifiez-le toujours avant de comparer deux sources."),
@@ -104,7 +119,17 @@ export function buildSocPath(facts: SocFacts) {
             text("Un système Linux est surtout une affaire de droits. Un attaquant qui entre avec un compte limité cherche une faille de configuration pour devenir root. L’audit consiste à passer en revue ces points faibles avant lui : fichiers trop permissifs, programmes qui s’exécutent avec les droits de leur propriétaire, règles sudo trop larges, comptes en trop."),
             videoSlot("Les 5 vérifications d’un audit Linux express"),
             text("Les droits d’un fichier se lisent avec ls -l. Ils se composent de trois triplets lecture (r), écriture (w), exécution (x) : propriétaire, groupe, autres. Le mode numérique correspondant s’écrit en octal : 755 signifie rwxr-xr-x. Le mode 777 donne tous les droits à tout le monde : un fichier ainsi ouvert peut être modifié par n’importe quel compte du système."),
-            { type: "schema", content: "-rwxr-xr-x 1 root root  1204 mars 14 09:00 /usr/local/bin/sauvegarde.sh      mode 755 : sain\n-rwxrwxrwx 1 root root   412 mars 14 09:00 /opt/scripts/nettoyage.sh         mode 777 : DANGER\n |||||||||\n |||||||||__ autres : r w x\n ||||||_____ groupe : r w x\n |||________ propriétaire : r w x" },
+            { type: "schema", content: figure({
+              kind: "table",
+              title: "Lire deux permissions de scripts",
+              columns: ["Script", "Propriétaire", "Taille", "Date", "Mode", "Verdict"],
+              rows: [
+                ["/usr/local/bin/sauvegarde.sh", "root:root", "1204", "14 mars 09:00", "755 = rwx r-x r-x", "sain"],
+                ["/opt/scripts/nettoyage.sh", "root:root", "412", "14 mars 09:00", "777 = rwx rwx rwx", "DANGER"],
+              ],
+              mono: [0, 1, 2, 4],
+              caption: "L’ordre du mode est toujours propriétaire, groupe, autres. Le `-` initial indique ici un fichier ordinaire.",
+            }).content },
             text("Le bit SUID (affiché s à la place du x du propriétaire) fait s’exécuter un programme avec les droits de son propriétaire, souvent root. Quelques programmes légitimes l’utilisent (passwd, sudo). Un éditeur ou un outil de recherche avec le bit SUID, en revanche, permet souvent d’obtenir un terminal root : des listes publiques (GTFOBins) recensent ces détournements."),
             text("Troisième point : sudo. Le dossier /etc/sudoers.d contient les règles qui autorisent des comptes à lancer des commandes en administrateur. Une règle précise (« redémarrer ce service ») est saine. Une règle « NOPASSWD: ALL » donne à son bénéficiaire un accès root sans mot de passe sur tout le système."),
             text("Quatrième et cinquième points : les tâches planifiées et les comptes. Une tâche cron exécutée par root qui lance un script modifiable par tous est une porte ouverte : il suffit de modifier le script pour que root exécute vos commandes. Côté comptes, un seul compte doit avoir l’UID 0 (root). Tout autre compte à UID 0 est un administrateur déguisé, souvent créé pour garder un accès."),
@@ -139,7 +164,18 @@ export function buildSocPath(facts: SocFacts) {
             text("Un serveur exposé à Internet reçoit des tentatives de connexion SSH en permanence : ce bruit de fond est normal. Une attaque par force brute se reconnaît à son volume et à sa régularité : des dizaines d’essais en quelques minutes, depuis une même adresse, sur des comptes souvent inventés (admin, test, oracle) ou sur un compte réel."),
             videoSlot("Lire auth.log : de l’échec à la prise de contrôle"),
             text("Dans auth.log, chaque essai laisse une ligne. « Failed password for invalid user » signifie que le compte n’existe pas. « Failed password for backup » signifie que le compte existe, ce qui est plus inquiétant : l’attaquant a trouvé un nom valide. « Accepted password » ou « Accepted publickey » signale une connexion réussie."),
-            { type: "schema", content: "03:31:14  Invalid user admin from 192.0.2.150              <- compte inventé\n03:31:15  Failed password for invalid user admin ...      <- échec\n   ...      (rafale d'échecs, quelques secondes d'écart)\n03:33:41  Failed password for backup ...                  <- compte réel visé\n03:33:47  Accepted password for backup ...                <- SUCCÈS : le moment critique\n03:34:20  sudo: backup : COMMAND=/bin/bash                <- il devient root" },
+            { type: "schema", content: figure({
+              kind: "timeline",
+              title: "Force brute SSH : du bruit au succès critique",
+              events: [
+                { at: "03:31:14", title: "Invalid user admin from 192.0.2.150", text: "compte inventé", icon: "user", tone: "amber" },
+                { at: "03:31:15", title: "Failed password for invalid user admin", text: "échec", icon: "lock", tone: "amber" },
+                { at: "03:31-03:33", title: "Rafale d’échecs", text: "quelques secondes d’écart", icon: "alert", tone: "amber" },
+                { at: "03:33:41", title: "Failed password for backup", text: "compte réel visé", icon: "user", tone: "amber" },
+                { at: "03:33:47", title: "Accepted password for backup", text: "SUCCÈS, le moment critique", icon: "key", tone: "red" },
+                { at: "03:34:20", title: "sudo: backup : COMMAND=/bin/bash", text: "il devient root", icon: "shield", tone: "red" },
+              ],
+            }).content },
             text("Le moment critique est le premier « Accepted » qui suit une rafale d’échecs depuis la même adresse : c’est la compromission. Tout ce qui vient après compte : nouvelle session, passage root avec sudo, création d’un compte, ajout à un groupe privilégié, modification du mot de passe. Chaque geste laisse sa propre ligne dans le journal."),
             { type: "code", language: "bash", content: "# Qui échoue le plus ?\ngrep \"Failed password\" auth.log | grep -o \"from [0-9.]*\" | sort | uniq -c | sort -rn | head\n# Un succès venant de cette adresse ?\ngrep \"Accepted\" auth.log | grep \"192.0.2.150\"\n# Création de compte et changements de groupe\ngrep -E \"useradd|usermod|passwd\" auth.log" },
             text("Attention aux leurres. Un scanner qui tente trois fois le compte root puis abandonne n’est pas l’attaquant : il n’a rien obtenu. Il faut toujours vérifier si une adresse a réussi à entrer, pas seulement si elle a essayé. Et une connexion par clé depuis une adresse interne connue est le comportement normal des administrateurs."),
@@ -169,7 +205,16 @@ export function buildSocPath(facts: SocFacts) {
             text("Les codes de réponse racontent beaucoup. 200 : la page existe et a été servie. 301 et 302 : redirection (un 302 après un POST sur une page de connexion signale souvent une connexion réussie). 404 : la page n’existe pas. 403 : accès refusé. 500 : erreur du serveur. Une longue suite de 404 depuis une même adresse indique un scanner qui essaie des chemins connus."),
             text("Les scanners de vulnérabilités, comme Nikto, se déclarent parfois dans le User-Agent. Un attaquant discret change cette valeur : c’est pourquoi on regarde aussi le comportement (rythme, chemins demandés) plutôt que la seule étiquette."),
             text("L’injection SQL se voit dans l’adresse demandée : apostrophe encodée (%27), tests logiques (OR 1=1), tri de colonnes (ORDER BY) puis UNION SELECT pour extraire les données d’une autre table. Les requêtes se suivent à un rythme trop régulier pour un humain : c’est un outil automatique comme sqlmap."),
-            { type: "schema", content: "GET /catalogue.php?id=7%27                              <- l'apostrophe casse la requête\nGET /catalogue.php?id=7%20OR%201=1                      <- test logique\nGET /catalogue.php?id=7%20ORDER%20BY%205                <- compte les colonnes\nGET /catalogue.php?id=-1%20UNION%20SELECT%201,2,3,4     <- extrait des données" },
+            { type: "schema", content: figure({
+              kind: "steps",
+              title: "Séquence typique d’une injection SQL",
+              items: [
+                { title: "Apostrophe", text: "`GET /catalogue.php?id=7%27` : l’apostrophe casse la requête" },
+                { title: "Test logique", text: "`GET /catalogue.php?id=7%20OR%201=1` : le filtre est contourné" },
+                { title: "Colonnes", text: "`GET /catalogue.php?id=7%20ORDER%20BY%205` : l’outil compte les colonnes" },
+                { title: "Extraction", text: "`GET /catalogue.php?id=-1%20UNION%20SELECT%201,2,3,4` : des données sont visées" },
+              ],
+            }).content },
             text("Enfin, le webshell : un petit fichier déposé sur le serveur (souvent après un envoi de fichier détourné) qui exécute les commandes passées dans l’adresse. On le reconnaît à une requête POST d’envoi de fichier, puis à des requêtes GET répétées vers un fichier .php situé dans un dossier d’envois, avec un paramètre comme cmd=whoami."),
             { type: "code", language: "bash", content: "# Requêtes d'une adresse\ngrep \"^198.51.100.30 \" access.log\n# Codes 404 par adresse\nawk '$9 == 404 {print $1}' access.log | sort | uniq -c | sort -rn\n# Signes d'injection SQL\ngrep -iE \"union|%27|or%201=1|order%20by\" access.log\n# Fichiers php appelés dans le dossier d'envois\ngrep \"/uploads/\" access.log | grep \".php\"" },
             { type: "example", content: "Exemple : un POST sur /admin/upload.php suivi de GET /uploads/x.php?cmd=id, puis cmd=whoami : la dernière étape de la chaîne est un webshell. Le premier appel de commande donne l’heure de la prise de contrôle." },
@@ -195,7 +240,19 @@ export function buildSocPath(facts: SocFacts) {
             text("Une attaque réelle ne laisse pas toutes ses traces au même endroit. Le journal web montre l’entrée, le journal d’authentification montre les rebonds, le journal de tâches planifiées montre la persistance et celui du pare-feu montre les données qui sortent. Le travail d’un analyste SOC consiste à relier ces sources pour raconter une histoire cohérente."),
             videoSlot("Du journal à la chronologie : méthode d’un analyste SOC"),
             text("La corrélation commence par un fil conducteur : une adresse IP, un compte, un nom de fichier. On cherche ce fil dans chaque source et on note chaque occurrence avec son heure. Mettre toutes les heures dans le même fuseau (UTC) est indispensable, sinon l’ordre des événements est faux."),
-            { type: "schema", content: "heure (UTC)  source        événement\n01:03:12     web          premiers échecs de connexion à l'administration\n01:04:05     web          connexion réussie           <- accès initial\n01:06:40     web          fichier déposé              <- webshell\n01:08:10     web          lecture d'un fichier de configuration\n01:15:22     ssh          connexion avec un compte de base de données   <- rebond\n01:18:50     cron         tâche planifiée créée       <- persistance\n01:27:31     pare-feu     connexion sortante vers l'attaquant   <- exfiltration" },
+            { type: "schema", content: figure({
+              kind: "timeline",
+              title: "Chronologie minimale d’un incident corrélé",
+              events: [
+                { at: "01:03:12", title: "web : premiers échecs de connexion à l’administration", icon: "globe", tone: "amber" },
+                { at: "01:04:05", title: "web : connexion réussie", text: "accès initial", icon: "key", tone: "red" },
+                { at: "01:06:40", title: "web : fichier déposé", text: "webshell", icon: "bug", tone: "red" },
+                { at: "01:08:10", title: "web : lecture d’un fichier de configuration", icon: "document", tone: "amber" },
+                { at: "01:15:22", title: "ssh : connexion avec un compte de base de données", text: "rebond", icon: "route", tone: "red" },
+                { at: "01:18:50", title: "cron : tâche planifiée créée", text: "persistance", icon: "clock", tone: "red" },
+                { at: "01:27:31", title: "pare-feu : connexion sortante vers l’attaquant", text: "exfiltration", icon: "internet", tone: "red" },
+              ],
+            }).content },
             text("Les faux positifs encombrent tous les journaux : une administratrice qui se connecte depuis le bureau, un scanner qui échoue, un script de sauvegarde. Pour les écarter, posez-vous trois questions : l’adresse est-elle connue ? Y a-t-il eu un succès ? L’action est-elle cohérente avec le reste de l’attaque ? Un événement qui répond « oui, non, non » n’appartient pas à l’histoire."),
             text("Une chronologie utile suit le cycle d’une intrusion : accès initial (comment il est entré), exécution (ce qu’il a lancé), rebond (autres comptes ou machines touchés), persistance (comment il compte revenir), exfiltration (ce qui est sorti). Pour chaque étape, notez l’heure, la preuve (la ligne du journal) et l’impact."),
             { type: "code", language: "bash", content: "# Toutes les occurrences d'une adresse, toutes sources confondues, triées par heure\ngrep -h \"192.0.2.60\" web.log ssh.log fw.log | sort\n# Fichiers déposés\ngrep -h \"upload\" web.log\n# Tâches planifiées créées ou modifiées\ngrep -h \"crontab\" auth.log" },

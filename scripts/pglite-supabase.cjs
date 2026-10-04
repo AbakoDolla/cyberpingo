@@ -39,8 +39,8 @@ const SUPABASE_STUBS = `
 
 const sqlFiles = (dir) => (fs.existsSync(dir) ? fs.readdirSync(dir).filter((name) => name.endsWith(".sql")).sort() : []);
 
-async function runFiles(db, dir) {
-  for (const file of sqlFiles(dir)) {
+async function runFiles(db, dir, keep = () => true) {
+  for (const file of sqlFiles(dir).filter(keep)) {
     try {
       await db.exec(fs.readFileSync(path.join(dir, file), "utf8"));
     } catch (error) {
@@ -50,13 +50,13 @@ async function runFiles(db, dir) {
   }
 }
 
-/** Returns a PGlite instance with every migration (and optionally the seed) applied. */
-async function createSupabaseDatabase({ seed = false } = {}) {
+/** Returns a PGlite instance with every migration (and optionally the seed) applied. `seedFilter` keeps only some seed files. */
+async function createSupabaseDatabase({ seed = false, seedFilter = () => true } = {}) {
   const { PGlite } = await import("@electric-sql/pglite");
   const db = new PGlite();
   await db.exec(SUPABASE_STUBS);
   await runFiles(db, migrationsDir);
-  if (seed) await runFiles(db, seedDir);
+  if (seed) await runFiles(db, seedDir, seedFilter);
   return db;
 }
 

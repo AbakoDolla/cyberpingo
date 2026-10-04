@@ -1,7 +1,10 @@
 // Authoring kit shared by the pedagogical paths written after the first Réseaux path: block helpers,
 // the lesson template and the list of references authors may cite. Every address below was fetched and
 // answered 200 when the list was built; the tests check that lessons only cite addresses from this list.
-// Read by scripts/seed-path-builder.cjs through scripts/ts-loader.cjs, so it must stay free of imports.
+// Read by scripts/seed-path-builder.cjs through scripts/ts-loader.cjs, so it must stay free of runtime imports
+// (the one import below is a type and is erased).
+
+import type { FigureInput } from "@/lib/figure-spec";
 
 export type Difficulty = "facile" | "moyen" | "difficile";
 export type BlockType = "text" | "heading" | "schema" | "code" | "example" | "callout" | "resource" | "image" | "video";
@@ -52,6 +55,8 @@ export const isExistingLesson = (entry: PathLessonEntry): entry is ExistingLesso
 export const text = (content: string): PathBlock => ({ type: "text", content });
 export const heading = (content: string): PathBlock => ({ type: "heading", content });
 export const schema = (content: string): PathBlock => ({ type: "schema", content });
+/** A diagram written as data (see lib/figure-spec.ts): the lesson page draws it as a real figure, not as text. */
+export const figure = (input: FigureInput): PathBlock => ({ type: "schema", content: JSON.stringify({ v: 1, ...input }) });
 export const code = (content: string, language = "text"): PathBlock => ({ type: "code", content, language });
 export const example = (content: string): PathBlock => ({ type: "example", content });
 export const callout = (content: string): PathBlock => ({ type: "callout", content });

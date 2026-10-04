@@ -26,7 +26,7 @@ Chaque leçon suit les dix étapes du modèle pédagogique. Les blocs sont recon
 | 2. Prérequis | `prerequisites(...)` : « Prérequis : » |
 | 3. Introduction contextualisée | `scenario(...)` : « Mise en situation : » |
 | 4. Vidéo de cours | `videoSlot(...)` : « Vidéo à venir : titre », affichée comme « Vidéo en préparation », jamais comme un faux lecteur |
-| 5. Cours détaillé | trois blocs `text` au moins, `schema`, `example` (exemple corrigé) |
+| 5. Cours détaillé | trois blocs `text` au moins, une `figure(...)` (schéma dessiné, voir plus bas), `example` (exemple corrigé) |
 | 6. Démonstration guidée | un `text` « Démonstration guidée : » suivi d'un `code` avec la sortie d'exemple |
 | 7. Erreurs fréquentes et sécurité | `mistakes(...)`, `safety(...)` |
 | 8. À retenir | `takeaway(...)` |
@@ -34,6 +34,32 @@ Chaque leçon suit les dix étapes du modèle pédagogique. Les blocs sont recon
 | 10. Références | deux ou trois `reference("clé")` en fin de leçon, tirées de la liste vérifiée de `path-kit.ts` |
 
 Un quiz corrige chaque réponse : l'explication dit pourquoi la bonne réponse est juste et pourquoi la plus tentante des autres est fausse. Une compétence n'est jamais validée sur un quiz seul : elle exige la leçon, le quiz, un laboratoire d'entraînement et une évaluation pratique.
+
+## Schémas : des figures, pas du texte
+
+Un bloc `schema` ne contient plus de dessin en caractères : il contient une **figure**, c'est-à-dire un schéma écrit comme une donnée (JSON compact) que la page dessine en HTML et en SVG (`components/figures/`). La figure reste nette sur tous les écrans, se lit au lecteur d'écran (`figureSummary`), s'imprime, et s'anime à l'arrivée sans jamais cacher son contenu quand les animations sont réduites. La base de données ne voit qu'un texte : aucune migration n'a été nécessaire, et un schéma en texte brut (écrit par un administrateur) s'affiche toujours, dans un cadre de texte préformaté.
+
+| Besoin | Type de figure |
+|---|---|
+| appareils, zones, liaisons | `network` (grille de colonnes et de lignes, demi-cases permises, zones teintées, liens `solid`, `dashed`, `wireless`, `thick`) |
+| 2 à 5 étapes enchaînées, avec retour éventuel | `flow` |
+| cycle de 3 à 8 étapes | `cycle` (anneau sur grand écran, liste sur téléphone) |
+| procédure numérotée | `steps` |
+| tableau de 2 à 6 colonnes | `table` (cartes empilées sur téléphone pour les tableaux de phrases, défilement pour les tableaux de données) |
+| vocabulaire, fiches | `cards` |
+| bon contre mauvais, avant contre après | `compare` |
+| couches, défense en profondeur | `layers` (`nested: true` pour des boîtes emboîtées) |
+| structure d'une trame, d'un paquet, d'un en-tête | `packet` |
+| chaîne annotée (URL, en-tête, commande, droits, jeton) | `anatomy` |
+| calcul | `formula` |
+| événements dans le temps | `timeline` |
+| qui fait quoi | `relations` |
+| grille de risque | `matrix` |
+| session de commandes | `terminal` |
+
+Une figure s'écrit avec l'aide `figure({ kind: "…", … })` de `supabase/seed/content/path-kit.ts`. Le typage (`lib/figure-spec.ts`), `node scripts/check-figures.cjs <fichier.ts>` et la grille de publication (`figureIssues` dans `scripts/content-quality.cjs`) refusent une icône inconnue, une liste trop longue, un libellé qui ne tient pas, une case de réseau hors grille ou occupée deux fois, un lien vers un nœud inconnu, l'apostrophe droite, le tiret cadratin ou une flèche écrite en texte. Un schéma en texte brut échoue à la grille (`FIGURES_OPTIONAL=1` le tolère pendant une conversion). `node scripts/figures-preview.cjs <fichiers> --out .shots/x.html` fabrique une page statique pour relire les dessins (`--kinds network,packet` pour filtrer), et `/dev/figures` montre les dix-neuf exemples de `lib/figure-samples.ts` en développement.
+
+Les 319 schémas des 177 leçons publiées ont été redessinés ainsi. `supabase/seed/12_figures.sql` (généré par `node scripts/generate-figures-seed.cjs`) apporte les figures aux bases déjà peuplées : un schéma n'est remplacé que tant qu'il porte, octet pour octet, le texte d'avant la conversion (empreinte md5 de `supabase/seed/content/figures-legacy.json`), de sorte qu'une leçon modifiée par un administrateur garde son texte, et le rejouer ne change rien. Déployer le site avant de charger cette graine.
 
 ## Grille de publication
 
@@ -109,8 +135,11 @@ Les fichiers de données que l'apprenant doit analyser ou hacher (dictionnaire d
 | `node scripts/generate-logs-seed.cjs` | génère `supabase/seed/09_logs_programme.sql` |
 | `node scripts/generate-swb-seed.cjs` | génère `supabase/seed/10_securite_web_programme.sql` |
 | `node scripts/generate-pt-seed.cjs` | génère `supabase/seed/11_pentest_programme.sql` |
+| `node scripts/check-figures.cjs <fichier.ts>` | contrôle les figures d'un fichier de contenu (structure, typographie, faits de l'ancien schéma conservés) |
+| `node scripts/figures-preview.cjs <fichiers.ts> --out <page.html>` | page statique pour relire les figures |
+| `node scripts/generate-figures-seed.cjs` | génère `supabase/seed/12_figures.sql` |
 | `npm run content:report` | état réel du contenu, cours par cours |
-| `npm test` | toute la suite, dont `programme.test.cjs`, `content-quality.test.cjs`, `equipment.test.cjs` et `documents.test.cjs` |
+| `npm test` | toute la suite (`tests/*.test.cjs`), dont `programme.test.cjs`, `content-quality.test.cjs`, `figures.test.cjs`, `figures-seed.test.cjs`, `equipment.test.cjs` et `documents.test.cjs` |
 
 Pour publier un parcours : déployer le code (les laboratoires pointent vers des fichiers de `public/labs/`), puis charger la graine dans la base de production (voir `docs/DEPLOYMENT.md`).
 

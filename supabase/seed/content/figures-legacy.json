@@ -1,0 +1,675 @@
+{
+ "006876f8-c1b0-2aa5-1ec0-ac998c960288": {
+  "5": "Trame Ethernet\n\nDestination   Source        EtherType   Données      FCS\n6 octets      6 octets      2 octets    46-1500 o   4 octets\n\nff:ff:ff:ff:ff:ff = diffusion\n01:00:5e:..:..:.. = multicast\n08:00:27:..:..:.. = unicast",
+  "7": "Apprentissage pas à pas\n\n1. PC-A (Fa0/3) envoie vers Imprimante inconnue\n   Table MAC : apprend PC-A -> Fa0/3\n   Action    : inondation sur les autres ports du VLAN\n\n2. Imprimante répond depuis Fa0/9\n   Table MAC : apprend Imprimante -> Fa0/9\n   Action    : réponse unicast vers Fa0/3\n\n3. Échange suivant\n   Action    : unicast direct Fa0/3 <-> Fa0/9"
+ },
+ "0225e562-116c-d84c-b86e-09c220ffbbb0": {
+  "5": "États de ports à connaître\n\nopen             : un service semble répondre\nclosed           : pas de service, mais l’hôte répond\nfiltered         : un filtre bloque ou masque la réponse\nunfiltered       : port accessible, état applicatif incertain\nopen|filtered    : Nmap ne tranche pas\nclosed|filtered  : Nmap ne tranche pas",
+  "7": "Formats de sortie utiles\n\n-oN : lisible pour l’humain\n-oG : greppable, pratique pour des filtres\n-oX : XML, pratique pour des traitements\n-oA demo : écrit les trois formats\n\nUn format n’ajoute pas de preuve, il change la lecture"
+ },
+ "02d7a0f6-60e1-5271-932d-d90732ddf606": {
+  "5": "Gravité != priorité\n\nCVSS  -> sévérité technique\nEPSS  -> probabilité d’exploitation à 30 jours\nKEV   -> exploitation observée dans la nature\ncontexte -> actif, exposition, contrôles, urgence\n\nPriorité = synthèse, pas un seul nombre",
+  "7": "Repère simple pour la priorisation\n\nCVSS élevé + actif public critique = souvent priorité haute\nCVSS moyen + portail d’authentification = peut monter\nCVSS élevé + service interne très segmenté = peut descendre\nKEV oui = signal fort, pas passe-droit pour un faux positif"
+ },
+ "02e318ea-d014-dcf2-bb23-08b07926d50e": {
+  "5": "Clé commune utile        Ce qu’elle relie\nIP source               un poste précis ou une sortie partagée, par exemple derrière un NAT ou un VPN\nCompte utilisateur      une action humaine ou un service\nNom de machine          un actif précis de l’inventaire\nIdentifiant de session  un parcours applicatif sur plusieurs lignes\nIdentifiant de requête  une transaction web ou API\nEmpreinte de fichier    un même artefact sur plusieurs hôtes\nFenêtre de temps        des événements proches à confirmer par une autre clé",
+  "9": "Chronologie UTC à produire\n2026-03-12T08:12:02Z | auth  | succès SSH pour awa depuis 10.1.4.23\n2026-03-12T08:13:02Z | web   | GET /admin/export.csv depuis 10.1.4.23\n2026-03-12T08:13:55Z | proxy | GET http://files.example.org/archive.zip\nPreuve minimale : fichier, ligne, clé de pivot, hypothèse encore ouverte"
+ },
+ "0439a7a3-c56b-f42b-2098-752c25a889c4": {
+  "5": "Échange HTTP minimal\n\nRequête\nGET /connexion HTTP/1.1\nHost: app.example.org\nCookie: session=abc123\n\nRéponse\nHTTP/1.1 401 Unauthorized\nContent-Type: text/plain; charset=utf-8\nSet-Cookie: session=abc123; Path=/; HttpOnly; SameSite=Lax\n\nCorps\nauth required",
+  "9": "Codes d’état à retenir\n\n301, 308   redirection durable\n302, 307   redirection temporaire\n401        il manque une authentification valide\n403        tu es identifié, mais l’action reste interdite\n404        ressource absente, ou existence non révélée\n405        méthode refusée sur cette route\n429        trop de requêtes, limitation de débit\n500, 503   erreur côté serveur"
+ },
+ "09342c50-8429-00f3-2a4c-31ef4ee28f6a": {
+  "5": "collecte -> décodeurs -> champs normalisés -> index et recherche\n          -> règles -> alertes -> qualification -> cas\n\nSans collecte fiable : pas de preuve\nSans normalisation : pas de corrélation\nSans réglage : trop de faux positifs\nSans analyste : pas de conclusion défendable",
+  "10": "Besoin principal                        Point de départ crédible\npostes et serveurs, agents, règles     Wazuh\njournaux texte centralisés, pipelines   Graylog\nfort volume, recherche et tableaux      Elastic ou OpenSearch\nsurveillance réseau et IDS              Security Onion\njournaux applicatifs légers             Loki"
+ },
+ "0b688d54-a030-a103-9936-8f85077df556": {
+  "5": "Journal Windows        Ce qu’on y cherche souvent\nSecurity              ouvertures de session, comptes, audit\nSystem                services, pilotes, démarrages, arrêts\nApplication           erreurs et messages applicatifs\nApplications et services\n  PowerShell          blocs de script, journalisation du moteur\n  Sysmon              processus, DNS, réseau, fichiers",
+  "7": "Exemple de lecture d’un événement de sécurité\nEventID           4624\nProvider          Microsoft-Windows-Security-Auditing\nComputer          atelier-pc\nTimeCreated       2026-03-10T08:15:21Z\nData              TargetUserName=awa\n                  LogonType=10\n                  IpAddress=192.168.1.77\n                  AuthenticationPackageName=Negotiate"
+ },
+ "0e986745-9f83-95a0-7afe-e74ae34d8c86": {
+  "4": "03:31:14  Invalid user admin from 192.0.2.150              <- compte inventé\n03:31:15  Failed password for invalid user admin ...      <- échec\n   ...      (rafale d'échecs, quelques secondes d'écart)\n03:33:41  Failed password for backup ...                  <- compte réel visé\n03:33:47  Accepted password for backup ...                <- SUCCÈS : le moment critique\n03:34:20  sudo: backup : COMMAND=/bin/bash                <- il devient root"
+ },
+ "0eae7831-e40b-29b2-3ed6-5a1e8609dcb7": {
+  "5": "Scanner vs pentest\n\nscanner -> versions, signatures, configs visibles\npentest -> preuves minimales, contexte, priorités\n\nLe scanner accélère le tri\nLe pentest tranche ce qui compte vraiment",
+  "7": "Repères utiles dans une alerte\n\nCVE : identifiant d’une vulnérabilité précise\nCWE : famille de faiblesse\nNVD : enrichissement, score, produits touchés\n\nUn identifiant aide à lire\nIl ne remplace pas la validation locale"
+ },
+ "0f4c4ebd-25df-1ef9-0eb2-5ad3d9a09df2": {
+  "5": "Écriture complète : 2001:0db8:0001:0012:0000:0000:0000:0034\nSans zéros de tête : 2001:db8:1:12:0:0:0:34\nCompression maximale : 2001:db8:1:12::34\n\nRègles\n1. enlève les zéros de tête de chaque groupe\n2. compresse une seule suite continue de groupes 0000 avec ::",
+  "7": "/32 : très grand bloc, souvent côté opérateur ou documentation\n/48 : préfixe site, soit 65 536 sous-réseaux /64\n/64 : taille normale d’un LAN IPv6\n\n2001:db8:1::/48 découpé en /64\n2001:db8:1:0::/64\n2001:db8:1:1::/64\n2001:db8:1:2::/64\n...\n2001:db8:1:ffff::/64"
+ },
+ "0ff76209-a64d-bc00-0da6-f1c1d5df89e6": {
+  "5": "Trois familles à distinguer\n\nréfléchi :\n  la donnée revient dans la réponse à la même requête\n  exemple : un terme de recherche réaffiché sans encodage\n\nstocké :\n  la donnée dangereuse est enregistrée puis servie à d’autres\n  exemple : un commentaire publié et relu plus tard\n\nDOM :\n  le navigateur réinjecte lui-même la donnée dans le DOM\n  exemple : un script lit location.hash puis écrit dans innerHTML"
+ },
+ "11c2eb2f-c1ad-430d-bab7-7140b77e2fe3": {
+  "5": "Modes IOS\n>\n  mode utilisateur\n#\n  mode privilégié\n(config)#\n  configuration globale\n\nRéflexe : show ?",
+  "12": "Codes fréquents\nC  connected\nL  local\nS  static\nR  RIP\nO  OSPF\n\nSauvegarde : copy running-config startup-config"
+ },
+ "13a2304d-16e3-55cb-0a26-88939a4a3a9d": {
+  "5": "Trois familles de laboratoire\n\nWSL / terminal léger\n  -> lire, trier, calculer, tester des scripts\n\nune VM locale isolée\n  -> héberger une cible volontairement vulnérable\n\nplateforme légale en ligne\n  -> s’entraîner sans gérer l’infrastructure",
+  "8": "Règles d’or du labo personnel\n\n1. sur son propre matériel\n2. cible volontairement vulnérable\n3. réseau isolé si possible\n4. instantané avant essais\n5. jamais de scan d’un réseau tiers"
+ },
+ "142e0fc3-a34d-d0e7-57d8-f823f1126400": {
+  "5": "En-tête                     Rôle défensif principal\n\nStrict-Transport-Security  force l’usage de HTTPS pour le domaine\nX-Content-Type-Options     empêche le « sniffing » de type avec nosniff\nReferrer-Policy            limite ce que le navigateur révèle en Referer\nPermissions-Policy         autorise ou refuse certaines capacités du navigateur\nCross-Origin-*             isole la page ou ses ressources selon le besoin\nX-Frame-Options            limite l’intégration en cadre, ancien mécanisme\nContent-Security-Policy    cadre plus large, y compris frame-ancestors\nCache-Control: no-store    évite le stockage de réponses sensibles"
+ },
+ "149a681c-e466-bce3-5710-d81721a059cb": {
+  "5": "Du signal à la décision\n\nÉvénement -> qualification -> incident\nIncident majeur + activité touchée + communication sensible -> crise",
+  "7": "Rôles pendant l’incident\nResponsable : arbitre et priorise\nTechnique : enquête, confine, restaure\nCommunication : prépare les messages internes et externes\nJuridique ou DPO : aide sur les obligations de notification",
+  "8": "Cycle en 6 étapes\nPréparation -> Identification -> Confinement\n      ^                             |\n      |                             v\nRetour d’expérience <- Récupération <- Éradication"
+ },
+ "14f86f29-65af-616b-5908-199e40e95c1b": {
+  "5": "Trois questions différentes\n\nidentité      -> quel compte ou quel rôle ?\nauthentification -> comment l’application te reconnaît ?\nautorisation  -> à quoi ce compte peut-il accéder ?\n\nNe pas mélanger les trois",
+  "7": "Ce qu’une relecture utile observe\n\nlogin/logout -> codes, redirections, messages\nSet-Cookie   -> HttpOnly, Secure, SameSite\nroute admin  -> 200, 302, 403, 404 selon le rôle\nobjet metier -> lecture de son objet vs objet d’un autre"
+ },
+ "16e2b52c-750a-fd98-e22e-bb1228adecff": {
+  "4": "-rwxr-xr-x 1 root root  1204 mars 14 09:00 /usr/local/bin/sauvegarde.sh      mode 755 : sain\n-rwxrwxrwx 1 root root   412 mars 14 09:00 /opt/scripts/nettoyage.sh         mode 777 : DANGER\n |||||||||\n |||||||||__ autres : r w x\n ||||||_____ groupe : r w x\n |||________ propriétaire : r w x"
+ },
+ "17bec502-56de-aa79-db09-0e1b03b9d2e5": {
+  "5": "Ce qu’il faut suivre\n\npackage.json      : ce que tu demandes\npackage-lock.json : ce qui sera réellement installé\nnpm ci            : installation propre depuis le verrouillage\nSBOM              : inventaire des composants livrés\navis de sécurité  : versions touchées, corrigées, gravité, contexte",
+  "11": "Pour lire un avis de dépendance\n\n1. quels paquets et quelles versions sont touchés ?\n2. quelle version corrige ?\n3. la dépendance est-elle dans le code livré ou seulement dans l’outillage ?\n4. le composant vulnérable est-il réellement atteignable ?\n5. quelle stratégie : mise à jour, retrait, contournement temporaire, surveillance ?"
+ },
+ "183d0dba-a2a2-6af9-8d05-2f403301a10f": {
+  "5": "Trois statuts utiles\n\npreuve suffisante   -> le fait est démontré\npreuve insuffisante -> piste plausible, pas encore démontrée\nhors cadre          -> action interdite ou non autorisée\n\nToujours noter rôle, date, requête, réponse",
+  "7": "Exemples de preuves minimales approuvées\n\n200 sur une ressource d’un autre compte\nSet-Cookie sans attribut attendu\nvaleur bénigne reflétée comme entrée non neutralisée\nfichier de test accepté alors qu’il devrait être refusé\n\nInutile : extraire toute une base ou un CSV RH"
+ },
+ "1a48979e-89ff-68fc-2af1-31b31881d4f5": {
+  "5": "Requête HTTP\nGET /login HTTP/1.1\nHost: atlas.example\nCookie: session=abc123\n\nRéponse HTTP\nHTTP/1.1 200 OK\nContent-Type: text/html\nSet-Cookie: session=abc123; Secure; HttpOnly; SameSite=Lax",
+  "7": "2xx  succès      200 OK, 201 Created\n3xx  redirection  301 Moved Permanently, 302 Found\n4xx  client       401 Unauthorized, 403 Forbidden, 404 Not Found\n5xx  serveur      500 Internal Server Error, 502 Bad Gateway"
+ },
+ "1c023e94-7dc4-9d30-261a-1accb24da48c": {
+  "5": "Commande ou option              Usage défensif courant\ngrep -E -i -v -c -n -o -w      motif, casse, exclusion, compteur, ligne, sous-partie, mot\ngrep -A/-B/-C                  voir le contexte avant ou après une ligne\nawk -F ':' '... END {...}'     séparateur explicite, conditions, totaux\nsort -n -r -k -t -u            tri numérique, inverse, par clé, avec séparateur, valeurs uniques\nuniq -c                        compter après tri\ncut, comm, join, column -t    découper, comparer, joindre, relire un tableau\nSelect-String, Group-Object   équivalents courants sous PowerShell"
+ },
+ "1cfe5e31-d5de-9945-c10a-1239974a969c": {
+  "5": "Question à poser        Principe associé\nQui es-tu ?             identification\nPeux-tu le prouver ?    authentification\nÀ quoi as-tu droit ?    autorisation\nQui l’a fait ?          imputabilité\nPeut-on le retracer ?   traçabilité",
+  "7": "Défense en profondeur\n[Humain]\n   [Données]\n      [Application]\n         [Appareil]\n            [Réseau]\n               [Physique]\n\nIdée : plusieurs couches, pas une seule barrière"
+ },
+ "2049fc87-1815-2f3f-1d59-4d54d7632a69": {
+  "5": "Disque            -> /dev/vda\nPartition système -> /dev/vda1  -> /\nPartition données -> /dev/vda2  -> /srv/atelier\nSystème de fichiers : ext4, xfs, btrfs\nPoint de montage    : endroit de l’arborescence où le volume apparaît"
+ },
+ "28cbb157-284f-9dce-6c58-c745ebd003df": {
+  "5": "États fréquents\nR  -> en cours d’exécution\nS  -> en sommeil, attend un événement\nD  -> sommeil non interrompable, souvent lié à une E/S\nT  -> stoppé\nZ  -> zombie, terminé mais pas encore récupéré par son parent",
+  "7": "Lecture rapide de « ps aux »\nUSER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot       861  0.0  0.8 121000 16480 ?        Ss   08:10   0:01 /usr/sbin/sshd -D\nwww-data  2140  3.8  4.1 286000 84200 ?        S    09:02   0:22 php-fpm: pool www\nawa       7312 98.0  0.2  23440  4212 pts/0    R    09:14   1:48 /tmp/.cache-update"
+ },
+ "28d13e07-9a2a-461d-f792-f8e2f439127d": {
+  "5": "Motivation             Exemple de but\nFinancière            voler, extorquer, frauder\nPolitique             afficher un message, perturber\nÉtatique              espionner, préparer une influence\nInterne               abuser d’un accès déjà obtenu\nCuriosité             tester sans autorisation",
+  "7": "Acteurs et relations\nUtilisateur -> signale un problème au SOC ou au support\nSOC / blue team -> analyse, contient, escalade\nCERT ou CSIRT -> coordonne la réponse à incident\nRSSI -> décide des priorités de sécurité\nDPO -> suit l’angle données personnelles\nÉditeur -> fournit correctifs et avis\nAutorité nationale -> publie guides et alertes"
+ },
+ "2a1cfa1f-1d87-acd1-da42-8da5ab1cd236": {
+  "5": "Décision avant toute action\n\nAutorisation écrite\n        |\n        v\nPérimètre explicite ? ----- non -----> clarification\n        |\n       oui\n        |\n        v\nActif observé dans la mission\n   |           |            |\n   |           |            |\ndans le      exclu       ambigu ou tiers\npérimètre                  non validé\n   |           |            |\n action      pas d’action   arrêt et demande écrite\n permise     technique      de clarification"
+ },
+ "2a3f7f17-a151-2135-cf31-99a084c5f58b": {
+  "5": "Bits spéciaux et affichage\n4755  -> -rwsr-xr-x  SUID actif\n2755  -> -rwxr-sr-x  SGID actif\n1777  -> drwxrwxrwt  sticky bit sur dossier partagé\nSi « x » manque : S ou T au lieu de s ou t",
+  "8": "Umask à retenir\n022  -> fichiers 644, dossiers 755\n027  -> fichiers 640, dossiers 750\n077  -> fichiers 600, dossiers 700\n\nACL : un « + » dans « ls -l » indique des entrées supplémentaires"
+ },
+ "2a9d1cf9-c38f-80f9-0202-6a143b8f32ff": {
+  "5": "Repères utiles\nimpact      = ce qui pourrait être cassé, perdu ou exposé\nprobabilité = vraisemblance du scénario redouté\ngravité     = impact × probabilité\ncriticité   = importance du bien concerné\ncertitude   = confiance issue de la qualification\npriorité    = gravité × criticité du bien × certitude\néchelles    = chaque organisation fixe ses entiers et ses seuils",
+  "11": "Exemple d’échelles locales à expliquer\nimpact, probabilité, criticité : 1 à 4\ncertitude 0 : faux positif confirmé\ncertitude 2 : à surveiller\ncertitude 4 : vrai positif confirmé\nmême gravité ≠ même priorité",
+  "12": "Escalade claire en dix lignes maximum\nquoi : type d’alerte et système\nquand : heure UTC\npreuve : journal et ligne clé\ngravité : ce que l’événement pourrait causer\npriorité : pourquoi ce cas passe avant les autres\nproposition : surveiller, bloquer, appeler, passer la main"
+ },
+ "2fe11eb7-194c-060f-2b7e-7d611d6166d6": {
+  "3": "1. DNS  : intranet.cyberpingo.lab  ->  192.168.10.50      (UDP, port 53)\n2. ARP  : qui a 192.168.10.2 ?       ->  00:1b:21:aa:00:02  (diffusion locale)\n3. TCP  : SYN vers 192.168.10.50:80 ...                    (la connexion commence)"
+ },
+ "3051c24b-403b-e40b-cb1a-a07b924c1519": {
+  "5": "Commandes de base\nmkdir -p dossiers/archives\ntouch note.txt\ncp -i rapport.txt rapport.txt.bak\ncp -r source/ copie/\nmv ancien.txt nouveau.txt\nrm -i fichier.txt\nrmdir dossier_vide\nln -s /srv/atelier/config.conf config-actuelle"
+ },
+ "30e93a35-47bd-51e0-6655-6bc990a03951": {
+  "5": "Type d’ACL      Ce qu’elle regarde        Où la placer en général\nStandard        source seulement           près de la destination\nÉtendue         source, destination,\n                protocole, port            près de la source\n\nFin implicite   deny any",
+  "11": "Erreur classique                     Effet\nACL appliquée en out au mauvais endroit  le trafic traverse déjà une partie du réseau\npermit trop tôt                          un deny plus précis ne sera jamais lu\noubli du permit final                    coupure involontaire\nACL sur les lignes VTY mal testée        perte de l’accès d’administration"
+ },
+ "31a0e8ed-e8f9-ebb0-6f7a-df0043157e9f": {
+  "5": "Trois couches de restitution\n\nrésumé exécutif -> risque, ordre, décisions\nrapport détaillé -> preuve, score, correctif\noral final -> aligner métier, technique, calendrier\n\nChaque couche a son public principal",
+  "7": "Re-test : ce qu’il dit\n\nfaille rejouée ?        oui / non\nbesoin métier intact ?  oui / non\nrégression évidente ?   oui / non\n\nIl ne dit pas : plus aucun risque partout"
+ },
+ "33c8a5a5-9d2d-c8f1-0fa8-ac7272b48c17": {
+  "5": "Comparer vite\n\nStatique : simple, prévisible, peu bavard\nRIP      : vecteur de distance, métrique = nb de sauts,\n           maximum 15, envoi RIPv2 vers 224.0.0.9\nOSPF     : état de liens, coût, voisins, zones,\n           Hello vers 224.0.0.5 et DR/BDR vers 224.0.0.6\nBGP      : entre systèmes autonomes sur Internet"
+ },
+ "34038745-9c8e-0864-a30f-2f4080735d00": {
+  "5": "Exemples de sources\n\nAlerte outil\nJournal de connexion\nSignalement utilisateur\nMessage de rançon\nFichiers renommés\nCourriels envoyés à l’insu du propriétaire",
+  "7": "Préserver la preuve\n1. Noter l’heure\n2. Capturer sans modifier si possible\n3. Copier avant d’analyser\n4. Calculer une empreinte si pertinent\n5. Garder la chaîne de conservation"
+ },
+ "3447fdfe-5343-3537-75d2-69aa5f519387": {
+  "5": "Checklist d’un script d’analyse\n1. Vérifier le fichier d’entrée\n2. Travailler en lecture seule\n3. Nommer le seuil ou les filtres\n4. Trier avant de compter si nécessaire\n5. Afficher un résultat simple à relire\n6. Conserver hash et commande pour rejouer"
+ },
+ "34eaad55-b18b-09cd-6054-961d6b991090": {
+  "7": "GET /catalogue.php?id=7%27                              <- l'apostrophe casse la requête\nGET /catalogue.php?id=7%20OR%201=1                      <- test logique\nGET /catalogue.php?id=7%20ORDER%20BY%205                <- compte les colonnes\nGET /catalogue.php?id=-1%20UNION%20SELECT%201,2,3,4     <- extrait des données"
+ },
+ "359dfa04-a40b-267c-8ce6-2aca7199de2c": {
+  "5": "Étapes d’un audit\n1 cadrer : périmètre, accord écrit, fenêtre\n2 collecter : commandes en lecture seule\n3 figer : horodatage et empreintes\n4 croiser : comptes, réseau, services, journaux\n5 noter : gravité, effort, priorité\n6 restituer : résumé, constats, annexes",
+  "10": "Structure d’un constat\nObservation : ce que tu vois\nPreuve : commande, fichier, extrait\nGravité : critique, importante, mineure\nRecommandation : quoi changer\nEffort : faible, moyen, élevé"
+ },
+ "375df27a-a6f0-4ece-a112-6c3fa81228fd": {
+  "5": "Liste de contrôle de durcissement\n\nconfiguration : pas de valeur par défaut, pas de mode debug en production\npublication   : pas de « .env », « .bak », « .git », « phpinfo » ni archive oubliée\nréseau        : ports d’administration fermés ou restreints\napplication   : erreurs sobres côté client, détails côté journal serveur\nsecrets       : hors code et hors dépôt, rotation prévue, accès minimal\nenvironnements: dev, test et production séparés",
+  "10": "Après une fuite de secret\n\n1. confirmer le secret concerné et le système touché\n2. révoquer ou remplacer le secret, puis redémarrer proprement si nécessaire\n3. relire les journaux utiles pour voir s’il a été utilisé\n4. corriger la cause : dépôt, archive, image, variable partagée, capture ou ticket"
+ },
+ "37711f84-b8de-65ba-adc2-9d279d71af38": {
+  "5": "Raccourci utile pour relire une API\nAPI1  objet d’un autre utilisateur\nAPI3  trop de propriétés lues ou modifiées\nAPI5  fonction d’administration appelée sans droit\nAPI4  consommation de ressources sans garde-fou\nAPI9  version ou point d’entrée oublié\nAPI10 réponse tierce acceptée sans assez de contrôle",
+  "11": "Réponse trop bavarde à corriger\n{\n  \"id\": 102,\n  \"client\": \"Awa\",\n  \"total\": 9500,\n  \"margeInterne\": 4300,\n  \"role\": \"admin\"\n}\n\nUne API grand public ne renvoie pas tout"
+ },
+ "3ac2de8c-8efe-cb68-9862-50f315950e7b": {
+  "5": "Commande : grep -rn motdepasse /home/awa/notes\n\ngrep              : programme lancé\n-r                : option courte\n-n                : option courte\nmotdepasse        : motif recherché\n/home/awa/notes   : argument, ici le dossier à parcourir",
+  "8": "Raccourcis utiles\nTab        : complète un nom de commande ou de fichier\nFlèche haut : relit une commande précédente\nCtrl+R     : cherche dans l’historique\nCtrl+C     : interrompt la commande courante\nCtrl+L     : efface l’écran sans fermer le shell"
+ },
+ "3b3977f9-35da-5c11-82f2-26f6084881d1": {
+  "5": "Internet\n   |\n[ Pare-feu ]\n  |   |   \\\n  |   |    +-- DMZ : 172.16.10.0/24\n  |   +------- LAN : 10.1.110.0/24\n  +----------- Invités : 10.1.130.0/24\n\nAdministration : 10.1.120.0/24, séparée du LAN",
+  "7": "Source              Destination         Port / protocole   Décision\nInternet            172.16.10.10        TCP 443            autoriser\nLAN 10.1.110.0/24   172.16.10.20        TCP 22             autoriser admin\nInvités 10.1.130.0  10.1.120.0/24       any                refuser\nDMZ                 LAN                  any                refuser\nAdministration      Pare-feu             HTTPS, SSH         autoriser"
+ },
+ "3cf8c98e-6b15-4569-0f37-1f89ad4f2efb": {
+  "5": "Question de base sur un réseau interne\n\nsegment source -> flux attendu ? -> service observé\n      |                 |                |\n      |                 |                |\n   poste user      oui / non       admin / partage / BD\n   invité          oui / non       web / LDAP / SMB / RDP\n   serveur         oui / non       WinRM / RPC / impression\n\nLe risque vient de l’écart entre attendu et observé",
+  "7": "Observation -> lecture défensive\n\nSMB poste -> serveur fichiers     : souvent normal\nLDAP poste -> contrôleur de domaine : selon besoin\nRDP user -> serveur critique      : à justifier\nWinRM user -> serveur critique    : souvent excessif\nBD exposée à plusieurs segments  : priorité élevée\n\nOn décrit un écart, pas une attaque réussie"
+ },
+ "3f531e71-da67-19ff-2426-096e0261b189": {
+  "5": "Famille                Exemple simple\nLogiciel malveillant   virus, ver, cheval de Troie, espion,\n                       enregistreur de frappe, rançongiciel,\n                       agent de botnet\nIngénierie sociale     faux support, hameçonnage, appel urgent\nMots de passe          devinette, dictionnaire, réutilisation\nRéseau                 interception sur Wi-Fi non sûr, DoS, DDoS",
+  "7": "Menace                 C/I/D     Exemple               Parade principale\nRançongiciel           D         fichiers bloqués       sauvegardes + mises à jour\nFuite d’identifiants   C         compte réutilisé       mots de passe uniques + MFA\nFacture falsifiée      I         montant modifié        double validation\nDoS ou DDoS            D         site saturé            filtrage + capacité réseau\nVol d’appareil         C, D      téléphone perdu        chiffrement + verrouillage"
+ },
+ "3f6583c5-5716-81a0-a116-6e6fc94dd63c": {
+  "5": "Modèles utiles avec find\nfind ./logs -type f -name '*.log'\nfind /srv/atelier -type f -mtime +7\nfind /srv/atelier -type f -perm -0002\nfind /srv/atelier -type f -user awa\n\nActions\n-print                    : afficher\n-exec commande {} \\;      : agir fichier par fichier\n-print0 | xargs -0        : transmettre sans casser les noms",
+  "8": "Avant d’extraire une archive inconnue\n1. lister avec « tar -tzf archive.tar.gz »\n2. vérifier les chemins affichés\n3. choisir un dossier cible avec « -C »\n4. vérifier l’empreinte si elle est fournie\n5. extraire seulement ensuite"
+ },
+ "405f6b35-639a-3b7d-62e3-b947b270136d": {
+  "3": "/24  255.255.255.0     256 adresses  254 utilisables\n/25  255.255.255.128    128 adresses  126 utilisables\n/26  255.255.255.192     64 adresses   62 utilisables\n/27  255.255.255.224     32 adresses   30 utilisables\n/28  255.255.255.240     16 adresses   14 utilisables\n/29  255.255.255.248      8 adresses    6 utilisables\n/30  255.255.255.252      4 adresses    2 utilisables",
+  "6": "192.168.20.0/24 découpé en quatre /26 :\n\n192.168.20.0/26     réseau .0     utilisables .1 à .62     diffusion .63\n192.168.20.64/26    réseau .64    utilisables .65 à .126   diffusion .127\n192.168.20.128/26   réseau .128   utilisables .129 à .190  diffusion .191\n192.168.20.192/26   réseau .192   utilisables .193 à .254  diffusion .255"
+ },
+ "429c3614-039f-27d2-ce85-c920ba2fb553": {
+  "5": "Même cause, interpréteurs différents\n\nshell   : commande système concaténée\nNoSQL   : opérateur JSON non attendu\nSSTI    : modèle compilé avec entrée\nLDAP    : filtre concaténé\nXPath   : expression concaténée\njournal : saut de ligne ou faux champ",
+  "7": "Ordre de défense recommandé\n\n1. Éviter l’interpréteur\n2. Paramétrer ou séparer les arguments\n3. Valider par liste autorisée\n4. Encoder selon le contexte\n5. Limiter les privilèges"
+ },
+ "43daea90-f63b-c9c3-4a92-89f5526c1f42": {
+  "5": "Type         Usage principal\nNAT statique publier un serveur interne de façon stable\nNAT dynamique prêter une adresse publique libre d’un pool\nPAT          partager une seule adresse publique entre plusieurs flux",
+  "7": "Avant sortie : 10.2.1.20:51514  ->  192.0.2.80:443\nAprès PAT    : 192.0.2.34:40001 ->  192.0.2.80:443\n\nAvant sortie : 10.2.1.21:51514  ->  192.0.2.80:443\nAprès PAT    : 192.0.2.34:40002 ->  192.0.2.80:443"
+ },
+ "446b74b7-abca-595e-a061-3df539d89b4e": {
+  "5": "Exemples rapides\n\nDonnée personnelle : nom, téléphone, adresse, photo\nSouvent sensible : santé, biométrie, croyances\nPas forcément personnelle seule : numéro interne sans contexte\nDevient personnelle si on peut relier le numéro à une personne",
+  "7": "Questions avant toute collecte\n1. Pourquoi cette donnée ?\n2. Qui y accède ?\n3. Combien de temps la garder ?\n4. Où est-elle stockée ?\n5. Comment la protéger ?\n6. Comment la supprimer ou la corriger ?"
+ },
+ "44fc36c1-ed95-116d-1263-02a1ff01bfbc": {
+  "5": "Carte simple d’une application web\n\nauth      -> login, reset, logout\ncompte    -> profil, commandes, documents\nadmin     -> export, gestion, tableaux\napi       -> /api/... et objets métier\nupload    -> dépôt et lecture de fichiers\n\nCartographier avant de tester",
+  "7": "Ce que tu relèves dans un historique\n\nméthode   -> GET, POST, PUT, DELETE\nroute     -> chemin et zone fonctionnelle\nrôle      -> compte utilisé ou contexte\nindices   -> cookies, televersement, export\npreuve    -> code, taille, en-tête, réponse"
+ },
+ "471c0b05-57de-a3a0-f60c-2c0e8ae9dde3": {
+  "5": "192.168.1.20 - - [10/Mar/2026:09:00:01 +0000]\n\"GET / HTTP/1.1\" 200 5120 \"-\" \"Mozilla/5.0\"\n|__________|       |__________________________|\nadresse                 date et fuseau\n\n\"GET / HTTP/1.1\"  200  5120  référent  user-agent\nrequête               code octets",
+  "10": "Accès vs erreurs\naccess.log   qui a demandé quoi, quand, avec quel code\nerror.log    pourquoi le serveur ou le service a échoué\n\nExemple :\n404 sur un chemin rare -> access.log d’abord\n500 répétés sur /intranet -> access.log puis error.log"
+ },
+ "47ca7fff-1a12-0650-8cf2-a3c7724381ed": {
+  "5": "Après une fuite, les données servent à\n1. Tester la réutilisation sur d’autres sites\n2. Lancer un hameçonnage ciblé plus crédible\n3. Répondre à des questions de récupération\n4. Faire du chantage ou de l’usurpation\n5. Alimenter d’autres bases revendues",
+  "10": "Plan d’action priorisé\n1. Vérifier que l’alerte est légitime\n2. Changer le mot de passe du service touché\n3. Changer partout où il a été réutilisé\n4. Activer la double authentification\n5. Surveiller comptes, relevés et messages suspects"
+ },
+ "480204c5-5397-9f10-dfb1-b0a31bd466a7": {
+  "5": "Unités fréquentes\n.service  -> un service ou démon\n.timer    -> un déclencheur planifié\n.socket   -> une écoute activant un service\n.target   -> un ensemble logique d’unités",
+  "7": "Commandes utiles\nsystemctl status ssh\nsystemctl start demo.service\nsystemctl stop demo.service\nsystemctl restart demo.service\nsystemctl reload nginx\nsystemctl enable demo.service\nsystemctl disable demo.service\nsystemctl mask demo.service\nsystemctl is-active demo.service\nsystemctl is-enabled demo.service",
+  "11": "[Unit]\nDescription=Sauvegarde locale de démonstration\nAfter=network-online.target\n\n[Service]\nType=oneshot\nUser=backup\nExecStart=/usr/local/bin/backup-demo.sh\nRestart=no\n\n[Install]\nWantedBy=multi-user.target"
+ },
+ "486be8f3-befc-23b5-72de-3a78a6b80500": {
+  "5": "Indices fréquents dans auth.log\n\nFailed password for invalid user admin   -> compte inexistant\nFailed password for awa                  -> compte existant\nAccepted password for awa                -> réussite par mot de passe\nAccepted publickey for awa               -> réussite par clé\npam_unix(... authentication failure ...) -> échec vu par PAM\nsudo: awa ... USER=root ... COMMAND=...  -> élévation ou action privilégiée",
+  "9": "Lire le contexte après la réussite\n\nsuccès SSH          -> Accepted password ou publickey\npuis sudo           -> commande sensible ou session root\npuis useradd        -> création de compte\npuis last / lastb   -> historique synthétique des succès ou échecs"
+ },
+ "4a008f9c-3624-a469-6392-224e0f72514f": {
+  "5": "R1 (passerelle)\n |-- Gi0/0 --- S1 --- PC-Direction     sous-réseau 1\n |-- Gi0/1 --- S2 --- PC-Atelier       sous-réseau 2\n |-- Gi0/2 --- S3 --- PC-Comptabilité  sous-réseau 3"
+ },
+ "4a4aeb58-f129-be66-8bb7-4fd41cf83da0": {
+  "5": "Clés de corrélation fréquentes\n\nadresse IP        utile, mais parfois partagée ou changeante\ncompte            utile, mais peut être usurpé ou réutilisé\nsession           très fort si l’application le journalise\nmachine           fort pour suivre un poste ou un serveur\ntemps             utile pour relier des séquences proches",
+  "9": "Méthode prudente\n\nobservation   : même adresse, même compte et proximité temporelle\nhypothèses    : erreur humaine, automatisme, attaque réussie\nvérification  : source habituelle ? appareil connu ? autre journal ?\nconclusion    : seulement après recoupement suffisant"
+ },
+ "4d44ddf9-81b3-d1d3-6631-4763b9d996f4": {
+  "5": "Trois questions utiles\n\npolitique : longueur, MFA, blocklist ?\nstockage  : hachage moderne, sel, coût ?\nrisque    : comptes sensibles, réutilisation ?\n\nOn audite, on ne casse pas",
+  "7": "Indices de format à reconnaître\n\n$argon2id$  -> Argon2id\n$2y$        -> bcrypt\n$6$         -> SHA-512 crypt\n32 hexa      -> souvent MD5, à confirmer\n\nIndice utile, jamais verdict seul"
+ },
+ "4e7b52d2-24a9-6b7c-592e-69f1dfff12da": {
+  "5": "Colonnes utiles d’un constat\n\ntitre précis\nactif ou route touchée\npreuve minimale\nimpact observé\nvecteur CVSS 3.1\npriorité métier\nrecommandation\nre-test attendu",
+  "7": "Note / priorité\n\nCVSS 3.1  -> gravité technique\nexposition -> public / interne / segmenté\nmétier     -> actif critique ou non\ncompensat. -> présent ou absent\npriorité   -> décision de correction\n\nUn score n’est pas un ordre automatique"
+ },
+ "4eb83d11-868f-a912-fefc-3907afd3aa66": {
+  "5": "Extrait de plan d’adressage\nVLAN  Nom              Réseau            Passerelle\n110   Utilisateurs     10.1.110.0/24     10.1.110.1\n120   Administration   10.1.120.0/24     10.1.120.1\n130   Invités          10.1.130.0/24     10.1.130.1\n199   Gestion          10.1.199.0/24     10.1.199.1",
+  "10": "Journal des changements\nDate        Auteur   Changement                      Validation\n2026-09-28  Nadia    création VLAN 199 gestion      show vlan brief\n2026-10-01  Koffi    publication HTTPS DMZ          test 443 depuis Internet\n2026-10-03  Nadia    correction trunk VLAN 130      test invités + sauvegarde"
+ },
+ "515eb089-daaf-367f-a846-068c45986091": {
+  "5": "Source                 Ce qu’elle apporte                 Limite principale\ninventaire interne     propriété, usage, criticité       parfois incomplet\nDNS inverse            nom parfois parlant               souvent absent ou trompeur\nWHOIS ou RDAP          données d’enregistrement          pas toujours la machine réelle ni l’activité\nRIPEstat               contexte IP, ASN, mesures réseau  vue macro, pas l’intention\nVirusTotal             analyses et réputation externes   un verdict n’est pas une preuve ; ne pas soumettre un fichier sensible\nURLhaus                URLs malveillantes recensées      centré sur la diffusion de malwares ; absence ≠ innocence",
+  "9": "Fiche d’enrichissement minimale\nindicateur : 192[.]0[.]2[.]77\nsource     : RIPEstat\ndate UTC   : 2026-03-14T09:20:00Z\nrequête    : prefix overview\nrésultat   : hébergeur mutualisé, à confirmer par l’inventaire\nconfiance  : moyenne\nprudence   : adresse potentiellement partagée"
+ },
+ "517f5de3-280e-7bde-1d63-fcf252ad270e": {
+  "5": "/                racine de toute l’arborescence\n/boot            fichiers du démarrage\n/home            dossiers personnels des utilisateurs\n/root            dossier personnel de root\n/etc             configuration locale du système\n/var/log         journaux\n/run             état depuis le dernier démarrage\n/tmp             fichiers temporaires effaçables\n/usr             programmes, bibliothèques, documentation\n/bin /sbin       souvent liés vers /usr sur les distributions récentes\n/opt /srv        logiciels additionnels, données servies\n/dev /proc /sys  périphériques et vues du noyau\n/mnt /media      montages manuels, médias amovibles",
+  "9": "Repères de navigation\npwd      : où suis-je ?\nls -la   : lister, y compris les fichiers cachés\nls -lh   : tailles lisibles\nls -R    : parcours récursif\ncd /etc  : chemin absolu\ncd ..    : remonter d’un niveau\ncd ~     : revenir au dossier personnel\ncd -     : revenir au dossier précédent"
+ },
+ "51de45b3-2f38-347c-e9eb-cbac4157ff42": {
+  "5": "Méthode en 5 étapes\n1. Cadrer\n2. Inventorier\n3. Constater\n4. Évaluer\n5. Restituer",
+  "7": "Notation simple\nConforme = 1\nPartiel = 0,5\nNon conforme = 0\n\nScore domaine = somme pondérée / poids total"
+ },
+ "539cd1ff-8602-9334-02a0-915f11c95c45": {
+  "5": "Réflexe défensif en cas de découverte\n\nconstat plausible\n      |\n      v\npreuve minimale suffisante ?\n   | oui                | non\n   v                    v\nsignalement privé    compléter seulement\ncoordonné            ce qui est autorisé\n   |\n   v\npas de publication sauvage",
+  "8": "Ce qu’on garde dans un livrable\n\nutile au constat ?      oui / non\nidentifie une personne ? oui / non\npreuve minimale suffit ? oui / non\n\nsi doute : masquer, résumer, ou ne pas garder"
+ },
+ "54ee745a-1c3d-2c4a-2837-8ed0b10ba2fb": {
+  "5": "Chaîne de développement sûre\n\nexigences     : ASVS, périmètre, données sensibles, rôles\nconception    : menaces, surfaces d’attaque, choix d’architecture\ncode          : revues, normes, tests unitaires de sécurité\npipeline      : SAST, SCA, secrets, tests bloquants\ndéploiement   : secrets séparés, rollback, vérifications finales\nretour        : rapports, incidents, correction et re-test",
+  "7": "Extrait de revue à relire\n\nconst sql = \"SELECT * FROM dons WHERE email = '\" + email + \"'\";\nzone.innerHTML = commentaire;\nconst apiKey = \"CLE_EXEMPLE_SERVICE\";\napp.post(\"/admin/export\", exportCsv);\n\nDéfauts à repérer : injection, XSS, secret codé en dur, contrôle d’accès absent",
+  "12": "Avant de fusionner\n\n1. la revue de code note-t-elle les défauts concrets ?\n2. un test automatisé casse-t-il la fusion en cas de secret ou dépendance critique ?\n3. la correction a-t-elle été re-testée ?\n4. un « security.txt » existe-t-il pour la divulgation coordonnée ?"
+ },
+ "561911be-b114-a42d-3bc5-c7506b74655a": {
+  "5": "Décision simple sur un artefact public\n\nutile au périmètre ?  -> oui / non\npersonnel ou sensible ? -> oui / non\npreuve minimale suffit ? -> oui / non\n\nGarder, masquer, purger :\nle minimum nécessaire",
+  "7": "Ce qu’on ne touche pas\n\naccès protégé derrière un compte\nanti-bot ou anti-scraping à contourner\ndonnées personnelles complètes sans nécessité\ncollecte de masse hors périmètre\n\nObserver un indice n’efface pas le cadre"
+ },
+ "564dc9c4-b8d8-8e77-2979-92d86a7b0585": {
+  "5": "UDP : léger, rapide, sans connexion, sans accusé automatique\nTCP : connecté, fiable, ordonné, plus bavard\n\nUsages fréquents d’UDP : DNS, DHCP, NTP, voix, vidéo en direct, QUIC",
+  "7": "Message ICMP             Usage courant\nEcho request / reply      ping\nDestination unreachable   réseau, hôte ou port injoignable\nTime exceeded             traceroute, TTL expiré"
+ },
+ "57de4155-e6dc-5e3b-be8f-aafc5bf84d14": {
+  "4": "heure (UTC)  source        événement\n01:03:12     web          premiers échecs de connexion à l'administration\n01:04:05     web          connexion réussie           <- accès initial\n01:06:40     web          fichier déposé              <- webshell\n01:08:10     web          lecture d'un fichier de configuration\n01:15:22     ssh          connexion avec un compte de base de données   <- rebond\n01:18:50     cron         tâche planifiée créée       <- persistance\n01:27:31     pare-feu     connexion sortante vers l'attaquant   <- exfiltration"
+ },
+ "598013ad-c87c-7b37-81e2-7aee0e3947b9": {
+  "5": "Type                    Avantage principal         Limite principale\nSymétrique              rapide                      partage de la clé\nAsymétrique             pas besoin de secret initial plus lent\nHybride                 combine les deux            demande une bonne mise en œuvre",
+  "8": "Signature numérique\nDocument -> empreinte -> signature avec clé privée\n\nVérification\nDocument reçu -> empreinte recalculée\nsignature + clé publique -> résultat : valide ou non"
+ },
+ "5a644514-0c06-2f3e-e085-439328350e5a": {
+  "5": "Ce qu on peut documenter\n\ncompte utilisé\nheure et actif touchés\nressource témoin lue\nprivilège observé\nartefact créé ou modifié\n\nSans fouille extensive",
+  "7": "Fait, impact, hypothèse\n\nfait      -> ce qui a été vu\nimpact    -> ce que cela expose déjà\nhypothèse -> ce qui serait possible ensuite\n\nNe pas les mélanger"
+ },
+ "5c1f2241-38b3-2ae8-b87b-31a315d44af3": {
+  "5": "Trois niveaux utiles\n\nindice       -> nom de fichier, note de scan\nexposition   -> lecture ou acces prouve\nimpact       -> portee du secret ou du reglage\n\nToujours masquer la valeur",
+  "7": "Correction défensive typique\n\n1. limiter l’exposition\n2. faire tourner le secret\n3. réduire sa portée\n4. nettoyer copies et journaux\n5. vérifier la non-régression"
+ },
+ "5d0743db-5594-311d-590f-66ba8acf117c": {
+  "5": "Nom                    Type          Pour qui ?          Usage courant\nRGPD                   loi           organismes traitant  protéger les données\nConvention de Malabo   convention    États et structures  repère africain général\nISO/IEC 27001          norme         organisations        SMSI certifiable\nISO/IEC 27002          norme         organisations        catalogue de mesures\nNIST CSF 2.0           cadre         tout type d’orga     piloter la cybersécurité",
+  "7": "Conformité utile, mais limitée\nConforme sur le papier   !=   protégé dans la pratique\n\nIl faut aussi :\n- mesures réellement appliquées\n- preuves et vérifications\n- amélioration continue\n- adaptation au risque réel"
+ },
+ "5e091ada-f0d5-ca53-b60a-40d8ec87a40c": {
+  "5": "Application de dons : surface d’attaque minimale\n\nnavigateur -> pages publiques -> serveur web -> base\n           -> formulaire don -> API paiement -> tiers\n           -> espace membre   -> stockage docs\nadmin      -> /admin         -> journaux\nCI/CD      -> build          -> secrets\nsupport    -> sauvegardes    -> exports CSV",
+  "7": "Quatre questions de modélisation des menaces\n\n1. Que construisons-nous ?\n2. Qu’est-ce qui peut mal tourner ?\n3. Que faisons-nous pour réduire le risque ?\n4. Avons-nous bien vérifié ?\n\nSTRIDE aide-mémoire :\nusurpation, falsification, répudiation,\ndivulgation, déni de service, élévation"
+ },
+ "5e3fa110-5967-6ae6-81c2-46ec51d36e07": {
+  "5": "Couches utiles\n\nnavigateur -> CDN ou reverse proxy -> WAF -> application -> base de données\n\nWAF                : filtre quelques motifs connus, pas la logique métier\nlimitation de débit: ralentit les rafales, renvoie souvent 429\njournaux           : rendent l’abus visible et réanalysable\ncorrectif code     : supprime la cause profonde",
+  "10": "Réponse à incident web en cinq étapes\n\n1. isoler ce qui doit l’être sans détruire les preuves\n2. préserver les journaux et la configuration utile\n3. comprendre le chemin d’attaque ou d’abus\n4. corriger la cause et pas seulement le symptôme\n5. vérifier le correctif et renforcer la détection"
+ },
+ "63895085-543d-c970-d288-3c4ff3b97a59": {
+  "5": "Entrer, normaliser, valider, sortir\n\nentrée brute -> normaliser -> valider -> stocker\n                                 |\n                                 v\n                         rejeter si hors règles\n\nà la sortie : encoder selon le contexte",
+  "7": "Contexte de sortie != même encodage\n\nHTML       -> encodage HTML\nattribut   -> attribut entre guillemets + encodage\nJavaScript -> JSON ou textContent, pas d’injection directe\nURL        -> valider le schéma puis encoder l’URL\nCSS        -> éviter l’injection directe, limiter les valeurs\nSQL        -> requêtes paramétrées\nshell      -> arguments séparés, pas de concaténation"
+ },
+ "65f63e26-d8b9-2dcb-0353-96ad3736df10": {
+  "5": "#!/bin/bash\n./script.sh journal.log\n\n$0  nom du script\n$1  premier argument\n$@  tous les arguments\n$#  nombre d’arguments\n$?  code de retour de la dernière commande\n\n0   succès\n1   erreur fonctionnelle simple\n2   mauvais usage du script"
+ },
+ "6691e9b7-e6bc-c9d8-72bc-46077a073445": {
+  "5": "Vol ou perte              Ce qui aide\nAppareil éteint           chiffrement complet + code solide\nAppareil déverrouillé     verrouillage rapide + effacement distant\nCompte lié à l’appareil   localisation + changement du mot de passe\nClé de récupération       copie hors de l’appareil",
+  "8": "À la maison              Dans un lieu public\nWPA2 ou WPA3             préférer HTTPS partout\nmot de passe box changé  éviter les opérations sensibles si possible\nWPS désactivé            se méfier des faux points d’accès\nappareils à jour         ne pas faire confiance au réseau seul"
+ },
+ "6712fc42-6c85-9c15-7359-c51e147b0350": {
+  "5": "Quelques signatures à reconnaître\n404 404 403 sur chemins sensibles   -> sondage ou scan\nPOST /login répété + 401            -> brute force probable\nid=7%27 puis UNION SELECT           -> injection SQL à lire\nfile=%2e%2e%2f...                   -> traversée de répertoires\n/uploads/rapport.php?cmd=...        -> appel d’un fichier téléversé",
+  "9": "Scanner opportuniste vs attaque plus ciblée\nOpportuniste : beaucoup de chemins, peu ou pas de succès\nCiblée      : moins de bruit, un succès, puis de nouveaux chemins\n\nSignal fort :\n404 404 403 200 sur /admin/login\npuis 200 sur /admin/export"
+ },
+ "68e79828-c0ed-2694-e32e-275fb4abdeca": {
+  "5": "Petite organisation : sources courantes de journaux\n\nposte Windows   -> connexions, processus, erreurs\nserveur Linux   -> ssh, sudo, services, noyau\nsite web        -> accès, erreurs, comptes applicatifs\npare-feu        -> ALLOW, DENY, ports, adresses\nrouteur ou proxy -> navigation, DNS, volumes\nservice en ligne -> audit, connexions, changements sensibles",
+  "7": "Formats fréquents et difficulté d’analyse\n\ntexte libre     : facile à lire, variable selon le logiciel\nsyslog          : très courant, gravité et source visibles\nJSON lignes     : champs explicites, pratique à filtrer\nCSV             : simple à exporter, dépend de l’ordre des colonnes\nXML             : structuré, parfois verbeux\nbinaire         : compact et fidèle, mais illisible sans l’outil prévu"
+ },
+ "6a204001-ea83-6f98-7582-68540ef889f4": {
+  "5": "HTTPS garantit\n1. confidentialité du trajet\n2. intégrité du trajet\n3. identité du serveur si le certificat est valide\n\nHTTPS ne garantit pas\n1. que le site est bienveillant\n2. que son contenu est vrai\n3. que l’utilisateur ne se trompe pas d’adresse",
+  "7": "Chaîne de confiance\n[Autorité racine]\n        |\n[Autorité intermédiaire]\n        |\n[Certificat du serveur example.com]\n\nVérifications : nom, date, signature, chaîne"
+ },
+ "6ab1e7ee-4e17-61c1-159d-074c813ecc86": {
+  "5": "Ce qu’un audit Wi-Fi défensif regarde\n\nSSID -> mode WPA2/WPA3\n     -> WPS actif ou non\n     -> isolement invité\n     -> inventaire des bornes\n     -> mot de passe robuste\n     -> mise à jour du matériel\n\nPas de capture, pas de deauth, pas de cassage",
+  "7": "Lecture défensive rapide\n\nWPA3 + invités isolés + WPS off   : bon point\nWPA2 + mot de passe fort          : acceptable\nWPA2 + WPS actif                  : à corriger\ninvité sans isolation             : à corriger\nborne inconnue ou perso           : à clarifier\n\nLe contexte compte autant que le mode radio"
+ },
+ "6dde5117-f9e6-729d-e73d-67ef23f654ee": {
+  "5": "Angles de lecture sur les entrées\n\nrecherche / filtre -> reflet, erreur, différence de résultat\nchamp libre        -> encodage, validation, message\nidentifiant objet  -> changement de cible ou refus\nteleversement      -> type annonce, type accepte, statut\n\nOn observe d’abord, on conclut ensuite",
+  "7": "Ce qu’on écrit / ce qu’on n’écrit pas\n\noui  -> valeur bénigne reflétée\noui  -> message d’erreur reproductible\noui  -> fichier de test accepté à tort\nnon  -> webshell ou extraction massive\nnon  -> charge destructive ou intrusive",
+  "9": "Mini-tableau de tri\n\nreflet contrôlé        -> A05 Injection (à confirmer) -> CWE à confirmer -> pas de script actif\nerreur détaillée       -> A10 Mishandling of Exceptional Conditions -> CWE-209 -> pas de charge intrusive\ntéléversement accepté  -> catégorie OWASP à confirmer -> CWE-434 -> pas de webshell\n\nToujours ecrire ce que tu n’as pas fait"
+ },
+ "6eb79cde-e27e-65bb-c1b5-6e5dada5ceb2": {
+  "5": "Carte d’exposition : quatre colonnes utiles\n\nnom            -> ce qui est observé\nsource         -> d’où vient l’indice\ntechnologie    -> ce que la source suggère\nconfiance      -> confirmé / probable / à vérifier\n\nRègle : observé n’est pas prouvé vulnérable",
+  "7": "Indice public  -> ce que tu peux dire\n\ncertificat     -> un nom a été utilisé\nREADME public  -> une technologie est citée\noffre d’emploi -> une pile est probablement en usage\nServer: nginx  -> un front web parle comme Nginx\n\nAucun indice seul ne prouve une CVE"
+ },
+ "704fbdc9-9b54-081c-baa5-0f8ad6255413": {
+  "5": "Publication d’un avis\n        |\n        v\nLecture de l’impact\n        |\n        v\nTest ou sauvegarde\n        |\n        v\nInstallation du correctif\n        |\n        v\nRedémarrage du service ou du noyau",
+  "10": "Automatique et prudent : unattended-upgrades, dnf-automatic\nÀ surveiller          : journaux, fenêtre de maintenance, sauvegarde\nÀ ne pas oublier      : relancer le service ou redémarrer si requis\nÀ vérifier            : support de la version et source officielle"
+ },
+ "71df3ffc-bfe3-4d15-d1de-a8a878beb7ba": {
+  "5": "Structure simple d’une recommandation\n\nproblème observé\n-> impact probable\n-> action concrète\n-> propriétaire du correctif\n-> délai raisonnable\n-> critère de re-test\n\nLe lecteur doit savoir quoi faire ensuite",
+  "7": "Trop vague / utile\n\nrevoir les droits\n-> vérifier côté serveur le rôle requis\n\nsécuriser le cookie\n-> ajouter Secure, HttpOnly, SameSite=Lax\n\nfaire un re-test\n-> rejouer le cas avec compte standard"
+ },
+ "73fb525a-51de-945e-c72c-d0381229adc2": {
+  "5": "1. La victime est connectée à boutique.example\n2. Son navigateur garde un cookie de session\n3. Elle ouvre aussi un site piégé\n4. Ce site provoque une requête vers boutique.example\n5. Le navigateur joint le cookie automatiquement\n6. Sans défense, le serveur croit à une action voulue",
+  "11": "Extrait inventé de journal\n09:15:00 POST /profil/adresse 200 Origin: https://boutique.example\n09:17:42 POST /profil/adresse 200 Referer: https://cadeaux.example/promo\n\nMême action sensible, mais deuxième origine inattendue"
+ },
+ "78c5d35a-bc04-2800-9d2f-c07835ea0190": {
+  "5": "Requête vers /api/commandes/1042\n          |\n          v\n1. Identifier l’utilisateur\n2. Vérifier son rôle\n3. Vérifier l’objet demandé\n4. Décider : autoriser ou refuser\n\nSi l’étape 3 manque : IDOR ou BOLA\nSi l’étape 2 manque : élévation de fonction",
+  "11": "Journal inventé à relire\n09:15:01 awa   GET /api/commandes/100 200\n09:15:02 awa   GET /api/commandes/101 200\n09:15:03 awa   GET /api/commandes/102 403\n09:15:04 awa   GET /api/commandes/103 403\n09:15:05 awa   GET /api/commandes/104 403\n\nMême compte, IDs successifs : énumération probable"
+ },
+ "7a798d49-4024-7653-b333-7d41dc725f22": {
+  "5": "Question avant toute démonstration\n\nest-ce explicitement autorisé ?\nla preuve minimale suffit-elle ?\nl’impact est-il borné ?\nle contact prévu est-il informé ?\n\nSi non : stop ou clarification",
+  "7": "Où s’entraîner légalement\n\nPortSwigger Academy\nOWASP Juice Shop\nDVWA\nMetasploitable 3\n\nLabo oui, production non"
+ },
+ "7e640cd8-9824-780c-f70c-115eebd1e24c": {
+  "5": "Chemin plausible à documenter\n\ncompte ou groupe trop large\n-> action possible observée\n-> actif touché\n-> impact probable\n-> correction attendue\n\nSans tutoriel offensif",
+  "7": "Signaux courants\n\nservice + admin local\nNOPASSWD: ALL\ngroupe privilégié trop large\nsecret dans script d’admin\npartage d’administration trop ouvert\n\nLire, qualifier, corriger"
+ },
+ "7f098d36-6bd9-39c9-f2a9-40753f8c514f": {
+  "5": "Les six gestes du triage\n1. comprendre l’alerte\n2. vérifier dans d’autres sources\n3. qualifier : vrai positif, faux positif, à surveiller, non concluant\n4. prioriser\n5. escalader selon la procédure\n6. documenter faits, hypothèses, actions et suite",
+  "9": "Note de triage\nFaits : ce qui est vu, où, quand, source, ligne\nHypothèses : marquées comme telles\nActions : vérification, blocage, appel, ticket\nDécision : vrai positif, faux positif, à surveiller, non concluant\nConfiance : faible, moyenne ou élevée\nSuite : À qui passer la main, avec quel niveau d’urgence"
+ },
+ "82d908d7-039d-ba6a-9023-f566d39a819f": {
+  "4": "/var/log/\n  auth.log      connexions SSH, sudo, changements de compte   (Debian, Ubuntu)\n  secure        même rôle sur Red Hat, CentOS, Fedora\n  syslog        messages généraux du système\n  kern.log      noyau et matériel\n  nginx/        access.log et error.log du serveur web\n  apache2/      access.log et error.log d'Apache\n  wtmp, btmp    connexions réussies et échouées (binaires : lastb, last)"
+ },
+ "82da3b35-54fe-ad32-abd2-be099ee8184b": {
+  "5": "Formats fréquents de temps\n\nRFC 3339      2026-03-10T08:15:00Z\nISO 8601      2026-03-10T09:15:00+01:00\nsyslog BSD    Mar 10 08:15:00\naccès web     [10/Mar/2026:08:15:00 +0000]\nepoch Unix    1700000000\nauditd        audit(1700000000.123:456)\njournald JSON __REALTIME_TIMESTAMP=1773130805123456",
+  "10": "Chronologie saine\n\n1. noter le format et le fuseau de chaque source\n2. convertir en UTC\n3. repérer l’heure de l’événement et celle de réception\n4. signaler toute dérive connue\n5. trier ensuite seulement"
+ },
+ "84370fe4-45d9-8475-3d27-b189a6cfa86e": {
+  "5": "Une règle simple contient\ncondition      ce qui doit être vrai\ngroupement     par source, par compte, par machine ou par processus\nfenêtre        combien de minutes ou d’heures\nseuil          à partir de combien d’occurrences\ncontexte       exclusions, heures ouvrées, biens critiques\nsortie         gravité, titre, description, prochaine action",
+  "11": "Fenêtre et seuil doivent être explicites\nFenêtre fixe      : intervalle prédéfini, ici 08:14:00 à 08:18:59\nFenêtre glissante : cinq minutes recalculées à partir de chaque nouvel événement\nSeuil 3 : attrape aussi un utilisateur qui insiste trop vite\nSeuil 5 : garde ici le scanner 192.0.2.44, laisse passer le poste 10.1.4.23\nSeuil 8 : risque de rater l’attaque lente"
+ },
+ "84432c64-0d2a-ea1c-ed10-765133451c32": {
+  "5": "Plage              Usage\n0 à 1023           ports connus, souvent réservés aux services classiques\n1024 à 49151       ports enregistrés\n49152 à 65535      ports dynamiques ou éphémères",
+  "7": "Service   Port(s)     Remarque\nHTTP      80          web en clair\nHTTPS     443         web dans TLS\nSSH       22          administration sécurisée\nTelnet    23          administration en clair\nDNS       53          UDP ou TCP\nDHCP      67/68       serveur / client\nNTP       123         synchronisation de l’heure\nSMB       445         partage Windows"
+ },
+ "8484fe84-4638-d6ef-3566-93906fd80ffd": {
+  "5": "Sources                    Transport                 Collecte\nserveur Linux  ----@@----> collecteur syslog ----> archives\npare-feu       ----@@----> centralisation       --> recherches\nDNS            ----agent-> ou SIEM              --> alertes\nWindows        ----WEF--> abonnements WEC       --> cas\n\n@   = UDP, simple mais muet si un message se perd\n@@  = TCP, plus fiable mais ne chiffre pas seul\nTLS = confidentialité et authentification du transport"
+ },
+ "8703c29c-e882-332b-101b-8d03842a2489": {
+  "5": "Type                 Préfixe        Usage principal\nLink-local           fe80::/10      voisinage local, passerelle, NDP\nGlobal unicast       2000::/3       Internet et réseaux interconnectés\nUnique local         fc00::/7       usage interne, souvent fd00::/8\nMulticast            ff00::/8       groupes, par exemple ff02::1 et ff02::2\n\nff02::1 = tous les nœuds du lien\nff02::2 = tous les routeurs du lien",
+  "7": "Démarrage IPv6 simplifié\n1. l’interface crée fe80::/10\n2. elle envoie une sollicitation de routeur\n3. le routeur annonce le préfixe du LAN, par exemple 2001:db8:1:20::/64\n4. l’hôte crée une adresse globale et une route par défaut\n5. NDP résout les voisins et remplace ARP"
+ },
+ "8844a6b5-0493-80d0-0fc0-f7150e367af1": {
+  "5": "Politique sobre\nEntrée   : deny par défaut\nSortie   : allow par défaut\nBoucle locale : allow\nConnexions établies : allow\nExceptions utiles : SSH, HTTP, HTTPS, selon le besoin réel"
+ },
+ "88d61c39-020a-1667-0f76-711b251e13f2": {
+  "5": "Famille                 Vérifications de base\nservices                désactiver l’inutile, compte dédié\ncorrectifs              paquets à jour, redémarrage planifié\ncomptes et SSH          clés, sudo précis, pas de root direct\nréseau                  ports utiles, pare-feu en refus par défaut\nfichiers                droits stricts, partitions sensibles\npreuves                 journaux, sauvegardes, vérification",
+  "10": "Prioriser un constat\nimpact élevé + exploitable à distance      critique\nimpact élevé ou exploitable localement     important\nimpact limité et peu exploitable           mineur\n\nNote aussi l’exposition, la preuve et l’effort de correction."
+ },
+ "8a32f6d6-e51d-bf40-47b1-64f802729208": {
+  "5": "2026-03-10T09:15:01Z ... [UFW BLOCK] IN=eth0 SRC=192.0.2.11\nDST=10.1.0.10 PROTO=TCP SPT=52341 DPT=22 ... SYN\n\n[UFW BLOCK]  -> action prise\nIN=eth0      -> interface ou le paquet arrive\nSRC=...      -> adresse qui envoie\nDST=...      -> adresse visée\nSPT=52341    -> port source, souvent éphémère\nDPT=22       -> port du service visé\nSYN          -> début d’une tentative TCP",
+  "9": "Motif utile                     Lecture prudente\nUne source, beaucoup de ports   Balayage de ports probable\nUn port, beaucoup de cibles     Balayage d’hôtes probable\nBeaucoup de refus sur 22        Bruit courant d’Internet\nALLOW sortant sur port rare     À vérifier en priorité\nTrafic inter-segments refusé    Peut révéler un poste mal placé"
+ },
+ "8b357a9a-e2ba-47fd-2fac-876e3779305f": {
+  "4": "No.  Temps   Source           Destination      Proto  Info\n  1  0.0000  192.168.10.23    broadcast        ARP    Who has 192.168.10.2 ?\n  2  0.0010  192.168.10.2     192.168.10.23    ARP    192.168.10.2 is at 00:1b:21:aa:00:02\n  3  0.0020  192.168.10.23    192.168.10.2     DNS    Standard query A intranet.cyberpingo.lab\n  4  0.0140  192.168.10.2     192.168.10.23    DNS    Standard query response A 192.168.10.50"
+ },
+ "8c38a4f7-3e75-5496-4fa8-84bb16498744": {
+  "5": "Rappels de tailles utiles\n/25 = 126 hôtes   /27 = 30 hôtes\n/26 = 62 hôtes    /28 = 14 hôtes\n/29 = 6 hôtes     /30 = 2 hôtes\n\nPlages privées RFC 1918\n10.0.0.0/8     172.16.0.0/12     192.168.0.0/16",
+  "7": "Service         Besoin utile   Préfixe   Réseau           Passerelle    Hôtes utilisables         Diffusion\nAtelier         70            /25       10.2.0.0/25      10.2.0.1      10.2.0.1 à 10.2.0.126    10.2.0.127\nAdministration  26            /27       10.2.0.128/27    10.2.0.129    10.2.0.129 à 10.2.0.158  10.2.0.159\nInvités         14            /28       10.2.0.160/28    10.2.0.161    10.2.0.161 à 10.2.0.174  10.2.0.175\nServeurs        6             /29       10.2.0.176/29    10.2.0.177    10.2.0.177 à 10.2.0.182  10.2.0.183"
+ },
+ "8c59c582-1eb6-2ff0-0ab4-51844ad05b8d": {
+  "5": "Élément à suivre         Exemple\nSystème                 Windows, Android, Ubuntu\nApplications            lecteur PDF, suite bureautique\nNavigateur              Firefox, Edge, Chrome\nMicrologiciel           box, routeur, imprimante\nÉtat critique           pris en charge ou fin de support",
+  "7": "Réduire la surface d’attaque\n1. désinstaller ce qui ne sert plus\n2. désactiver extensions et services inutiles\n3. garder un seul antivirus à la fois\n4. utiliser le pare-feu local\n5. travailler avec un compte standard"
+ },
+ "8c65209f-579d-7a1a-6ea9-e4eeb0790279": {
+  "4": "Adresse    192.168.10.23   =  11000000.10101000.00001010.00010111\nMasque     255.255.255.0   =  11111111.11111111.11111111.00000000\n                              \\______ réseau ______/ \\_ hôte _/\nRéseau     192.168.10.0    (adresse ET masque)\nDiffusion  192.168.10.255  (tous les bits hôte à 1)"
+ },
+ "9126bae3-8396-9cc4-81a2-cf71a88f10c5": {
+  "5": "Flux -> source, destination, ports, protocole, début, fin, octets\n\nUtile pour :\n- repérer un gros transfert sortant\n- voir si un poste parle à une destination inédite\n- compter les connexions vers un même serveur\n\nLimite :\n- pas de contenu applicatif\n- pas de preuve, seulement un résumé",
+  "12": "Alerte IDS                  Réaction analytique\nGravité faible, trafic légitime   À surveiller ou faux positif probable\nGros volume + action allowed      À traiter rapidement\nAction blocked par une politique  Vérifier, mais priorité souvent plus basse\nSignature seule                    Jamais suffisante"
+ },
+ "923f6fea-bc14-7133-bf02-d16db0bf61f5": {
+  "5": "Décision simple avant un test actif\n\npérimètre clair ?      oui / non\nfenêtre adaptée ?      oui / non\nvolume acceptable ?    oui / non\néquipement fragile ?   oui / non\n\nSi non ou doute : réduire, reporter ou arrêter",
+  "7": "Réduire l’impact\n\nmoins d’hôtes\nmoins de ports\nfenêtre plus calme\ncadence plus douce\narrêt si instabilité\n\nCe n’est pas de l’évasion"
+ },
+ "9564cd85-5229-a1c9-d025-cc8cd2231543": {
+  "5": "Plus volatil\nregistres, caches\ntable de routage, cache ARP, processus et mémoire\nfichiers temporaires\ndisque local\njournaux distants\nconfiguration physique et topologie réseau\narchives\nMoins volatil",
+  "10": "Rapport d’investigation\n1. Résumé dirigeant : quoi, quand, impact, état\n2. Périmètre et sources : journaux, machines, limites\n3. Chronologie UTC : faits et preuves\n4. Analyse : techniques observées, certitude, doutes\n5. Actions menées et recommandations priorisées\n6. Annexes : indicateurs désarmés, commandes, empreintes"
+ },
+ "9608de54-e3ce-2388-335f-d8b1cc8058c3": {
+  "5": "Champs cron\nm h dom mon dow  commande\n| |  |   |   |\n| |  |   |   +-- jour semaine, 0 ou 7 = dimanche\n| |  |   +------ mois\n| |  +---------- jour du mois\n| +------------- heure\n+--------------- minute",
+  "7": "Exemples utiles\n*/5 * * * *          toutes les 5 minutes\n30 2 * * 1-5         à 02 h 30, du lundi au vendredi\n0 3 1 * *            le 1er jour du mois à 03 h 00\n15 6 * * 0           chaque dimanche à 06 h 15"
+ },
+ "96b02bb7-463c-85b4-fcb9-14feebc83d24": {
+  "5": "Actif + menace + vulnérabilité = risque\n\nActif : messagerie\nMenace : prise de contrôle du compte\nVulnérabilité : pas de double authentification\nImpact possible : lecture de courriels, fraude, perte de confiance",
+  "7": "Matrice 4 x 4\n\nImpact →        1     2      3       4\nVrais. 1        1     2      3       4\nVrais. 2        2     4      6       8\nVrais. 3        3     6      9      12\nVrais. 4        4     8     12      16"
+ },
+ "9853f10a-9941-0b53-c76a-a1ac142e2bbb": {
+  "5": "7 Application    service visible : HTTP, DNS, SMTP        unité : message\n6 Présentation  format, compression, chiffrement     unité : message\n5 Session       ouverture et suivi d’une session     unité : message\n4 Transport     TCP, UDP, ports                      unité : segment\n3 Réseau        IP, routage                          unité : paquet\n2 Liaison       Ethernet, Wi-Fi, MAC                 unité : trame\n1 Physique      câble, fibre, ondes                  unité : bits",
+  "7": "OSI                      TCP/IP                Exemple d’équipement\n7, 6, 5 Application      Application           proxy, navigateur, serveur DNS\n4      Transport         Transport             pare-feu à états, load balancer\n3      Réseau            Internet              routeur\n2, 1   Liaison/Physique  Accès réseau          commutateur, point d’accès, câble"
+ },
+ "998aebd3-c337-e876-7d2c-f5c15fd999c7": {
+  "5": "Scénario                        Levier            Réflexe\nSMS « colis en attente »        Urgence           Taper l’adresse officielle\nAppel du « conseiller »         Autorité          Raccrocher et rappeler\n« Transfert envoyé par erreur » Pression morale   Vérifier le solde réel\n« J’ai changé de numéro »       Confiance         Vérifier par un autre canal\nQR code inconnu                 Curiosité         Demander l’URL avant d’ouvrir",
+  "8": "Réaction sûre sur téléphone\n1. Lire sans cliquer\n2. Chercher le service dans l’application officielle\n3. Raccrocher si un secret est demandé\n4. Vérifier par un autre canal\n5. Bloquer, signaler, conserver une preuve si besoin"
+ },
+ "9c9efce7-463b-a8a6-880b-ab4af74d08dd": {
+  "5": "Fichier             Rôle principal\n/etc/passwd        identité du compte, UID, GID, dossier, shell\n/etc/shadow        empreinte du mot de passe et règles d’expiration\n/etc/group         groupes et membres secondaires\nCommandes utiles   whoami, id, groups, who, w, last, lastlog",
+  "7": "Exemple « /etc/passwd »\nawa:x:1001:1001:Awa Diop:/home/awa:/bin/bash\n|   | |    |    |        |         |\n|   | |    |    |        |         +-- shell\n|   | |    |    |        +------------ dossier personnel\n|   | |    |    +--------------------- commentaire\n|   | |    +-------------------------- GID principal\n|   | +------------------------------- UID\n|   +--------------------------------- empreinte dans shadow\n+------------------------------------- nom du compte"
+ },
+ "9ce3af04-6403-f91e-bdee-d9bf4ba0c2fe": {
+  "5": "Où chercher selon la question\n\nauthentification      -> /var/log/auth.log ou /var/log/secure\nactivité générale     -> /var/log/syslog ou /var/log/messages\nnoyau                 -> /var/log/kern.log ou journalctl -k\npaquets et mises à jour -> /var/log/dpkg.log, /var/log/apt/\nservice web           -> /var/log/nginx/ ou /var/log/apache2/\njournal binaire       -> journalctl, pas « cat »",
+  "7": "Repères journald utiles\n\n-u ssh.service ou sshd.service : une unité précise\n-b                            : démarrage courant\n--since / --until             : plage de temps\n-p err                        : erreurs et niveaux plus urgents\n-o json                       : champs structurés exportables\n--no-pager, -f                : sans pager, puis suivre en direct"
+ },
+ "9de9ab9c-9d8e-a2f7-9215-a6ffaf3ce30c": {
+  "5": "Élément regex   Sens\n^              début de ligne\n$              fin de ligne\n[0-9]          un chiffre\n+              une ou plusieurs fois\n( ... )        groupe capture\n|              ou logique\n\\.            point littéral"
+ },
+ "9f726ab0-21c9-4eef-96d3-e1dd6271497e": {
+  "5": "Repères simples\n\névaluation de vulnérabilités : identifier et prioriser\ntest d’intrusion         : valider prudemment\nboîte noire              : peu d’informations initiales\nboîte grise              : quelques infos ou comptes\nboîte blanche            : documentation ou architecture fournies\nred team                 : exercice piloté, plus large",
+  "9": "Quand utiliser quoi ?\n\nPTES           -> structurer une mission\nNIST 800-115   -> cadrer, conduire, restituer\nWSTG           -> tester une application web\nATT&CK         -> décrire des tactiques et techniques"
+ },
+ "a0523f46-076e-f08d-8acf-2198afcb66dd": {
+  "5": "Cookie de session défensif, exemple\n\nSet-Cookie: __Host-session=RND...;\n  Path=/;\n  Secure;\n  HttpOnly;\n  SameSite=Lax;\n  Max-Age=1800\n\n__Host-  : pas de Domain, Path=/, Secure\nSecure   : envoyé seulement en HTTPS\nHttpOnly : inaccessible à JavaScript\nSameSite : limite certains envois intersites"
+ },
+ "a1a1c2ef-9afc-8a84-c92b-fe83daa3f7d2": {
+  "5": "Téléversement reçu\n      |\n      +-> taille acceptable ?\n      +-> extension autorisée ?\n      +-> signature cohérente ?\n      +-> nom remplacé par un identifiant ?\n      +-> stockage hors exécution ?\n      +-> service avec Content-Disposition et nosniff ?",
+  "10": "Journal inventé à relire\n09:15:00 GET /fichiers/rapport.pdf 200\n09:15:05 GET /fichiers/../../config.json 400\n09:15:06 GET /fichiers/%2e%2e%2fsecret.txt 400\n09:15:08 POST /upload Content-Type: image/png 415\n\nLe type annoncé et le chemin demandé ne suffisent pas"
+ },
+ "a3218882-f4b2-4d34-1da7-c6e638ada54f": {
+  "5": "Reste à vérifier avant clôture\n\ncomptes temporaires\nsecrets ou jetons de démo\nfichiers témoins déposés\nrègles réseau temporaires\ntâches et services ajoutés\n\nRetirer, tracer, valider",
+  "7": "Preuves à garder / copies à détruire\n\ngarder : extrait minimal, horodatage, contexte\ndétruire : copie excessive, secret complet, dump inutile\n\nConserver seulement le nécessaire"
+ },
+ "a42bf176-c05d-7248-ffa9-b7949df5db3c": {
+  "5": "Danger                     Symptôme                      Réflexe\nvariable non citée         espace découpe le nom         écrire \"$var\"\nvariable vide              chemin tronqué ou faux        vérifier l’argument\nerreur ignorée             script continue en silence    tester le retour\nfichier temporaire oublié  traces inutiles ou fuite      mktemp + trap"
+ },
+ "a4cbf136-7579-f45f-d0ac-c6d0a75262d7": {
+  "5": "Strate 0 : horloge de référence\nStrate 1 : serveur connecté à la référence\nStrate 2 : serveur synchronisé sur la strate 1\nStrate 3 : clients et équipements réseau",
+  "7": "Niveau syslog  Sens\n0              urgence\n1              alerte\n2              critique\n3              erreur\n4              avertissement\n5              notification\n6              information\n7              débogage"
+ },
+ "a4f419b8-7ceb-5ebc-2654-b1396bae5a86": {
+  "5": "Utilisateur -> URL fournie\n                |\n                v\nServeur applicatif\n   |\n   +-> Internet public attendu\n   +-> localhost à refuser\n   +-> réseau privé à refuser\n   +-> métadonnées cloud à refuser",
+  "11": "Extrait XML à ne pas accepter tel quel\n<!DOCTYPE note [\n  <!ENTITY ext SYSTEM \"file:///etc/passwd\">\n]>\n<note>&ext;</note>\n\nRemède : désactiver DTD et entités externes"
+ },
+ "a8bca3fe-de26-477d-224d-ec1aa4f0d58f": {
+  "5": "Audit web par étapes\n\n1. cartographier : pages, routes, rôles, versions, API\n2. lire : TLS, cookies, en-têtes, méthodes, réponses\n3. vérifier : sessions, accès, entrées, erreurs\n4. approfondir : logique métier, API, client riche\n5. consigner : requête, réponse, conclusion, preuve, référence",
+  "10": "Fiche de test à tenir à jour\n\ndate UTC       : quand le test a été lancé\ncible          : URL, rôle et compte de test\nrequête        : méthode, chemin, en-têtes utiles, corps si nécessaire\nréponse        : code, en-têtes, extrait utile\nconclusion     : fait, hypothèse ou faux positif\nsuite          : re-test, correction attendue, référence WSTG ou ASVS"
+ },
+ "a8d04f10-056b-7f35-7140-76d2ddb37768": {
+  "5": "Rôles minimaux\n\nDirection : fixe les priorités et valide les moyens\nRéférent sécurité : suit les actions et coordonne\nUtilisateurs : appliquent, signalent, demandent en cas de doute\nSupport ou prestataire : met en œuvre et documente",
+  "7": "Cycle simple\nRègle claire -> habitude -> signalement rapide -> retour d’expérience\n          ^                                         |\n          +--------------- amélioration continue ---+"
+ },
+ "aa1266fd-0742-e5a4-2295-cc48b368ed14": {
+  "5": "Repères de lecture\nhead -n 5 journal.log  : voir le début\ntail -n 20 journal.log : voir la fin\nless journal.log       : lire et chercher\nwc -l journal.log      : compter les lignes\n\ngrep utile\ngrep -n motif fichier            : afficher le numéro de ligne\ngrep -c motif fichier            : compter les lignes qui correspondent\ngrep -v motif fichier            : exclure\ngrep -E 'motif1|motif2' fichier  : alternatives"
+ },
+ "aacaecda-468f-60c1-4041-3fb76ec68744": {
+  "5": "Dépôt signé\n   |\n   v\nListe des paquets  <- « apt update »\n   |\n   v\nPaquet choisi      <- « apt install »\n   |\n   +--> dépendances\n   |\n   v\nBase locale        <- « dpkg -l », « rpm -qa »",
+  "10": "Commande              Effet principal\napt search motif      cherche un paquet\napt show paquet       décrit un paquet\napt install paquet    installe le paquet demandé\napt remove paquet     retire le logiciel, garde souvent sa config\napt purge paquet      retire aussi la configuration du paquet\napt autoremove        retire des dépendances devenues inutiles\ndpkg -l               liste les paquets connus localement\ndpkg -L paquet        liste les fichiers fournis par ce paquet\ndpkg -S /chemin       retrouve le paquet depuis un fichier\ndnf search ou dnf upgrade  équivalents courants côté Fedora ou RHEL"
+ },
+ "ab51c641-1833-1001-a951-d183830838ea": {
+  "5": "Table de R1, le routeur du siège (extrait simplifié)\n\nC   10.1.0.0/16 is directly connected, GigabitEthernet0/0\nL   10.1.0.1/32 is directly connected, GigabitEthernet0/0\nS   10.2.0.0/16 [1/0] via 172.16.1.2\nS   10.2.8.0/24 [1/0] via 172.16.1.6\nS*  0.0.0.0/0 [1/0] via 172.16.1.10",
+  "7": "Les voisins de R1\n\n                     +== 172.16.1.0/30 ==  R2 (agences du nord : 10.2.0.0/16)\nLAN siège            |\n10.1.0.0/16 --- R1 --+== 172.16.1.4/30 ==  R3 (agence de l’est : 10.2.8.0/24)\n                     |\n                     +== 172.16.1.8/30 ==  Fournisseur d’accès (Internet)\n\nSur chaque lien /30, R1 prend l’adresse de rang 1 et le voisin celle de rang 2 :\nR2 = 172.16.1.2, R3 = 172.16.1.6, fournisseur = 172.16.1.10"
+ },
+ "adc9689b-9ce8-4e74-a389-2165989d6350": {
+  "5": "Levier                Signal d’alarme              Réflexe\nAutorité              « Le directeur l’exige »       Vérifier la demande\nUrgence               « Dans 5 minutes sinon... »    Ralentir\nCuriosité             « Regarde ce document secret » Ouvrir avec prudence\nPeur                  « Ton compte sera bloqué »     Passer par un canal sûr\nAppât du gain         « Tu as gagné »                Chercher la contrepartie",
+  "7": "Anatomie d’une attaque en 5 étapes\n1. Reconnaissance : collecte d’infos publiques\n2. Prétexte : histoire crédible et rôle joué\n3. Contact : mail, SMS, appel, QR code, visite\n4. Action : obtenir clic, code, accès ou argent\n5. Exploitation : réutiliser ce qui a été obtenu"
+ },
+ "af9b35ee-f81b-ca2a-79f4-da5f14c036af": {
+  "5": "Comparer les sources\n4688 Security   nouveau processus, selon la stratégie\nSysmon 1        image, ligne de commande, parent, hachages\nSysmon 3        connexion réseau liée au processus\nSysmon 7        image chargée dans un processus\nSysmon 8 et 10  thread distant ou accès à un processus\nSysmon 11       fichier créé ou remplacé\nSysmon 12 à 14  création, suppression ou modification du registre\nSysmon 22       requête DNS liée au processus\nPowerShell 4103 journalisation de module\nPowerShell 4104 contenu d’un bloc de script si activée",
+  "10": "Indices forts sans automatisme\nWINWORD.EXE -> powershell.exe     parenté inhabituelle\npowershell.exe -> requête DNS     pivot vers le domaine\npowershell.exe -> 192.0.2.44:443  pivot vers la connexion\npowershell.exe -> fichier temp    effet local observable"
+ },
+ "b064a56b-ffb8-202b-ce1c-8ec612a480eb": {
+  "5": "Besoin                            Outil adapté\nprotéger un disque entier         LUKS avec cryptsetup\nprotéger un fichier à envoyer     GnuPG\nvérifier qu’un fichier n’a pas changé  sha256sum ou openssl dgst\nprouver l’origine d’un fichier    signature GnuPG + clé de confiance"
+ },
+ "b0b98751-5df0-e21b-4e8c-737003c10d9e": {
+  "5": "Lecture rapide d’un cadrage\n\nobjectif            -> pourquoi la mission existe\npérimètre           -> quoi tester\nexclusions          -> quoi ne pas toucher\nfenêtre             -> quand agir\ncontacts            -> qui prévenir\ndonnées             -> quoi garder et comment\ntiers               -> qui nécessite un accord séparé",
+  "7": "Donnée de mission\n\ncollecte minimale\n      -> chiffrée\n      -> destinataires définis\n      -> durée convenue\n      -> suppression en fin de mission"
+ },
+ "b166be31-17a9-c97b-a832-d0fe25236fad": {
+  "6": "Outil      Force principale                 Limite à garder en tête\ntar        archive simple et portable      peu de versionnement natif\nrsync      copie efficace et différentielle une mauvaise option peut refléter une erreur\nrestic     instantanés chiffrés, déduplication exige une gestion sérieuse du mot de passe"
+ },
+ "b1e6d953-5cb5-88df-23f4-d2c0735be76e": {
+  "5": "Router on a stick\n\nVLAN 110 192.168.10.0/24 --+\nVLAN 120 192.168.11.0/24 --+-- SW1 == trunk == R1 Gi0/0\nVLAN 130 192.168.12.0/24 --+\n\nPasserelles\n110 -> 192.168.10.1\n120 -> 192.168.11.1\n130 -> 192.168.12.1"
+ },
+ "b2aa5220-1c43-9e81-21f3-4449980d7fc2": {
+  "5": "   ATELIER D’AWA (LAN)                                    OPÉRATEUR (WAN)\n\n   [PC1]   [PC2]   [PC3]   [Imprimante]\n     \\       |       |       /\n      +------+-------+------+\n             [Commutateur]\n                  |\n               [  Box  ] ======= liaison de l’opérateur ======> ( Internet )",
+  "7": "Topologie  Principe                           Avantage                    Point faible\nÉtoile     tout passe par un équipement      une panne de poste reste     le centre est un point\n           central                           isolée                       de défaillance\nBus        un câble partagé par toutes       peu de câble                 une coupure bloque tout\n           les machines\nAnneau     chaque machine relie la suivante  accès organisé               une rupture coupe l’anneau\nMaillée    plusieurs chemins entre les       résiste aux pannes           coûteuse et complexe\n           équipements",
+  "9": "Équipement      Ce qu’il lit             Ce qu’il relie\nCommutateur     adresse MAC              des machines d’un même réseau\nRouteur         adresse IP               des réseaux différents\nPoint d’accès   adresse MAC, sans fil    des appareils Wi-Fi à un réseau filaire\nPare-feu        IP, ports, état          deux zones dont il filtre le trafic"
+ },
+ "b3360077-4ea7-967d-471d-831ed39073f6": {
+  "5": "Mesures de base\nVP = vrai positif, FP = faux positif, FN = faux négatif, VN = vrai négatif\nprécision = VP / (VP + FP)\nrappel    = VP / (VP + FN)\nseuil bas  : plus sensible, souvent plus bruyant\nseuil haut : moins bruyant, mais peut rater des attaques lentes"
+ },
+ "b3f18a0f-c8cc-22a0-912a-4a100b736394": {
+  "5": "Navigateur sur https://app.example.org\n            |\n            | GET simple vers https://api.example.org\n            v\nRéponse avec Access-Control-Allow-Origin\n\nSi la requête ajoute un en-tête non simple :\nOPTIONS de pré-requête\n  -> Access-Control-Request-Method\n  -> Access-Control-Request-Headers",
+  "11": "Configuration saine pour un front officiel\nAccess-Control-Allow-Origin: https://app.example.org\nAccess-Control-Allow-Credentials: true\nAccess-Control-Allow-Methods: GET, POST\nAccess-Control-Allow-Headers: Content-Type, X-CSRF-Token\nVary: Origin"
+ },
+ "b3f2d856-7c5d-2169-ae53-175cc32fb4ce": {
+  "5": "Stockage correct, en bref\n\nmot de passe saisi\n        +\nsel unique aléatoire\n        +\nalgorithme lent, par exemple Argon2id ou scrypt\n        =\nempreinte stockée\n\noptionnel : poivre côté serveur, séparé de la base"
+ },
+ "b5447ef4-5935-ad25-710e-a9459b2b05be": {
+  "3": "Client                         Serveur (port 80)\n  | --- SYN  ------------------> |   « je veux me connecter »\n  | <----------------- SYN-ACK --- |   « d'accord, moi aussi »\n  | --- ACK  ------------------> |   « c'est établi »\n  | === données (HTTP) ===========> |\n  | --- FIN  ------------------> |   fermeture propre",
+  "6": "SYN envoyé  ->  SYN-ACK reçu         port OUVERT\nSYN envoyé  ->  RST (ou RST-ACK)     port FERMÉ (machine joignable)\nSYN envoyé  ->  rien, puis SYN répétés  port FILTRÉ ou machine injoignable"
+ },
+ "b55726cc-ba7c-7c46-f5ed-73fd200f1d19": {
+  "5": "Lettre de mission minimale\n\ncible        : URL, API, sous-domaines, environnement\ncomptes      : jeux d’essai fournis, rôles, MFA éventuelle\ntechniques   : lecture seule, scans passifs, tests actifs autorisés ou non\nhoraires     : plage de test, jours exclus, période sensible\nvolumétrie   : limites de requêtes, pas de déni de service\ncontacts     : responsable métier, exploitant, urgence\narrêt        : conditions d’arrêt et escalade",
+  "10": "Divulgation responsable trouvée par hasard\n\nne pas insister ni télécharger des données inutiles\nprendre juste assez de preuve pour expliquer le problème\nchercher « /.well-known/security.txt » ou un contact officiel\nprévenir sans publier la faille avant accord"
+ },
+ "b6fc0a07-6799-72eb-8c61-8ffdd153c97e": {
+  "5": "racine (.)\n  |\n  +-- .example\n       |\n       +-- atlas.example\n       |\n       +-- intranet.atlas.example",
+  "7": "Type   Rôle principal\nA      nom -> adresse IPv4\nAAAA   nom -> adresse IPv6\nCNAME  alias vers un autre nom\nMX     serveur de courrier\nNS     serveurs DNS autoritaires\nTXT    texte de politique ou de preuve\nPTR    adresse IP -> nom"
+ },
+ "b947a3cc-f0fe-3ceb-a97f-d8d400e7b98d": {
+  "5": "Même origine ?\n\nhttps://app.example.org\nhttps://app.example.org/admin        oui\nhttp://app.example.org               non, schéma différent\nhttps://app.example.org:8443         non, port différent\nhttps://api.example.org              non, hôte différent\nhttps://shop.example.org:443         origine différente si hôte différent"
+ },
+ "beaa4028-018e-e199-7bf2-136c6f35c3fa": {
+  "5": "Quelques repères utiles\n\n22/tcp   -> SSH\n25/tcp   -> SMTP\n53/tcp,udp -> DNS\n80/tcp   -> HTTP\n443/tcp  -> HTTPS\n3389/tcp -> RDP\n\nRepère ne veut pas dire certitude absolue",
+  "7": "Ce que tu peux dire / ne pas dire\n\nTu peux dire :\n- service probable\n- bannière observée\n- version annoncée ou détectée\n\nTu ne peux pas dire :\n- faille prouvée\n- impact métier certain\n- pile complète garantie"
+ },
+ "bfba48bd-79c7-d629-1a5a-f63ec0a56915": {
+  "5": "Chemin dangereux\n\nrequete HTTP -> parametre q\n            -> concatene dans SQL\n            -> base interprete le tout comme du code\n\nChemin correct\nrequete HTTP -> parametre q\n            -> placeholder ?\n            -> base separe code et valeur",
+  "9": "Indices utiles dans un journal d’accès\n\n%27, apostrophes répétées, --\nUNION SELECT, information_schema\nOR 1=1, sleep(, benchmark(\nrafale de 500 ou réponses anormalement lentes"
+ },
+ "c045ce75-1795-2e49-69ca-372c2978faf4": {
+  "5": "LogonType à retenir d’abord\n2   Interactive        clavier local\n3   Network            accès réseau, partage, service distant\n4   Batch              tâche planifiée\n5   Service            service Windows\n7   Unlock             déverrouillage\n10  RemoteInteractive  RDP\n11  CachedInteractive  ouverture hors ligne avec cache",
+  "10": "Lecture prudente d’une séquence\n4625  awa   type 10  192.168.1.77  status 0xC000006A\n4625  awa   type 10  192.168.1.77  status 0xC000006A\n4624  awa   type 10  192.168.1.77  succès\n4672  awa   privilèges sensibles attribués\n4634  awa   fin de session\n=> série à vérifier, pas preuve suffisante seule"
+ },
+ "c0fc8876-2b34-1b63-1e31-e84b80f92dc4": {
+  "5": "Métier                  Mission du quotidien         Parcours CyberPingo conseillé\nAnalyste SOC            lire journaux et alertes      fondamentaux, réseaux\nRéponse à incident      contenir, documenter          fondamentaux, réseaux\nPentest                 tester avec autorisation      réseaux, web, Linux\nGRC / conformité        cartographier contrôles       fondamentaux\nAppSec                  sécuriser le code             web, fondamentaux\nCloud security          sécuriser services cloud      réseaux, fondamentaux",
+  "7": "Compétences à cultiver\nTechnique : réseaux, Linux, journaux, web, scripts\nMéthode   : observation, priorisation, preuve\nHumain    : rédaction, pédagogie, éthique, calme\nPortfolio : compte rendu, capture d’écran, conclusion"
+ },
+ "c33a4522-d29b-18d7-589c-7438abec177e": {
+  "5": "Bureau Atlas\n\nPC compta -- Fa0/2 [VLAN 110]\nPC accueil -- Fa0/5 [VLAN 120]   SW1 == trunk == SW2\nWi-Fi invités - Fa0/8 [VLAN 130]\n\nMême câble entre SW1 et SW2,\nplusieurs VLAN transportés grâce au tag 802.1Q"
+ },
+ "c371460c-c036-53e8-80d4-a4af8ebb69be": {
+  "5": "Cadre minimal avant toute simulation\n\naccord explicite\npérimètre humain défini\ndonnées collectées limitées\nindicateurs annoncés\ndébriefing bienveillant\npoint de contact incident\n\nSans cela, on ne lance rien",
+  "7": "Indicateurs utiles / dérive à éviter\n\nclics           -> oui\nsignalements    -> oui\ndélai alerte    -> oui\nliste publique  -> non\nclassement honte-> non\ncollecte inutile -> non\n\nOn cherche une progression, pas un coupable"
+ },
+ "c3c8ea55-49de-9d15-7ce3-cf2ca90b370b": {
+  "5": "But principal          Exemple\nSauvegarde             récupérer après panne, erreur, attaque\nSynchronisation        retrouver les mêmes fichiers partout\nArchivage              conserver longtemps, même peu consulté",
+  "7": "Types de sauvegarde\nComplète       tout recopier\nIncrémentale   recopier ce qui a changé depuis la dernière sauvegarde\nDifférentielle recopier ce qui a changé depuis la dernière complète"
+ },
+ "c4d212cd-33bb-84a5-4f83-364e8f64acde": {
+  "5": "Auditd : champs à connaître\n\ntype=SYSCALL           -> appel système et identité du contexte\ntype=EXECVE            -> arguments, comme a0= et a1=\ntype=PATH              -> chemin touché, par exemple name=\"/etc/shadow\"\nmsg=audit(epoch:seq)   -> temps et numéro de séquence de l’événement\nauid                   -> identité d’origine de la session\nuid                    -> identité effective au moment de l’action\ncomm / exe             -> nom court et chemin du binaire\nkey                    -> règle d’audit qui a produit l’événement"
+ },
+ "c670235e-1bde-3053-414f-91ec83fd3f1e": {
+  "5": "Méthode simple de mission\n\n1. cadrage validé\n2. reconnaissance autorisée\n3. validation prudente\n4. preuve minimale\n5. note horodatée\n6. arrêt si risque ou instabilité\n7. restitution et nettoyage",
+  "9": "Preuve minimale utile\n\nconstat\n-> préconditions\n-> action courte et autorisée\n-> résultat horodaté\n-> arrêt\n-> recommandation"
+ },
+ "cb702636-1df2-e9c3-74dc-2d7d0c8b2ded": {
+  "5": "Client                        Serveur\n~/.ssh/id_ed25519            /home/awa/.ssh/authorized_keys\nclé privée : 600             fichier : 600\nclé publique : partageable   dossier .ssh : 700\nknown_hosts : mémoire des    sshd_config : règles du service\nempreintes de serveur"
+ },
+ "cbef2648-8943-8fab-a3db-5750d73aebc3": {
+  "5": "Extrait DNS normalisé :\n2026-03-10T09:18:02Z  192.168.1.50  k3n9za.service.example  TXT  NXDOMAIN\nheure                 client        qname                 type rcode\n\nExtrait Squid natif :\n1773134100.000 120 192.168.1.44 TCP_MISS/200 512 GET http://api.sync.example/health - HIER_DIRECT/192.0.2.40 application/json\n\ntime  durée(ms)  client  résultat/code  octets  méthode  URL  identité  pair/statut  type",
+  "10": "Signal observé                 Question suivante\nNXDOMAIN en rafale             Le domaine est-il aléatoire ou juste mal saisi ?\nBeaucoup de TXT                Quel logiciel légitime peut faire cela ?\nCONNECT vers un domaine rare   Quel poste, quel utilisateur, quelle heure ?\nIntervalles réguliers          Supervision légitime ou balisage ?\nVolume sortant élevé           Sauvegarde, mise à jour ou exfiltration ?"
+ },
+ "cc077a0c-1cda-e187-2be3-338cf896f030": {
+  "5": "Mode                  Niveau actuel         Remarque\nWEP                   à proscrire            cassé depuis longtemps\nWPA2-PSK              acceptable             dépend d’une phrase forte\nWPA3-SAE              meilleur               protège mieux l’échange initial\n802.1X + RADIUS       recommandé en entreprise\n                                           identité par utilisateur",
+  "10": "Checklist de durcissement\n1. mot de passe d’usine changé\n2. mises à jour appliquées\n3. SSH activé, Telnet coupé\n4. VLAN de gestion séparé\n5. ports inutilisés arrêtés\n6. journaux envoyés vers un serveur"
+ },
+ "cc3864f5-d03f-ebac-19eb-79059e2edfb1": {
+  "5": "Même langage, rôles différents\n\nCWE  : type de faiblesse\nCVE  : cas précis dans un produit\nNVD  : base enrichie de vulnérabilités\nCVSS : gravité technique\nEPSS : probabilité estimée d’exploitation\n\nExemple : une CVE peut relever de CWE-89\net recevoir une note CVSS de 9,8",
+  "7": "CVSS v3.1 : rappels utiles\n\nAV N/A/L/P  : vecteur d’attaque\nAC L/H      : complexité\nPR N/L/H    : privilèges requis\nUI N/R      : interaction utilisateur\nS U/C       : portée\nC I A N/L/H : impacts\n\nBandes : 0,0 aucune ; 0,1-3,9 faible ;\n4,0-6,9 moyenne ; 7,0-8,9 élevée ;\n9,0-10,0 critique"
+ },
+ "cf8db6dd-d520-a71e-d1d9-6947a51ea2d4": {
+  "5": "Trame Ethernet\n+----------------+----------------+---------+----------------------+\n| MAC dest 6 o   | MAC src 6 o    | Type 2  | charge utile         |\n+----------------+----------------+---------+----------------------+\n                                   |\n                                   v\nPaquet IPv4 : src, dst, TTL, protocole\nSegment TCP : port src, port dst, seq, ack, flags\nDonnées : GET /intranet HTTP/1.1",
+  "7": "                 Lien 1         Lien 2          Lien 3\n                 PC > routeur 1  routeur 1 > 2   routeur 2 > serveur\nMAC source       PC             routeur 1       routeur 2\nMAC destination  routeur 1      routeur 2       serveur\nIP source        192.168.1.25   192.168.1.25    192.168.1.25\nIP destination   172.16.5.20    172.16.5.20     172.16.5.20\nTTL              64             63              62"
+ },
+ "cfbf2dd7-0410-a120-e23d-1fef9785fd4a": {
+  "4": "Port ouvert  :  Scanner --SYN-->  Cible\n                Scanner <--SYN-ACK-- Cible\n                Scanner --RST-->  Cible   (il referme, sans jamais finir le handshake)\nPort fermé   :  Scanner --SYN-->  Cible\n                Scanner <--RST-ACK-- Cible"
+ },
+ "d027f928-53c8-5026-a782-465b5000afda": {
+  "5": "Flux code d’autorisation + PKCE\n\n1. le client prépare un code_verifier aléatoire\n2. il en dérive un code_challenge\n3. il envoie l’utilisateur vers le serveur d’autorisation\n4. retour avec un code d’autorisation\n5. le client échange ce code avec le code_verifier\n6. le serveur compare et remet les jetons\n\nvérifications :\n  state, redirect_uri exacte, portées minimales, PKCE"
+ },
+ "d2327bf3-67b9-5d93-6f32-799db0922bf3": {
+  "5": "Diagnostic par couches\n1. interface : « ip -br a »\n2. route locale : « ip r »\n3. voisin et passerelle : « ip neigh », « ping -c 3 »\n4. nom DNS : « dig +short »\n5. service : « ss -tulpn », « curl -I »",
+  "10": "Écoute observée        Lecture utile\n0.0.0.0:22            service exposé sur toutes les interfaces IPv4\n127.0.0.1:5432        service limité à la machine locale\n[::]:80               service exposé sur toutes les interfaces IPv6\ndefault via 192.168.1.1  sortie réseau par la passerelle 192.168.1.1"
+ },
+ "d29853c9-a6eb-20d9-1606-8469dfbad22d": {
+  "5": "Format de sortie conseillé\nOK;détail\nALERTE;détail\n\nCode de retour\n0  état normal\n1  alerte à relire\n2  mauvais usage du script"
+ },
+ "d601e4ef-ef50-dbda-d6c8-9a8086da400f": {
+  "5": "Phase                    Usage principal\nbase active              exploitation quotidienne, recherche rapide\narchivage intermédiaire  dossiers clos, contentieux, accès ponctuel\narchivage définitif      valeur historique ou légale particulière\n\nQuestions à noter : pourquoi ? qui accède ? quand supprime-t-on ?",
+  "10": "Lecture des journaux     : analystes et admins habilités\nEffacement des journaux  : très limité, avec trace et justification\nArchivage                : support séparé ou accès logique restreint\nRestauration testée      : oui, sinon conservation fictive"
+ },
+ "d74434e9-8226-0a66-6d20-71a5f0a6aed8": {
+  "5": "Flux standard\n0 : entrée standard\n1 : sortie standard\n2 : erreur standard\n\nExemples\ncommande > rapport.txt      : écrase rapport.txt\ncommande >> rapport.txt     : ajoute en fin de fichier\ncommande 2> erreurs.log     : garde seulement les erreurs\ncommande > tout.log 2>&1    : fusionne sortie et erreur"
+ },
+ "d78764c1-7a8d-ffd9-a71e-3f5d8308ba43": {
+  "5": "Sources passives utiles\n\nDNS public  -> noms, messagerie, délégation\nRDAP/WHOIS  -> titulaire, plages, contacts\nCT logs     -> certificats et noms observés\nmoteurs     -> pages, titres, copies\ndocs/publi  -> technologies, API, procédures\n\nRègle : public ne veut pas dire illimité",
+  "7": "Ce qu’une source peut dire, et ce qu’elle ne prouve pas\n\nA/AAAA  : où pointe un nom\nMX      : qui reçoit le courrier\nTXT     : politiques, clés ou traces d’intégration\nRDAP    : objet enregistré et métadonnées\nCT log  : qu’un certificat public a existé\n\nAucune source seule n’est exhaustive"
+ },
+ "dc198c8e-24c1-f84c-d5cf-2fb3de66b1cb": {
+  "5": "Échelle de tests\n1. 127.0.0.1\n2. sa propre IP\n3. la passerelle\n4. une IP distante\n5. un nom DNS\n\nSi l’étape 4 marche mais pas la 5 : pense DNS",
+  "7": "Symptôme observé                  Cause probable\nAPIPA 169.254.x.x                 pas de réponse DHCP\nnom KO, IP OK                     DNS en cause\npasserelle KO                     panne locale ou VLAN\ntracert bloqué dès le 1er saut    routeur local ou pare-feu\nport précis inaccessible          service arrêté ou filtrage"
+ },
+ "ddbc0f5c-b92f-3348-fdb7-14d0852a58ed": {
+  "5": "Fiche d’un constat\n\ntitre          : court et spécifique\ncatégorie      : OWASP 2025, CWE, éventuellement référence interne\nemplacement    : route, fonction, rôle, composant ou dépendance\npreuve         : requête, réponse, extrait ou capture minimale\nimpact         : ce que cela permet ou expose\nnote CVSS      : score + vecteur + limites de la note\nrecommandation : action technique vérifiable\nre-test        : comment confirmer la correction",
+  "10": "Prioriser sans se limiter à CVSS\n\ngravité technique : score et vecteur\nexposition        : Internet, interne, rôle nécessaire, fréquence\nactif concerné    : paiement, comptes, données, back-office\nexploitabilité    : simple ou non, automatisable ou non\ncorrectif         : disponible, testé, contournement provisoire ou non"
+ },
+ "e17f9e23-37d2-6396-44ae-ec0f2a436175": {
+  "5": "Ordre de sécurisation conseillé\n\n1. messagerie principale\n2. compte Apple, Google ou Microsoft du téléphone ou du PC\n3. banque, argent mobile, commerce\n4. réseaux sociaux et messageries\n5. services moins critiques"
+ },
+ "e252b6c7-6646-fa7c-0318-dc4468253d8a": {
+  "5": "Client                         Serveur DHCP\n  | --- Discover  -----------> |  je cherche une config\n  | <--- Offer  -------------- |  voici 192.168.10.41/24\n  | --- Request  ------------> |  je prends cette adresse\n  | <--- Acknowledge --------- |  bail confirmé",
+  "7": "Élément          Exemple\nPlage distribuée  192.168.10.21 à 192.168.10.200\nExclusions        192.168.10.1 à 192.168.10.20\nRéservation       imprimante -> 192.168.10.15\nOptions           passerelle 192.168.10.1, DNS 192.168.1.53"
+ },
+ "e6f045fb-94c2-2f29-10b9-10195a9a19b6": {
+  "5": "Commande        Effet principal\nsudo cmd       élève une seule commande\nsudo -l        liste ce que tu peux faire\nsudo -i        ouvre un shell root de maintenance\nsu -           ouvre une session d’un autre compte\nvisudo         édite sudoers avec vérification de syntaxe",
+  "7": "Exemples de règles\nawa ALL=(ALL:ALL) ALL\n%admins ALL=(root) /usr/bin/systemctl restart nginx\n%sauvegarde ALL=(root) NOPASSWD: /usr/local/bin/backup.sh\n\nLecture rapide\nqui          où    = (comme qui) commande autorisée"
+ },
+ "e859b749-3d21-dfdc-7a24-3b14198bd752": {
+  "5": "Directives utiles à connaître\n\ndefault-src        règle par défaut\nscript-src         scripts autorisés\nstyle-src          feuilles de style autorisées\nimg-src            images autorisées\nconnect-src        appels réseau autorisés\nframe-ancestors    qui peut intégrer la page\nbase-uri           contrôle la balise base\nform-action        destinations de formulaire\nobject-src         à mettre à 'none' dans la majorité des cas"
+ },
+ "eadc6ced-16dc-90ec-e1d1-297bc8b0202b": {
+  "5": "Ce que le cadenas dit, et ne dit pas\n\nOui :\n- le navigateur parle en TLS avec ce nom de domaine\n- le trajet réseau est protégé contre l’écoute banale\n- le certificat présenté est accepté par la chaîne de confiance\n\nNon :\n- le site est honnête\n- l’application n’a pas de XSS ni d’injection\n- l’équipe gère bien ses comptes et ses sauvegardes",
+  "7": "Sortie de certificat au format réel, annotée\n\nCertificate:\n  Subject: CN=www.boutique-soleil.example\n  X509v3 Subject Alternative Name:\n    DNS:www.boutique-soleil.example, DNS:boutique-soleil.example\n  Issuer: C=US, O=Let's Encrypt, CN=R11\n  Validity\n    Not Before: Mar 17 00:00:00 2026 GMT\n    Not After : Jun 15 00:00:00 2026 GMT\n\nLecture : le SAN couvre le nom, l’émetteur est connu,\nmais il faut surveiller l’expiration."
+ },
+ "ed5343e4-8bcd-4ee8-5372-299bd9b2798c": {
+  "5": "Facteurs d’authentification\nCe que je sais   : mot de passe, code PIN\nCe que j’ai      : téléphone, clé de sécurité\nCe que je suis   : empreinte, visage\n\nDouble authentification = au moins deux facteurs différents",
+  "7": "Comparer les méthodes\nSMS        : simple, mais fragile face au SIM swap et au social\nTOTP       : mieux, mais un faux site peut voler le code\nPush       : pratique, mais risque de fatigue d’approbation\nClé d’accès: liée au site, très résistante à l’hameçonnage"
+ },
+ "f12a8799-f1b5-972b-9741-2c89918854a5": {
+  "5": "Type et droits d’une ligne « ls -l »\n-rwxr-x--- 1 awa admins 1540 Jun  7 09:15 sauvegarde.sh\n||||||||||\n|--------- type : - = fichier, d = dossier, l = lien\n |||------ propriétaire : rwx = 7\n    |||--- groupe : r-x = 5\n       ||| autres : --- = 0\nMode octal : 750",
+  "7": "Modes utiles à retenir\n644  -> rw-r--r--  fichier lisible par tous, modifiable par son propriétaire\n600  -> rw-------  clé privée, jeton, secret local\n755  -> rwxr-xr-x  dossier traversable ou script exécutable\n700  -> rwx------  dossier personnel sensible\n640  -> rw-r-----  journal ou configuration pour un groupe précis"
+ },
+ "f224ac19-650c-93e5-75f9-1276cc02ae0a": {
+  "5": "Mot                  Définition simple\nActif                ce qui a de la valeur\nMenace               ce qui peut causer un dommage\nVulnérabilité        faiblesse exploitable\nRisque               dommage plausible et impact estimé\nAttaque              action malveillante\nImpact               conséquence subie\nIncident             événement qui perturbe ou compromet",
+  "7": "Propriété            Exemple d’atteinte\nConfidentialité     fuite d’une liste de clients\nIntégrité           facture falsifiée avant validation\nDisponibilité       rançongiciel qui bloque les postes"
+ },
+ "f3295f6a-0338-999a-fd6d-e7e10c60a0d4": {
+  "5": "Exemple JSON lignes\n{\"ts\":\"2026-03-10T10:30:24Z\",\"level\":\"error\",\n\"service\":\"api\",\"request_id\":\"req-1005\",\n\"user\":\"awa\",\"ip\":\"192.168.1.77\",\n\"msg\":\"export started\",\"rows\":850}",
+  "10": "Trois sources pour un même incident\naccess.log      POST /login 302 puis /admin/export 200\napp.jsonl       request_id=req-1005, rôle changed, export\ndb log          connection opened, slow query, access denied"
+ },
+ "f389fbae-e861-7aff-603a-29b9d907b891": {
+  "5": "OWASP Top 10:2025, en ordre\n\nA01 Broken Access Control\nA02 Security Misconfiguration\nA03 Software Supply Chain Failures\nA04 Cryptographic Failures\nA05 Injection\nA06 Insecure Design\nA07 Authentication Failures\nA08 Software or Data Integrity Failures\nA09 Security Logging & Alerting Failures\nA10 Mishandling of Exceptional Conditions",
+  "8": "Ce qui change entre 2021 et 2025\n\nSSRF : A10 en 2021 -> rattaché à A01 en 2025\nSupply chain : A06 2021 élargi -> A03 2025\nMisconfiguration : A05 2021 -> A02 2025\nExceptional conditions : nouvelle A10 2025"
+ },
+ "f4606174-e97e-7f03-2777-9ab40196495f": {
+  "5": "Attaque                     Ce qui aide à se défendre\nDictionnaire                Longueur, mots inattendus, blocage\nForce brute                 Phrase de passe longue, limite d’essais\nBourrage d’identifiants     Un mot de passe unique par service\nHameçonnage                 Vérifier le site, utiliser un gestionnaire\nEnregistreur de frappe      Poste sain, mises à jour, MFA",
+  "7": "Entropie approximative\nbits = longueur × log2(taille de l’alphabet)\n\n62 caractères possibles : a-z A-Z 0-9\n8 caractères  : 8 × log2(62) ≈ 47,6 bits\n12 caractères : 12 × log2(62) ≈ 71,5 bits\n\nDiceware, 7776 mots :\n5 mots ≈ 64,6 bits\n6 mots ≈ 77,5 bits"
+ },
+ "f4be91e0-6c7a-5f55-52d6-6df702ba0bb7": {
+  "5": "Questions simples à poser à chaque ligne\n\nquand ?      horodatage, fuseau, ordre relatif\noù ?         machine, application, équipement\nqui ?        compte, service, adresse source\nquoi ?       action observée\nrésultat ?   succès, échec, refus, erreur, code\npreuve ?     champ exact qui permet de le dire",
+  "9": "Une annotation prudente\n\nligne SSH      : échec de connexion, compte connu, source externe\nligne web      : tentative de connexion refusée, navigateur déclaré\nligne pare-feu : accès SSH bloqué, règle réseau appliquée\n\nce qui manque  : fréquence, historique, propriétaire de l’adresse,\n                 rôle habituel du compte, autres sources"
+ },
+ "f638f916-d05f-bae5-b2cd-9ac3e323da67": {
+  "5": "Noyau Linux\n   +\nOutils, paquets, configuration, documentation\n   =\nDistribution\n\nFamilles courantes\nDebian, Ubuntu : apprentissage et serveurs courants\nRHEL, Fedora   : entreprise, dnf, SELinux\nArch           : système très manuel, très formateur",
+  "8": "Choix rapide\nWSL               : pratique sous Windows, installation guidée\nMachine virtuelle : plus fidèle, instantané avant essai\nTermux            : utile sur téléphone, limites franches\nLive USB          : essai temporaire sans installation\nConteneur         : utile pour une appli, pas pour tout le système"
+ },
+ "f9873b02-e1f6-24c4-5bce-7081d13404d5": {
+  "5": "Nom affiché ≠ adresse réelle\n\nAffiché : Comptabilité Atlas\nFrom    : facturation@atlas-service.example.org\nReply-To: recouvrement@example.net\n\nSignal : la réponse part vers example.net,\npas vers le domaine affiché à l’écran.",
+  "7": "Extrait d’en-têtes annoté\nAuthentication-Results: mx.example.org;\n spf=fail smtp.mailfrom=atlas-service.example.org\n dkim=none header.d=none\n dmarc=fail header.from=atlas-service.example.org\nFrom: \"Comptabilité Atlas\" <facturation@atlas-service.example.org>\nReply-To: aide@example.net\n\nLecture simple : fail = échec, none = absent,\net la réponse veut partir ailleurs."
+ },
+ "fbcfdd5c-013d-e26b-a05b-c31f58ae5049": {
+  "5": "Besoin                    Outil\ntransporter ou afficher    encodage\ncacher le contenu          chiffrement\nvérifier l’intégrité       hachage",
+  "7": "Vocabulaire utile\nTexte en clair   message lisible avant chiffrement\nTexte chiffré    message protégé par une clé\nClé              secret ou paramètre qui permet de chiffrer ou déchiffrer\nEmpreinte        résultat fixe d’une fonction de hachage"
+ },
+ "fd1598af-3d9d-1412-b123-7b76e96ee6d3": {
+  "5": "Réflexe simple face à un message sensible\n\n1. arrêter la réponse immédiate\n2. lire le vrai domaine du lien\n3. vérifier la demande par un canal connu\n4. signaler si l’organisation le prévoit\n5. si tu as cliqué, changer le mot de passe et prévenir"
+ },
+ "fe2a3450-e735-5b6f-eeae-b6623d9a8159": {
+  "5": "Structure compacte\n\nen-tête.charge.signature\n\nen-tête :\n  typ, alg\n\ncharge :\n  iss, sub, aud, exp, nbf, iat, jti\n\nsignature :\n  vérifie que les deux premières parties n’ont pas été altérées"
+ }
+}

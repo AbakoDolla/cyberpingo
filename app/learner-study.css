@@ -533,10 +533,10 @@ a.course-outline__lesson:hover { background: rgba(0, 213, 255, 0.055); }
 }
 .lesson-reader-layout {
   display: grid;
-  grid-template-columns: minmax(190px, 250px) minmax(0, 72ch);
+  grid-template-columns: minmax(190px, 250px) minmax(0, 1fr);
   gap: 34px;
   align-items: start;
-  max-width: 1060px;
+  max-width: 1200px;
   margin: 38px auto 0;
 }
 .lesson-progress-rail {
@@ -587,8 +587,13 @@ a.course-outline__lesson:hover { background: rgba(0, 213, 255, 0.055); }
   display: grid;
   gap: 22px;
   min-width: 0;
-  max-width: 72ch;
+  max-width: 900px;
 }
+.lesson-content > .lesson-block-text,
+.lesson-content > .lesson-block-heading,
+.lesson-content > .lesson-callout,
+.lesson-content > .lesson-code-block,
+.lesson-content > .lesson-resource { max-width: 74ch; }
 .lesson-block-text {
   color: #d8e7f7;
   font-size: 17px;

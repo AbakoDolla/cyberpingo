@@ -1,6 +1,7 @@
 import {
   code,
   example,
+  figure,
   goals,
   mistakes,
   practice,
@@ -9,10 +10,10 @@ import {
   reference,
   safety,
   scenario,
-  schema,
   takeaway,
   text,
   videoSlot,
+  schema,
   type NewLesson,
   type PathModuleEntry,
 } from "./path-kit";
@@ -29,23 +30,33 @@ const sourcesFormatsLesson: NewLesson = {
     scenario("Awa rejoint l’équipe de support de Baobab Tech. Un matin, elle reçoit un fichier de journal Linux, un export CSV, deux lignes JSON et une alerte du pare-feu. Tout le monde lui demande ce qu’il faut regarder d’abord. Avant de parler d’attaque ou de panne, elle doit reconnaître ce qu’elle a sous les yeux et ce que chaque format peut réellement raconter."),
     videoSlot("Reconnaître les sources et formats de journaux sans se perdre"),
     text("Un journal, ou log, est un enregistrement horodaté d’un événement. Un événement dit qu’une chose s’est produite : une connexion réussie, un échec, un redémarrage, une requête web, un refus du pare-feu, un changement de mot de passe. Pour l’analyser, tu cherches toujours les mêmes repères : quand, qui, quoi, où, d’où, avec quel résultat. Le journal n’est pas réservé à la sécurité : il sert aussi au diagnostic, à l’exploitation, à l’audit et parfois à la conformité."),
-    schema(`Petite organisation : sources courantes de journaux
-
-poste Windows   -> connexions, processus, erreurs
-serveur Linux   -> ssh, sudo, services, noyau
-site web        -> accès, erreurs, comptes applicatifs
-pare-feu        -> ALLOW, DENY, ports, adresses
-routeur ou proxy -> navigation, DNS, volumes
-service en ligne -> audit, connexions, changements sensibles`),
+    figure({
+      kind: "cards",
+      title: "Petite organisation : sources courantes de journaux",
+      columns: 2,
+      items: [
+        { term: "Poste Windows", text: "connexions, processus, erreurs", icon: "pc", tone: "blue" },
+        { term: "Serveur Linux", text: "ssh, sudo, services, noyau", icon: "server", tone: "green" },
+        { term: "Site web", text: "accès, erreurs, comptes applicatifs", icon: "globe", tone: "cyan" },
+        { term: "Pare-feu", text: "ALLOW, DENY, ports, adresses", icon: "firewall", tone: "red" },
+        { term: "Routeur ou proxy", text: "navigation, DNS, volumes", icon: "router", tone: "violet" },
+        { term: "Service en ligne", text: "audit, connexions, changements sensibles", icon: "cloud", tone: "amber" },
+      ],
+    }),
     text("Les sources se multiplient vite : systèmes, applications, équipements réseau, services en ligne. Le premier piège est de croire qu’elles parlent toutes la même langue. En pratique, tu rencontres du texte libre, du syslog, du JSON lignes, du CSV, du XML et des formats binaires. Un bon analyste commence donc par reconnaître la forme avant d’inventer une interprétation. Cette discipline t’évite de confondre un champ, un fuseau horaire ou même une simple colonne."),
-    schema(`Formats fréquents et difficulté d’analyse
-
-texte libre     : facile à lire, variable selon le logiciel
-syslog          : très courant, gravité et source visibles
-JSON lignes     : champs explicites, pratique à filtrer
-CSV             : simple à exporter, dépend de l’ordre des colonnes
-XML             : structuré, parfois verbeux
-binaire         : compact et fidèle, mais illisible sans l’outil prévu`),
+    figure({
+      kind: "table",
+      title: "Formats fréquents et difficulté d’analyse",
+      columns: ["Format", "Atout principal", "Point de vigilance"],
+      rows: [
+        ["Texte libre", "facile à lire", "variable selon le logiciel"],
+        ["Syslog", "très courant", "gravité et source visibles"],
+        ["JSON lignes", "champs explicites", "pratique à filtrer"],
+        ["CSV", "simple à exporter", "dépend de l’ordre des colonnes"],
+        ["XML", "structuré", "parfois verbeux"],
+        ["Binaire", "compact et fidèle", "illisible sans l’outil prévu"],
+      ],
+    }),
     text("Le syslog traditionnel montre souvent, dans les fichiers texte, une date courte, une machine, un programme et un message. Le syslog RFC 5424 normalise au contraire un en-tête avec « PRI », une version et un horodatage complet RFC 3339. Le JSON lignes stocke un objet par ligne, pratique pour filtrer un champ comme « level » ou « ip ». Le CSV fonctionne bien pour des exports d’événements ou d’inventaire, mais tu dois connaître l’ordre des colonnes. Le XML sert beaucoup dans l’univers Windows. Les formats binaires, comme journald, wtmp ou les fichiers EVTX, imposent un outil spécialisé : « cat » ne suffit pas."),
     text("Démonstration guidée : prends six lignes mélangées, puis classe-les sans encore parler de compromission. Tu peux refaire cet exercice dans Git Bash, PowerShell, WSL, une machine virtuelle ou Termux. Si tu n’as qu’un poste Windows, Git Bash et PowerShell suffisent déjà pour apprendre à reconnaître les formats sans disposer d’un serveur."),
     code(`# Classer six lignes selon leur forme
@@ -114,14 +125,19 @@ const lireLesson: NewLesson = {
     scenario("Nadia doit expliquer à une collègue pourquoi trois lignes semblent inquiétantes sans promettre trop vite une attaque. L’une vient d’un journal SSH, l’autre d’un serveur web, la troisième d’un pare-feu. Si elle mélange observation, hypothèse et intuition, elle risque de déclencher une alerte inutile ou, pire, de manquer la vraie question."),
     videoSlot("Lire une ligne de journal sans raconter trop vite une histoire"),
     text("Lire un événement, ce n’est pas seulement lire un message. C’est repérer qui agit, quoi se produit, quand cela arrive, où l’événement a été observé, d’où vient l’action et quel est le résultat annoncé. Selon la source, certains champs manquent ou changent de place. C’est normal. Ton travail consiste à relever ce qui est présent, puis à noter explicitement ce qui manque. Un bon analyste préfère une case vide à une supposition cachée."),
-    schema(`Questions simples à poser à chaque ligne
-
-quand ?      horodatage, fuseau, ordre relatif
-où ?         machine, application, équipement
-qui ?        compte, service, adresse source
-quoi ?       action observée
-résultat ?   succès, échec, refus, erreur, code
-preuve ?     champ exact qui permet de le dire`),
+    figure({
+      kind: "cards",
+      title: "Questions simples à poser à chaque ligne",
+      columns: 2,
+      items: [
+        { term: "Quand ?", text: "horodatage, fuseau, ordre relatif", tone: "blue" },
+        { term: "Où ?", text: "machine, application, équipement", tone: "green" },
+        { term: "Qui ?", text: "compte, service, adresse source", tone: "violet" },
+        { term: "Quoi ?", text: "action observée", tone: "cyan" },
+        { term: "Résultat ?", text: "succès, échec, refus, erreur, code", tone: "amber" },
+        { term: "Preuve ?", text: "champ exact qui permet de le dire", tone: "red" },
+      ],
+    }),
     text("La différence entre fait et interprétation est centrale. « Failed password » est un fait : le journal annonce un échec. « Quelqu’un attaque » est une interprétation : elle peut être juste, mais elle demande encore du contexte. Un seul échec peut venir d’une faute de frappe, d’un mot de passe oublié, d’un robot opportuniste ou d’un test légitime. De la même manière, une ligne absente ne prouve pas qu’aucune action n’a eu lieu : peut-être que le niveau de journalisation était insuffisant, que la rotation a déjà déplacé le fichier, ou qu’une autre source doit être consultée."),
     code(`# Lire trois événements bruts
 sed -n '1p' auth-line.log
@@ -132,14 +148,34 @@ sed -n '1p' fw-line.log
 # 192.0.2.44 - - [10/Mar/2026:08:15:09 +0000] "POST /login HTTP/1.1" 401 728 "https://portail.example/login" "Mozilla/5.0"
 # 2026-03-10T08:15:11Z pare-feu01 action=DENY src=192.0.2.10 dst=10.1.4.20 proto=TCP dpt=22 rule=wan-to-ssh`, "bash"),
     text("Démonstration guidée : annote maintenant ces trois lignes sans inventer ce qu’elles ne disent pas. La première dit : à 08:15:04, sur « web01 », le service « sshd » rapporte un échec de mot de passe pour le compte « awa » depuis l’adresse « 192.0.2.10 ». La deuxième dit : l’adresse « 192.0.2.44 » a envoyé une requête « POST » vers « /login », et le serveur a répondu 401, donc refusé l’accès. La troisième dit : le pare-feu « pare-feu01 » a refusé une tentative TCP vers le port 22 de « 10.1.4.20 ». Aucune de ces trois lignes, seule, ne prouve une compromission. Chacune décrit un fait utile."),
-    schema(`Une annotation prudente
-
-ligne SSH      : échec de connexion, compte connu, source externe
-ligne web      : tentative de connexion refusée, navigateur déclaré
-ligne pare-feu : accès SSH bloqué, règle réseau appliquée
-
-ce qui manque  : fréquence, historique, propriétaire de l’adresse,
-                 rôle habituel du compte, autres sources`),
+    figure({
+      kind: "compare",
+      title: "Une annotation prudente",
+      sides: [
+        {
+          title: "Ce que disent les lignes",
+          tone: "blue",
+          mark: "dot",
+          items: [
+            "Ligne SSH : échec de connexion, compte connu, source externe",
+            "Ligne web : tentative de connexion refusée, navigateur déclaré",
+            "Ligne pare-feu : accès SSH bloqué, règle réseau appliquée",
+          ],
+        },
+        {
+          title: "Ce qu’il manque",
+          tone: "amber",
+          mark: "dot",
+          items: [
+            "fréquence et historique",
+            "propriétaire de l’adresse",
+            "rôle habituel du compte",
+            "autres sources",
+          ],
+        },
+      ],
+      verdict: "Une ligne décrit un fait ; le contexte décide du sens.",
+    }),
     text("Les données personnelles apparaissent vite : adresses IP, noms de comptes, URL parfois sensibles, références internes. C’est pourquoi un extrait de journal n’est pas un texte anodin. Tu peux l’utiliser pour apprendre, enquêter ou documenter, mais pas le diffuser sans précaution. Dans un rapport large, tu désarmes les indicateurs si besoin et tu gardes les détails complets dans le dossier de preuve réservé aux personnes autorisées."),
     example("Exemple corrigé : classe ces six affirmations. « code 401 sur /login » est un fait. « le mot de passe a été volé » est une interprétation. « l’adresse 192.0.2.10 appartient-elle à un prestataire connu ? » est à vérifier. « le pare-feu a refusé le port 22 » est un fait. « aucun pirate n’est passé aujourd’hui » est une interprétation trop large. « le compte awa se connecte-t-il d’habitude à cette heure ? » est à vérifier. Cette discipline t’empêche de présenter une intuition comme une preuve."),
     mistakes("prendre un mot comme « error » ou « denied » pour une conclusion finale ; oublier de noter les champs absents ; confondre l’adresse source avec une personne unique ; recopier des extraits réels sans penser à la confidentialité."),
@@ -174,15 +210,21 @@ const tempsLesson: NewLesson = {
     scenario("Moussa reçoit trois traces d’un même incident apparent : un accès web à 09:15 +01:00, un refus de pare-feu à 08:15Z et un extrait syslog sans fuseau. Au premier regard, tout semble se contredire. S’il compare ces heures brutes, il peut raconter une cause qui vient après sa conséquence. Il doit d’abord remettre tout le monde sur la même montre."),
     videoSlot("Reconstituer une chronologie sans se faire piéger par les fuseaux"),
     text("Le temps est la colonne vertébrale d’une analyse. Sans horodatage fiable, tu peux difficilement dire ce qui s’est passé avant, pendant ou après. Le problème est que toutes les sources n’écrivent pas le temps de la même manière. Certaines donnent un RFC 3339 complet, comme « 2026-03-10T09:15:00+01:00 ». D’autres écrivent une heure locale dans une interface et gardent l’UTC dans le fichier brut. Le syslog traditionnel, lui, n’indique ni l’année ni le fuseau. Si tu oublies ces différences, ta chronologie devient fausse avant même d’avoir commencé."),
-    schema(`Formats fréquents de temps
-
-RFC 3339      2026-03-10T08:15:00Z
-ISO 8601      2026-03-10T09:15:00+01:00
-syslog BSD    Mar 10 08:15:00
-accès web     [10/Mar/2026:08:15:00 +0000]
-epoch Unix    1700000000
-auditd        audit(1700000000.123:456)
-journald JSON __REALTIME_TIMESTAMP=1773130805123456`),
+    figure({
+      kind: "table",
+      title: "Formats fréquents de temps",
+      columns: ["Format", "Exemple", "Repère utile"],
+      rows: [
+        ["RFC 3339", "2026-03-10T08:15:00Z", "UTC explicite avec Z"],
+        ["ISO 8601", "2026-03-10T09:15:00+01:00", "décalage horaire explicite"],
+        ["syslog BSD", "Mar 10 08:15:00", "sans année ni fuseau"],
+        ["accès web", "[10/Mar/2026:08:15:00 +0000]", "fuseau dans les crochets"],
+        ["epoch Unix", "1700000000", "secondes depuis l’epoch"],
+        ["auditd", "audit(1700000000.123:456)", "epoch avec millisecondes"],
+        ["journald JSON", "__REALTIME_TIMESTAMP=1773130805123456", "microsecondes UTC"],
+      ],
+      mono: [1],
+    }),
     text("L’UTC, temps universel coordonné, sert de référence commune. Le suffixe « Z » signifie UTC. Un décalage comme « +01:00 » signifie « une heure en avance sur UTC ». Ainsi, « 2026-03-10T09:15:00+01:00 » et « 2026-03-10T08:15:00Z » désignent le même instant. Le but n’est pas de préférer un format à un autre, mais de les traduire dans une échelle unique avant toute comparaison. Cette règle vaut aussi pour l’heure d’un événement et l’heure de réception dans un collecteur : ce sont parfois deux moments différents, tous deux utiles. Avec « journalctl -o json », journald expose aussi « __REALTIME_TIMESTAMP », c’est-à-dire l’heure de réception par le journal en microsecondes depuis l’epoch UTC : c’est précis, mais il faut le convertir proprement."),
     code(`# Conversions rapides dans Git Bash
 date -u -d '2026-03-10 09:15:00 +0100' '+%Y-%m-%dT%H:%M:%SZ'
@@ -205,13 +247,18 @@ date -u -d @1700000000 '+%Y-%m-%dT%H:%M:%SZ'
 # 2026-03-10T08:15:12Z
 # 2026-03-10T08:20:05.123Z`, "powershell"),
     text("Démonstration guidée : convertis toujours d’abord, interprète ensuite. Si deux lignes disent « 09:15 +01:00 » et « 08:15Z », tu ne les ranges pas l’une après l’autre : tu notes qu’elles parlent du même instant. Si une machine dérive de quatre minutes, tu l’écris comme un problème de qualité de preuve. Une dérive n’invalide pas tout le journal, mais elle interdit les conclusions trop fines tant que tu n’as pas corrigé ou estimé l’écart."),
-    schema(`Chronologie saine
-
-1. noter le format et le fuseau de chaque source
-2. convertir en UTC
-3. repérer l’heure de l’événement et celle de réception
-4. signaler toute dérive connue
-5. trier ensuite seulement`),
+    figure({
+      kind: "steps",
+      title: "Chronologie saine",
+      numbered: true,
+      items: [
+        { title: "Noter la source", text: "format et fuseau de chaque source", tone: "blue" },
+        { title: "Convertir en UTC", text: "passer tout le monde sur la même montre", tone: "green" },
+        { title: "Distinguer les temps", text: "heure de l’événement et heure de réception", tone: "violet" },
+        { title: "Signaler l’écart", text: "toute dérive connue de l’horloge", tone: "amber" },
+        { title: "Trier seulement après", text: "ordonner les lignes une fois normalisées", tone: "cyan" },
+      ],
+    }),
     text("Le syslog traditionnel demande une prudence supplémentaire : sans année ni fuseau, « Mar 10 08:15:00 » doit être replacé dans le contexte de la machine qui l’a produit et de la période d’enquête. Tu n’inventes donc pas une conversion RFC 3164 sans écrire l’hypothèse retenue, par exemple « serveur en UTC+01, enquête sur mars 2026 ». Les journaux Windows affichés dans l’Observateur d’événements utilisent souvent l’heure locale, alors que le XML contient « SystemTime » en UTC. Les journaux web incluent souvent un décalage explicite dans les crochets. auditd écrit une époque Unix avec millisecondes, et journald JSON une époque en microsecondes. Dans tous les cas, la bonne méthode reste la même : noter, convertir, comparer."),
     example("Exemple corrigé : un portail écrit « 2026-03-10T09:15:00+01:00 ». Le pare-feu distant écrit « 2026-03-10T08:15:04Z ». Quatre secondes séparent donc les deux événements, pas une heure et quatre secondes. Autre cas : une ligne RFC 3164 « Mar 10 08:15:00 » venant d’un serveur réglé en UTC+01 correspond à « 2026-03-10T07:15:00Z », mais seulement si tu notes explicitement cette hypothèse de fuseau et d’année. Enfin, si une machine A annonce 08:21Z alors qu’une autre annonce 08:17Z pour le même échange, une dérive connue de quatre minutes peut rétablir une chronologie plausible, à condition de documenter cette correction."),
     mistakes("mélanger heure locale et UTC dans le même tableau ; oublier que le syslog traditionnel ne donne pas l’année ni le fuseau ; comparer un temps d’événement à un temps de réception sans le dire ; corriger une dérive d’horloge sans la documenter."),
@@ -246,13 +293,18 @@ const correlerLesson: NewLesson = {
     scenario("Fatou reçoit une alerte courte : trois échecs SSH, une réussite, puis l’ouverture d’une session dans un portail interne. Sa cheffe lui demande si le compte a été compromis. Fatou pourrait répondre trop vite. Elle choisit plutôt de relier les traces, de lister plusieurs explications possibles, puis de chercher ce qui confirme ou non chacune d’elles."),
     videoSlot("Corréler plusieurs journaux sans confondre coïncidence et preuve"),
     text("Corréler, c’est relier des événements à l’aide d’une clé commune : adresse IP, nom d’utilisateur, identifiant de session, machine, empreinte ou plage de temps. Cette opération est puissante, mais elle attire les raccourcis. Une adresse IP peut être partagée par un VPN, un NAT ou un opérateur mobile. Un nom d’utilisateur peut exister sur plusieurs systèmes différents. Une plage horaire peut contenir à la fois une action légitime et une action malveillante. La corrélation ne remplace donc jamais le jugement : elle organise l’enquête."),
-    schema(`Clés de corrélation fréquentes
-
-adresse IP        utile, mais parfois partagée ou changeante
-compte            utile, mais peut être usurpé ou réutilisé
-session           très fort si l’application le journalise
-machine           fort pour suivre un poste ou un serveur
-temps             utile pour relier des séquences proches`),
+    figure({
+      kind: "cards",
+      title: "Clés de corrélation fréquentes",
+      items: [
+        { term: "Adresse IP", text: "utile, mais parfois partagée ou changeante", icon: "network", tone: "amber" },
+        { term: "Compte", text: "utile, mais peut être usurpé ou réutilisé", icon: "user", tone: "amber" },
+        { term: "Session", text: "très fort si l’application le journalise", icon: "key", tone: "green" },
+        { term: "Machine", text: "fort pour suivre un poste ou un serveur", icon: "pc", tone: "blue" },
+        { term: "Temps", text: "utile pour relier des séquences proches", icon: "clock", tone: "violet" },
+      ],
+      columns: 2,
+    }),
     text("La bonne méthode commence par une hypothèse modeste. Par exemple : « les échecs SSH et la session portail semblent liés par l’adresse 192.0.2.10 ». Ensuite, tu cherches ce qui la renforce et ce qui pourrait la contredire. Y a-t-il la même heure ? le même compte ? une ouverture de session applicative juste après la réussite ? une activité habituelle connue depuis cette adresse ? Chercher ce qui contredit ton idée te protège contre le biais qui consiste à ne voir que ce qui t’arrange."),
     code(`# Pivoter sur une même adresse dans deux sources
 grep '192\\.0\\.2\\.10' corr-auth.log
@@ -265,12 +317,16 @@ grep '"ip":"192.0.2.10"' corr-portail.jsonl
 # {"ts":"2026-03-10T08:16:48Z","app":"portail","ip":"192.0.2.10","user":"awa","result":"session_opened","session":"sess-7842"}
 # {"ts":"2026-03-10T08:17:12Z","app":"portail","ip":"192.0.2.10","user":"awa","result":"mfa_changed","session":"sess-7842"}`, "bash"),
     text("Démonstration guidée : ici, la même adresse vise le même compte « awa » dans deux sources proches dans le temps. Cela renforce l’hypothèse d’un lien. Pourtant, tu n’écris pas encore « compromission certaine ». Tu notes plutôt trois lectures possibles : faute de frappe suivie d’une connexion légitime ; tentative malveillante suivie d’une réussite ; automatisme interne utilisant la même sortie Internet. Pour départager, tu regardes l’habitude du compte, le poste utilisé, l’éventuel changement de facteur MFA, ou encore la présence d’une autre source comme un proxy."),
-    schema(`Méthode prudente
-
-observation   : même adresse, même compte et proximité temporelle
-hypothèses    : erreur humaine, automatisme, attaque réussie
-vérification  : source habituelle ? appareil connu ? autre journal ?
-conclusion    : seulement après recoupement suffisant`),
+    figure({
+      kind: "steps",
+      title: "Méthode prudente",
+      items: [
+        { title: "Observation", text: "même adresse, même compte et proximité temporelle", tone: "blue" },
+        { title: "Hypothèses", text: "erreur humaine, automatisme, attaque réussie", tone: "violet" },
+        { title: "Vérification", text: "source habituelle ? appareil connu ? autre journal ?", tone: "amber" },
+        { title: "Conclusion", text: "seulement après recoupement suffisant", tone: "green" },
+      ],
+    }),
     text("La règle d’or reste la même : deux sources indépendantes valent mieux qu’une seule. Si le journal SSH dit « succès » et que le portail ouvre une session dans la même minute, l’histoire gagne en solidité. Si, au contraire, un proxy montre que l’adresse appartient à un prestataire interne connu qui renouvelle un jeton à cette heure chaque mardi, l’hypothèse d’attaque recule. Corréler, ce n’est donc pas faire grossir une intuition : c’est mesurer ce qui résiste à la contradiction."),
     example("Exemple corrigé : même séquence, trois lectures possibles. 1. Faute de frappe : quelques échecs, puis succès, puis activité normale. 2. Attaque : échecs serrés, réussite inhabituelle, puis changement MFA et accès depuis un appareil jamais vu. 3. Service automatique : même adresse partagée, compte technique connu, horaires réguliers. La vérification qui tranche n’est pas « j’ai un doute », mais un fait nouveau : appareil reconnu ou non, contexte métier, troisième source indépendante."),
     mistakes("prendre une adresse IP pour une personne ; oublier qu’un DHCP ou un VPN peut brouiller l’attribution ; chercher seulement les éléments qui confirment ton idée ; conclure à partir d’une seule source parce que la séquence paraît convaincante."),
@@ -305,23 +361,34 @@ const linuxSyslogLesson: NewLesson = {
     scenario("Yacine doit répondre à trois questions simples sur un serveur Debian : qui s’est connecté, quel service a échoué et qu’est-ce qui s’est passé avant le redémarrage du matin. Le collègue précédent lui dit seulement « regarde dans /var/log ». Pour aller vite sans se tromper, Yacine doit savoir où chercher et quand passer de fichiers texte à « journalctl »."),
     videoSlot("Trouver le bon journal Linux avant de filtrer"),
     text("Sous Linux, les journaux viennent surtout de deux mondes qui cohabitent souvent : les fichiers texte gérés par syslog ou rsyslog, et le journal binaire géré par journald. Un fichier syslog traditionnel ressemble à « Mar 10 08:15:00 web01 sshd[1201]: ... ». En RFC 5424, tu vois au contraire un « <PRI> », une version, puis un horodatage complet RFC 3339. journald stocke ces événements sous forme structurée et peut les ressortir au format court, détaillé ou JSON. Sur Debian ou Ubuntu avec rsyslog, tu rencontres souvent « /var/log/syslog », « /var/log/auth.log », « /var/log/kern.log », « /var/log/dpkg.log » et les dossiers de services comme « /var/log/nginx/ ». Sur RHEL ou Fedora, tu vois plutôt « /var/log/messages », « /var/log/secure », « /var/log/audit/audit.log » et « /var/log/httpd/ ». Sur certaines installations récentes de Debian, rsyslog n’est pas installé par défaut : il faut alors lire journald avec « journalctl »."),
-    schema(`Où chercher selon la question
-
-authentification      -> /var/log/auth.log ou /var/log/secure
-activité générale     -> /var/log/syslog ou /var/log/messages
-noyau                 -> /var/log/kern.log ou journalctl -k
-paquets et mises à jour -> /var/log/dpkg.log, /var/log/apt/
-service web           -> /var/log/nginx/ ou /var/log/apache2/
-journal binaire       -> journalctl, pas « cat »`),
+    figure({
+      kind: "table",
+      title: "Où chercher selon la question",
+      columns: ["Question", "Première source à lire"],
+      rows: [
+        ["authentification", "`/var/log/auth.log` ou `/var/log/secure`"],
+        ["activité générale", "`/var/log/syslog` ou `/var/log/messages`"],
+        ["noyau", "`/var/log/kern.log` ou `journalctl -k`"],
+        ["paquets et mises à jour", "`/var/log/dpkg.log`, `/var/log/apt/`"],
+        ["service web", "`/var/log/nginx/` ou `/var/log/apache2/`"],
+        ["journal binaire", "`journalctl`, pas `cat`"],
+      ],
+      mono: [1],
+    }),
     text("Le champ « PRI » du syslog combine facilité et gravité, mais le plus utile au quotidien est souvent l’emplacement. Si tu cherches une connexion SSH, commence par le journal d’authentification. Si tu veux suivre un service systemd, « journalctl -u service » est souvent plus pratique qu’un « grep » large dans « /var/log/syslog ». journald sait filtrer par unité, par gravité, par démarrage, par plage de temps et même sortir du JSON. Les fichiers texte restent très pratiques pour des pipelines simples et pour les archives tournées."),
-    schema(`Repères journald utiles
-
--u ssh.service ou sshd.service : une unité précise
--b                            : démarrage courant
---since / --until             : plage de temps
--p err                        : erreurs et niveaux plus urgents
--o json                       : champs structurés exportables
---no-pager, -f                : sans pager, puis suivre en direct`),
+    figure({
+      kind: "cards",
+      title: "Repères journald utiles",
+      columns: 2,
+      items: [
+        { term: "`-u ssh.service`", text: "ou `sshd.service` : une unité précise", tone: "blue" },
+        { term: "`-b`", text: "démarrage courant", tone: "green" },
+        { term: "`--since` / `--until`", text: "plage de temps", tone: "violet" },
+        { term: "`-p err`", text: "erreurs et niveaux plus urgents", tone: "red" },
+        { term: "`-o json`", text: "champs structurés exportables", tone: "cyan" },
+        { term: "`--no-pager`, `-f`", text: "sans pager, puis suivre en direct", tone: "amber" },
+      ],
+    }),
     text("Démonstration guidée : commence par le fichier texte, puis pense à l’archive tournée. Beaucoup d’analyses ratent une information simplement parce qu’elle a déjà quitté « auth.log » pour « auth.log.1 » ou « auth.log.2.gz ». La rotation protège le disque, mais elle oblige l’analyste à regarder aussi les anciennes copies. Sur un vrai serveur, « journalctl -u ssh.service --since \"2026-03-10 08:00\" --no-pager » ou « journalctl -o json » font gagner du temps, car tu récupères à la fois l’heure, l’unité systemd et l’identifiant du programme. Ici, sur un simple extrait, tu peux déjà travailler la méthode."),
     code(`# Chercher l’activité SSH d’une plage courte dans un fichier syslog
 grep 'sshd' syslog-demo.log | awk '$3 >= "08:16:00" && $3 <= "08:17:00"'
@@ -366,14 +433,20 @@ const authSudoLesson: NewLesson = {
     scenario("Amina ouvre « auth.log » d’un serveur exposé à Internet et voit une rafale de tentatives. Le responsable lui demande si c’est juste le bruit habituel ou le début d’un incident. Pour répondre utilement, elle doit lire les messages de « sshd », de PAM et de « sudo », puis résumer ce qui mérite vraiment une suite."),
     videoSlot("Lire auth.log et repérer le moment qui change tout"),
     text("Les journaux d’authentification Linux racontent l’accès au système. Dans « auth.log » ou « secure », tu rencontres des lignes « Failed password for invalid user admin » quand le compte n’existe pas, et « Failed password for awa » quand le compte existe. Cette nuance importe : dans le second cas, la source a déjà deviné ou découvert un compte valide. Tu vois aussi « Accepted password », « Accepted publickey », « Invalid user », « Connection closed ... [preauth] », ainsi que les messages PAM qui détaillent un refus ou l’ouverture d’une session."),
-    schema(`Indices fréquents dans auth.log
-
-Failed password for invalid user admin   -> compte inexistant
-Failed password for awa                  -> compte existant
-Accepted password for awa                -> réussite par mot de passe
-Accepted publickey for awa               -> réussite par clé
-pam_unix(... authentication failure ...) -> échec vu par PAM
-sudo: awa ... USER=root ... COMMAND=...  -> élévation ou action privilégiée`),
+    figure({
+      kind: "table",
+      title: "Indices fréquents dans auth.log",
+      columns: ["Ligne ou motif", "Lecture prudente"],
+      rows: [
+        ["Failed password for invalid user admin", "compte inexistant"],
+        ["Failed password for awa", "compte existant"],
+        ["Accepted password for awa", "réussite par mot de passe"],
+        ["Accepted publickey for awa", "réussite par clé"],
+        ["pam_unix(... authentication failure ...)", "échec vu par PAM"],
+        ["sudo: awa ... USER=root ... COMMAND=...", "élévation ou action privilégiée"],
+      ],
+      mono: [0],
+    }),
     text("La force d’« auth.log » tient à la séquence. Beaucoup d’échecs rapprochés depuis une même source, sur plusieurs comptes, font penser à une force brute ou à un arrosage de mots de passe. Une réussite juste après plusieurs échecs sur un compte réel est plus inquiétante qu’un simple bruit opportuniste. En revanche, le journal ne montre pas le mot de passe essayé, ni ce que l’attaquant pense faire ensuite. Il te faut donc une conclusion prudente : ce que la ligne prouve, et ce qu’elle ne prouve pas."),
     code(`# Compter les échecs par adresse source
 grep 'Failed password' auth-demo.log | awk '{for (i=1;i<=NF;i++) if ($i=="from") print $(i+1)}' | sort | uniq -c | sort -rn
@@ -392,12 +465,16 @@ grep 'Failed password' auth-demo.log | awk '{for (i=1;i<=NF;i++) if ($i=="for") 
 #       1 moussa
 #       1 backup`, "bash"),
     text("Démonstration guidée : dans cet extrait, « 192.0.2.10 » vise plusieurs fois « awa », puis réussit, et le même journal montre aussitôt une commande « sudo » et l’ouverture de session root par PAM. Tu peux donc écrire : « une réussite depuis 192.0.2.10 sur le compte awa est suivie d’une action privilégiée ». Tu n’écris pas encore : « l’attaquant a tout compromis ». Peut-être s’agit-il d’un administrateur légitime qui s’est trompé deux fois, ou d’un test interne. La différence se fera avec le contexte habituel du compte, de la source et de l’horaire."),
-    schema(`Lire le contexte après la réussite
-
-succès SSH          -> Accepted password ou publickey
-puis sudo           -> commande sensible ou session root
-puis useradd        -> création de compte
-puis last / lastb   -> historique synthétique des succès ou échecs`),
+    figure({
+      kind: "flow",
+      title: "Lire le contexte après la réussite",
+      nodes: [
+        { label: "Succès SSH", text: "`Accepted password` ou `publickey`", icon: "key", tone: "green" },
+        { label: "Puis sudo", text: "commande sensible ou session root", icon: "shield", tone: "amber" },
+        { label: "Puis useradd", text: "création de compte", icon: "user-plus", tone: "red" },
+        { label: "Puis `last` / `lastb`", text: "historique synthétique des succès ou échecs", icon: "clock", tone: "blue" },
+      ],
+    }),
     text("Les commandes « last -F », « lastb » et « lastlog » complètent cette lecture. « last -F » montre les connexions réussies avec les dates et heures complètes d’ouverture et de fermeture quand elles sont connues. « lastb » lit « btmp » pour les échecs enregistrés, souvent avec des droits root selon la distribution. « lastlog » résume la dernière connexion connue par compte et aide à repérer un « Never logged in ». Eux aussi ont des limites : un historique synthétique n’explique pas tout. Enfin, attention aux réactions trop rapides. Bannir une adresse partagée ou couper un compte sans vérifier peut gêner une personne légitime. Le journal te pousse à enquêter, pas à punir avant d’avoir compris."),
     example("Exemple corrigé : si une même adresse produit 7 échecs, puis « Accepted password for awa », puis « sudo: awa ... USER=root ... COMMAND=/usr/bin/apt update », la conclusion prudente est : « réussite suspecte suivie d’une action privilégiée, à confirmer avec le contexte du compte et des accès habituels ». Si, en revanche, tu ne vois que trois échecs sur « admin » sans succès, tu parleras plutôt de bruit opportuniste courant sur un serveur exposé."),
     mistakes("oublier la différence entre compte inexistant et compte réel ; compter les échecs sans regarder s’il existe aussi un succès ; prendre « sudo » pour une preuve d’attaque alors qu’il peut s’agir d’une maintenance légitime ; bannir une adresse sans réfléchir au partage d’IP."),
@@ -431,16 +508,21 @@ const auditExecutionLesson: NewLesson = {
     scenario("Koffi sait déjà qu’un compte s’est connecté en SSH. Ce qu’il doit maintenant établir, c’est l’action précise qui a suivi : simple maintenance, curiosité maladroite ou lecture d’un fichier sensible. Pour le démontrer proprement, il ne peut pas s’appuyer uniquement sur « auth.log ». Il doit croiser l’audit, l’historique du shell et les processus observés."),
     videoSlot("Relier une session SSH à une commande exécutée"),
     text("Les journaux d’authentification disent qu’une session existe. Ils ne suffisent pas à dire tout ce qui a été lancé ensuite. C’est le rôle de sources comme auditd, de l’historique du shell et des processus actifs. auditd est la source la plus solide des trois quand il est correctement configuré : il enregistre des appels système et associe une action à un identifiant de connexion d’origine, « auid ». Cet identifiant survit à « sudo », ce qui aide à relier une action root à la personne initialement connectée."),
-    schema(`Auditd : champs à connaître
-
-type=SYSCALL           -> appel système et identité du contexte
-type=EXECVE            -> arguments, comme a0= et a1=
-type=PATH              -> chemin touché, par exemple name="/etc/shadow"
-msg=audit(epoch:seq)   -> temps et numéro de séquence de l’événement
-auid                   -> identité d’origine de la session
-uid                    -> identité effective au moment de l’action
-comm / exe             -> nom court et chemin du binaire
-key                    -> règle d’audit qui a produit l’événement`),
+    figure({
+      kind: "cards",
+      title: "Auditd : champs à connaître",
+      columns: 2,
+      items: [
+        { term: "`type=SYSCALL`", text: "appel système et identité du contexte", tone: "blue" },
+        { term: "`type=EXECVE`", text: "arguments, comme `a0=` et `a1=`", tone: "violet" },
+        { term: "`type=PATH`", text: "chemin touché, par exemple `name=\"/etc/shadow\"`", tone: "cyan" },
+        { term: "`msg=audit(epoch:seq)`", text: "temps et numéro de séquence de l’événement", tone: "green" },
+        { term: "`auid`", text: "identité d’origine de la session", tone: "amber" },
+        { term: "`uid`", text: "identité effective au moment de l’action", tone: "amber" },
+        { term: "`comm` / `exe`", text: "nom court et chemin du binaire", tone: "neutral" },
+        { term: "`key`", text: "règle d’audit qui a produit l’événement", tone: "red" },
+      ],
+    }),
     text("L’historique « ~/.bash_history » a une valeur plus faible. Il s’écrit souvent à la fermeture du shell, il peut être modifié, désactivé ou incomplet. Avec « HISTTIMEFORMAT », tu récupères parfois une ligne « #epoch » avant chaque commande. C’est utile, mais pas suffisant pour accuser ou innocenter seul. Les processus du moment, lus avec « ps » ou « ss », sont encore plus volatils : ils montrent l’instant présent, pas toute l’histoire. La bonne pratique consiste donc à croiser ces sources, en notant leur force probante respective. Sur un vrai hôte Linux, « ausearch -k exec -ts today » regroupe justement les enregistrements d’un même événement partageant le même numéro de séquence."),
     code(`# Relier une réussite SSH à une exécution auditée
 grep 'Accepted password for awa' auth-demo.log

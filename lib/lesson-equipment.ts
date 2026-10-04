@@ -1,5 +1,6 @@
 import placements from "@/data/lesson-equipment.json";
 import { equipmentById, type Equipment } from "@/data/equipment";
+import { parseFigure } from "@/lib/figure-spec";
 import type { LessonBlock } from "@/types/api";
 
 export type EquipmentBoxData = { title: string; devices: Equipment[] };
@@ -7,9 +8,21 @@ export type EquipmentBoxData = { title: string; devices: Equipment[] };
 type RawPlacement = { after: string; title: string; devices: string[] };
 
 const lessons = placements.lessons as Record<string, { title: string; placements: RawPlacement[] }>;
-const TEXTUAL = new Set<LessonBlock["type"]>(["text", "schema", "example", "code"]);
+export const TEXTUAL_BLOCKS = new Set<LessonBlock["type"]>(["text", "schema", "example", "code"]);
 const collapse = (value: string) => value.replace(/\s+/g, " ").trim();
-const textOf = (block: LessonBlock): string => ("content" in block && typeof block.content === "string" ? collapse(block.content) : "");
+
+/**
+ * The text a photo box can be anchored on: the beginning of a paragraph, of an example or of a code block, and for a drawn
+ * schema (a figure) its title, because the stored JSON is not something an author reads.
+ */
+export function anchorTextOf(block: LessonBlock): string {
+  if (!("content" in block) || typeof block.content !== "string") return "";
+  if (block.type === "schema") {
+    const figure = parseFigure(block.content);
+    if (figure) return collapse(figure.title ?? "");
+  }
+  return collapse(block.content);
+}
 
 /**
  * The photo boxes of a lesson, keyed by the index of the block they follow. A box is anchored on the beginning of
@@ -23,7 +36,7 @@ export function equipmentBoxes(lessonId: string, blocks: readonly LessonBlock[])
   for (const placement of entry.placements) {
     const devices = placement.devices.map(equipmentById).filter((device): device is Equipment => Boolean(device));
     if (devices.length === 0) continue;
-    const found = blocks.findIndex((block) => TEXTUAL.has(block.type) && textOf(block).startsWith(placement.after));
+    const found = blocks.findIndex((block) => TEXTUAL_BLOCKS.has(block.type) && anchorTextOf(block).startsWith(placement.after));
     const index = found >= 0 ? found : blocks.length - 1;
     result.set(index, [...(result.get(index) ?? []), { title: placement.title, devices }]);
   }
