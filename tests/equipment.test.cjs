@@ -10,7 +10,7 @@ const { createSupabaseDatabase } = require("../scripts/pglite-supabase.cjs");
 const { load, root } = require("../scripts/ts-loader.cjs");
 
 const { equipment, equipmentById, equipmentForLab, equipmentFromPhoto, photoCredit } = load("data/equipment");
-const { equipmentBoxes, lessonEquipmentAnchors } = load("lib/lesson-equipment");
+const { equipmentBoxes, lessonEquipmentAnchors, anchorTextOf, TEXTUAL_BLOCKS } = load("lib/lesson-equipment");
 const catalogue = JSON.parse(fs.readFileSync(path.join(root, "data", "equipment.json"), "utf8"));
 const publicFile = (url) => path.join(root, "public", ...url.split("/").filter(Boolean));
 const COURSES = new Set(["reseaux", "fondamentaux", "linux"]);
@@ -98,7 +98,7 @@ test("every lesson photo box is anchored on one paragraph of a seeded lesson", a
     const [lesson] = (await db.query("select title, content -> 'blocks' as blocks from public.lessons where id = $1", [anchor.lessonId])).rows;
     assert.ok(lesson, `${anchor.title}: the lesson exists`);
     assert.equal(lesson.title, anchor.title, `${anchor.lessonId}: title`);
-    const hits = lesson.blocks.filter((block) => ["text", "schema", "example", "code"].includes(block.type) && block.content.replace(/\s+/g, " ").trim().startsWith(anchor.after));
+    const hits = lesson.blocks.filter((block) => TEXTUAL_BLOCKS.has(block.type) && anchorTextOf(block).startsWith(anchor.after));
     assert.equal(hits.length, 1, `${anchor.title} : « ${anchor.after} » matches ${hits.length} paragraphs`);
     assert.ok(anchor.devices.length >= 1 && anchor.devices.length <= 6 && anchor.devices.every((id) => equipmentById(id)), `${anchor.title}: devices`);
     assert.ok(!seen.has(`${anchor.lessonId}|${anchor.after}`), "an anchor is used once");
@@ -110,7 +110,7 @@ test("the photo boxes follow their paragraph, and close the lesson if the paragr
   const db = await database();
   const anchor = lessonEquipmentAnchors().find((entry) => entry.title === "LAN, WAN, topologies et équipements" && entry.after.startsWith("Quatre"));
   const [lesson] = (await db.query("select content -> 'blocks' as blocks from public.lessons where id = $1", [anchor.lessonId])).rows;
-  const at = lesson.blocks.findIndex((block) => block.content?.startsWith(anchor.after));
+  const at = lesson.blocks.findIndex((block) => TEXTUAL_BLOCKS.has(block.type) && anchorTextOf(block).startsWith(anchor.after));
   const placed = equipmentBoxes(anchor.lessonId, lesson.blocks);
   assert.deepEqual(placed.get(at).map((box) => box.devices.map((device) => device.id)), [anchor.devices]);
   assert.equal(placed.get(at)[0].title, "Routeur, point d’accès, pare-feu et box");

@@ -15,10 +15,13 @@ const mapNpm = (specifier) => {
 };
 
 function load(file) {
-  const filename = path.resolve(root, `${file}.ts`);
+  // Pure modules are .ts; the components that tests render on the server are .tsx.
+  const plain = path.resolve(root, `${file}.ts`);
+  const filename = fs.existsSync(plain) ? plain : path.resolve(root, `${file}.tsx`);
   if (cache.has(filename)) return cache.get(filename);
   const output = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX },
+    fileName: filename,
   }).outputText;
   const module = { exports: {} };
   cache.set(filename, module.exports);
@@ -29,7 +32,7 @@ function load(file) {
     // `import data from "./file.json"` : the JSON is the default export, as with resolveJsonModule.
     if (target.endsWith(".json")) return { __esModule: true, default: JSON.parse(fs.readFileSync(target, "utf8")) };
     // Deno wants the extension in a relative import ("./brand.ts"); the loader adds it back itself.
-    return load(path.relative(root, target.replace(/\.ts$/, "")));
+    return load(path.relative(root, target.replace(/\.tsx?$/, "")));
   };
   vm.runInThisContext(`(function(require,module,exports){${output}\n})`, { filename })(localRequire, module, module.exports);
   return module.exports;

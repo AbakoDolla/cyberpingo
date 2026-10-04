@@ -11,6 +11,29 @@
 const MIN_BASE_TEXT = 1100;
 const MIN_TEMPLATE_CHARS = 2400;
 
+const { load } = require("./ts-loader.cjs");
+
+/**
+ * A schema is drawn as a figure (lib/figure-spec.ts). While courses are being converted the plain-text schemas are tolerated;
+ * once a course is converted it must not fall back to text: flip the switch when every course is.
+ */
+const FIGURES_REQUIRED = process.env.FIGURES_OPTIONAL !== "1";
+
+/** The structure and the typography of a figure stored in a schema block. */
+function figureIssues(content, where) {
+  const trimmed = content.trim();
+  if (!trimmed.startsWith("{")) return FIGURES_REQUIRED ? [`${where} : schéma en texte brut (dessine-le avec figure({ … }), voir lib/figure-spec.ts)`] : [];
+  let value;
+  try { value = JSON.parse(trimmed); } catch { return [`${where} : figure illisible (JSON invalide)`]; }
+  const spec = load("lib/figure-spec");
+  const problems = spec.validateFigure(value);
+  if (problems.length) return problems.map((problem) => `${where} : figure invalide, ${problem}`);
+  const prose = spec.figureProse(value);
+  const issues = textHygiene(prose, `${where} (figure)`);
+  if (prose.some((line) => /->|=>/.test(line))) issues.push(`${where} (figure) : flèche en texte (-> ou =>) : le dessin trace déjà les flèches`);
+  return issues;
+}
+
 const PROSE = new Set(["text", "heading", "example", "callout"]);
 const VIDEO_SLOT = /^Vidéo à venir\s*:/u;
 
@@ -106,6 +129,7 @@ function lessonIssues(lesson, { level = "base", allowedUrls, quizInherited = fal
   issues.push(...textHygiene(proseOf(lesson, !quizInherited), where));
   for (const block of blocks) {
     if (!PROSE.has(block.type) && /\*{6}/u.test(block.content)) issues.push(`${where} : suite d’astérisques dans un bloc ${block.type} (un secret masqué à l’écran a été recopié : rétablis le texte d’origine)`);
+    if (block.type === "schema") issues.push(...figureIssues(block.content, where));
   }
 
   if (level === "template") {
@@ -183,4 +207,4 @@ const PLAN = {
   "analyse-logs": { modules: 10, hours: "40 à 60" },
 };
 
-module.exports = { lessonIssues, labIssues, moduleIssues, quizIssues, textHygiene, allowedReferenceUrls, ENFORCED_COURSES, PLAN, MIN_BASE_TEXT, MIN_TEMPLATE_CHARS };
+module.exports = { lessonIssues, labIssues, moduleIssues, quizIssues, textHygiene, figureIssues, allowedReferenceUrls, ENFORCED_COURSES, PLAN, MIN_BASE_TEXT, MIN_TEMPLATE_CHARS };

@@ -4,7 +4,7 @@
       "title": "LAN, WAN, topologies et équipements",
       "placements": [
         {
-          "after": "ATELIER D’AWA (LAN)",
+          "after": "Atelier d’Awa : le LAN, la box et le WAN",
           "title": "L’atelier d’Awa, en vrai",
           "devices": [
             "poste-fixe",
@@ -28,7 +28,7 @@
       "title": "Le modèle OSI en pratique",
       "placements": [
         {
-          "after": "7 Application service visible",
+          "after": "Les 7 couches OSI et leur unité",
           "title": "La couche 1 en vrai : du cuivre ou de la lumière",
           "devices": [
             "cable-ethernet",
@@ -36,7 +36,7 @@
           ]
         },
         {
-          "after": "OSI TCP/IP Exemple d’équipement",
+          "after": "OSI et TCP/IP",
           "title": "Un équipement pour chaque couche",
           "devices": [
             "pare-feu",
@@ -178,7 +178,7 @@
       "title": "TCP/IP et encapsulation : le voyage d’un paquet",
       "placements": [
         {
-          "after": "Lien 1 Lien 2 Lien 3",
+          "after": "Ce qui change ou non entre trois liens",
           "title": "Un poste, des routeurs et un serveur",
           "devices": [
             "poste-fixe",
@@ -256,7 +256,7 @@
       "title": "Mises à jour, antivirus et surface d’attaque",
       "placements": [
         {
-          "after": "Élément à suivre Exemple",
+          "after": "Éléments à suivre sur un poste",
           "title": "Des appareils qui reçoivent aussi des mises à jour",
           "devices": [
             "box-internet",

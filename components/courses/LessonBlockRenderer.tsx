@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
+import FigureView from "@/components/figures/Figure";
 import { parseCallout, pendingVideoTitle, videoEmbed } from "@/lib/lesson-content";
+import { parseFigure } from "@/lib/figure-spec";
 import type { LessonBlock } from "@/types/api";
 
 function TextBlock({ content }: { content: string }) {
@@ -59,6 +61,12 @@ function VideoBlock({ url, title }: { url: string; title?: string }) {
   return <div className="lesson-media lesson-media--video"><video src={embed.src} controls preload="metadata">Ton navigateur ne peut pas lire cette vidéo.</video></div>;
 }
 
+function SchemaBlock({ content }: { content: string }) {
+  const figure = useMemo(() => parseFigure(content), [content]);
+  if (figure) return <FigureView figure={figure} />;
+  return <pre className="lesson-schema" tabIndex={0}><code>{content}</code></pre>;
+}
+
 export default function LessonBlockRenderer({ block }: { block: LessonBlock }) {
   switch (block.type) {
     case "text":
@@ -66,7 +74,7 @@ export default function LessonBlockRenderer({ block }: { block: LessonBlock }) {
     case "heading":
       return <h2 className="lesson-block-heading">{block.content}</h2>;
     case "schema":
-      return <pre className="lesson-schema"><code>{block.content}</code></pre>;
+      return <SchemaBlock content={block.content} />
     case "example":
       return <aside className="lesson-callout lesson-callout--example"><strong>Exemple</strong><p>{block.content}</p></aside>;
     case "callout": {
