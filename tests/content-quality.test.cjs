@@ -14,10 +14,6 @@ const { readLessons, templateLessonIds } = require("../scripts/content-snapshot.
 const KNOWN_DEBT = {
   "securite-web": ["HTTPS : ce que le cadenas protège vraiment", "Protéger ses comptes avec un gestionnaire et la MFA", "Déjouer un message de phishing"],
   "pentest-intro": ["Autorisation et périmètre d’un audit", "Une méthode de test responsable", "Rédiger une recommandation utile"],
-  "analyse-logs": [
-    "Lire un événement dans un journal", "Relier les événements sans conclure trop vite", "Qualifier une alerte et documenter la suite",
-    "Reconnaître une attaque SSH par force brute", "Lire les journaux d’un serveur web", "Reconstituer la chronologie d’un incident",
-  ],
 };
 
 let db;

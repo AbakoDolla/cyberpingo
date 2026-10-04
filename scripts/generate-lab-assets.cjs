@@ -13,6 +13,9 @@ const { buildSecuriteAssetsB } = require("./lab-scenarios-securite-b.cjs");
 const { buildLinuxAssetsA } = require("./lab-scenarios-linux-a.cjs");
 const { buildLinuxAssetsB } = require("./lab-scenarios-linux-b.cjs");
 const { buildLinuxAssetsC } = require("./lab-scenarios-linux-c.cjs");
+const { buildLogsAssetsA } = require("./lab-scenarios-logs-a.cjs");
+const { buildLogsAssetsB } = require("./lab-scenarios-logs-b.cjs");
+const { buildLogsAssetsC } = require("./lab-scenarios-logs-c.cjs");
 
 const root = path.resolve(__dirname, "..");
 const OUTPUT_DIR = path.join(root, "public", "labs");
@@ -504,6 +507,9 @@ function buildLabAssets() {
   const linuxA = buildLinuxAssetsA();
   const linuxB = buildLinuxAssetsB();
   const linuxC = buildLinuxAssetsC();
+  const logsA = buildLogsAssetsA();
+  const logsB = buildLogsAssetsB();
+  const logsC = buildLogsAssetsC();
   return {
     files: [
       { name: "reseau-instable.pcap", data: instable.file },
@@ -521,12 +527,16 @@ function buildLabAssets() {
       ...linuxA.files,
       ...linuxB.files,
       ...linuxC.files,
+      ...logsA.files,
+      ...logsB.files,
+      ...logsC.files,
     ],
     facts: {
       instable: instable.facts, evaluation: evaluation.facts, firewall: firewall.facts, packetTracer, soc: soc.facts,
       programme: { ...programmeLabs.facts, ...kora.facts },
       fondamentaux: { ...securiteA.facts, ...securiteB.facts },
       linux: { ...linuxA.facts, ...linuxB.facts, ...linuxC.facts },
+      logs: { ...logsA.facts, ...logsB.facts, ...logsC.facts },
     },
   };
 }

@@ -49,4 +49,16 @@ module.exports = [
   { file: "lnx-proj-guide", kind: "guide", docLabel: "Guide du projet final", course: "linux", lab: "Projet final · Audit d’un serveur Linux", equipment: ["serveur", "nas", "pare-feu"], direct: true },
   { file: "lnx-proj-grille-audit", kind: "grid", docLabel: "Grille d’audit", course: "linux", lab: "Projet final · Audit d’un serveur Linux", direct: true },
   { file: "lnx-proj-modele-rapport", kind: "template", docLabel: "Modèle de rapport", course: "linux", lab: "Projet final · Audit d’un serveur Linux", direct: true },
+
+  // Analyse de logs : publiés en PDF dès leur seed (09_logs_programme.sql), donc « direct »
+  { file: "slg-tp1-guide", kind: "guide", docLabel: "Guide pas à pas", course: "logs", lab: "TP 1 · Lire, normaliser et dater", equipment: ["serveur", "portable"], direct: true },
+  { file: "slg-tp2-guide", kind: "guide", docLabel: "Guide pas à pas", course: "logs", lab: "TP 2 · Journaux Windows", equipment: ["poste-fixe", "portable", "serveur"], direct: true },
+  { file: "slg-tp3-guide", kind: "guide", docLabel: "Guide pas à pas", course: "logs", lab: "TP 3 · Pare-feu, DNS et proxy", equipment: ["pare-feu", "routeur", "serveur"], direct: true },
+  { file: "slg-tp4-guide", kind: "guide", docLabel: "Guide pas à pas", course: "logs", lab: "TP 4 · Corréler et dater", equipment: ["serveur", "pare-feu", "poste-fixe"], direct: true },
+  { file: "slg-tp4-modele-chronologie", kind: "template", docLabel: "Modèle de chronologie", course: "logs", lab: "TP 4 · Corréler et dater", direct: true },
+  { file: "slg-tp5-guide", kind: "guide", docLabel: "Guide pas à pas", course: "logs", lab: "TP 5 · Règles de détection", equipment: ["serveur", "pare-feu"], direct: true },
+  { file: "slg-tp5-regles", kind: "brief", docLabel: "Règles à évaluer", course: "logs", lab: "TP 5 · Règles de détection", direct: true },
+  { file: "slg-proj-guide", kind: "guide", docLabel: "Guide du projet final", course: "logs", lab: "Projet final · Trier une semaine d’alertes", equipment: ["serveur", "pare-feu", "poste-fixe"], direct: true },
+  { file: "slg-proj-grille-triage", kind: "grid", docLabel: "Grille de triage", course: "logs", lab: "Projet final · Trier une semaine d’alertes", direct: true },
+  { file: "slg-proj-modele-rapport", kind: "template", docLabel: "Modèle de rapport", course: "logs", lab: "Projet final · Trier une semaine d’alertes", direct: true },
 ];

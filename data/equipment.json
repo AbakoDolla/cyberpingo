@@ -568,6 +568,34 @@
       "serveur",
       "nas",
       "pare-feu"
+    ],
+    "tp-logs-formats-temps": [
+      "serveur",
+      "portable"
+    ],
+    "tp-logs-windows": [
+      "poste-fixe",
+      "portable",
+      "serveur"
+    ],
+    "tp-logs-reseau": [
+      "pare-feu",
+      "routeur",
+      "serveur"
+    ],
+    "tp-logs-correlation": [
+      "serveur",
+      "pare-feu",
+      "poste-fixe"
+    ],
+    "tp-logs-detection": [
+      "serveur",
+      "pare-feu"
+    ],
+    "projet-soc-pme": [
+      "serveur",
+      "pare-feu",
+      "poste-fixe"
     ]
   }
 }

@@ -24,6 +24,23 @@ function proseOf(lesson, withQuiz) {
   return parts;
 }
 
+/**
+ * Words that are always written with an accent in French. Finding one of them without it means an ASCII-only edit stripped the
+ * accents of a passage. A word touching a hyphen, a slash, a dot or an underscore is a file name or an identifier and is ignored.
+ */
+const STRIPPED_WORDS = [
+  "deja", "meme", "memes", "apres", "etre", "ete", "reponse", "reponses", "reussi", "reussie", "reussis", "reussir", "executer", "verification",
+  "verifier", "evenement", "evenements", "donnee", "donnees", "probleme", "problemes", "systeme", "systemes", "numero", "numeros", "resultat",
+  "resultats", "differente", "differents", "differentes", "derniere", "dernieres", "premiere", "premieres", "periode", "periodes", "securite",
+  "ecart", "ecarts", "ecrit", "ecrite", "ecrire", "ecris", "etape", "etapes", "interet", "interessant", "interessante", "metier", "metiers",
+  "reseau", "reseaux", "requete", "requetes", "tres", "prevue", "prevus", "prevues", "specifique", "specifiques", "equipe", "equipes", "reperer",
+  "decision", "decisions", "decider", "egalite", "regle", "regles", "reglage", "regulier", "reguliere", "reguliers", "regulieres", "methode",
+  "methodes", "memoire", "modele", "modeles", "theorie", "reel", "reelle", "reels", "reelles", "creer", "difficulte", "necessaire", "necessite",
+  "legitime", "legitimes", "completer", "entree", "entrees", "gravite", "criticite", "priorite", "priorites", "probabilite", "duree", "echec",
+  "echecs", "reussite", "activite", "detecter", "evaluer", "francais", "caractere", "caracteres", "elevee", "debut", "propriete",
+];
+const STRIPPED = new RegExp(`(?<![\\p{L}\\p{N}_.\\/\\\\$@-])(?:${STRIPPED_WORDS.join("|")})(?![\\p{L}\\p{N}_.\\/\\\\@-])`, "iu");
+
 function textHygiene(strings, where) {
   const issues = [];
   strings.forEach((value) => {
@@ -31,6 +48,8 @@ function textHygiene(strings, where) {
     if (/\p{L}'\p{L}/u.test(value)) issues.push(`${where} : apostrophe droite dans « ${value.slice(0, 50)}… » (utilise ’)`);
     if (/lorem|todo|à compléter|xxx/iu.test(value)) issues.push(`${where} : texte provisoire dans « ${value.slice(0, 50)}… »`);
     if (value.includes("`")) issues.push(`${where} : accent grave dans « ${value.slice(0, 50)}… » (le texte n’est pas interprété comme du Markdown : écris « commande » entre guillemets ou utilise un bloc code)`);
+    const stripped = STRIPPED.exec(value);
+    if (stripped) issues.push(`${where} : accent manquant sur « ${stripped[0]} » dans « ${value.slice(Math.max(0, stripped.index - 25), stripped.index + 40)} »`);
   });
   return issues;
 }
@@ -148,7 +167,7 @@ function allowedReferenceUrls(references) {
 }
 
 /** Courses whose lessons must all meet the checklist: they are the ones declared finished. */
-const ENFORCED_COURSES = ["reseaux", "fondamentaux", "linux"];
+const ENFORCED_COURSES = ["reseaux", "fondamentaux", "linux", "analyse-logs"];
 
 /** The programme planned for each course in the specification of the six paths (modules and indicative hours). */
 const PLAN = {
