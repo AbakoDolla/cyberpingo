@@ -1,0 +1,12 @@
+<34>1 2026-05-19T07:02:11Z srv-reservation01 sshd 2140 auth-crit - password database unavailable
+<30>1 2026-05-19T07:06:15Z srv-reservation01 app-api 881 auth-warn - login latency higher than baseline
+<46>1 2026-05-19T07:10:05Z proxy01 squid 1104 proxy-info - connect cache warmup complete
+<13>1 2026-05-19T07:14:44Z dns01 dnsmasq 612 dns-notice - upstream switched to resolver-b
+<23>1 2026-05-19T07:19:30Z srv-reservation01 booking-api 1408 app-error - room lock retry failed
+<38>1 2026-05-19T07:24:55Z srv-reservation01 scheduler 220 cron-info - import run finished
+<11>1 2026-05-19T07:29:01Z srv-reservation01 kernel 0 kernel-error - nf_conntrack table close to limit
+<26>1 2026-05-19T07:33:40Z srv-reservation01 php-fpm 1601 app-critical - payment bridge unavailable
+<45>1 2026-05-19T07:38:09Z proxy01 squid 1104 proxy-notice - acl maintenance window closed
+<54>1 2026-05-19T07:42:10Z srv-reservation01 booking-api 1408 local0-critical - drift marker for correlation
+<22>1 2026-05-19T07:46:17Z srv-reservation01 sshd 2455 auth-critical - repeated password failure threshold reached
+<31>1 2026-05-19T07:51:51Z srv-reservation01 booking-api 1408 local3-error - seat map backend timeout

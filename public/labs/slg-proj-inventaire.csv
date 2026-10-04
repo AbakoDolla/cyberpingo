@@ -1,0 +1,9 @@
+Machine;Role;Criticite;Proprietaire
+srv-reservation01;Application de réservation;4;Kader Sow
+fw-palmier01;Pare-feu et routeur;4;Kader Sow
+pc-compta01;Poste comptabilité;4;Aissatou Diop
+pc-reception01;Poste réception;3;Mariam Sylla
+pc-direction01;Poste direction;3;Jean-Baptiste Ouédraogo
+adm-pc02;Portable du prestataire;2;Kader Sow
+dns01;Résolveur DNS interne;2;Kader Sow
+proxy01;Mandataire web;2;Kader Sow

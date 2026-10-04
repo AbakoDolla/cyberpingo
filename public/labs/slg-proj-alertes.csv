@@ -1,0 +1,13 @@
+AlertId;HorodatageUtc;Regle;Machine;GraviteAnnoncee
+ALT-01;2026-05-18T07:12:41Z;WIN-4625-repetition;pc-compta01;2
+ALT-02;2026-05-18T18:40:12Z;PROXY-volume-maj;pc-direction01;1
+ALT-03;2026-05-19T02:15:03Z;LNX-ssh-echec-repetition;srv-reservation01;2
+ALT-04;2026-05-21T09:12:44Z;WEB-upload-execution;srv-reservation01;3
+ALT-05;2026-05-21T09:18:31Z;LNX-ssh-succes-externe;srv-reservation01;2
+ALT-06;2026-05-21T09:24:14Z;FW-sortie-vers-destination-neuve;srv-reservation01;4
+ALT-07;2026-05-22T10:02:18Z;DNS-burst-txt;pc-reception01;2
+ALT-08;2026-05-22T22:10:05Z;WIN-powershell-encoded;adm-pc02;2
+ALT-09;2026-05-23T06:20:45Z;PROXY-admin-download;adm-pc02;1
+ALT-10;2026-05-21T09:23:51Z;DNS-nouveau-domaine-critique;srv-reservation01;3
+ALT-11;2026-05-24T08:10:14Z;WIN-connexion-reseau-hors-horaire;pc-reception01;2
+ALT-12;2026-05-24T12:45:39Z;WEB-404-scan;srv-reservation01;2

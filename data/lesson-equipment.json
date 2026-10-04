@@ -467,6 +467,100 @@
           ]
         }
       ]
+    },
+    "9ce3af04-6403-f91e-bdee-d9bf4ba0c2fe": {
+      "title": "Les journaux Linux : syslog, journald et /var/log",
+      "placements": [
+        {
+          "after": "Sous Linux, les journaux viennent surtout de deux mondes",
+          "title": "Le serveur qui écrit ces journaux",
+          "devices": [
+            "serveur",
+            "raspberry-pi"
+          ]
+        }
+      ]
+    },
+    "0b688d54-a030-a103-9936-8f85077df556": {
+      "title": "Les journaux d’événements Windows : Security, System et Application",
+      "placements": [
+        {
+          "after": "Sous Windows, un événement n’est pas une simple ligne de texte",
+          "title": "Les machines Windows qui journalisent",
+          "devices": [
+            "poste-fixe",
+            "portable",
+            "serveur"
+          ]
+        }
+      ]
+    },
+    "8a32f6d6-e51d-bf40-47b1-64f802729208": {
+      "title": "Journaux de pare-feu : lire un ALLOW, un DENY et une série de ports",
+      "placements": [
+        {
+          "after": "Un journal de pare-feu enregistre surtout une décision",
+          "title": "Le pare-feu et le routeur : là où naissent ces lignes",
+          "devices": [
+            "pare-feu",
+            "routeur"
+          ]
+        }
+      ]
+    },
+    "cbef2648-8943-8fab-a3db-5750d73aebc3": {
+      "title": "DNS et mandataire : domaines rares, volumes et appels réguliers",
+      "placements": [
+        {
+          "after": "Le mandataire Squid raconte autre chose.",
+          "title": "Le mandataire : un serveur sur le chemin du web",
+          "devices": [
+            "serveur",
+            "pare-feu"
+          ]
+        }
+      ]
+    },
+    "9126bae3-8396-9cc4-81a2-cf71a88f10c5": {
+      "title": "Flux réseau et détection d’intrusion : NetFlow, Zeek et Suricata",
+      "placements": [
+        {
+          "after": "NetFlow et IPFIX ne conservent pas le contenu des paquets.",
+          "title": "Les équipements qui voient passer les flux",
+          "devices": [
+            "routeur",
+            "switch",
+            "pare-feu"
+          ]
+        }
+      ]
+    },
+    "8484fe84-4638-d6ef-3566-93906fd80ffd": {
+      "title": "Centraliser les journaux : rsyslog, agents et transport sécurisé",
+      "placements": [
+        {
+          "after": "Centraliser des journaux consiste à envoyer une copie des événements",
+          "title": "Un point de collecte : serveur, baie et stockage",
+          "devices": [
+            "serveur",
+            "baie",
+            "nas"
+          ]
+        }
+      ]
+    },
+    "d601e4ef-ef50-dbda-d6c8-9a8086da400f": {
+      "title": "Conserver et protéger les journaux : rétention, intégrité et vie privée",
+      "placements": [
+        {
+          "after": "L’intégrité répond à une autre question",
+          "title": "Où vivent les archives de journaux",
+          "devices": [
+            "nas",
+            "disque-externe"
+          ]
+        }
+      ]
     }
   }
 }

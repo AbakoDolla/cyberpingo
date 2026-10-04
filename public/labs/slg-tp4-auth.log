@@ -1,0 +1,12 @@
+May 23 09:03:11 srv-reservation01 sshd[2011]: Failed password for invalid user admin from 198.51.100.88 port 51221 ssh2
+May 23 09:03:29 srv-reservation01 sshd[2014]: Failed password for invalid user guest from 198.51.100.88 port 51244 ssh2
+May 23 09:11:52 srv-reservation01 sshd[2101]: Accepted publickey for ksow from 172.20.10.44 port 49920 ssh2: ED25519 SHA256:Bt9fFgM0Y6fZ4demo
+May 23 09:11:53 srv-reservation01 sshd[2101]: pam_unix(sshd:session): session opened for user ksow(uid=1004) by (uid=0)
+May 23 10:05:12 srv-reservation01 sshd[2788]: Failed password for root from 203.0.113.66 port 54311 ssh2
+May 23 10:05:44 srv-reservation01 sshd[2792]: Failed password for root from 203.0.113.66 port 54329 ssh2
+May 23 10:06:08 srv-reservation01 sshd[2797]: Failed password for invalid user postgres from 203.0.113.66 port 54344 ssh2
+May 23 11:19:31 srv-reservation01 sshd[4012]: Accepted password for svc-resa from 172.20.10.57 port 55124 ssh2
+May 23 11:19:31 srv-reservation01 sshd[4012]: pam_unix(sshd:session): session opened for user svc-resa(uid=1106) by (uid=0)
+May 23 11:22:40 srv-reservation01 sudo[4099]: svc-resa : TTY=pts/1 ; PWD=/srv/reservation ; USER=root ; COMMAND=/usr/sbin/useradd -m audit-cache
+May 23 11:28:12 srv-reservation01 sshd[4012]: Disconnected from user svc-resa 172.20.10.57 port 55124
+May 23 11:28:13 srv-reservation01 sshd[4012]: pam_unix(sshd:session): session closed for user svc-resa

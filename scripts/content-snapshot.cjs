@@ -1,19 +1,22 @@
 // Reads what the seeds publish, in the shape the publication checklist (scripts/content-quality.cjs) expects.
 // Shared by tests/content-quality.test.cjs and scripts/content-report.cjs.
 
-const { load } = require("./ts-loader.cjs");
+const fs = require("node:fs");
+const path = require("node:path");
+const { load, root } = require("./ts-loader.cjs");
 const { contentId } = require("./generate-content-seed.cjs");
 
 const rows = async (db, text, params = []) => (await db.query(text, params)).rows;
 
-/** The authoring files of every finished programme: each one is split in parts "a" to "d" (see docs/CONTENU.md). */
-const PROGRAMMES = ["reseaux-programme", "fondamentaux-programme", "linux-programme"];
+/** The authoring files of every finished programme: each one is split in parts "a" to "e" (see docs/CONTENU.md). */
+const PROGRAMMES = ["reseaux-programme", "fondamentaux-programme", "linux-programme", "logs-programme"];
 
 /** Lessons written with the full lesson template (the programme parts), found by their id. */
 function templateLessonIds() {
   const ids = new Set();
   for (const programme of PROGRAMMES) {
-    for (const part of ["a", "b", "c", "d"]) {
+    for (const part of ["a", "b", "c", "d", "e"]) {
+      if (!fs.existsSync(path.join(root, "supabase", "seed", "content", `${programme}-${part}.ts`))) continue;
       const { modules } = load(`supabase/seed/content/${programme}-${part}`);
       for (const entry of modules) for (const lesson of entry.lessons) if (!lesson.existing) ids.add(contentId("lesson", lesson.key));
     }

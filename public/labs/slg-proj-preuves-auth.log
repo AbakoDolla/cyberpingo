@@ -1,0 +1,216 @@
+May 18 00:00:00 srv-reservation01 CRON[900]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 00:00:04 srv-reservation01 CRON[900]: pam_unix(cron:session): session closed for user root
+May 18 02:00:00 srv-reservation01 CRON[901]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 02:00:04 srv-reservation01 CRON[901]: pam_unix(cron:session): session closed for user root
+May 18 04:00:00 srv-reservation01 CRON[902]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 04:00:04 srv-reservation01 CRON[902]: pam_unix(cron:session): session closed for user root
+May 18 06:00:00 srv-reservation01 CRON[903]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 06:00:04 srv-reservation01 CRON[903]: pam_unix(cron:session): session closed for user root
+May 18 08:00:00 srv-reservation01 CRON[904]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 08:00:04 srv-reservation01 CRON[904]: pam_unix(cron:session): session closed for user root
+May 18 08:03:12 srv-reservation01 sshd[1400]: Accepted publickey for ksow from 172.20.10.90 port 43986 ssh2: ED25519 SHA256:4Yd1vKqP8n2M
+May 18 08:03:13 srv-reservation01 sshd[1400]: pam_unix(sshd:session): session opened for user ksow(uid=1006) by (uid=0)
+May 18 08:23:12 srv-reservation01 sshd[1400]: pam_unix(sshd:session): session closed for user ksow
+May 18 10:00:00 srv-reservation01 CRON[905]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 10:00:04 srv-reservation01 CRON[905]: pam_unix(cron:session): session closed for user root
+May 18 10:11:04 srv-reservation01 sshd[1412]: Accepted publickey for msylla from 172.20.10.21 port 48186 ssh2: ED25519 SHA256:7Qm3oLxP4r2N
+May 18 10:11:05 srv-reservation01 sshd[1412]: pam_unix(sshd:session): session opened for user msylla(uid=1001) by (uid=0)
+May 18 10:33:04 srv-reservation01 sshd[1412]: pam_unix(sshd:session): session closed for user msylla
+May 18 12:00:00 srv-reservation01 CRON[906]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 12:00:04 srv-reservation01 CRON[906]: pam_unix(cron:session): session closed for user root
+May 18 14:00:00 srv-reservation01 CRON[907]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 14:00:04 srv-reservation01 CRON[907]: pam_unix(cron:session): session closed for user root
+May 18 16:00:00 srv-reservation01 CRON[908]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 16:00:04 srv-reservation01 CRON[908]: pam_unix(cron:session): session closed for user root
+May 18 18:00:00 srv-reservation01 CRON[909]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 18:00:04 srv-reservation01 CRON[909]: pam_unix(cron:session): session closed for user root
+May 18 20:00:00 srv-reservation01 CRON[910]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 20:00:04 srv-reservation01 CRON[910]: pam_unix(cron:session): session closed for user root
+May 18 22:00:00 srv-reservation01 CRON[911]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 18 22:00:04 srv-reservation01 CRON[911]: pam_unix(cron:session): session closed for user root
+May 19 00:00:00 srv-reservation01 CRON[912]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 00:00:04 srv-reservation01 CRON[912]: pam_unix(cron:session): session closed for user root
+May 19 02:00:00 srv-reservation01 CRON[913]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 02:00:04 srv-reservation01 CRON[913]: pam_unix(cron:session): session closed for user root
+May 19 02:15:03 srv-reservation01 sshd[2100]: Failed password for invalid user admin from 203.0.113.25 port 52152 ssh2
+May 19 02:15:04 srv-reservation01 sshd[2100]: Invalid user admin from 203.0.113.25 port 52152
+May 19 02:15:45 srv-reservation01 sshd[2101]: Failed password for invalid user guest from 203.0.113.25 port 51760 ssh2
+May 19 02:15:46 srv-reservation01 sshd[2101]: Invalid user guest from 203.0.113.25 port 51760
+May 19 02:16:27 srv-reservation01 sshd[2102]: Failed password for root from 203.0.113.25 port 51278 ssh2
+May 19 02:17:09 srv-reservation01 sshd[2103]: Failed password for invalid user support from 203.0.113.25 port 52501 ssh2
+May 19 02:17:10 srv-reservation01 sshd[2103]: Invalid user support from 203.0.113.25 port 52501
+May 19 02:17:51 srv-reservation01 sshd[2104]: Failed password for svc-resa from 203.0.113.25 port 53745 ssh2
+May 19 02:18:33 srv-reservation01 sshd[2105]: Failed password for invalid user backup from 203.0.113.25 port 51555 ssh2
+May 19 02:18:34 srv-reservation01 sshd[2105]: Invalid user backup from 203.0.113.25 port 51555
+May 19 02:19:15 srv-reservation01 sshd[2106]: Failed password for root from 203.0.113.25 port 52406 ssh2
+May 19 02:19:57 srv-reservation01 sshd[2107]: Failed password for invalid user audit from 203.0.113.25 port 53315 ssh2
+May 19 02:19:58 srv-reservation01 sshd[2107]: Invalid user audit from 203.0.113.25 port 53315
+May 19 02:20:39 srv-reservation01 sshd[2108]: Failed password for svc-resa from 203.0.113.25 port 51339 ssh2
+May 19 04:00:00 srv-reservation01 CRON[914]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 04:00:04 srv-reservation01 CRON[914]: pam_unix(cron:session): session closed for user root
+May 19 06:00:00 srv-reservation01 CRON[915]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 06:00:04 srv-reservation01 CRON[915]: pam_unix(cron:session): session closed for user root
+May 19 06:55:21 srv-reservation01 sshd[1421]: Accepted publickey for jbouedraogo from 172.20.10.11 port 48742 ssh2: RSA SHA256:P5j3mN0qL8xR
+May 19 06:55:22 srv-reservation01 sshd[1421]: pam_unix(sshd:session): session opened for user jbouedraogo(uid=1010) by (uid=0)
+May 19 07:20:21 srv-reservation01 sshd[1421]: pam_unix(sshd:session): session closed for user jbouedraogo
+May 19 08:00:00 srv-reservation01 CRON[916]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 08:00:04 srv-reservation01 CRON[916]: pam_unix(cron:session): session closed for user root
+May 19 10:00:00 srv-reservation01 CRON[917]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 10:00:04 srv-reservation01 CRON[917]: pam_unix(cron:session): session closed for user root
+May 19 12:00:00 srv-reservation01 CRON[918]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 12:00:04 srv-reservation01 CRON[918]: pam_unix(cron:session): session closed for user root
+May 19 14:00:00 srv-reservation01 CRON[919]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 14:00:04 srv-reservation01 CRON[919]: pam_unix(cron:session): session closed for user root
+May 19 16:00:00 srv-reservation01 CRON[920]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 16:00:04 srv-reservation01 CRON[920]: pam_unix(cron:session): session closed for user root
+May 19 18:00:00 srv-reservation01 CRON[921]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 18:00:04 srv-reservation01 CRON[921]: pam_unix(cron:session): session closed for user root
+May 19 20:00:00 srv-reservation01 CRON[922]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 20:00:04 srv-reservation01 CRON[922]: pam_unix(cron:session): session closed for user root
+May 19 22:00:00 srv-reservation01 CRON[923]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 19 22:00:04 srv-reservation01 CRON[923]: pam_unix(cron:session): session closed for user root
+May 20 00:00:00 srv-reservation01 CRON[924]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 00:00:04 srv-reservation01 CRON[924]: pam_unix(cron:session): session closed for user root
+May 20 02:00:00 srv-reservation01 CRON[925]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 02:00:04 srv-reservation01 CRON[925]: pam_unix(cron:session): session closed for user root
+May 20 04:00:00 srv-reservation01 CRON[926]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 04:00:04 srv-reservation01 CRON[926]: pam_unix(cron:session): session closed for user root
+May 20 06:00:00 srv-reservation01 CRON[927]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 06:00:04 srv-reservation01 CRON[927]: pam_unix(cron:session): session closed for user root
+May 20 08:00:00 srv-reservation01 CRON[928]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 08:00:04 srv-reservation01 CRON[928]: pam_unix(cron:session): session closed for user root
+May 20 10:00:00 srv-reservation01 CRON[929]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 10:00:04 srv-reservation01 CRON[929]: pam_unix(cron:session): session closed for user root
+May 20 12:00:00 srv-reservation01 CRON[930]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 12:00:04 srv-reservation01 CRON[930]: pam_unix(cron:session): session closed for user root
+May 20 14:00:00 srv-reservation01 CRON[931]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 14:00:04 srv-reservation01 CRON[931]: pam_unix(cron:session): session closed for user root
+May 20 15:19:02 srv-reservation01 sshd[1415]: Accepted publickey for msylla from 172.20.10.21 port 45742 ssh2: ED25519 SHA256:7Qm3oLxP4r2N
+May 20 15:19:03 srv-reservation01 sshd[1415]: pam_unix(sshd:session): session opened for user msylla(uid=1004) by (uid=0)
+May 20 15:40:02 srv-reservation01 sshd[1415]: pam_unix(sshd:session): session closed for user msylla
+May 20 16:00:00 srv-reservation01 CRON[932]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 16:00:04 srv-reservation01 CRON[932]: pam_unix(cron:session): session closed for user root
+May 20 18:00:00 srv-reservation01 CRON[933]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 18:00:04 srv-reservation01 CRON[933]: pam_unix(cron:session): session closed for user root
+May 20 18:44:51 srv-reservation01 sshd[1403]: Accepted publickey for ksow from 172.20.10.90 port 46917 ssh2: ED25519 SHA256:4Yd1vKqP8n2M
+May 20 18:44:52 srv-reservation01 sshd[1403]: pam_unix(sshd:session): session opened for user ksow(uid=1009) by (uid=0)
+May 20 19:05:51 srv-reservation01 sshd[1403]: pam_unix(sshd:session): session closed for user ksow
+May 20 20:00:00 srv-reservation01 CRON[934]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 20:00:04 srv-reservation01 CRON[934]: pam_unix(cron:session): session closed for user root
+May 20 22:00:00 srv-reservation01 CRON[935]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 20 22:00:04 srv-reservation01 CRON[935]: pam_unix(cron:session): session closed for user root
+May 21 00:00:00 srv-reservation01 CRON[936]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 00:00:04 srv-reservation01 CRON[936]: pam_unix(cron:session): session closed for user root
+May 21 02:00:00 srv-reservation01 CRON[937]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 02:00:04 srv-reservation01 CRON[937]: pam_unix(cron:session): session closed for user root
+May 21 04:00:00 srv-reservation01 CRON[938]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 04:00:04 srv-reservation01 CRON[938]: pam_unix(cron:session): session closed for user root
+May 21 06:00:00 srv-reservation01 CRON[939]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 06:00:04 srv-reservation01 CRON[939]: pam_unix(cron:session): session closed for user root
+May 21 08:00:00 srv-reservation01 CRON[940]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 08:00:04 srv-reservation01 CRON[940]: pam_unix(cron:session): session closed for user root
+May 21 09:18:31 srv-reservation01 sshd[3001]: Accepted password for svc-resa from 198.51.100.77 port 54412 ssh2
+May 21 09:18:34 srv-reservation01 sshd[3001]: pam_unix(sshd:session): session opened for user svc-resa(uid=995) by (uid=0)
+May 21 09:19:41 srv-reservation01 sudo[3020]: svc-resa : TTY=pts/1 ; PWD=/var/www/resa ; USER=root ; COMMAND=/usr/bin/tee /etc/cron.d/resa-cache
+May 21 09:21:09 srv-reservation01 sudo[3021]: svc-resa : TTY=pts/1 ; PWD=/var/www/resa ; USER=root ; COMMAND=/usr/sbin/useradd -m -s /bin/bash svc-planning
+May 21 09:21:10 srv-reservation01 useradd[3022]: new user: name=svc-planning, UID=1008, GID=1008, home=/home/svc-planning, shell=/bin/bash
+May 21 09:21:44 srv-reservation01 sudo[3025]: svc-resa : TTY=pts/1 ; PWD=/var/www/resa ; USER=root ; COMMAND=/usr/bin/chmod 755 /usr/local/bin/resa-cache-refresh.sh
+May 21 09:26:11 srv-reservation01 sshd[3001]: pam_unix(sshd:session): session closed for user svc-resa
+May 21 10:00:00 srv-reservation01 CRON[941]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 10:00:04 srv-reservation01 CRON[941]: pam_unix(cron:session): session closed for user root
+May 21 12:00:00 srv-reservation01 CRON[942]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 12:00:04 srv-reservation01 CRON[942]: pam_unix(cron:session): session closed for user root
+May 21 14:00:00 srv-reservation01 CRON[943]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 14:00:04 srv-reservation01 CRON[943]: pam_unix(cron:session): session closed for user root
+May 21 16:00:00 srv-reservation01 CRON[944]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 16:00:04 srv-reservation01 CRON[944]: pam_unix(cron:session): session closed for user root
+May 21 18:00:00 srv-reservation01 CRON[945]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 18:00:04 srv-reservation01 CRON[945]: pam_unix(cron:session): session closed for user root
+May 21 20:00:00 srv-reservation01 CRON[946]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 20:00:04 srv-reservation01 CRON[946]: pam_unix(cron:session): session closed for user root
+May 21 22:00:00 srv-reservation01 CRON[947]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 21 22:00:04 srv-reservation01 CRON[947]: pam_unix(cron:session): session closed for user root
+May 22 00:00:00 srv-reservation01 CRON[948]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 00:00:04 srv-reservation01 CRON[948]: pam_unix(cron:session): session closed for user root
+May 22 02:00:00 srv-reservation01 CRON[949]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 02:00:04 srv-reservation01 CRON[949]: pam_unix(cron:session): session closed for user root
+May 22 04:00:00 srv-reservation01 CRON[950]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 04:00:04 srv-reservation01 CRON[950]: pam_unix(cron:session): session closed for user root
+May 22 06:00:00 srv-reservation01 CRON[951]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 06:00:04 srv-reservation01 CRON[951]: pam_unix(cron:session): session closed for user root
+May 22 06:52:08 srv-reservation01 sshd[1424]: Accepted publickey for jbouedraogo from 172.20.10.11 port 44358 ssh2: RSA SHA256:P5j3mN0qL8xR
+May 22 06:52:09 srv-reservation01 sshd[1424]: pam_unix(sshd:session): session opened for user jbouedraogo(uid=1013) by (uid=0)
+May 22 07:18:08 srv-reservation01 sshd[1424]: pam_unix(sshd:session): session closed for user jbouedraogo
+May 22 08:00:00 srv-reservation01 CRON[952]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 08:00:04 srv-reservation01 CRON[952]: pam_unix(cron:session): session closed for user root
+May 22 09:04:13 srv-reservation01 sshd[1406]: Accepted publickey for ksow from 172.20.10.90 port 44172 ssh2: ED25519 SHA256:4Yd1vKqP8n2M
+May 22 09:04:14 srv-reservation01 sshd[1406]: pam_unix(sshd:session): session opened for user ksow(uid=1012) by (uid=0)
+May 22 09:31:13 srv-reservation01 sshd[1406]: pam_unix(sshd:session): session closed for user ksow
+May 22 10:00:00 srv-reservation01 CRON[953]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 10:00:04 srv-reservation01 CRON[953]: pam_unix(cron:session): session closed for user root
+May 22 12:00:00 srv-reservation01 CRON[954]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 12:00:04 srv-reservation01 CRON[954]: pam_unix(cron:session): session closed for user root
+May 22 14:00:00 srv-reservation01 CRON[955]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 14:00:04 srv-reservation01 CRON[955]: pam_unix(cron:session): session closed for user root
+May 22 16:00:00 srv-reservation01 CRON[956]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 16:00:04 srv-reservation01 CRON[956]: pam_unix(cron:session): session closed for user root
+May 22 18:00:00 srv-reservation01 CRON[957]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 18:00:04 srv-reservation01 CRON[957]: pam_unix(cron:session): session closed for user root
+May 22 20:00:00 srv-reservation01 CRON[958]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 20:00:04 srv-reservation01 CRON[958]: pam_unix(cron:session): session closed for user root
+May 22 22:00:00 srv-reservation01 CRON[959]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 22 22:00:04 srv-reservation01 CRON[959]: pam_unix(cron:session): session closed for user root
+May 23 00:00:00 srv-reservation01 CRON[960]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 00:00:04 srv-reservation01 CRON[960]: pam_unix(cron:session): session closed for user root
+May 23 02:00:00 srv-reservation01 CRON[961]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 02:00:04 srv-reservation01 CRON[961]: pam_unix(cron:session): session closed for user root
+May 23 04:00:00 srv-reservation01 CRON[962]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 04:00:04 srv-reservation01 CRON[962]: pam_unix(cron:session): session closed for user root
+May 23 06:00:00 srv-reservation01 CRON[963]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 06:00:04 srv-reservation01 CRON[963]: pam_unix(cron:session): session closed for user root
+May 23 08:00:00 srv-reservation01 CRON[964]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 08:00:04 srv-reservation01 CRON[964]: pam_unix(cron:session): session closed for user root
+May 23 08:40:15 srv-reservation01 sshd[1418]: Accepted publickey for msylla from 172.20.10.21 port 43339 ssh2: ED25519 SHA256:7Qm3oLxP4r2N
+May 23 08:40:16 srv-reservation01 sshd[1418]: pam_unix(sshd:session): session opened for user msylla(uid=1007) by (uid=0)
+May 23 09:14:15 srv-reservation01 sshd[1418]: pam_unix(sshd:session): session closed for user msylla
+May 23 10:00:00 srv-reservation01 CRON[965]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 10:00:04 srv-reservation01 CRON[965]: pam_unix(cron:session): session closed for user root
+May 23 12:00:00 srv-reservation01 CRON[966]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 12:00:04 srv-reservation01 CRON[966]: pam_unix(cron:session): session closed for user root
+May 23 14:00:00 srv-reservation01 CRON[967]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 14:00:04 srv-reservation01 CRON[967]: pam_unix(cron:session): session closed for user root
+May 23 16:00:00 srv-reservation01 CRON[968]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 16:00:04 srv-reservation01 CRON[968]: pam_unix(cron:session): session closed for user root
+May 23 18:00:00 srv-reservation01 CRON[969]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 18:00:04 srv-reservation01 CRON[969]: pam_unix(cron:session): session closed for user root
+May 23 20:00:00 srv-reservation01 CRON[970]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 20:00:04 srv-reservation01 CRON[970]: pam_unix(cron:session): session closed for user root
+May 23 22:00:00 srv-reservation01 CRON[971]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 23 22:00:04 srv-reservation01 CRON[971]: pam_unix(cron:session): session closed for user root
+May 24 00:00:00 srv-reservation01 CRON[972]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 00:00:04 srv-reservation01 CRON[972]: pam_unix(cron:session): session closed for user root
+May 24 02:00:00 srv-reservation01 CRON[973]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 02:00:04 srv-reservation01 CRON[973]: pam_unix(cron:session): session closed for user root
+May 24 04:00:00 srv-reservation01 CRON[974]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 04:00:04 srv-reservation01 CRON[974]: pam_unix(cron:session): session closed for user root
+May 24 06:00:00 srv-reservation01 CRON[975]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 06:00:04 srv-reservation01 CRON[975]: pam_unix(cron:session): session closed for user root
+May 24 08:00:00 srv-reservation01 CRON[976]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 08:00:04 srv-reservation01 CRON[976]: pam_unix(cron:session): session closed for user root
+May 24 10:00:00 srv-reservation01 CRON[977]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 10:00:04 srv-reservation01 CRON[977]: pam_unix(cron:session): session closed for user root
+May 24 12:00:00 srv-reservation01 CRON[978]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 12:00:04 srv-reservation01 CRON[978]: pam_unix(cron:session): session closed for user root
+May 24 14:00:00 srv-reservation01 CRON[979]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 14:00:04 srv-reservation01 CRON[979]: pam_unix(cron:session): session closed for user root
+May 24 16:00:00 srv-reservation01 CRON[980]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 16:00:04 srv-reservation01 CRON[980]: pam_unix(cron:session): session closed for user root
+May 24 18:00:00 srv-reservation01 CRON[981]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 18:00:04 srv-reservation01 CRON[981]: pam_unix(cron:session): session closed for user root
+May 24 18:07:44 srv-reservation01 sshd[1409]: Accepted publickey for ksow from 172.20.10.90 port 47919 ssh2: ED25519 SHA256:4Yd1vKqP8n2M
+May 24 18:07:45 srv-reservation01 sshd[1409]: pam_unix(sshd:session): session opened for user ksow(uid=1015) by (uid=0)
+May 24 18:30:44 srv-reservation01 sshd[1409]: pam_unix(sshd:session): session closed for user ksow
+May 24 20:00:00 srv-reservation01 CRON[982]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 20:00:04 srv-reservation01 CRON[982]: pam_unix(cron:session): session closed for user root
+May 24 22:00:00 srv-reservation01 CRON[983]: pam_unix(cron:session): session opened for user root(uid=0) by (uid=0)
+May 24 22:00:04 srv-reservation01 CRON[983]: pam_unix(cron:session): session closed for user root

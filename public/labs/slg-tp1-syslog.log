@@ -1,0 +1,190 @@
+May 19 08:00:06 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:00:24 srv-reservation01 CRON[324]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:00:54 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:01:10 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:01:37 srv-reservation01 CRON[343]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:02:00 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:02:20 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:02:46 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:03:07 srv-reservation01 systemd: Reached target Paths.
+May 19 08:03:29 srv-reservation01 sshd[2162]: Accepted publickey for svc-resa from 172.20.20.15 port 42201 ssh2: ED25519 SHA256:sync
+May 19 08:03:51 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:04:22 srv-reservation01 sshd[2103]: Accepted publickey for ksow from 172.20.10.44 port 41128 ssh2: ED25519 SHA256:demo
+May 19 08:04:45 srv-reservation01 sshd[2114]: Accepted publickey for svc-resa from 172.20.20.15 port 42201 ssh2: ED25519 SHA256:sync
+May 19 08:05:07 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:05:28 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:05:47 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 08:06:18 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:06:38 srv-reservation01 sshd[2109]: Accepted publickey for svc-resa from 172.20.20.15 port 42201 ssh2: ED25519 SHA256:sync
+May 19 08:07:00 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:07:26 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:07:45 srv-reservation01 sshd[2179]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:08:12 srv-reservation01 CRON[348]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:08:30 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:08:54 srv-reservation01 sshd[2115]: Accepted publickey for svc-resa from 172.20.20.15 port 42201 ssh2: ED25519 SHA256:sync
+May 19 08:09:19 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:09:44 srv-reservation01 sshd[2160]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:10:01 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:10:26 srv-reservation01 systemd: Started Session c3 of user svc-resa.
+May 19 08:10:51 srv-reservation01 sshd[2133]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:11:14 srv-reservation01 sshd[2144]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:11:31 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:12:02 srv-reservation01 sshd[2129]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:12:14 srv-reservation01 sshd[2101]: Failed password for invalid user audit from 203.0.113.54 port 51214 ssh2
+May 19 08:12:20 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:12:40 srv-reservation01 sshd[2105]: Failed password for invalid user admin from 198.51.100.12 port 51280 ssh2
+May 19 08:12:49 srv-reservation01 sshd[2181]: Accepted publickey for ksow from 172.20.10.44 port 41128 ssh2: ED25519 SHA256:demo
+May 19 08:13:02 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:13:30 srv-reservation01 sshd[2150]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:13:50 srv-reservation01 systemd: Started Daily apt download activities.
+May 19 08:14:17 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:14:37 srv-reservation01 CRON[349]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:15:00 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:15:27 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:15:44 srv-reservation01 sshd[2193]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:16:14 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:16:36 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:16:57 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:17:16 srv-reservation01 CRON[331]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:17:39 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:18:04 srv-reservation01 sshd[2125]: Failed password for invalid user root from 203.0.113.77 port 51311 ssh2
+May 19 08:18:10 srv-reservation01 CRON[322]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:18:26 srv-reservation01 CRON[308]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:18:49 srv-reservation01 systemd: Started Session c3 of user svc-resa.
+May 19 08:19:13 srv-reservation01 sshd[2158]: Accepted publickey for ksow from 172.20.10.44 port 41128 ssh2: ED25519 SHA256:demo
+May 19 08:19:40 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:19:58 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:20:19 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:20:51 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:21:06 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 08:21:30 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:21:53 srv-reservation01 systemd: Reached target Paths.
+May 19 08:22:21 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:22:38 srv-reservation01 sshd[2100]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:23:08 srv-reservation01 sshd[2127]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:23:33 srv-reservation01 sshd[2101]: Accepted publickey for svc-resa from 172.20.20.15 port 42201 ssh2: ED25519 SHA256:sync
+May 19 08:23:49 srv-reservation01 CRON[325]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:24:12 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:24:40 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:25:04 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:25:23 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:25:46 srv-reservation01 CRON[331]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:26:11 srv-reservation01 systemd: Started Daily apt download activities.
+May 19 08:26:35 srv-reservation01 CRON[320]: (root) CMD (run-parts /etc/cron.hourly)
+May 19 08:26:56 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:27:21 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:27:37 srv-reservation01 systemd: Started Daily apt download activities.
+May 19 08:28:03 srv-reservation01 sshd[2150]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:28:29 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 08:28:46 srv-reservation01 systemd: Reached target Paths.
+May 19 08:29:15 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:29:39 srv-reservation01 sshd[2120]: Failed password for invalid user audit from 203.0.113.77 port 52077 ssh2
+May 19 08:30:03 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 08:30:26 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:30:41 srv-reservation01 sshd[2137]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:31:04 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:31:36 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:31:58 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:32:15 srv-reservation01 sshd[2144]: Failed password for invalid user demo from 198.51.100.88 port 52084 ssh2
+May 19 08:32:44 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:33:02 srv-reservation01 systemd: Reached target Paths.
+May 19 08:33:31 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:33:45 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:34:13 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 08:34:34 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:34:57 srv-reservation01 sshd[2154]: Failed password for invalid user support from 203.0.113.54 port 52091 ssh2
+May 19 08:35:23 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:35:39 srv-reservation01 CRON[303]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:36:06 srv-reservation01 sshd[2187]: Accepted publickey for ksow from 172.20.10.44 port 41128 ssh2: ED25519 SHA256:demo
+May 19 08:36:34 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:36:58 srv-reservation01 CRON[304]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:37:12 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:37:38 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:37:58 srv-reservation01 systemd: Started Daily apt download activities.
+May 19 08:38:21 srv-reservation01 CRON[327]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:38:46 srv-reservation01 sshd[2137]: Accepted publickey for ksow from 172.20.10.44 port 41128 ssh2: ED25519 SHA256:demo
+May 19 08:39:15 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:39:34 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 08:39:58 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:40:21 srv-reservation01 CRON[324]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:40:39 srv-reservation01 CRON[321]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:41:02 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:41:31 srv-reservation01 CRON[301]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:41:47 srv-reservation01 CRON[338]: (root) CMD (run-parts /etc/cron.hourly)
+May 19 08:42:14 srv-reservation01 CRON[308]: (root) CMD (run-parts /etc/cron.hourly)
+May 19 08:42:43 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:42:57 srv-reservation01 CRON[315]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:43:19 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:43:47 srv-reservation01 sshd[2146]: Accepted publickey for svc-resa from 172.20.20.15 port 42201 ssh2: ED25519 SHA256:sync
+May 19 08:44:09 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:44:34 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:44:55 srv-reservation01 sshd[2149]: Accepted publickey for ksow from 172.20.10.44 port 42218 ssh2: ED25519 SHA256:Kader
+May 19 08:44:58 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:45:18 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:45:37 srv-reservation01 sshd[2148]: Failed password for invalid user demo from 198.51.100.88 port 52119 ssh2
+May 19 08:46:08 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:46:30 srv-reservation01 CRON[339]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 08:46:54 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:47:18 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:47:39 srv-reservation01 sshd[2122]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 08:48:00 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:48:20 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:48:51 srv-reservation01 CRON[324]: (root) CMD (run-parts /etc/cron.hourly)
+May 19 08:49:11 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:49:37 srv-reservation01 systemd: Started Daily apt download activities.
+May 19 08:49:52 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:50:23 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 08:50:37 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:51:07 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:51:23 srv-reservation01 systemd: Started Session c3 of user svc-resa.
+May 19 08:51:45 srv-reservation01 systemd: Reached target Paths.
+May 19 08:52:08 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:52:32 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:53:01 srv-reservation01 systemd: Started Daily apt download activities.
+May 19 08:53:27 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:53:48 srv-reservation01 sshd[2134]: Failed password for invalid user admin from 203.0.113.40 port 52140 ssh2
+May 19 08:54:10 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:54:31 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 08:54:57 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:55:15 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:55:36 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 08:56:02 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 08:56:22 srv-reservation01 sshd[2195]: Failed password for invalid user audit from 203.0.113.77 port 52147 ssh2
+May 19 08:56:45 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 08:57:11 srv-reservation01 sshd[2113]: Accepted publickey for svc-resa from 172.20.20.15 port 42201 ssh2: ED25519 SHA256:sync
+May 19 08:57:37 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:57:53 srv-reservation01 CRON[347]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 08:58:26 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:58:42 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 08:59:04 srv-reservation01 systemd: Started Session c3 of user svc-resa.
+May 19 08:59:30 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 08:59:57 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 09:00:19 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 09:00:37 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 09:01:02 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 09:01:26 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 09:01:49 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 09:02:12 srv-reservation01 CRON[318]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 09:02:29 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 09:02:52 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 09:03:23 srv-reservation01 sshd[2118]: Accepted publickey for ksow from 172.20.10.44 port 41128 ssh2: ED25519 SHA256:demo
+May 19 09:03:47 srv-reservation01 sshd[2159]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 09:04:09 srv-reservation01 CRON[324]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 09:04:26 srv-reservation01 systemd: Listening on OpenSSH Server Socket.
+May 19 09:04:53 srv-reservation01 sshd[2102]: Accepted publickey for ksow from 172.20.10.44 port 41128 ssh2: ED25519 SHA256:demo
+May 19 09:05:16 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 09:05:33 srv-reservation01 nginx: 2026/05/19 08:44:09 [error] 1432#1432: *418 upstream prematurely closed connection while reading response header from upstream
+May 19 09:06:02 srv-reservation01 CRON[308]: (root) CMD (run-parts /etc/cron.hourly)
+May 19 09:06:25 srv-reservation01 CRON[307]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 09:06:48 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl reload nginx
+May 19 09:07:11 srv-reservation01 systemd: Started Daily apt download activities.
+May 19 09:07:38 srv-reservation01 CRON[326]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 09:07:56 srv-reservation01 kernel: audit: type=1400 apparmor="STATUS" operation="profile_load" profile="unconfined"
+May 19 09:08:11 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/systemctl restart php8.3-fpm
+May 19 09:08:21 srv-reservation01 sudo: ksow : TTY=pts/0 ; PWD=/home/ksow ; USER=root ; COMMAND=/usr/bin/journalctl -u nginx
+May 19 09:08:42 srv-reservation01 sshd[2182]: Connection closed by authenticating user root 203.0.113.77 port 55218 [preauth]
+May 19 09:09:07 srv-reservation01 CRON[331]: (www-data) CMD (/usr/local/bin/nettoyer-miniatures.sh)
+May 19 09:09:25 srv-reservation01 kernel: nf_conntrack: default automatic helper assignment has been turned off for security reasons
+May 19 09:09:47 srv-reservation01 CRON[347]: (svc-sauvegarde) CMD (/usr/local/bin/export-reservations.sh)
+May 19 09:10:10 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file
+May 19 09:10:34 srv-reservation01 nginx: 2026/05/19 08:31:11 [warn] 1432#1432: an upstream response is buffered to a temporary file

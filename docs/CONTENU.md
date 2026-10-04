@@ -40,7 +40,7 @@ Un quiz corrige chaque réponse : l'explication dit pourquoi la bonne réponse e
 `scripts/content-quality.cjs` traduit la liste de contrôle de publication en règles. Elle est appliquée pendant la rédaction (`node scripts/check-path-part.cjs <fichier>`) et à tout ce que les graines publient (`tests/content-quality.test.cjs`).
 
 - Leçon : objectifs en premier bloc, cours assez détaillé, un exemple, un schéma ou un code, un espace vidéo, un « À retenir », au moins une référence, quiz de trois questions au moins avec des corrections de 50 caractères au moins. Les leçons rédigées avec le gabarit complet ajoutent : prérequis, mise en situation, erreurs fréquentes, renvoi vers le laboratoire, 2 400 caractères au moins, deux références au moins, mélange de difficultés, bonne réponse jamais toujours à la même place.
-- Texte : apostrophe typographique, aucun tiret cadratin, aucun accent grave (le texte n'est pas interprété comme du Markdown), aucun texte provisoire.
+- Texte : apostrophe typographique, aucun tiret cadratin, aucun accent grave (le texte n'est pas interprété comme du Markdown), aucun texte provisoire, aucun mot courant écrit sans son accent (« meme », « reseau », « deja »… : liste `STRIPPED_WORDS` de `scripts/content-quality.cjs`, qui trahit un passage réécrit en ASCII). Les leçons, les quiz, les laboratoires et les modules sont tous contrôlés.
 - Références : seules les adresses de la liste vérifiée de `path-kit.ts` sont acceptées. Chacune a répondu 200 au moment de la constitution de la liste.
 - Laboratoire : briefing, contraintes, outils, indices, durée, fichiers, au moins cinq étapes (huit pour une évaluation), chaque étape avec indice, format de réponse et correction. Un laboratoire Packet Tracer demande un guide et un schéma de topologie.
 - Module : « Critères de réussite : » dans sa description.
@@ -52,7 +52,7 @@ Les cours qui ne passent pas encore la grille sont listés par titre dans `KNOWN
 
 Un guide de laboratoire enseigne la méthode avec des commandes et des exemples génériques. Il ne contient jamais une valeur du scénario, un résultat de calcul ni la bonne option d'un choix : l'apprenant doit les trouver dans les fichiers. `tests/fondamentaux-guides.test.cjs` vérifie que, pour chaque laboratoire du parcours Fondamentaux, aucune réponse acceptée ne figure dans un guide, dans le briefing ou dans l'énoncé d'une autre tâche, qu'aucun caractère de contrôle ne s'est glissé dans un fichier et que toute commande d'un guide est dans un bloc de code.
 
-Le parcours Linux va plus loin, parce qu'un guide qui lance ses commandes sur les vrais fichiers du laboratoire montre la réponse à l'écran. Chaque commande d'un guide travaille donc sur des données inventées que le bloc crée lui-même, jamais sur les fichiers du labo, et la section « visionneuse » reste générique. `tests/linux-guides.test.cjs` exécute réellement chaque bloc bash et PowerShell 5.1 de chacun des huit guides (un bloc marqué `# hors-test` est une commande pour un vrai serveur) et échoue si la sortie contient une réponse acceptée du laboratoire, si une réponse figure dans le texte d'un guide, si un mot a perdu son accent ou si un caractère de contrôle s'est glissé dans un fichier. Les guides disent aussi d'ajouter `-Encoding UTF8` à Get-Content, que Windows PowerShell 5.1 lit sinon en ANSI.
+Les parcours Linux et Analyse de logs vont plus loin, parce qu'un guide qui lance ses commandes sur les vrais fichiers du laboratoire montre la réponse à l'écran. Chaque commande d'un guide travaille donc sur des données inventées que le bloc crée lui-même, jamais sur les fichiers du labo, et la section « visionneuse » reste générique. `tests/linux-guides.test.cjs` (huit guides) et `tests/logs-guides.test.cjs` (les six laboratoires de l'Analyse de logs) exécutent réellement chaque bloc bash et PowerShell 5.1 de chaque guide (un bloc marqué `# hors-test` est une commande pour un vrai serveur) et échouent si la sortie contient une réponse acceptée du laboratoire, si une réponse figure dans le texte d'un guide, si un mot a perdu son accent ou si un caractère de contrôle s'est glissé dans un fichier. Les guides disent aussi d'ajouter `-Encoding UTF8` à Get-Content, que Windows PowerShell 5.1 lit sinon en ANSI.
 
 ## Migration sans perte
 
@@ -88,7 +88,7 @@ Ajouter ou remplacer une photo : choisir un fichier sous licence libre, le recad
 
 Les guides, aide-mémoire, cahiers des charges, grilles et modèles de rapport sont téléchargés en PDF : page de garde avec le logo et la mascotte, polices Space Grotesk, Inter et JetBrains Mono, titres illustrés, encadrés, tableaux, blocs de commandes colorés, lignes d'écriture pour les modèles à remplir, bandeau de photos du matériel. Le fichier Markdown de `public/labs/` reste la source et la version texte (utile pour copier une commande longue) ; le PDF en est fabriqué.
 
-- `scripts/pdf/documents.cjs` liste les 33 documents, leur type, leur parcours et le matériel à montrer. Les 11 documents du Linux sont marqués `direct` : le seed 08 les publie déjà en PDF, et le seed 07 ne les touche pas ;
+- `scripts/pdf/documents.cjs` liste les 43 documents, leur type, leur parcours et le matériel à montrer. Les 11 documents du Linux et les 10 de l'Analyse de logs sont marqués `direct` : les seeds 08 et 09 les publient déjà en PDF, et le seed 07 ne les touche pas ;
 - `node scripts/build-lab-pdfs.cjs` fabrique les PDF avec Chrome ou Edge (variable `CHROME_PATH` pour un chemin particulier). Il ne refait que les documents dont la source, la mise en page, le logo, les polices ou les photos ont changé (empreinte par document dans `scripts/pdf/manifest.json` : fichiers du moteur, catalogue du matériel réduit à ce que les PDF affichent, JSON du document, source Markdown et photos, avec des fins de ligne normalisées) ; `--force` refait tout, `--only a,b` certains, `--check` signale ceux qui sont périmés ;
 - `node scripts/generate-documents-seed.cjs` écrit `supabase/seed/07_lab_documents_pdf.sql`, qui fait pointer les labs vers les PDF (voir `docs/DEPLOYMENT.md`).
 
@@ -106,6 +106,7 @@ Les fichiers de données que l'apprenant doit analyser ou hacher (dictionnaire d
 | `node scripts/generate-reseaux-programme-seed.cjs` | génère `supabase/seed/05_reseaux_programme.sql` |
 | `node scripts/generate-fondamentaux-seed.cjs` | génère `supabase/seed/06_fondamentaux_programme.sql` |
 | `node scripts/generate-linux-seed.cjs` | génère `supabase/seed/08_linux_programme.sql` |
+| `node scripts/generate-logs-seed.cjs` | génère `supabase/seed/09_logs_programme.sql` |
 | `npm run content:report` | état réel du contenu, cours par cours |
 | `npm test` | toute la suite, dont `programme.test.cjs`, `content-quality.test.cjs`, `equipment.test.cjs` et `documents.test.cjs` |
 
@@ -118,15 +119,15 @@ Pour publier un parcours : déployer le code (les laboratoires pointent vers des
 | Réseaux informatiques | 10 / 9 | 9 dont 3 évaluations, 91 étapes | Terminé selon la grille : 31 leçons conformes, 16 compétences, 6 badges propres au programme |
 | Fondamentaux de la cybersécurité | 8 / 8 | 7 dont 2 évaluations, 88 étapes | Terminé selon la grille : 24 leçons conformes, 8 compétences, 6 badges propres au programme |
 | Administration Linux | 9 / 9 | 9 dont 2 évaluations, 134 étapes | Terminé selon la grille : 29 leçons conformes, 8 compétences, 7 badges propres au programme |
+| Analyse de logs | 10 / 10 | 9 dont 2 évaluations, 122 étapes | Terminé selon la grille : 32 leçons conformes, 8 compétences, 7 badges propres au programme |
 | Sécurité Web | 2 / 10 | aucun | À construire (3 leçons de départ courtes) |
 | Introduction au Pentest | 2 / 10 | aucun | À construire (3 leçons de départ courtes) |
-| Analyse de logs | 3 / 10 | 3 dont 1 évaluation | À construire (6 leçons, dont 3 détaillées) |
 
-Le nombre de modules prévus vient de la spécification des six parcours. L'ordre de construction recommandé après le Réseaux, les Fondamentaux et le Linux : Analyse de logs, Sécurité Web, Pentest. Chaque parcours repart du même modèle : leçons au gabarit, une évaluation pratique, des compétences reliées, un laboratoire d'entraînement par compétence.
+Le nombre de modules prévus vient de la spécification des six parcours. L'ordre de construction recommandé après le Réseaux, les Fondamentaux, le Linux et l'Analyse de logs : Sécurité Web, Pentest. Chaque parcours repart du même modèle : leçons au gabarit, une évaluation pratique, des compétences reliées, un laboratoire d'entraînement par compétence.
 
 ## Ce que l'équipe doit encore fournir
 
-- **Vidéos** : chaque leçon du Réseaux, des Fondamentaux et du Linux annonce sa vidéo (« Vidéo en préparation »). Elles s'ajoutent depuis l'éditeur de cours, par un bloc vidéo.
+- **Vidéos** : chaque leçon du Réseaux, des Fondamentaux, du Linux et de l'Analyse de logs annonce sa vidéo (« Vidéo en préparation »). Elles s'ajoutent depuis l'éditeur de cours, par un bloc vidéo.
 - **Fichiers Packet Tracer** (`.pkt`) : facultatifs pour les TP 1 à 3 et le projet final. Les laboratoires se valident sans le logiciel ; un fichier réel s'ajoute comme ressource du laboratoire.
 - **Relecture par une personne du métier** : la grille demande que le contenu soit relu et testé par une personne compétente. Les contrôles faits ici sont automatiques (règles, recalcul des réponses depuis les fichiers, absence de réponse dans les guides, parcours complet d'un apprenant), complétés par des relectures techniques indépendantes, une vérification des affirmations des leçons contre des sources officielles et une résolution en aveugle de chaque laboratoire par des apprenants simulés qui ne voyaient que le sujet et les fichiers. Ces contrôles ont corrigé de nombreuses erreurs, mais une relecture par un formateur reste à faire avant de présenter un parcours comme validé.
 - **Voix humaines** : voir `docs/DEPLOYMENT.md`.
