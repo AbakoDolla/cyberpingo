@@ -343,6 +343,8 @@ export type Database = {
           revoked_at: string | null
           revoked_reason: string | null
           pdf_path: string | null
+          exam_percentage: number | null
+          exam_attempt_id: string | null
         }
         Insert: {
           id?: string
@@ -356,6 +358,8 @@ export type Database = {
           revoked_at?: string | null
           revoked_reason?: string | null
           pdf_path?: string | null
+          exam_percentage?: number | null
+          exam_attempt_id?: string | null
         }
         Update: {
           id?: string
@@ -369,6 +373,8 @@ export type Database = {
           revoked_at?: string | null
           revoked_reason?: string | null
           pdf_path?: string | null
+          exam_percentage?: number | null
+          exam_attempt_id?: string | null
         }
         Relationships: [
           {
@@ -376,6 +382,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_exam_attempt_id_fkey"
+            columns: ["exam_attempt_id"]
+            isOneToOne: false
+            referencedRelation: "exam_attempts"
             referencedColumns: ["id"]
           },
           {
@@ -591,6 +604,9 @@ export type Database = {
           domain_id: string | null
           cb_price: number | null
           prerequisite_course_id: string | null
+          exam_pass_percentage: number
+          exam_duration_minutes: number
+          exam_question_count: number
         }
         Insert: {
           id?: string
@@ -615,6 +631,9 @@ export type Database = {
           domain_id?: string | null
           cb_price?: number | null
           prerequisite_course_id?: string | null
+          exam_pass_percentage?: number
+          exam_duration_minutes?: number
+          exam_question_count?: number
         }
         Update: {
           id?: string
@@ -639,6 +658,9 @@ export type Database = {
           domain_id?: string | null
           cb_price?: number | null
           prerequisite_course_id?: string | null
+          exam_pass_percentage?: number
+          exam_duration_minutes?: number
+          exam_question_count?: number
         }
         Relationships: [
           {
@@ -783,6 +805,78 @@ export type Database = {
           },
           {
             foreignKeyName: "enrollments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exam_attempts: {
+        Row: {
+          id: string
+          user_id: string
+          course_id: string
+          started_at: string
+          expires_at: string
+          submitted_at: string | null
+          score: number | null
+          total_questions: number
+          percentage: number | null
+          passed: boolean | null
+          pass_percentage: number
+          module_breakdown: Json | null
+          questions: Json
+          answers: Json | null
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          course_id: string
+          started_at?: string
+          expires_at: string
+          submitted_at?: string | null
+          score?: number | null
+          total_questions?: number
+          percentage?: number | null
+          passed?: boolean | null
+          pass_percentage?: number
+          module_breakdown?: Json | null
+          questions?: Json
+          answers?: Json | null
+          status?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          course_id?: string
+          started_at?: string
+          expires_at?: string
+          submitted_at?: string | null
+          score?: number | null
+          total_questions?: number
+          percentage?: number | null
+          passed?: boolean | null
+          pass_percentage?: number
+          module_breakdown?: Json | null
+          questions?: Json
+          answers?: Json | null
+          status?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exam_attempts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exam_attempts_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -2308,6 +2402,12 @@ export type Database = {
         Args: never
         Returns: Json
       }
+      get_course_exam_status: {
+        Args: {
+          p_course_id: string
+        }
+        Returns: Json
+      }
       get_my_academy: {
         Args: never
         Returns: Json
@@ -2365,6 +2465,12 @@ export type Database = {
         }
         Returns: undefined
       }
+      start_course_exam: {
+        Args: {
+          p_course_id: string
+        }
+        Returns: Json
+      }
       start_lesson: {
         Args: {
           p_lesson_id: string
@@ -2378,6 +2484,13 @@ export type Database = {
           p_message: string
         }
         Returns: string
+      }
+      submit_course_exam: {
+        Args: {
+          p_attempt_id: string
+          p_answers: Json
+        }
+        Returns: Json
       }
       submit_lab: {
         Args: {

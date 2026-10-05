@@ -7,14 +7,15 @@ import type {
 } from "@/types/api";
 
 export const COURSE_COLUMNS =
-  "id, slug, title, short_description, description, thumbnail_url, level, category, icon, estimated_duration, status, access_level, position, completion_xp, certificate_enabled, published_at, cb_price, prerequisite_course_id";
+  "id, slug, title, short_description, description, thumbnail_url, level, category, icon, estimated_duration, status, access_level, position, completion_xp, certificate_enabled, published_at, cb_price, prerequisite_course_id, exam_pass_percentage, exam_duration_minutes, exam_question_count";
 // Never select lessons.content here: visitors are only granted the outline columns.
 export const LESSON_OUTLINE_COLUMNS = "id, module_id, title, summary, content_type, duration_minutes, xp_reward, position";
 export const QUIZ_OUTLINE_COLUMNS = "id, module_id, lesson_id, title, description, pass_percentage, position";
 
 type CourseRow = Pick<Tables<"courses">,
   "id" | "slug" | "title" | "short_description" | "description" | "thumbnail_url" | "level" | "category" | "icon" | "estimated_duration"
-  | "status" | "access_level" | "position" | "completion_xp" | "certificate_enabled" | "published_at" | "cb_price" | "prerequisite_course_id">;
+  | "status" | "access_level" | "position" | "completion_xp" | "certificate_enabled" | "published_at" | "cb_price" | "prerequisite_course_id"
+  | "exam_pass_percentage" | "exam_duration_minutes" | "exam_question_count">;
 
 export function toCourseSummary(row: CourseRow, counts: { modules: number; lessons: number; quizzes: number }): CourseSummary {
   return {
