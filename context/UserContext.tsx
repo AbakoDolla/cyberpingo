@@ -20,6 +20,9 @@ import { emitMascot } from "@/lib/mascot/bus";
 import { mascotEventsFromRewards } from "@/lib/mascot/events";
 import { countUnreadNotifications, subscribeToNotifications } from "@/services/notification.service";
 import { sendHeartbeat } from "@/services/platform.service";
+import { summarizeReward } from "@/lib/cyberbits";
+import { emitCyberBits, subscribeCyberBits } from "@/lib/cyberbits-bus";
+import { getWallet } from "@/services/cyberbits.service";
 import { hasRewards, type LabSubmission, type LabTaskResult, type LessonCompletion, type MascotEvent, type LevelInfo, type MyProfile, type OnboardingAnswers, type QuizSubmission, type RewardSummary } from "@/types/api";
 
 type Level = Awaited<ReturnType<typeof listLevels>>[number];
@@ -41,6 +44,7 @@ interface UserStateValue {
   level: LevelInfo | null;
   /** Current streak as the server counts it (0 once a full day was missed). */
   streak: number;
+  cbBalance: number;
   timezone: string;
   unreadNotifications: number;
   syncError: string | null;
@@ -48,7 +52,7 @@ interface UserStateValue {
 
 interface UserActionsValue {
   refresh: () => Promise<void>;
-  /** Applies an RPC reward summary locally (XP, level, streak) and queues the matching toasts. */
+  /** Applies an RPC reward summary locally (XP, level, streak, cyberbits) and queues the matching toasts. */
   applyRewards: (result: unknown, fallback?: MascotEvent) => void;
   completeLesson: (lessonId: string) => Promise<LessonCompletion>;
   submitQuiz: (quizId: string, answers: Record<string, string[]>) => Promise<QuizSubmission>;
@@ -62,6 +66,8 @@ interface UserActionsValue {
   deleteAccount: () => Promise<void>;
   logout: () => Promise<void>;
   setUnreadNotifications: (update: number | ((current: number) => number)) => void;
+  setCbBalance: (update: number | ((current: number) => number)) => void;
+  refreshWallet: () => Promise<void>;
 }
 
 interface RewardToastValue { toasts: RewardToast[]; dismiss: (id: number) => void }
@@ -101,6 +107,9 @@ function rewardToasts(summary: RewardSummary): Omit<RewardToast, "id">[] {
   } else if (summary.xp_gained > 0) {
     toasts.push({ tone: "success", title: `+${summary.xp_gained} XP`, detail: summary.level_info.next_level ? `${summary.level_info.progress_percentage} % vers le niveau ${summary.level_info.next_level}` : undefined });
   }
+  if (summary.cyberbits && summary.cyberbits.gained > 0) {
+    toasts.push({ tone: "success", title: `+${summary.cyberbits.gained} CB`, detail: summarizeReward(summary.cyberbits.items) });
+  }
   for (const badge of summary.new_badges) toasts.push({ tone: "badge", title: `Badge débloqué : ${badge.name}`, detail: badge.description });
   for (const challenge of summary.completed_challenges) toasts.push({ tone: "success", title: `Défi réussi : ${challenge.title}`, detail: `+${challenge.xp_reward} XP` });
   if (summary.course_completed) toasts.push({ tone: "level-up", title: "Parcours terminé !", detail: summary.course_completed.title });
@@ -115,6 +124,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [levels, setLevels] = useState<Level[]>([]);
   const [timezone, setTimezone] = useState(browserZone);
   const [unreadNotifications, setUnreadState] = useState(0);
+  const [cbBalance, setCbBalance] = useState(0);
   const [hydrated, setHydrated] = useState(!isSupabaseConfigured);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [toasts, setToasts] = useState<RewardToast[]>([]);
@@ -144,6 +154,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setSessionUserId(null);
     setProfile(null);
     setUnreadState(0);
+    setCbBalance(0);
     setSyncError(null);
     for (const timer of toastTimers.current.values()) clearTimeout(timer);
     toastTimers.current.clear();
@@ -156,11 +167,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     loadedFor.current = userId;
     setSessionUserId(userId);
     try {
-      const [nextProfile, settings, levelRows, unread] = await Promise.all([
+      const [nextProfile, settings, levelRows, unread, wallet] = await Promise.all([
         getMyProfile(userId),
         getMySettings(userId),
         levels.length ? Promise.resolve(levels) : listLevels(),
         countUnreadNotifications(userId),
+        getWallet().catch(() => null),
       ]);
       if (ticket !== request.current) return;
       if (!nextProfile) throw new Error("Profil introuvable");
@@ -168,6 +180,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (settings) setTimezone(settings.timezone);
       if (!levels.length) setLevels(levelRows);
       setUnreadState(unread);
+      if (wallet) setCbBalance(wallet.balance);
       setSyncError(null);
     } catch (error) {
       if (ticket !== request.current) return;
@@ -209,6 +222,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     return subscribeToNotifications(userId, () => setUnreadState((count) => count + 1));
   }, [userId]);
 
+  useEffect(() => {
+    return subscribeCyberBits((reward) => {
+      setCbBalance(reward.balance);
+    });
+  }, []);
+
   const requireUser = useCallback(() => {
     const id = loadedFor.current;
     if (!id) throw new Error("Connecte-toi pour enregistrer ta progression.");
@@ -225,6 +244,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     if (!hasRewards(result)) return;
     const events = mascotEventsFromRewards(result);
     emitMascot(events.length || !fallback ? events : [fallback]);
+    if (result.cyberbits) {
+      setCbBalance(result.cyberbits.balance);
+      emitCyberBits(result.cyberbits);
+    }
     setProfile((current) => current && {
       ...current,
       xp: result.level_info.xp,
@@ -313,6 +336,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     setUnreadState((current) => Math.max(0, typeof update === "function" ? update(current) : update));
   }, []);
 
+  const refreshWallet = useCallback(async () => {
+    try {
+      const wallet = await getWallet();
+      setCbBalance(wallet.balance);
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const level = useMemo(() => (profile && levels.length ? computeLevelInfo(profile.xp, levels) : null), [profile, levels]);
   const streak = profile ? effectiveStreak(profile.current_streak, profile.last_activity_date, timezone) : 0;
 
@@ -324,15 +356,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     profile,
     level,
     streak,
+    cbBalance,
     timezone,
     unreadNotifications,
     syncError,
-  }), [hydrated, sessionUserId, profile, level, streak, timezone, unreadNotifications, syncError]);
+  }), [hydrated, sessionUserId, profile, level, streak, cbBalance, timezone, unreadNotifications, syncError]);
 
   const actions = useMemo<UserActionsValue>(() => ({
     refresh, applyRewards, completeLesson, submitQuiz, submitLab, submitLabTask, submitLabReport, completeOnboarding, updateProfile, updateAvatar, resetProgress, deleteAccount, logout,
-    setUnreadNotifications,
-  }), [refresh, applyRewards, completeLesson, submitQuiz, submitLab, submitLabTask, submitLabReport, completeOnboarding, updateProfile, updateAvatar, resetProgress, deleteAccount, logout, setUnreadNotifications]);
+    setUnreadNotifications, setCbBalance, refreshWallet,
+  }), [refresh, applyRewards, completeLesson, submitQuiz, submitLab, submitLabTask, submitLabReport, completeOnboarding, updateProfile, updateAvatar, resetProgress, deleteAccount, logout, setUnreadNotifications, refreshWallet]);
 
   const toastValue = useMemo(() => ({ toasts, dismiss }), [toasts, dismiss]);
 

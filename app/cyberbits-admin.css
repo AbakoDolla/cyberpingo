@@ -1,0 +1,255 @@
+.cbadm-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.cbadm-warnings,
+.cbadm-settings,
+.cbadm-rule-groups,
+.cbadm-catalog-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.cbadm-warning,
+.cbadm-setting-card,
+.cbadm-subpanel,
+.cbadm-row-editor,
+.cbadm-filter-pill {
+  border: 1px solid var(--cp-line);
+  border-radius: 18px;
+  background: rgba(7, 20, 38, 0.54);
+}
+
+.cbadm-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.cbadm-warning--amber {
+  border-color: rgba(255, 191, 71, 0.3);
+  background: rgba(255, 191, 71, 0.1);
+}
+
+.cbadm-warning--red {
+  border-color: rgba(255, 107, 125, 0.3);
+  background: rgba(255, 107, 125, 0.1);
+}
+
+.cbadm-warning--violet {
+  border-color: rgba(154, 100, 255, 0.3);
+  background: rgba(154, 100, 255, 0.12);
+}
+
+.cbadm-warning__detail {
+  margin-top: 4px;
+  color: var(--cp-muted);
+  font-size: 13px;
+}
+
+.cbadm-settings {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.cbadm-setting-card,
+.cbadm-subpanel,
+.cbadm-row-editor {
+  padding: 16px;
+}
+
+.cbadm-setting-card__head,
+.cbadm-setting-card__meta,
+.cbadm-inline-actions,
+.cbadm-table-actions,
+.cbadm-pagination,
+.cbadm-pagination__actions,
+.cbadm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cbadm-setting-card__head {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.cbadm-setting-card__head h3,
+.cbadm-subpanel__title {
+  color: #fff;
+  font-weight: 700;
+}
+
+.cbadm-setting-card__head p,
+.cbadm-setting-card__meta,
+.cbadm-help,
+.cbadm-pagination__summary,
+.cbadm-pagination__page,
+.cbadm-chart__totals,
+.cbadm-chart__label,
+.cbadm-legend,
+.cbadm-filter-pill {
+  color: var(--cp-muted);
+  font-size: 13px;
+}
+
+.cbadm-setting-card__meta {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.cbadm-inline-form,
+.cbadm-row-editor {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.cbadm-inline-actions,
+.cbadm-table-actions,
+.cbadm-pagination__actions,
+.cbadm-legend {
+  align-items: center;
+}
+
+.cbadm-row-editor {
+  margin-top: 6px;
+}
+
+.cbadm-row-editor__grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.cbadm-row-editor__hint {
+  display: flex;
+  align-items: end;
+}
+
+.cbadm-row-editor__toggle {
+  align-self: end;
+}
+
+.cbadm-chart {
+  display: grid;
+  gap: 14px;
+}
+
+.cbadm-chart__bars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
+  gap: 8px;
+  align-items: end;
+  min-height: 250px;
+}
+
+.cbadm-chart__day {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.cbadm-chart__track {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 180px;
+  padding: 10px 0;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 213, 255, 0.05));
+}
+
+.cbadm-chart__bar {
+  width: min(16px, 38%);
+  min-height: 4px;
+  border-radius: 999px 999px 4px 4px;
+}
+
+.cbadm-chart__bar--earned {
+  background: linear-gradient(180deg, rgba(62, 250, 149, 0.95), rgba(36, 168, 103, 0.92));
+}
+
+.cbadm-chart__bar--spent {
+  background: linear-gradient(180deg, rgba(255, 181, 72, 0.94), rgba(255, 123, 61, 0.9));
+}
+
+.cbadm-chart__totals {
+  font-variant-numeric: tabular-nums;
+}
+
+.cbadm-chart__label {
+  text-align: center;
+}
+
+.cbadm-legend__dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 999px;
+}
+
+.cbadm-legend__dot--earned {
+  background: var(--cp-green);
+}
+
+.cbadm-legend__dot--spent {
+  background: var(--cp-amber);
+}
+
+.cbadm-filter-pill {
+  align-items: center;
+  padding: 8px 12px;
+}
+
+.cbadm-pagination {
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.cbadm-pagination__page {
+  min-width: 7.5rem;
+  text-align: center;
+}
+
+.cbadm-amount {
+  font-variant-numeric: tabular-nums;
+}
+
+.cbadm-amount--positive {
+  color: #baf8cf;
+}
+
+.cbadm-amount--negative {
+  color: #ffbec8;
+}
+
+@media (max-width: 720px) {
+  .cbadm-setting-card__head,
+  .cbadm-setting-card__meta,
+  .cbadm-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cbadm-chart__bars {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .cbadm-chart__day {
+    min-width: 40px;
+  }
+
+  .cbadm-table-actions {
+    justify-content: flex-end;
+  }
+}

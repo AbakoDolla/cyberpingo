@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/Icon";
 import Pingo from "@/components/mascot/Pingo";
 import { Pingo3D } from "@/components/mascot/Pingo3D";
+import DashboardCyberBitsCard from "@/components/cyberbits/DashboardCyberBitsCard";
 import SlugIcon from "@/components/ui/SlugIcon";
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
@@ -192,7 +193,7 @@ function WeekRhythm({ week }: { week: Dashboard["week"] }) {
 }
 
 function LearnerDashboard() {
-  const { profile, level: learnerLevel, timezone } = useLearner();
+  const { profile, level: learnerLevel, timezone, cbBalance } = useLearner();
   const { setUnreadNotifications } = useUserActions();
   const { data, error, loading, reload } = useAsync(getMyDashboard, []);
   const { data: academy } = useAsync(() => getMyAcademy().catch(() => null), []);
@@ -362,6 +363,8 @@ function LearnerDashboard() {
         </div>
 
         <aside className="dash-side">
+          <DashboardCyberBitsCard balance={cbBalance} />
+
           <WeekRhythm week={data.week} />
 
           {academy && (

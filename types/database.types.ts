@@ -173,6 +173,163 @@ export type Database = {
           },
         ]
       }
+      cb_rules: {
+        Row: {
+          key: string
+          kind: string
+          label: string
+          description: string
+          amount: number
+          is_active: boolean
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          kind: string
+          label: string
+          description?: string
+          amount: number
+          is_active?: boolean
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          kind?: string
+          label?: string
+          description?: string
+          amount?: number
+          is_active?: boolean
+          position?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cb_settings: {
+        Row: {
+          singleton: boolean
+          rewards_enabled: boolean
+          purchases_enabled: boolean
+          gating_enabled: boolean
+          paused_reason: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          singleton?: boolean
+          rewards_enabled?: boolean
+          purchases_enabled?: boolean
+          gating_enabled?: boolean
+          paused_reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          singleton?: boolean
+          rewards_enabled?: boolean
+          purchases_enabled?: boolean
+          gating_enabled?: boolean
+          paused_reason?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cb_settings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cb_transactions: {
+        Row: {
+          id: number
+          user_id: string
+          amount: number
+          reason: string
+          reference_type: string | null
+          reference_id: string | null
+          label: string
+          source: string
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          amount: number
+          reason: string
+          reference_type?: string | null
+          reference_id?: string | null
+          label?: string
+          source?: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          amount?: number
+          reason?: string
+          reference_type?: string | null
+          reference_id?: string | null
+          label?: string
+          source?: string
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cb_transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cb_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cb_wallets: {
+        Row: {
+          user_id: string
+          balance: number
+          lifetime_earned: number
+          lifetime_spent: number
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          balance?: number
+          lifetime_earned?: number
+          lifetime_spent?: number
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          balance?: number
+          lifetime_earned?: number
+          lifetime_spent?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cb_wallets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           id: string
@@ -371,6 +528,45 @@ export type Database = {
           },
         ]
       }
+      course_unlocks: {
+        Row: {
+          user_id: string
+          course_id: string
+          source: string
+          price_paid: number
+          unlocked_at: string
+        }
+        Insert: {
+          user_id: string
+          course_id: string
+          source: string
+          price_paid?: number
+          unlocked_at?: string
+        }
+        Update: {
+          user_id?: string
+          course_id?: string
+          source?: string
+          price_paid?: number
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_unlocks_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_unlocks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           id: string
@@ -393,6 +589,8 @@ export type Database = {
           updated_at: string
           published_at: string | null
           domain_id: string | null
+          cb_price: number | null
+          prerequisite_course_id: string | null
         }
         Insert: {
           id?: string
@@ -415,6 +613,8 @@ export type Database = {
           updated_at?: string
           published_at?: string | null
           domain_id?: string | null
+          cb_price?: number | null
+          prerequisite_course_id?: string | null
         }
         Update: {
           id?: string
@@ -437,6 +637,8 @@ export type Database = {
           updated_at?: string
           published_at?: string | null
           domain_id?: string | null
+          cb_price?: number | null
+          prerequisite_course_id?: string | null
         }
         Relationships: [
           {
@@ -451,6 +653,13 @@ export type Database = {
             columns: ["domain_id"]
             isOneToOne: false
             referencedRelation: "domains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "courses_prerequisite_course_id_fkey"
+            columns: ["prerequisite_course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]
@@ -809,6 +1018,45 @@ export type Database = {
           },
         ]
       }
+      lab_unlocks: {
+        Row: {
+          user_id: string
+          lab_id: string
+          source: string
+          price_paid: number
+          unlocked_at: string
+        }
+        Insert: {
+          user_id: string
+          lab_id: string
+          source: string
+          price_paid?: number
+          unlocked_at?: string
+        }
+        Update: {
+          user_id?: string
+          lab_id?: string
+          source?: string
+          price_paid?: number
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_unlocks_lab_id_fkey"
+            columns: ["lab_id"]
+            isOneToOne: false
+            referencedRelation: "labs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_unlocks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       labs: {
         Row: {
           id: string
@@ -836,6 +1084,7 @@ export type Database = {
           requires_computer: boolean
           is_assessment: boolean
           estimated_minutes: number
+          cb_price: number | null
         }
         Insert: {
           id?: string
@@ -863,6 +1112,7 @@ export type Database = {
           requires_computer?: boolean
           is_assessment?: boolean
           estimated_minutes?: number
+          cb_price?: number | null
         }
         Update: {
           id?: string
@@ -890,6 +1140,7 @@ export type Database = {
           requires_computer?: boolean
           is_assessment?: boolean
           estimated_minutes?: number
+          cb_price?: number | null
         }
         Relationships: [
           {
@@ -1831,6 +2082,14 @@ export type Database = {
       }
     }
     Functions: {
+      admin_adjust_cb: {
+        Args: {
+          p_user: string
+          p_amount: number
+          p_reason: string
+        }
+        Returns: Json
+      }
       admin_adjust_xp: {
         Args: {
           p_user: string
@@ -1847,6 +2106,27 @@ export type Database = {
           p_audience?: string
         }
         Returns: number
+      }
+      admin_cb_overview: {
+        Args: never
+        Returns: Json
+      }
+      admin_cb_transactions: {
+        Args: {
+          p_user?: string
+          p_reason?: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: Json
+      }
+      admin_cb_wallets: {
+        Args: {
+          p_search?: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: Json
       }
       admin_course_stats: {
         Args: {
@@ -1871,6 +2151,15 @@ export type Database = {
           p_quiz_id: string
         }
         Returns: Json
+      }
+      admin_grant_unlock: {
+        Args: {
+          p_kind: string
+          p_id: string
+          p_user: string
+          p_reason: string
+        }
+        Returns: undefined
       }
       admin_import_course: {
         Args: {
@@ -1909,6 +2198,42 @@ export type Database = {
           p_questions: Json
         }
         Returns: number
+      }
+      admin_set_cb_prerequisite: {
+        Args: {
+          p_course_id: string
+          p_prerequisite_id: string
+          p_reason: string
+        }
+        Returns: undefined
+      }
+      admin_set_cb_price: {
+        Args: {
+          p_kind: string
+          p_id: string
+          p_price: number
+          p_reason: string
+        }
+        Returns: undefined
+      }
+      admin_set_cb_rule: {
+        Args: {
+          p_key: string
+          p_amount: number
+          p_active: boolean
+          p_reason: string
+        }
+        Returns: undefined
+      }
+      admin_set_cb_settings: {
+        Args: {
+          p_rewards: boolean
+          p_purchases: boolean
+          p_gating: boolean
+          p_paused_reason: string
+          p_reason: string
+        }
+        Returns: undefined
       }
       admin_set_lab_flag: {
         Args: {
@@ -1979,8 +2304,19 @@ export type Database = {
         }
         Returns: Json
       }
+      get_cb_catalog: {
+        Args: never
+        Returns: Json
+      }
       get_my_academy: {
         Args: never
+        Returns: Json
+      }
+      get_my_cb_history: {
+        Args: {
+          p_limit?: number
+          p_before?: number
+        }
         Returns: Json
       }
       get_my_dashboard: {
@@ -1988,6 +2324,10 @@ export type Database = {
         Returns: Json
       }
       get_my_stats: {
+        Args: never
+        Returns: Json
+      }
+      get_my_wallet: {
         Args: never
         Returns: Json
       }
@@ -2065,6 +2405,18 @@ export type Database = {
         Args: {
           p_quiz_id: string
           p_answers: Json
+        }
+        Returns: Json
+      }
+      unlock_course: {
+        Args: {
+          p_course_id: string
+        }
+        Returns: Json
+      }
+      unlock_lab: {
+        Args: {
+          p_lab_id: string
         }
         Returns: Json
       }

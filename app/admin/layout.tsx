@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import "../cyberbits-admin.css";
 import AdminShell from "@/components/admin/AdminShell";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getRequestUser } from "@/lib/supabase/server";

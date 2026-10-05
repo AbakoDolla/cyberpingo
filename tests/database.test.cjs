@@ -122,7 +122,7 @@ test("every table is protected by RLS and only intended functions are callable a
   assert.deepEqual(unprotected, []);
   const anonCallable = await sql(`select p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace
     where n.nspname = 'public' and has_function_privilege('anon', p.oid, 'execute') order by 1`);
-  assert.deepEqual(anonCallable.map((row) => row.proname), ["is_admin", "is_superadmin", "submit_contact_message", "verify_certificate"]);
+  assert.deepEqual(anonCallable.map((row) => row.proname), ["get_cb_catalog", "is_admin", "is_superadmin", "submit_contact_message", "verify_certificate"]);
   const privateUsage = await sql("select has_schema_privilege('authenticated', 'private', 'usage') as auth, has_schema_privilege('anon', 'private', 'usage') as anon");
   assert.deepEqual(privateUsage[0], { auth: false, anon: false });
 });

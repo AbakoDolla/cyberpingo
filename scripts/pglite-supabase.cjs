@@ -50,13 +50,18 @@ async function runFiles(db, dir, keep = () => true) {
   }
 }
 
-/** Returns a PGlite instance with every migration (and optionally the seed) applied. `seedFilter` keeps only some seed files. */
-async function createSupabaseDatabase({ seed = false, seedFilter = () => true } = {}) {
+/**
+ * Returns a PGlite instance with every migration (and optionally the seed) applied. `seedFilter` keeps only some seed files.
+ * `economy: "open"` (default) switches the CyberBits gating off, so content tests can walk through any course or lab; the
+ * CyberBits tests ask for `economy: "real"` to run with the shop closed exactly as in production.
+ */
+async function createSupabaseDatabase({ seed = false, seedFilter = () => true, economy = "open" } = {}) {
   const { PGlite } = await import("@electric-sql/pglite");
   const db = new PGlite();
   await db.exec(SUPABASE_STUBS);
   await runFiles(db, migrationsDir);
   if (seed) await runFiles(db, seedDir, seedFilter);
+  if (economy === "open") await db.exec("update public.cb_settings set gating_enabled = false");
   return db;
 }
 

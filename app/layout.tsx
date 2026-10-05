@@ -14,6 +14,7 @@ import "./art.css";
 import "./academy.css";
 import "./equipment.css";
 import "./figures.css";
+import "./cyberbits.css";
 import Providers from "./providers";
 
 const spaceGrotesk = localFont({
