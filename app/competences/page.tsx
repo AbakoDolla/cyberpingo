@@ -11,28 +11,31 @@ import { IconAlert, IconCheck, IconCircle, IconLock } from "@/components/ui/Icon
 import SlugIcon from "@/components/ui/SlugIcon";
 import { useLearner } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
+import { useTranslation } from "@/lib/i18n";
 import {
   SKILL_STATE_LABELS,
   SKILL_STATE_STEP_COUNT,
   groupSkillsByDomain,
   linkHref,
   linkKindLabel,
+  localizeLinkKind,
+  localizeSkillState,
   skillStateStep,
   skillStateTone,
 } from "@/lib/academy-view";
 import { getMyAcademy } from "@/services/academy.service";
 import type { Skill } from "@/types/api";
 
-function SkillCard({ skill }: { skill: Skill }) {
+function SkillCard({ skill, lang }: { skill: Skill; lang: "fr" | "en" }) {
   const step = skillStateStep(skill.state);
   return (
     <article className="skill-card" data-state={skill.state}>
       <header>
         <h4>{skill.name}</h4>
-        <Badge tone={skillStateTone(skill.state)}>{SKILL_STATE_LABELS[skill.state]}</Badge>
+        <Badge tone={skillStateTone(skill.state)}>{localizeSkillState(skill.state, lang)}</Badge>
       </header>
       <p>{skill.description}</p>
-      <div className="skill-card__meter" role="img" aria-label={`Étape ${step} sur ${SKILL_STATE_STEP_COUNT} : ${SKILL_STATE_LABELS[skill.state]}`}>
+      <div className="skill-card__meter" role="img" aria-label={`Étape ${step} sur ${SKILL_STATE_STEP_COUNT} : ${localizeSkillState(skill.state, lang)}`}>
         {Array.from({ length: SKILL_STATE_STEP_COUNT }, (_, index) => <span key={index} className={index < step ? "is-on" : undefined} />)}
       </div>
       {skill.links.length > 0 && (
@@ -43,7 +46,7 @@ function SkillCard({ skill }: { skill: Skill }) {
               <>
                 {link.done ? <IconCheck size={15} /> : <IconCircle size={15} />}
                 <span>{link.title}</span>
-                <small>{linkKindLabel(link.kind)}</small>
+                <small>{linkKindLabel(link.kind, lang)}</small>
               </>
             );
             return (
@@ -59,12 +62,14 @@ function SkillCard({ skill }: { skill: Skill }) {
 }
 
 function CompetencesContent() {
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
   const { profile } = useLearner();
   const { data, error, loading, reload } = useAsync(getMyAcademy, [profile.id]);
 
   if (loading) {
     return (
-      <div className="competences-page" role="status" aria-label="Chargement de tes compétences">
+      <div className="competences-page" role="status" aria-label={isEn ? "Loading your skills" : "Chargement de tes compétences"}>
         <div className="ui-skeleton ui-skeleton--title" />
         <div className="ui-skeleton ui-skeleton--card" />
         <div className="ui-skeleton ui-skeleton--card" />
@@ -76,9 +81,9 @@ function CompetencesContent() {
       <div className="competences-page">
         <section className="prog-state prog-state-error" role="alert">
           <IconAlert size={22} />
-          <h1>Impossible de charger tes compétences.</h1>
-          <p>{error?.message ?? "Aucune donnée reçue."}</p>
-          <Button type="button" variant="secondary" onClick={() => void reload()}>Réessayer</Button>
+          <h1>{isEn ? "Unable to load your skills." : "Impossible de charger tes compétences."}</h1>
+          <p>{error?.message ?? (isEn ? "No data received." : "Aucune donnée reçue.")}</p>
+          <Button type="button" variant="secondary" onClick={() => void reload()}>{t("action.retry")}</Button>
         </section>
       </div>
     );
@@ -92,28 +97,28 @@ function CompetencesContent() {
       <header>
         <SceneBanner variant="progression" className="prog-hero">
           <div>
-            <h1>Mes compétences</h1>
+            <h1>{t("skills.title")}</h1>
             <p>
               {data.skills.length === 0
-                ? "Les compétences apparaissent ici dès qu’un parcours est publié."
-                : `${validated} sur ${data.skills.length} compétences validées par une évaluation pratique.`}
+                ? (isEn ? "Skills will appear here as soon as a track is published." : "Les compétences apparaissent ici dès qu’un parcours est publié.")
+                : (isEn ? `${validated} of ${data.skills.length} skills validated through hands-on evaluation.` : `${validated} sur ${data.skills.length} compétences validées par une évaluation pratique.`)}
             </p>
           </div>
-          <Link href="/courses" className="study-button study-button--ghost">Choisir un parcours</Link>
+          <Link href="/courses" className="study-button study-button--ghost">{isEn ? "Choose a track" : "Choisir un parcours"}</Link>
         </SceneBanner>
       </header>
 
       <section className="competences-rank" aria-labelledby="competences-rank-title">
-        <h2 id="competences-rank-title">Ton grade</h2>
+        <h2 id="competences-rank-title">{t("skills.rank")}</h2>
         <RankProgress academy={data} />
       </section>
 
       {groups.length === 0 ? (
         <section className="prog-empty-card">
           <EmptyArt kind="courses" />
-          <h2>Aucune compétence publiée.</h2>
-          <p>Dès que l’équipe publie un parcours avec ses compétences, tu pourras suivre ta maîtrise ici.</p>
-          <Link href="/courses" className="study-button">Voir les parcours</Link>
+          <h2>{t("skills.empty")}</h2>
+          <p>{isEn ? "As soon as tracks and skills are published, you can monitor your mastery here." : "Dès que l’équipe publie un parcours avec ses compétences, tu pourras suivre ta maîtrise ici."}</p>
+          <Link href="/courses" className="study-button">{t("skills.see_courses")}</Link>
         </section>
       ) : (
         groups.map(({ domain, skills }) => (
@@ -126,14 +131,14 @@ function CompetencesContent() {
               </div>
             </div>
             <div className="competences-grid">
-              {skills.map((skill) => <SkillCard key={skill.id} skill={skill} />)}
+              {skills.map((skill) => <SkillCard key={skill.id} skill={skill} lang={lang} />)}
             </div>
           </section>
         ))
       )}
 
       <section className="competences-ladder" aria-labelledby="competences-ladder-title">
-        <h2 id="competences-ladder-title">Échelle des grades</h2>
+        <h2 id="competences-ladder-title">{t("skills.ladder")}</h2>
         <ol>
           {data.ranks.map((rank) => {
             const current = rank.slug === data.rank.slug;

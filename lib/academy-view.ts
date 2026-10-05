@@ -8,6 +8,19 @@ export const SKILL_STATE_LABELS: Record<SkillState, string> = {
   validated: "Validée par une évaluation pratique",
 };
 
+export const SKILL_STATE_LABELS_EN: Record<SkillState, string> = {
+  not_studied: "Not started",
+  learning: "Currently learning",
+  consolidating: "Consolidating knowledge",
+  exercises_mastered: "Mastered in exercises",
+  validated: "Validated by hands-on assessment",
+};
+
+export function localizeSkillState(state: SkillState, lang: "fr" | "en" = "fr"): string {
+  if (lang === "en") return SKILL_STATE_LABELS_EN[state] ?? state;
+  return SKILL_STATE_LABELS[state] ?? state;
+}
+
 const STATE_STEPS: Record<SkillState, number> = {
   not_studied: 0,
   learning: 1,
@@ -51,7 +64,15 @@ export function rankProgress(requirements: RankRequirement[]): number {
   return Math.round((total / requirements.length) * 100);
 }
 
-export function linkKindLabel(kind: SkillLink["kind"]): string {
+export function linkKindLabel(kind: SkillLink["kind"], lang: "fr" | "en" = "fr"): string {
+  if (lang === "en") {
+    switch (kind) {
+      case "lesson": return "Lesson";
+      case "quiz": return "Quiz";
+      case "practice": return "Practice";
+      case "validation": return "Assessment";
+    }
+  }
   switch (kind) {
     case "lesson": return "Leçon";
     case "quiz": return "Quiz";
@@ -59,6 +80,8 @@ export function linkKindLabel(kind: SkillLink["kind"]): string {
     case "validation": return "Évaluation";
   }
 }
+
+export const localizeLinkKind = linkKindLabel;
 
 /** In-app destination of a skill link. Labs are addressed by slug, lessons and quizzes by id. */
 export function linkHref(link: SkillLink): string | null {

@@ -6,6 +6,8 @@ import Logo from "./Logo";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { useTranslation } from "@/lib/i18n";
+import { localizeRankTitle } from "@/lib/levels";
+import { RankBadge } from "@/components/levels/RankBadge";
 import {
   IconActivity, IconAI, IconArrowRight, IconBell, IconCourses, IconDashboard, IconFlame, IconGlobe, IconLesson,
   IconMap, IconProfile, IconSettings, IconShield, IconTarget, IconTrophy, IconUsers,
@@ -84,18 +86,30 @@ function NavGroup({ title, items, pathname, badge }: { title: string; items: Nav
 
 function LevelMini() {
   const { level, streak } = useUser();
+  const { lang } = useTranslation();
+  const isEn = lang === "en";
   if (!level) return null;
   const remaining = level.next_level_xp !== null ? Math.max(0, level.next_level_xp - level.xp) : null;
+  const localizedTitle = localizeRankTitle(level.level, isEn ? "en" : "fr");
   return (
-    <Link href="/progression" className="sidebar-level" aria-label={`Niveau ${level.level}, ${level.title}. Voir ma progression`}>
-      <span className="sidebar-level__head">
-        <span className="sidebar-level__badge">{level.level}</span>
-        <span><strong>{level.title}</strong><small>{remaining !== null ? `${remaining} XP avant le niveau ${level.next_level}` : "Niveau maximum atteint"}</small></span>
+    <Link href="/progression" className="sidebar-level" aria-label={`Niveau ${level.level}, ${localizedTitle}. Voir ma progression`}>
+      <span className="sidebar-level__head flex items-center gap-2">
+        <RankBadge level={level.level} size="xs" />
+        <span className="min-w-0 flex-1">
+          <strong className="truncate block">{localizedTitle}</strong>
+          <small className="truncate block">
+            {remaining !== null
+              ? (isEn ? `${remaining} XP until rank ${level.next_level}` : `${remaining} XP avant le niveau ${level.next_level}`)
+              : (isEn ? "Max rank achieved" : "Niveau maximum atteint")}
+          </small>
+        </span>
       </span>
       <span className="sidebar-level__bar" role="progressbar" aria-label="Progression vers le niveau suivant" aria-valuemin={0} aria-valuemax={100} aria-valuenow={level.progress_percentage}>
         <span style={{ transform: `scaleX(${level.progress_percentage / 100})` }} />
       </span>
-      <span className={cn("sidebar-level__streak", streak > 0 && "is-hot")}><IconFlame size={14} /> {streak > 0 ? `Série de ${streak} jour${streak > 1 ? "s" : ""}` : "Lance ta série aujourd’hui"}</span>
+      <span className={cn("sidebar-level__streak", streak > 0 && "is-hot")}>
+        <IconFlame size={14} /> {streak > 0 ? (isEn ? `${streak}-day streak` : `Série de ${streak} jour${streak > 1 ? "s" : ""}`) : (isEn ? "Start your streak today" : "Lance ta série aujourd’hui")}
+      </span>
     </Link>
   );
 }

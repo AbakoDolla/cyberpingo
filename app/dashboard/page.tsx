@@ -30,7 +30,8 @@ import SlugIcon from "@/components/ui/SlugIcon";
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { useTranslation } from "@/lib/i18n";
-import { dateInZone, effectiveStreak } from "@/lib/levels";
+import { dateInZone, effectiveStreak, localizeRankTitle } from "@/lib/levels";
+import { RankBadge } from "@/components/levels/RankBadge";
 import { formatDate, formatDuration, formatNumber, formatRelative, formatShortDate, greeting, levelLabel, plural } from "@/lib/format";
 import { getMyAcademy } from "@/services/academy.service";
 import { getMyDashboard } from "@/services/gamification.service";
@@ -196,6 +197,8 @@ function WeekRhythm({ week }: { week: Dashboard["week"] }) {
 
 function LearnerDashboard() {
   const { profile, level: learnerLevel, timezone, cbBalance } = useLearner();
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
   const { setUnreadNotifications } = useUserActions();
   const { data, error, loading, reload } = useAsync(getMyDashboard, []);
   const { data: academy } = useAsync(() => getMyAcademy().catch(() => null), []);
@@ -247,14 +250,20 @@ function LearnerDashboard() {
           )}
         </div>
 
-        <aside className="dash-level-card" aria-label={`Niveau ${level.level}`}>
-          <div className="dash-level-badge">N{level.level}</div>
-          <div>
-            <h2>{level.title}</h2>
-            <p>{formatNumber(level.xp)} XP cumulés</p>
+        <aside className="dash-level-card flex flex-col md:flex-row items-center gap-4 p-5 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md shadow-xl" aria-label={`Niveau ${level.level}`}>
+          <RankBadge level={level.level} size="md" showTierBadge />
+          <div className="flex-1 w-full">
+            <div className="flex items-center justify-between mb-1">
+              <h2 className="text-base font-bold text-white">{localizeRankTitle(level.level, isEn ? "en" : "fr")}</h2>
+              <span className="text-xs font-mono text-cyan-400 font-semibold">{formatNumber(level.xp)} XP</span>
+            </div>
+            <ProgressBar value={level.progress_percentage} tone="blue" />
+            <p className="text-xs text-slate-400 mt-2">
+              {xpToNext === null
+                ? (isEn ? "Max rank tier unlocked." : "Palier maximal atteint.")
+                : (isEn ? `${formatNumber(xpToNext)} XP before ${localizeRankTitle(level.next_level ?? 0, "en")}.` : `${formatNumber(xpToNext)} XP avant ${localizeRankTitle(level.next_level ?? 0, "fr")}.`)}
+            </p>
           </div>
-          <ProgressBar value={level.progress_percentage} tone="blue" />
-          <p>{xpToNext === null ? "Palier maximal atteint." : `${formatNumber(xpToNext)} XP avant ${level.next_title}.`}</p>
         </aside>
       </section>
 

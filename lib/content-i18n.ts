@@ -351,3 +351,18 @@ export function localizeLab(lab: Lab, lang: Language): Lab {
     flag_placeholder: translation.flag_placeholder || lab.flag_placeholder,
   };
 }
+
+export function localizeLesson<T extends { title: string; summary?: string; course?: { slug?: string } }>(lesson: T, lang: Language): T {
+  if (lang !== "en") return lesson;
+  const courseSlug = lesson.course?.slug;
+  if (!courseSlug) return lesson;
+  const courseTrans = COURSE_TRANSLATIONS[courseSlug];
+  if (!courseTrans || !courseTrans.lessons) return lesson;
+  const lessonTrans = courseTrans.lessons[lesson.title];
+  if (!lessonTrans) return lesson;
+  return {
+    ...lesson,
+    title: lessonTrans.title || lesson.title,
+    summary: lessonTrans.summary || lesson.summary,
+  };
+}

@@ -8,7 +8,7 @@ export interface MascotPrefs {
   subtitles: boolean;
 }
 
-export const DEFAULT_PREFS: MascotPrefs = { auto: true, voice: true, volume: 0.8, subtitles: true };
+export const DEFAULT_PREFS: MascotPrefs = { auto: true, voice: false, volume: 0, subtitles: true };
 export const PREFS_KEY = "cyberpingo.mascot";
 
 export function parsePrefs(raw: string | null): MascotPrefs {

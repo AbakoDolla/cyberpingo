@@ -31,6 +31,9 @@ import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDate, formatDuration, formatNumber, formatRelative, formatShortDate, levelLabel, plural } from "@/lib/format";
 import { RARITY_LABELS, badgeCondition } from "@/lib/academy-view";
+import { useTranslation } from "@/lib/i18n";
+import { PLATFORM_LEVELS, localizeRankTitle } from "@/lib/levels";
+import { RankBadge } from "@/components/levels/RankBadge";
 import { getMyAcademy } from "@/services/academy.service";
 import { listMyCourseProgress, listPublishedCourses } from "@/services/courses.service";
 import {
@@ -222,35 +225,46 @@ function CourseProgressList({ courses, catalog }: { courses: CourseProgress[]; c
 }
 
 function LevelLadder({ levels, currentLevel }: { levels: LevelRow[]; currentLevel: number }) {
+  const { lang } = useTranslation();
+  const isEn = lang === "en";
+  const displayLevels = levels.length >= 20 ? levels : PLATFORM_LEVELS.map(pl => ({
+    level: pl.level,
+    required_xp: pl.required_xp,
+    title: isEn ? pl.title_en : pl.title_fr,
+  }));
+
   return (
     <section className="prog-panel" aria-labelledby="prog-levels-title">
       <div className="prog-section-head">
         <div>
-          <h2 id="prog-levels-title">Échelle des niveaux</h2>
-          <p>Ta position dans la progression globale CyberPingo.</p>
+          <h2 id="prog-levels-title">{isEn ? "Rank Ladder & Heraldry" : "Échelle des Rangs & Héraldique"}</h2>
+          <p>{isEn ? "Your standing in the challenging CyberPingo progression. Every rank is earned." : "Ta position dans la progression exigeante CyberPingo. Chaque niveau est mérité."}</p>
         </div>
       </div>
-      {levels.length === 0 ? (
-        <p className="prog-empty">Aucun niveau disponible pour le moment.</p>
-      ) : (
-        <ol className="prog-level-list">
-          {levels.map((level) => {
-            const state = level.level === currentLevel ? "current" : level.level < currentLevel ? "done" : "locked";
-            return (
-              <li key={level.level} className={`prog-level-row is-${state}`}>
-                <span className="prog-level-dot">{state === "done" ? <IconCheck size={15} /> : state === "locked" ? <IconLock size={15} /> : level.level}</span>
-                <span>
-                  <strong>Niveau {level.level} · {level.title}</strong>
-                  <small>{formatNumber(level.required_xp)} XP requis</small>
-                </span>
-                <Badge tone={state === "current" ? "blue" : state === "done" ? "green" : "neutral"}>
-                  {state === "current" ? "Actuel" : state === "done" ? "Atteint" : "À venir"}
-                </Badge>
-              </li>
-            );
-          })}
-        </ol>
-      )}
+      <ol className="prog-level-list space-y-3">
+        {displayLevels.map((level) => {
+          const state = level.level === currentLevel ? "current" : level.level < currentLevel ? "done" : "locked";
+          const localizedTitle = localizeRankTitle(level.level, isEn ? "en" : "fr");
+          return (
+            <li key={level.level} className={`prog-level-row is-${state} flex items-center justify-between p-3 rounded-xl border border-white/10 bg-slate-900/40 backdrop-blur-sm transition-all hover:border-cyan-500/40`}>
+              <div className="flex items-center gap-3 min-w-0">
+                <RankBadge level={level.level} size="sm" />
+                <div className="min-w-0">
+                  <strong className="block text-sm font-bold text-white truncate">
+                    {isEn ? `Rank ${level.level}` : `Niveau ${level.level}`} · {localizedTitle}
+                  </strong>
+                  <small className="text-xs text-slate-400 font-mono">
+                    {formatNumber(level.required_xp)} XP {isEn ? "required" : "requis"}
+                  </small>
+                </div>
+              </div>
+              <Badge tone={state === "current" ? "blue" : state === "done" ? "green" : "neutral"}>
+                {state === "current" ? (isEn ? "Current" : "Actuel") : state === "done" ? (isEn ? "Achieved" : "Atteint") : (isEn ? "Locked" : "À venir")}
+              </Badge>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }
@@ -421,6 +435,8 @@ function XpHistoryPanel({ data }: { data: ProgressionData }) {
 
 function ProgressionContent() {
   const { profile } = useLearner();
+  const { lang } = useTranslation();
+  const isEn = lang === "en";
   const { data, error, loading, reload } = useAsync<ProgressionData>(async () => {
     const [stats, courses, catalog, history, levels, badges, certificates, academy] = await Promise.all([
       getMyStats(),
@@ -458,11 +474,16 @@ function ProgressionContent() {
       </header>
 
       <section className="prog-overview" aria-label="Résumé du niveau">
-        <div className="prog-level-focus">
-          <span>Niveau {data.stats.level.level}</span>
-          <h2>{data.stats.level.title}</h2>
-          <p>{formatNumber(data.stats.xp)} XP cumulés · {xpToNext === null ? "dernier palier atteint" : `${formatNumber(xpToNext)} XP avant ${data.stats.level.next_title}`}</p>
-          <ProgressBar value={data.stats.level.progress_percentage} tone="blue" />
+        <div className="prog-level-focus flex flex-col sm:flex-row items-center gap-6 p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md">
+          <RankBadge level={data.stats.level.level} size="xl" showLabel showTierBadge />
+          <div className="flex-1 w-full text-center sm:text-left">
+            <span className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-semibold">{isEn ? `Rank ${data.stats.level.level}` : `Niveau ${data.stats.level.level}`}</span>
+            <h2 className="text-2xl font-black text-white">{localizeRankTitle(data.stats.level.level, isEn ? "en" : "fr")}</h2>
+            <p className="text-sm text-slate-300 mt-1 mb-3">
+              {formatNumber(data.stats.xp)} XP {isEn ? "earned" : "cumulés"} · {xpToNext === null ? (isEn ? "maximum rank tier reached" : "dernier palier atteint") : `${formatNumber(xpToNext)} XP ${isEn ? "before" : "avant"} ${localizeRankTitle(data.stats.level.next_level ?? 0, isEn ? "en" : "fr")}`}
+            </p>
+            <ProgressBar value={data.stats.level.progress_percentage} tone="blue" />
+          </div>
         </div>
         <div className="prog-overview-stats">
           <StatPill label="Parcours terminés" value={`${data.stats.courses_completed}/${data.stats.courses_started}`} icon={<IconLesson size={18} />} />
