@@ -1351,4 +1351,144 @@
   }
 }
 
+/* Monthly Championship Gifts Showcase */
+.monthly-gifts-section {
+  margin: 32px 0 40px;
+}
+.monthly-gifts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.monthly-gifts-header h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.monthly-gifts-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.monthly-gifts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.monthly-gift-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+}
+.monthly-gift-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  border-color: rgba(0, 213, 255, 0.4);
+}
+.monthly-gift-card.gift-top-1 {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15);
+}
+.monthly-gift-card.gift-top-2 {
+  background: linear-gradient(135deg, rgba(148, 163, 184, 0.12) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border-color: rgba(148, 163, 184, 0.35);
+}
+.monthly-gift-card.gift-top-3 {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.12) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border-color: rgba(217, 119, 6, 0.35);
+}
+.monthly-gift-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.monthly-gift-rank {
+  font-size: 14px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+}
+.monthly-gift-badge {
+  font-size: 24px;
+}
+.gift-physical-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.gift-digital-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 213, 255, 0.12);
+  border: 1px solid rgba(0, 213, 255, 0.3);
+  color: #00d5ff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+.monthly-gift-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+.monthly-gift-desc {
+  font-size: 12.5px;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  flex: 1;
+}
+.monthly-gift-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+}
+.monthly-gift-cb {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #f59e0b;
+  font-weight: 800;
+}
+
 

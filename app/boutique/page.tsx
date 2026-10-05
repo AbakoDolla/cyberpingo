@@ -15,6 +15,8 @@ import {
 import { useUser, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { formatDate, formatDateTime, formatDuration, formatNumber, formatRelative, levelLabel, plural } from "@/lib/format";
+import { useTranslation } from "@/lib/i18n";
+import { localizeCategory, localizeLevel } from "@/lib/content-i18n";
 import { CB_REASON_LABELS, CB_SOURCE_LABELS, formatCb, formatCbSigned } from "@/lib/cyberbits";
 import { getCatalog, getHistory, getWallet, listRules } from "@/services/cyberbits.service";
 import type { CbCatalogCourse, CbCatalogLab, CbRule, CbTransaction } from "@/types/cyberbits";
@@ -24,6 +26,8 @@ import { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
 type TabKey = "courses" | "labs" | "history" | "rules";
 
 function BoutiqueView() {
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") === "historique" ? "history" : "courses";
   const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
@@ -69,13 +73,11 @@ function BoutiqueView() {
       {/* Hero / Wallet Overview Banner */}
       <header className="cb-shop-hero">
         <div>
-          <h1>Boutique CyberBits</h1>
-          <p>
-            Gagne des CyberBits en apprenant, puis utilise-les pour débloquer des parcours spécialisés et des laboratoires pratiques.
-          </p>
+          <h1>{t("shop.title")}</h1>
+          <p>{t("shop.subtitle")}</p>
         </div>
         <div className="cb-shop-hero__wallet">
-          <span className="cb-shop-hero__wallet-label">Mon solde disponible</span>
+          <span className="cb-shop-hero__wallet-label">{t("shop.available_balance")}</span>
           <div className="cb-shop-hero__wallet-amount">
             <CoinIcon size={32} glow />
             <strong>{formatNumber(balance)}</strong>
@@ -83,10 +85,12 @@ function BoutiqueView() {
           </div>
           {isAuthenticated && wallet ? (
             <span className="cb-shop-hero__wallet-sub">
-              +{formatNumber(wallet.lifetime_earned)} gagnés · −{formatNumber(wallet.lifetime_spent)} dépensés
+              {isEn
+                ? `+${formatNumber(wallet.lifetime_earned)} earned · −${formatNumber(wallet.lifetime_spent)} spent`
+                : `+${formatNumber(wallet.lifetime_earned)} gagnés · −${formatNumber(wallet.lifetime_spent)} dépensés`}
             </span>
           ) : (
-            <span className="cb-shop-hero__wallet-sub">Mode découverte</span>
+            <span className="cb-shop-hero__wallet-sub">{t("shop.discovery_mode")}</span>
           )}
         </div>
       </header>
@@ -96,7 +100,7 @@ function BoutiqueView() {
         <div className="cb-unlock-modal__alert is-warning" role="alert">
           <IconAlert size={20} />
           <div>
-            <strong>Message de l’équipe CyberPingo</strong>
+            <strong>{isEn ? "CyberPingo Team Notice" : "Message de l’équipe CyberPingo"}</strong>
             <p>{settings.paused_reason}</p>
           </div>
         </div>
@@ -105,8 +109,8 @@ function BoutiqueView() {
         <div className="cb-unlock-modal__alert is-warning" role="alert">
           <IconAlert size={20} />
           <div>
-            <strong>Boutique temporairement fermée</strong>
-            <p>Les achats sont suspendus pour maintenance. Tes CyberBits sont en sécurité.</p>
+            <strong>{isEn ? "Shop temporarily closed" : "Boutique temporairement fermée"}</strong>
+            <p>{isEn ? "Purchases are paused for maintenance. Your CyberBits remain secure." : "Les achats sont suspendus pour maintenance. Tes CyberBits sont en sécurité."}</p>
           </div>
         </div>
       )}
@@ -114,27 +118,27 @@ function BoutiqueView() {
         <div className="cb-unlock-modal__alert is-info" role="status">
           <IconBolt size={20} />
           <div>
-            <strong>Accès libre activé</strong>
-            <p>Tous les parcours et laboratoires sont actuellement ouverts sans dépense de CyberBits.</p>
+            <strong>{isEn ? "Free Access Mode Enabled" : "Accès libre activé"}</strong>
+            <p>{isEn ? "All courses and labs are currently accessible without spending CyberBits." : "Tous les parcours et laboratoires sont actuellement ouverts sans dépense de CyberBits."}</p>
           </div>
         </div>
       )}
 
       {/* Tabs */}
-      <nav className="cb-shop-tabs" aria-label="Sections de la boutique">
+      <nav className="cb-shop-tabs" aria-label={isEn ? "Shop sections" : "Sections de la boutique"}>
         <button
           type="button"
           onClick={() => setActiveTab("courses")}
           className={`cb-shop-tab ${activeTab === "courses" ? "is-active" : ""}`}
         >
-          <IconCourses size={16} /> Parcours ({catalog?.courses.length ?? 0})
+          <IconCourses size={16} /> {t("shop.tab_courses")} ({catalog?.courses.length ?? 0})
         </button>
         <button
           type="button"
           onClick={() => setActiveTab("labs")}
           className={`cb-shop-tab ${activeTab === "labs" ? "is-active" : ""}`}
         >
-          <IconShield size={16} /> Laboratoires ({catalog?.labs.length ?? 0})
+          <IconShield size={16} /> {t("shop.tab_labs")} ({catalog?.labs.length ?? 0})
         </button>
         {isAuthenticated && (
           <button
@@ -142,7 +146,7 @@ function BoutiqueView() {
             onClick={() => setActiveTab("history")}
             className={`cb-shop-tab ${activeTab === "history" ? "is-active" : ""}`}
           >
-            <IconClock size={16} /> Mon historique
+            <IconClock size={16} /> {t("shop.tab_history")}
           </button>
         )}
         <button
@@ -150,14 +154,14 @@ function BoutiqueView() {
           onClick={() => setActiveTab("rules")}
           className={`cb-shop-tab ${activeTab === "rules" ? "is-active" : ""}`}
         >
-          <IconTarget size={16} /> Comment gagner ?
+          <IconTarget size={16} /> {t("shop.tab_rules")}
         </button>
       </nav>
 
       {/* Tab: Courses */}
       {activeTab === "courses" && (
-        <section aria-label="Parcours de formation">
-          {loadingCatalog && <div className="study-empty"><p>Chargement du catalogue…</p></div>}
+        <section aria-label={isEn ? "Learning Tracks" : "Parcours de formation"}>
+          {loadingCatalog && <div className="study-empty"><p>{t("shop.loading_catalog")}</p></div>}
           {catalog?.courses && (
             <div className="cb-shop-grid">
               {catalog.courses.map((course) => {
@@ -167,23 +171,23 @@ function BoutiqueView() {
                   <article key={course.id} className="cb-item-card">
                     <div className="cb-item-card__top">
                       <div className="cb-item-card__badges">
-                        <Badge tone="blue">{levelLabel(course.level)}</Badge>
-                        <Badge tone="neutral">{course.category}</Badge>
+                        <Badge tone="blue">{localizeLevel(course.level, lang)}</Badge>
+                        <Badge tone="neutral">{localizeCategory(course.category, lang)}</Badge>
                       </div>
                       <span className={`cb-item-card__price ${isFree ? "is-free" : ""}`}>
-                        {isFree ? "Gratuit" : <><CoinIcon size={14} /> {course.price} CB</>}
+                        {isFree ? t("shop.free") : <><CoinIcon size={14} /> {course.price} CB</>}
                       </span>
                     </div>
 
                     <h3>{course.title}</h3>
-                    <p>{course.short_description || "Parcours complet avec leçons, quiz et validation pratique."}</p>
+                    <p>{course.short_description || (isEn ? "Complete track with lessons, quizzes, and practical validation." : "Parcours complet avec leçons, quiz et validation pratique.")}</p>
 
                     {course.prerequisite && !course.unlocked && (
                       <div className="cb-item-card__prereq">
                         {course.prerequisite.completed ? (
-                          <span><IconCheck size={14} className="inline mr-1 text-cyber-green" /> Prérequis validé : {course.prerequisite.title}</span>
+                          <span><IconCheck size={14} className="inline mr-1 text-cyber-green" /> {t("shop.valid_prereq")} : {course.prerequisite.title}</span>
                         ) : (
-                          <span><IconLock size={14} className="inline mr-1" /> Prérequis nécessaire : {course.prerequisite.title}</span>
+                          <span><IconLock size={14} className="inline mr-1" /> {t("shop.locked_prereq")} : {course.prerequisite.title}</span>
                         )}
                       </div>
                     )}
@@ -194,7 +198,7 @@ function BoutiqueView() {
                       </span>
                       {course.unlocked ? (
                         <Link href={`/courses/${course.slug}`} className="study-button study-button--sm study-button--ghost">
-                          Accéder <IconArrowRight size={14} />
+                          {t("shop.access")} <IconArrowRight size={14} />
                         </Link>
                       ) : (
                         <Button
@@ -211,7 +215,7 @@ function BoutiqueView() {
                             prerequisite: course.prerequisite,
                           })}
                         >
-                          Débloquer
+                          {t("shop.unlock")}
                         </Button>
                       )}
                     </div>
@@ -225,11 +229,11 @@ function BoutiqueView() {
 
       {/* Tab: Labs */}
       {activeTab === "labs" && (
-        <section aria-label="Laboratoires pratiques">
+        <section aria-label={isEn ? "Hands-on Labs" : "Laboratoires pratiques"}>
           {/* Filters */}
           <div className="study-filters mb-6">
             <label>
-              Rechercher un lab
+              {isEn ? "Search a lab" : "Rechercher un lab"}
               <input
                 type="search"
                 value={labSearch}
@@ -238,20 +242,20 @@ function BoutiqueView() {
               />
             </label>
             <label>
-              Difficulté
+              {isEn ? "Difficulty" : "Difficulté"}
               <select value={labDifficulty} onChange={(e) => setLabDifficulty(e.target.value as SkillLevel | "")}>
-                <option value="">Toutes les difficultés</option>
-                <option value="debutant">Débutant (30 CB)</option>
-                <option value="intermediaire">Intermédiaire (80 CB)</option>
-                <option value="avance">Avancé (180 CB)</option>
+                <option value="">{t("shop.all_levels")}</option>
+                <option value="debutant">{isEn ? "Beginner (30 CB)" : "Débutant (30 CB)"}</option>
+                <option value="intermediaire">{isEn ? "Intermediate (80 CB)" : "Intermédiaire (80 CB)"}</option>
+                <option value="avance">{isEn ? "Advanced (180 CB)" : "Avancé (180 CB)"}</option>
               </select>
             </label>
             <label>
-              Catégorie
+              {isEn ? "Category" : "Catégorie"}
               <select value={labCategory} onChange={(e) => setLabCategory(e.target.value as LabCategory | "")}>
-                <option value="">Toutes les catégories</option>
+                <option value="">{t("shop.all_categories")}</option>
                 {Object.entries(LAB_CATEGORY_LABELS).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
+                  <option key={k} value={k}>{localizeCategory(v, lang)}</option>
                 ))}
               </select>
             </label>
@@ -265,17 +269,17 @@ function BoutiqueView() {
                 <article key={lab.id} className="cb-item-card">
                   <div className="cb-item-card__top">
                     <div className="cb-item-card__badges">
-                      <Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge>
-                      <Badge tone="blue">{levelLabel(lab.difficulty)}</Badge>
-                      {lab.is_assessment && <Badge tone="amber">Évaluation</Badge>}
+                      <Badge tone="purple">{localizeCategory(LAB_CATEGORY_LABELS[lab.category] || lab.category, lang)}</Badge>
+                      <Badge tone="blue">{localizeLevel(lab.difficulty, lang)}</Badge>
+                      {lab.is_assessment && <Badge tone="amber">{isEn ? "Assessment" : "Évaluation"}</Badge>}
                     </div>
                     <span className={`cb-item-card__price ${isFree ? "is-free" : ""}`}>
-                      {isFree ? "Gratuit" : <><CoinIcon size={14} /> {lab.price} CB</>}
+                      {isFree ? t("shop.free") : <><CoinIcon size={14} /> {lab.price} CB</>}
                     </span>
                   </div>
 
                   <h3>{lab.title}</h3>
-                  <p>{lab.course_slug ? `Parcours associé : ${lab.course_slug}` : "Laboratoire d’entraînement autonome."}</p>
+                  <p>{lab.course_slug ? (isEn ? `Associated Track: ${lab.course_slug}` : `Parcours associé : ${lab.course_slug}`) : (isEn ? "Autonomous hands-on lab." : "Laboratoire d’entraînement autonome.")}</p>
 
                   <div className="cb-item-card__footer">
                     <span className="text-xs text-cyber-muted flex items-center gap-1">
@@ -283,7 +287,7 @@ function BoutiqueView() {
                     </span>
                     {lab.unlocked ? (
                       <Link href={`/challenges/${lab.slug}`} className="study-button study-button--sm study-button--ghost">
-                        {lab.completed ? "Rejouer" : "Ouvrir"} <IconArrowRight size={14} />
+                        {lab.completed ? (isEn ? "Replay" : "Rejouer") : (isEn ? "Open" : "Ouvrir")} <IconArrowRight size={14} />
                       </Link>
                     ) : (
                       <Button
@@ -299,7 +303,7 @@ function BoutiqueView() {
                           category: lab.category,
                         })}
                       >
-                        Débloquer
+                        {t("shop.unlock")}
                       </Button>
                     )}
                   </div>
@@ -309,7 +313,7 @@ function BoutiqueView() {
           </div>
           {filteredLabs.length === 0 && (
             <div className="study-empty">
-              <p>Aucun laboratoire ne correspond aux filtres.</p>
+              <p>{t("shop.empty_labs")}</p>
             </div>
           )}
         </section>
@@ -317,11 +321,11 @@ function BoutiqueView() {
 
       {/* Tab: History */}
       {activeTab === "history" && isAuthenticated && (
-        <section aria-label="Historique des transactions CyberBits">
+        <section aria-label={isEn ? "CyberBits transaction history" : "Historique des transactions CyberBits"}>
           <div className="adm-panel">
-            {loadingHistory && <p className="adm-muted text-sm">Chargement de l’historique…</p>}
+            {loadingHistory && <p className="adm-muted text-sm">{isEn ? "Loading history…" : "Chargement de l’historique…"}</p>}
             {history && history.length === 0 && (
-              <p className="adm-muted text-sm">Aucun mouvement enregistré pour le moment. Valide une leçon pour recevoir tes premiers CyberBits !</p>
+              <p className="adm-muted text-sm">{t("shop.history_empty")}</p>
             )}
             {history && history.length > 0 && (
               <div className="overflow-x-auto">
@@ -329,9 +333,9 @@ function BoutiqueView() {
                   <thead>
                     <tr>
                       <th>Date</th>
-                      <th>Opération</th>
-                      <th>Montant</th>
-                      <th>Solde après</th>
+                      <th>{isEn ? "Operation" : "Opération"}</th>
+                      <th>{isEn ? "Amount" : "Montant"}</th>
+                      <th>{isEn ? "Balance after" : "Solde après"}</th>
                       <th>Source</th>
                     </tr>
                   </thead>
@@ -363,14 +367,16 @@ function BoutiqueView() {
 
       {/* Tab: Rules & Economy */}
       {activeTab === "rules" && (
-        <section aria-label="Barème des CyberBits" className="space-y-6">
+        <section aria-label={isEn ? "CyberBits Economy Rules" : "Barème des CyberBits"} className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <div className="adm-panel">
               <h2 className="adm-section-title mb-4 flex items-center gap-2">
-                <IconBolt size={18} className="text-cyber-green" /> Comment gagner des CyberBits ?
+                <IconBolt size={18} className="text-cyber-green" /> {isEn ? "How to earn CyberBits?" : "Comment gagner des CyberBits ?"}
               </h2>
               <p className="text-sm text-cyber-muted mb-4">
-                Les CyberBits ne s’achètent pas avec de l’argent réel. Ils récompensent uniquement tes efforts et ta progression réelle.
+                {isEn
+                  ? "CyberBits cannot be purchased with real money. They solely reward your dedication, hard work, and verified progression."
+                  : "Les CyberBits ne s’achètent pas avec de l’argent réel. Ils récompensent uniquement tes efforts et ta progression réelle."}
               </p>
               <ul className="space-y-3 text-sm">
                 {(rules ?? []).filter((r) => r.kind === "reward").map((r) => (
@@ -387,10 +393,12 @@ function BoutiqueView() {
 
             <div className="adm-panel">
               <h2 className="adm-section-title mb-4 flex items-center gap-2">
-                <IconLock size={18} className="text-cyber-cyan" /> Coût indicatif des déblocages
+                <IconLock size={18} className="text-cyber-cyan" /> {isEn ? "Indicative Content Pricing" : "Coût indicatif des déblocages"}
               </h2>
               <p className="text-sm text-cyber-muted mb-4">
-                Les cours d’initiation restent toujours 100 % gratuits pour démarrer sereinement.
+                {isEn
+                  ? "Introductory courses remain 100% free so everyone can start with peace of mind."
+                  : "Les cours d’initiation restent toujours 100 % gratuits pour démarrer sereinement."}
               </p>
               <ul className="space-y-3 text-sm">
                 {(rules ?? []).filter((r) => r.kind === "price").map((r) => (
@@ -400,7 +408,7 @@ function BoutiqueView() {
                       <span className="text-xs text-cyber-muted">{r.description}</span>
                     </div>
                     <Badge tone={r.amount === 0 ? "green" : "blue"}>
-                      {r.amount === 0 ? "Gratuit" : `${r.amount} CB`}
+                      {r.amount === 0 ? (isEn ? "Free" : "Gratuit") : `${r.amount} CB`}
                     </Badge>
                   </li>
                 ))}

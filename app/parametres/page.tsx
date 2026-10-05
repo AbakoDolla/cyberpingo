@@ -36,21 +36,40 @@ import type { LearningGoal, SkillLevel } from "@/types/api";
 const RESET_PHRASE = "RÉINITIALISER";
 const DELETE_PHRASE = "SUPPRIMER";
 const SKILL_LEVELS: SkillLevel[] = ["debutant", "intermediaire", "avance"];
-const GOALS: { value: LearningGoal; label: string; description: string }[] = [
+
+const GOALS_FR: { value: LearningGoal; label: string; description: string }[] = [
   { value: "decouvrir", label: "Découvrir", description: "Comprendre les bases à ton rythme." },
   { value: "professionnel", label: "Professionnel", description: "Structurer une montée en compétence métier." },
   { value: "emploi", label: "Trouver un emploi", description: "Préparer un portfolio et des réflexes solides." },
   { value: "competences", label: "Compétences", description: "Renforcer tes acquis techniques." },
   { value: "certification", label: "Certification", description: "Te préparer à valider tes connaissances." },
 ];
-const AREAS = [
+
+const GOALS_EN: { value: LearningGoal; label: string; description: string }[] = [
+  { value: "decouvrir", label: "Explore & Discover", description: "Understand fundamentals at your own pace." },
+  { value: "professionnel", label: "Professional Upskilling", description: "Structure hands-on professional mastery." },
+  { value: "emploi", label: "Find a Job", description: "Build a strong portfolio and SOC instincts." },
+  { value: "competences", label: "Technical Skills", description: "Strengthen hands-on defense and audit abilities." },
+  { value: "certification", label: "Certification", description: "Prepare to pass and validate official cyber exams." },
+];
+
+const AREAS_FR = [
   { value: "reseaux", label: "Réseaux" },
   { value: "linux", label: "Linux" },
   { value: "programmation", label: "Programmation" },
   { value: "securite", label: "Sécurité" },
   { value: "aucune", label: "Aucune" },
 ];
-const SECTIONS = [
+
+const AREAS_EN = [
+  { value: "reseaux", label: "Networking" },
+  { value: "linux", label: "Linux" },
+  { value: "programmation", label: "Programming" },
+  { value: "securite", label: "Security" },
+  { value: "aucune", label: "None" },
+];
+
+const SECTIONS_FR = [
   { id: "profil-public", label: "Profil public" },
   { id: "apprentissage", label: "Apprentissage" },
   { id: "preferences", label: "Préférences" },
@@ -58,6 +77,16 @@ const SECTIONS = [
   { id: "compte", label: "Compte" },
   { id: "donnees", label: "Données" },
   { id: "danger", label: "Zone sensible" },
+] as const;
+
+const SECTIONS_EN = [
+  { id: "profil-public", label: "Public Profile" },
+  { id: "apprentissage", label: "Learning Goals" },
+  { id: "preferences", label: "Preferences" },
+  { id: "pingo", label: "Pingo" },
+  { id: "compte", label: "Account" },
+  { id: "donnees", label: "Data" },
+  { id: "danger", label: "Danger Zone" },
 ] as const;
 
 type SectionKey = "learning" | "preferences" | "email" | "password" | "data" | "danger" | "session";
@@ -110,7 +139,12 @@ function CheckSwitch({
 function SettingsContent() {
   const router = useRouter();
   const { profile, timezone } = useLearner();
-  const { lang, setLanguage } = useTranslation();
+  const { lang, setLanguage, t } = useTranslation();
+  const isEn = lang === "en";
+  const sections = isEn ? SECTIONS_EN : SECTIONS_FR;
+  const goals = isEn ? GOALS_EN : GOALS_FR;
+  const areas = isEn ? AREAS_EN : AREAS_FR;
+
   const { updateProfile, resetProgress, deleteAccount, logout, refresh } = useUserActions();
   const { data: settings, error: settingsError, loading: settingsLoading, reload: reloadSettings } = useAsync(() => getMySettings(profile.id), [profile.id]);
   const [statuses, setStatuses] = useState<Record<SectionKey, Status | null>>({
@@ -156,8 +190,8 @@ function SettingsContent() {
   }, [settings, timezone]);
 
   const timezoneOptions = useMemo(() => TIMEZONES.map((value) => ({ value, label: value.replace(/_/g, " ") })), []);
-  const dangerPhrase = dangerAction === "reset" ? RESET_PHRASE : DELETE_PHRASE;
-  const dangerTitle = dangerAction === "reset" ? "Réinitialiser la progression" : "Supprimer le compte";
+  const dangerPhrase = dangerAction === "reset" ? (isEn ? "RESET" : RESET_PHRASE) : (isEn ? "DELETE" : DELETE_PHRASE);
+  const dangerTitle = dangerAction === "reset" ? (isEn ? "Reset learning progress" : "Réinitialiser la progression") : (isEn ? "Delete account" : "Supprimer le compte");
 
   function report(section: SectionKey, message: string, failed = false) {
     setStatuses((current) => ({ ...current, [section]: { message, error: failed } }));
@@ -177,9 +211,9 @@ function SettingsContent() {
     try {
       const changes: ProfileChanges = { goal, skill_level: skillLevel, daily_minutes: dailyMinutes, known_areas: knownAreas };
       await updateProfile(changes);
-      report("learning", "Objectifs d’apprentissage enregistrés.");
+      report("learning", isEn ? "Learning goals saved successfully." : "Objectifs d’apprentissage enregistrés.");
     } catch (cause) {
-      report("learning", errorMessage(cause, "Les objectifs n’ont pas pu être enregistrés."), true);
+      report("learning", errorMessage(cause, isEn ? "Could not save learning goals." : "Les objectifs n’ont pas pu être enregistrés."), true);
     } finally {
       setBusy(null);
     }
@@ -199,9 +233,9 @@ function SettingsContent() {
       await updateMySettings(profile.id, changes);
       await reloadSettings();
       await refresh();
-      report("preferences", "Préférences enregistrées.");
+      report("preferences", isEn ? "Preferences saved successfully." : "Préférences enregistrées.");
     } catch (cause) {
-      report("preferences", errorMessage(cause, "Les préférences n’ont pas pu être enregistrées."), true);
+      report("preferences", errorMessage(cause, isEn ? "Could not save preferences." : "Les préférences n’ont pas pu être enregistrées."), true);
     } finally {
       setBusy(null);
     }
@@ -211,19 +245,19 @@ function SettingsContent() {
     event.preventDefault();
     const nextEmail = email.trim();
     if (!/^\S+@\S+\.\S+$/.test(nextEmail)) {
-      report("email", "Entre une adresse e-mail valide.", true);
+      report("email", isEn ? "Please enter a valid email address." : "Entre une adresse e-mail valide.", true);
       return;
     }
     if (nextEmail === profile.email) {
-      report("email", "Cette adresse est déjà associée à ton compte.");
+      report("email", isEn ? "This email is already associated with your account." : "Cette adresse est déjà associée à ton compte.");
       return;
     }
     setBusy("email");
     try {
       await updateEmail(nextEmail);
-      report("email", "Un lien de confirmation a été envoyé. Le changement sera actif après validation.");
+      report("email", isEn ? "Confirmation link sent. Check your inbox." : "Un lien de confirmation a été envoyé. Le changement sera actif après validation.");
     } catch (cause) {
-      report("email", errorMessage(cause, "L’adresse e-mail n’a pas pu être modifiée."), true);
+      report("email", errorMessage(cause, isEn ? "Email address could not be updated." : "L’adresse e-mail n’a pas pu être modifiée."), true);
     } finally {
       setBusy(null);
     }
@@ -237,7 +271,7 @@ function SettingsContent() {
       return;
     }
     if (password !== confirmPassword) {
-      report("password", "Les mots de passe ne correspondent pas.", true);
+      report("password", isEn ? "Passwords do not match." : "Les mots de passe ne correspondent pas.", true);
       return;
     }
     setBusy("password");
@@ -245,9 +279,9 @@ function SettingsContent() {
       await updatePassword(password);
       setPassword("");
       setConfirmPassword("");
-      report("password", "Mot de passe modifié. Utilise-le dès ta prochaine connexion.");
+      report("password", isEn ? "Password changed successfully." : "Mot de passe modifié. Utilise-le dès ta prochaine connexion.");
     } catch (cause) {
-      report("password", errorMessage(cause, "Le mot de passe n’a pas pu être modifié."), true);
+      report("password", errorMessage(cause, isEn ? "Could not change password." : "Le mot de passe n’a pas pu être modifié."), true);
     } finally {
       setBusy(null);
     }
@@ -285,9 +319,9 @@ function SettingsContent() {
       anchor.click();
       anchor.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 0);
-      report("data", "Export JSON préparé avec les données disponibles sur cette page.");
+      report("data", isEn ? "JSON export ready." : "Export JSON préparé avec les données disponibles sur cette page.");
     } catch (cause) {
-      report("data", errorMessage(cause, "L’export n’a pas pu être préparé."), true);
+      report("data", errorMessage(cause, isEn ? "Could not prepare export." : "L’export n’a pas pu être préparé."), true);
     }
   }
 
@@ -298,7 +332,7 @@ function SettingsContent() {
       router.replace("/login?etat=deconnexion");
       router.refresh();
     } catch (cause) {
-      report("session", errorMessage(cause, "La déconnexion a échoué."), true);
+      report("session", errorMessage(cause, isEn ? "Sign out failed." : "La déconnexion a échoué."), true);
       setBusy(null);
     }
   }
@@ -316,7 +350,7 @@ function SettingsContent() {
         await resetProgress();
         setDangerAction(null);
         setConfirmation("");
-        report("danger", "Tes progrès ont été réinitialisés. Ton profil et tes préférences sont conservés.");
+        report("danger", isEn ? "Progress reset. Profile and settings preserved." : "Tes progrès ont été réinitialisés. Ton profil et tes préférences sont conservés.");
         setBusy(null);
         return;
       }
@@ -324,7 +358,7 @@ function SettingsContent() {
       router.replace("/");
       router.refresh();
     } catch (cause) {
-      report("danger", errorMessage(cause, dangerAction === "reset" ? "La réinitialisation a échoué." : "La suppression a échoué."), true);
+      report("danger", errorMessage(cause, dangerAction === "reset" ? (isEn ? "Reset failed." : "La réinitialisation a échoué.") : (isEn ? "Deletion failed." : "La suppression a échoué.")), true);
       setBusy(null);
     }
   }
@@ -334,23 +368,23 @@ function SettingsContent() {
       <header>
         <SceneBanner variant="settings" className="set-hero">
           <div>
-            <h1>Paramètres du compte</h1>
-            <p>Règle ton rythme d’apprentissage, tes préférences de notification, tes données et les actions sensibles depuis des sections indépendantes.</p>
+            <h1>{t("settings.title")}</h1>
+            <p>{t("settings.subtitle")}</p>
           </div>
           <div className="set-profile-card">
             <Avatar name={profile.display_name} src={profile.avatar_url} size="lg" />
             <div>
               <strong>{profile.display_name}</strong>
               <span>@{profile.username}</span>
-              <Link href="/profile" className="study-link">Modifier l’identité publique</Link>
+              <Link href="/profile" className="study-link">{isEn ? "Edit public profile" : "Modifier l’identité publique"}</Link>
             </div>
           </div>
         </SceneBanner>
       </header>
 
       <div className="set-layout">
-        <nav className="set-nav" aria-label="Sections des paramètres">
-          {SECTIONS.map((section) => (
+        <nav className="set-nav" aria-label={isEn ? "Settings sections" : "Sections des paramètres"}>
+          {sections.map((section) => (
             <a key={section.id} href={`#${section.id}`}>{section.label}</a>
           ))}
         </nav>
@@ -360,13 +394,13 @@ function SettingsContent() {
             <div className="set-section-head">
               <span className="set-section-icon"><IconSettings size={20} /></span>
               <div>
-                <h2 id="set-profile-title">Profil public</h2>
-                <p>Ton nom, ton pseudo, ta bio et ton avatar se modifient depuis la page profil pour garder une prévisualisation directe.</p>
+                <h2 id="set-profile-title">{t("settings.public_profile")}</h2>
+                <p>{isEn ? "Your name, handle, bio, and avatar are managed on your profile page with live preview." : "Ton nom, ton pseudo, ta bio et ton avatar se modifient depuis la page profil pour garder une prévisualisation directe."}</p>
               </div>
             </div>
             <div className="set-callout">
               <p>{profile.display_name} · @{profile.username} · {levelLabel(profile.skill_level)}</p>
-              <Link href="/profile" className="study-link">Ouvrir l’édition du profil</Link>
+              <Link href="/profile" className="study-link">{isEn ? "Open profile editor" : "Ouvrir l’édition du profil"}</Link>
             </div>
           </section>
 
@@ -374,20 +408,20 @@ function SettingsContent() {
             <div className="set-section-head">
               <span className="set-section-icon"><IconTarget size={20} /></span>
               <div>
-                <h2 id="set-learning-title">Apprentissage</h2>
-                <p>Ces choix guident le tableau de bord, l’objectif quotidien et les recommandations.</p>
+                <h2 id="set-learning-title">{t("settings.learning")}</h2>
+                <p>{isEn ? "These choices tune the dashboard, your daily goal, and course recommendations." : "Ces choix guident le tableau de bord, l’objectif quotidien et les recommandations."}</p>
               </div>
             </div>
             <form className="set-form" onSubmit={(event) => void saveLearning(event)}>
               <div className="set-form-grid">
-                <Select label="Objectif principal" value={goal} onChange={(event) => setGoal(event.target.value as LearningGoal)} options={GOALS.map((item) => ({ value: item.value, label: item.label }))} />
-                <Select label="Niveau estimé" value={skillLevel} onChange={(event) => setSkillLevel(event.target.value as SkillLevel)} options={SKILL_LEVELS.map((value) => ({ value, label: levelLabel(value) }))} />
-                <Select label="Temps quotidien" value={String(dailyMinutes)} onChange={(event) => setDailyMinutes(Number(event.target.value))} options={DAILY_GOALS.map((value) => ({ value: String(value), label: `${value} minutes par jour` }))} />
+                <Select label={t("settings.main_goal")} value={goal} onChange={(event) => setGoal(event.target.value as LearningGoal)} options={goals.map((item) => ({ value: item.value, label: item.label }))} />
+                <Select label={t("settings.skill_level")} value={skillLevel} onChange={(event) => setSkillLevel(event.target.value as SkillLevel)} options={SKILL_LEVELS.map((value) => ({ value, label: levelLabel(value) }))} />
+                <Select label={t("settings.daily_time")} value={String(dailyMinutes)} onChange={(event) => setDailyMinutes(Number(event.target.value))} options={DAILY_GOALS.map((value) => ({ value: String(value), label: `${value} ${isEn ? "min/day" : "minutes par jour"}` }))} />
               </div>
               <fieldset className="set-fieldset">
-                <legend>Connaissances déjà présentes</legend>
+                <legend>{t("settings.existing_knowledge")}</legend>
                 <div className="set-chip-grid">
-                  {AREAS.map((area) => (
+                  {areas.map((area) => (
                     <label key={area.value} className={knownAreas.includes(area.value) ? "is-selected" : undefined}>
                       <input type="checkbox" checked={knownAreas.includes(area.value)} onChange={() => toggleArea(area.value)} />
                       {area.label}
@@ -396,10 +430,10 @@ function SettingsContent() {
                 </div>
               </fieldset>
               <ul className="set-goal-notes">
-                {GOALS.filter((item) => item.value === goal).map((item) => <li key={item.value}>{item.description}</li>)}
-                <li>Objectif quotidien actuel : {dailyMinutes} minutes.</li>
+                {goals.filter((item) => item.value === goal).map((item) => <li key={item.value}>{item.description}</li>)}
+                <li>{isEn ? `Current daily goal: ${dailyMinutes} minutes.` : `Objectif quotidien actuel : ${dailyMinutes} minutes.`}</li>
               </ul>
-              <Button type="submit" loading={busy === "learning"} disabled={busy !== null}>Enregistrer l’apprentissage</Button>
+              <Button type="submit" loading={busy === "learning"} disabled={busy !== null}>{t("settings.save_learning")}</Button>
             </form>
             <StatusMessage status={statuses.learning} />
           </section>
@@ -408,23 +442,23 @@ function SettingsContent() {
             <div className="set-section-head">
               <span className="set-section-icon"><IconBell size={20} /></span>
               <div>
-                <h2 id="set-preferences-title">Préférences</h2>
-                <p>Ton fuseau horaire pilote la série quotidienne. Les notifications restent activables par canal.</p>
+                <h2 id="set-preferences-title">{t("settings.preferences")}</h2>
+                <p>{isEn ? "Your timezone drives daily streaks. Notifications can be configured per channel." : "Ton fuseau horaire pilote la série quotidienne. Les notifications restent activables par canal."}</p>
               </div>
             </div>
             {settingsError && (
               <div className="acct-status is-error" role="alert">
                 {settingsError.message}
-                <Button type="button" variant="secondary" size="sm" onClick={() => void reloadSettings()}>Réessayer</Button>
+                <Button type="button" variant="secondary" size="sm" onClick={() => void reloadSettings()}>{isEn ? "Retry" : "Réessayer"}</Button>
               </div>
             )}
             <form className="set-form" onSubmit={(event) => void savePreferences(event)}>
               <div className="p-4 rounded-xl border border-cyber-border bg-cyber-surface/60 mb-4">
                 <label className="block text-sm font-semibold text-white mb-1">
-                  {lang === "en" ? "Platform Language / Langue de la plateforme" : "Langue de la plateforme / Platform Language"}
+                  {isEn ? "Platform Language / Langue de la plateforme" : "Langue de la plateforme / Platform Language"}
                 </label>
                 <p className="text-xs text-cyber-muted mb-3">
-                  {lang === "en"
+                  {isEn
                     ? "Changes the language across the entire platform in real time: navigation, courses, and labs."
                     : "Modifie la langue sur l’ensemble de la plateforme en temps réel : navigation, cours et labs."}
                 </p>
@@ -457,20 +491,20 @@ function SettingsContent() {
                   </button>
                 </div>
               </div>
-              <Select label={lang === "en" ? "Timezone" : "Fuseau horaire"} value={prefTimezone} onChange={(event) => setPrefTimezone(event.target.value)} options={timezoneOptions} disabled={settingsLoading || busy !== null} />
+              <Select label={t("settings.timezone")} value={prefTimezone} onChange={(event) => setPrefTimezone(event.target.value)} options={timezoneOptions} disabled={settingsLoading || busy !== null} />
               {settingsLoading ? (
                 <div className="set-switch-list" aria-busy="true">
                   {Array.from({ length: 4 }).map((_, index) => <span key={index} className="ui-skeleton set-switch-skeleton" />)}
                 </div>
               ) : (
                 <div className="set-switch-list">
-                  <CheckSwitch label="Notifications e-mail" description="Recevoir les messages importants de CyberPingo." checked={emailNotifications} onChange={setEmailNotifications} disabled={busy !== null} />
-                  <CheckSwitch label="Rappels de série" description="Être prévenu avant de perdre ta série." checked={streakReminders} onChange={setStreakReminders} disabled={busy !== null} />
-                  <CheckSwitch label="Nouveaux contenus" description="Découvrir les parcours et défis publiés." checked={newContentAlerts} onChange={setNewContentAlerts} disabled={busy !== null} />
-                  <CheckSwitch label="Effets sonores" description="Activer les sons de réussite dans l’interface." checked={soundEffects} onChange={setSoundEffects} disabled={busy !== null} />
+                  <CheckSwitch label={t("settings.email_notif")} description={t("settings.email_notif_desc")} checked={emailNotifications} onChange={setEmailNotifications} disabled={busy !== null} />
+                  <CheckSwitch label={t("settings.streak_reminders")} description={t("settings.streak_reminders_desc")} checked={streakReminders} onChange={setStreakReminders} disabled={busy !== null} />
+                  <CheckSwitch label={t("settings.new_content")} description={t("settings.new_content_desc")} checked={newContentAlerts} onChange={setNewContentAlerts} disabled={busy !== null} />
+                  <CheckSwitch label={t("settings.sound_fx")} description={t("settings.sound_fx_desc")} checked={soundEffects} onChange={setSoundEffects} disabled={busy !== null} />
                 </div>
               )}
-              <Button type="submit" loading={busy === "preferences"} disabled={busy !== null || settingsLoading}>Enregistrer les préférences</Button>
+              <Button type="submit" loading={busy === "preferences"} disabled={busy !== null || settingsLoading}>{t("settings.save_prefs")}</Button>
             </form>
             <StatusMessage status={statuses.preferences} />
           </section>
@@ -479,8 +513,8 @@ function SettingsContent() {
             <div className="set-section-head">
               <span className="set-section-icon"><IconAward size={20} /></span>
               <div>
-                <h2 id="set-pingo-title">Pingo, ton coach</h2>
-                <p>Choisis quand Pingo intervient. Ces réglages restent sur cet appareil et n’affectent jamais ta progression.</p>
+                <h2 id="set-pingo-title">{t("settings.pingo")}</h2>
+                <p>{isEn ? "Choose when Pingo speaks or reacts. These settings stay local on this device." : "Choisis quand Pingo intervient. Ces réglages restent sur cet appareil et n’affectent jamais ta progression."}</p>
               </div>
             </div>
             <MascotSettings idPrefix="settings" />
@@ -490,30 +524,30 @@ function SettingsContent() {
             <div className="set-section-head">
               <span className="set-section-icon"><IconMail size={20} /></span>
               <div>
-                <h2 id="set-account-title">Compte et connexion</h2>
-                <p>Les changements sensibles sont séparés pour éviter les validations accidentelles.</p>
+                <h2 id="set-account-title">{t("settings.account")}</h2>
+                <p>{isEn ? "Sensitive credentials changes are isolated to prevent unintended modifications." : "Les changements sensibles sont séparés pour éviter les validations accidentelles."}</p>
               </div>
             </div>
             <div className="set-account-grid">
               <form className="set-form set-form--compact" onSubmit={(event) => void changeEmail(event)}>
-                <Input id="settings-email" label="Nouvelle adresse e-mail" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required />
-                <Button type="submit" variant="secondary" loading={busy === "email"} disabled={busy !== null}>Envoyer le lien de confirmation</Button>
+                <Input id="settings-email" label={t("settings.new_email")} type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required />
+                <Button type="submit" variant="secondary" loading={busy === "email"} disabled={busy !== null}>{t("settings.send_conf_link")}</Button>
                 <StatusMessage status={statuses.email} />
               </form>
               <form className="set-form set-form--compact" onSubmit={(event) => void changePassword(event)}>
-                <Input id="settings-password" label="Nouveau mot de passe" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" />
-                <Input id="settings-confirm-password" label="Confirmer le mot de passe" type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" />
-                <Button type="submit" variant="secondary" loading={busy === "password"} disabled={busy !== null}>Changer le mot de passe</Button>
+                <Input id="settings-password" label={t("settings.new_password")} type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" />
+                <Input id="settings-confirm-password" label={t("settings.confirm_password")} type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" />
+                <Button type="submit" variant="secondary" loading={busy === "password"} disabled={busy !== null}>{t("settings.change_password")}</Button>
                 <StatusMessage status={statuses.password} />
               </form>
             </div>
             <div className="set-logout-row">
               <div>
-                <h3>Déconnexion</h3>
-                <p>Ferme la session locale sur cet appareil.</p>
+                <h3>{t("settings.logout")}</h3>
+                <p>{t("settings.logout_desc")}</p>
               </div>
               <Button type="button" variant="ghost" loading={busy === "session"} disabled={busy !== null} icon={<IconLogout size={15} />} onClick={() => void handleLogout()}>
-                Se déconnecter
+                {t("settings.disconnect")}
               </Button>
             </div>
             <StatusMessage status={statuses.session} />
@@ -523,42 +557,42 @@ function SettingsContent() {
             <div className="set-section-head">
               <span className="set-section-icon"><IconDownload size={20} /></span>
               <div>
-                <h2 id="set-data-title">Données</h2>
-                <p>Prépare un fichier JSON local avec ton profil, tes objectifs et les préférences actuellement chargées.</p>
+                <h2 id="set-data-title">{t("settings.data")}</h2>
+                <p>{t("settings.export_desc")}</p>
               </div>
             </div>
             <div className="set-data-card">
               <IconList size={22} aria-hidden="true" />
               <div>
-                <strong>Export personnel</strong>
-                <p>Le fichier est généré dans ton navigateur. Aucun nouveau stockage n’est créé.</p>
+                <strong>{isEn ? "Personal JSON Export" : "Export personnel"}</strong>
+                <p>{isEn ? "The file is generated locally in your browser. No extra storage is created." : "Le fichier est généré dans ton navigateur. Aucun nouveau stockage n’est créé."}</p>
               </div>
-              <Button type="button" variant="secondary" icon={<IconDownload size={15} />} onClick={exportData}>Exporter mes données</Button>
+              <Button type="button" variant="secondary" icon={<IconDownload size={15} />} onClick={exportData}>{t("settings.export_json")}</Button>
             </div>
             <StatusMessage status={statuses.data} />
-            <Link href="/confidentialite" className="study-link">Comprendre comment mes données sont utilisées</Link>
+            <Link href="/confidentialite" className="study-link">{isEn ? "Privacy Policy & Data Rights" : "Comprendre comment mes données sont utilisées"}</Link>
           </section>
 
           <section id="danger" className="set-section set-section--danger" aria-labelledby="set-danger-title">
             <div className="set-section-head">
               <span className="set-section-icon"><IconAlert size={20} /></span>
               <div>
-                <h2 id="set-danger-title">Zone sensible</h2>
-                <p>Ces actions sont isolées et demandent une confirmation tapée avant d’appeler le serveur.</p>
+                <h2 id="set-danger-title">{t("settings.danger")}</h2>
+                <p>{isEn ? "These actions are isolated and require typed confirmation before executing." : "Ces actions sont isolées et demandent une confirmation tapée avant d’appeler le serveur."}</p>
               </div>
             </div>
             <div className="set-danger-grid">
               <article>
                 <IconClock size={22} aria-hidden="true" />
-                <h3>Réinitialiser la progression</h3>
-                <p>Efface XP, badges, leçons, quiz, labs et certificats obtenus. Ton profil et tes préférences restent en place.</p>
-                <Button type="button" variant="danger" disabled={busy !== null} onClick={() => openDanger("reset")}>Réinitialiser</Button>
+                <h3>{isEn ? "Reset learning progress" : "Réinitialiser la progression"}</h3>
+                <p>{isEn ? "Wipes XP, badges, lessons, quizzes, labs, and certificates. Your profile and preferences remain intact." : "Efface XP, badges, leçons, quiz, labs et certificats obtenus. Ton profil et tes préférences restent en place."}</p>
+                <Button type="button" variant="danger" disabled={busy !== null} onClick={() => openDanger("reset")}>{isEn ? "Reset" : "Réinitialiser"}</Button>
               </article>
               <article>
                 <IconAlert size={22} aria-hidden="true" />
-                <h3>Supprimer le compte</h3>
-                <p>Supprime définitivement ton compte CyberPingo et les données associées.</p>
-                <Button type="button" variant="danger" disabled={busy !== null} onClick={() => openDanger("delete")}>Supprimer mon compte</Button>
+                <h3>{isEn ? "Delete account" : "Supprimer le compte"}</h3>
+                <p>{isEn ? "Permanently deletes your CyberPingo account and all associated data." : "Supprime définitivement ton compte CyberPingo et les données associées."}</p>
+                <Button type="button" variant="danger" disabled={busy !== null} onClick={() => openDanger("delete")}>{isEn ? "Delete my account" : "Supprimer mon compte"}</Button>
               </article>
             </div>
             <StatusMessage status={statuses.danger} />
@@ -569,20 +603,24 @@ function SettingsContent() {
       <Modal open={dangerAction !== null} onClose={() => { if (busy !== "danger") setDangerAction(null); }} title={dangerTitle}>
         <div className="set-danger-modal">
           <p>
-            Cette action est irréversible. Tape <strong>{dangerPhrase}</strong> pour confirmer.
+            {isEn ? (
+              <>This action cannot be undone. Type <strong>{dangerPhrase}</strong> to confirm.</>
+            ) : (
+              <>Cette action est irréversible. Tape <strong>{dangerPhrase}</strong> pour confirmer.</>
+            )}
           </p>
           <Input
             id="danger-confirmation"
-            label="Confirmation"
+            label={isEn ? "Confirmation" : "Confirmation"}
             value={confirmation}
             onChange={(event) => setConfirmation(event.target.value)}
             autoComplete="off"
             autoFocus
           />
           <div className="set-modal-actions">
-            <Button type="button" variant="ghost" disabled={busy === "danger"} onClick={() => setDangerAction(null)}>Annuler</Button>
+            <Button type="button" variant="ghost" disabled={busy === "danger"} onClick={() => setDangerAction(null)}>{isEn ? "Cancel" : "Annuler"}</Button>
             <Button type="button" variant="danger" loading={busy === "danger"} disabled={confirmation !== dangerPhrase || busy === "danger"} onClick={() => void confirmDanger()}>
-              Confirmer
+              {isEn ? "Confirm" : "Confirmer"}
             </Button>
           </div>
         </div>

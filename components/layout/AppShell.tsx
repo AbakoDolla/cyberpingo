@@ -14,6 +14,9 @@ import AmbientBackground from "./AmbientBackground";
 import { IconAlert, IconArrowRight, IconBell, IconBolt, IconFlame, IconLock } from "@/components/ui/Icon";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { formatNumber } from "@/lib/format";
+import { useTranslation } from "@/lib/i18n";
+import { localizeRankTitle } from "@/lib/levels";
+import { RankBadge } from "@/components/levels/RankBadge";
 
 function ShellStatus({ title, tone = "info", children }: { title: string; tone?: "info" | "error"; children?: React.ReactNode }) {
   return (
@@ -85,20 +88,26 @@ export default function AppShell({ children, allowGuest = false }: { children: R
     content = children;
   }
 
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
   const levelProgress = level?.progress_percentage ?? 0;
   const rankTheme = (() => {
     const lvl = profile?.level ?? 1;
-    if (lvl >= 9) return "legend";
+    if (lvl >= 19) return "mythic";
+    if (lvl >= 16) return "legend";
+    if (lvl >= 13) return "master";
+    if (lvl >= 10) return "amethyst";
     if (lvl >= 7) return "amber";
-    if (lvl >= 5) return "amethyst";
-    if (lvl >= 3) return "emerald";
-    return "cyan";
+    if (lvl >= 4) return "cyan";
+    return "emerald";
   })();
+
+  const localizedRank = profile ? localizeRankTitle(profile.level, isEn ? "en" : "fr") : "";
 
   return (
     <div className="learner-shell" data-rank-theme={rankTheme}>
       <AmbientBackground />
-      <a className="learner-skip-link" href="#contenu">Aller au contenu principal</a>
+      <a className="learner-skip-link" href="#contenu">{isEn ? "Skip to main content" : "Aller au contenu principal"}</a>
       <Sidebar />
       <div className="learner-main">
         <header className="learner-topbar">
@@ -106,9 +115,9 @@ export default function AppShell({ children, allowGuest = false }: { children: R
           {profile ? (
             <div className="learner-topbar__progress flex items-center gap-3">
               <dl className="learner-stats" aria-label="Ta progression">
-                <div className="learner-stat learner-stat--level" title={level ? `${level.title} · ${levelProgress} % vers le niveau suivant` : undefined}>
-                  <span className="learner-ring" style={{ "--ring": `${levelProgress}` } as React.CSSProperties} aria-hidden="true"><span>{profile.level}</span></span>
-                  <span className="learner-stat__text"><dt>Niveau</dt><dd>{level?.title ?? profile.level}</dd></span>
+                <div className="learner-stat learner-stat--level flex items-center gap-1.5" title={level ? `${localizedRank} · ${levelProgress} % ${isEn ? "to next rank" : "vers le niveau suivant"}` : undefined}>
+                  <RankBadge level={profile.level} size="xs" />
+                  <span className="learner-stat__text"><dt>{isEn ? "Rank" : "Niveau"}</dt><dd>{localizedRank}</dd></span>
                 </div>
                 <div className="learner-stat learner-stat--xp">
                   <span className="learner-stat__icon" aria-hidden="true"><IconBolt size={15} /></span>
@@ -116,17 +125,17 @@ export default function AppShell({ children, allowGuest = false }: { children: R
                 </div>
                 <div className={`learner-stat learner-stat--streak${streak > 0 ? " is-hot" : ""}`}>
                   <span className="learner-stat__icon" aria-hidden="true"><IconFlame size={15} /></span>
-                  <span className="learner-stat__text"><dt>Série</dt><dd>{streak} j</dd></span>
+                  <span className="learner-stat__text"><dt>{isEn ? "Streak" : "Série"}</dt><dd>{streak} {isEn ? "d" : "j"}</dd></span>
                 </div>
               </dl>
               <CbBalanceChip />
             </div>
           ) : guest ? (
-            <p className="learner-guest-note"><span aria-hidden="true" />Mode découverte : connecte-toi pour enregistrer ta progression.</p>
+            <p className="learner-guest-note"><span aria-hidden="true" />{isEn ? "Guest preview: sign in to save your progress." : "Mode découverte : connecte-toi pour enregistrer ta progression."}</p>
           ) : <span className="hidden md:block" />}
           <div className="learner-toplinks">
-            {isStaff && <Link href="/admin" className="learner-admin-link">Console admin</Link>}
-            <Link href="/ressources" className="learner-text-link hidden sm:inline-flex">Guides</Link>
+            {isStaff && <Link href="/admin" className="learner-admin-link">{isEn ? "Admin Console" : "Console admin"}</Link>}
+            <Link href="/ressources" className="learner-text-link hidden sm:inline-flex">{isEn ? "Guides" : "Guides"}</Link>
             {profile && (
               <Link href="/notifications" className="learner-bell" aria-label={unreadNotifications ? `Notifications, ${unreadNotifications} non lues` : "Notifications"}>
                 <IconBell size={20} />

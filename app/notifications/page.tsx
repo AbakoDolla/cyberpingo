@@ -21,6 +21,7 @@ import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDate, formatRelative } from "@/lib/format";
+import { useTranslation, type Language } from "@/lib/i18n";
 import {
   deleteNotification,
   listMyNotifications,
@@ -30,14 +31,14 @@ import {
 } from "@/services/notification.service";
 import type { AppNotification, NotificationType } from "@/types/api";
 
-const typeConfig: Record<NotificationType, { label: string; icon: ReactNode; tone: "blue" | "green" | "purple" | "red" | "neutral" }> = {
-  achievement: { label: "Badge", icon: <IconAward size={18} />, tone: "purple" },
-  course: { label: "Parcours", icon: <IconLesson size={18} />, tone: "blue" },
-  challenge: { label: "Défi", icon: <IconTrophy size={18} />, tone: "green" },
-  system: { label: "Système", icon: <IconAlert size={18} />, tone: "neutral" },
-  certificate: { label: "Certificat", icon: <IconCertificate size={18} />, tone: "green" },
-  streak: { label: "Série", icon: <IconFlame size={18} />, tone: "red" },
-  level: { label: "Niveau", icon: <IconAward size={18} />, tone: "blue" },
+const typeConfig: Record<NotificationType, { labelFr: string; labelEn: string; icon: ReactNode; tone: "blue" | "green" | "purple" | "red" | "neutral" }> = {
+  achievement: { labelFr: "Badge", labelEn: "Badge", icon: <IconAward size={18} />, tone: "purple" },
+  course: { labelFr: "Parcours", labelEn: "Course", icon: <IconLesson size={18} />, tone: "blue" },
+  challenge: { labelFr: "Défi", labelEn: "Challenge", icon: <IconTrophy size={18} />, tone: "green" },
+  system: { labelFr: "Système", labelEn: "System", icon: <IconAlert size={18} />, tone: "neutral" },
+  certificate: { labelFr: "Certificat", labelEn: "Certificate", icon: <IconCertificate size={18} />, tone: "green" },
+  streak: { labelFr: "Série", labelEn: "Streak", icon: <IconFlame size={18} />, tone: "red" },
+  level: { labelFr: "Niveau", labelEn: "Level", icon: <IconAward size={18} />, tone: "blue" },
 };
 const TYPE_ORDER: NotificationType[] = ["achievement", "course", "challenge", "certificate", "streak", "level", "system"];
 const UNDO_DELAY_MS = 6500;
@@ -45,22 +46,27 @@ const UNDO_DELAY_MS = 6500;
 type Filter = "all" | "unread" | NotificationType;
 type Status = { message: string; error?: boolean; undoId?: string } | null;
 
-function typeDetails(type: string) {
-  return typeConfig[type as NotificationType] ?? typeConfig.system;
+function typeDetails(type: string, lang: Language) {
+  const cfg = typeConfig[type as NotificationType] ?? typeConfig.system;
+  return {
+    label: lang === "en" ? cfg.labelEn : cfg.labelFr,
+    icon: cfg.icon,
+    tone: cfg.tone,
+  };
 }
 
 function sortNotifications(list: AppNotification[]) {
   return [...list].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 }
 
-function dayLabel(value: string) {
+function dayLabel(value: string, lang: Language) {
   const date = new Date(value);
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const target = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
   const diff = Math.round((start - target) / 86400000);
-  if (diff === 0) return "Aujourd’hui";
-  if (diff === 1) return "Hier";
+  if (diff === 0) return lang === "en" ? "Today" : "Aujourd’hui";
+  if (diff === 1) return lang === "en" ? "Yesterday" : "Hier";
   return formatDate(value);
 }
 
@@ -83,14 +89,17 @@ function NotificationRow({
   onOpen,
   onDelete,
   busy,
+  lang,
 }: {
   notification: AppNotification;
   onOpen: (notification: AppNotification) => void;
   onDelete: (notification: AppNotification) => void;
   busy: boolean;
+  lang: Language;
 }) {
-  const details = typeDetails(notification.type);
+  const details = typeDetails(notification.type, lang);
   const unread = !notification.read_at;
+  const isEn = lang === "en";
   return (
     <article className={`notif-row ${unread ? "is-unread" : ""}`}>
       <button type="button" className="notif-row__open" onClick={() => onOpen(notification)} disabled={busy}>
@@ -99,10 +108,10 @@ function NotificationRow({
           <span className="notif-row__title">
             <strong>{notification.title}</strong>
             <Badge tone={details.tone}>{details.label}</Badge>
-            {unread && <Badge tone="blue">Non lue</Badge>}
+            {unread && <Badge tone="blue">{isEn ? "Unread" : "Non lue"}</Badge>}
           </span>
           <span className="notif-row__text">{notification.body}</span>
-          <span className="notif-row__meta">{formatRelative(notification.created_at)}{notification.link ? " · ouvrir le lien" : ""}</span>
+          <span className="notif-row__meta">{formatRelative(notification.created_at)}{notification.link ? (isEn ? " · open link" : " · ouvrir le lien") : ""}</span>
         </span>
       </button>
       <button
@@ -110,7 +119,7 @@ function NotificationRow({
         className="notif-row__delete"
         onClick={() => onDelete(notification)}
         disabled={busy}
-        aria-label={`Supprimer ${notification.title}`}
+        aria-label={isEn ? `Delete ${notification.title}` : `Supprimer ${notification.title}`}
       >
         <IconTrash size={16} />
       </button>
@@ -120,6 +129,8 @@ function NotificationRow({
 
 function NotificationsContent() {
   const router = useRouter();
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
   const { profile } = useLearner();
   const { setUnreadNotifications } = useUserActions();
   const { data, error, loading, reload, setData } = useAsync(() => listMyNotifications(profile.id), [profile.id]);
@@ -156,8 +167,8 @@ function NotificationsContent() {
       if (list.some((item) => item.id === notification.id)) return list;
       return sortNotifications([notification, ...list]).slice(0, 50);
     });
-    setStatus({ message: "Nouvelle notification reçue." });
-  }), [profile.id, setData]);
+    setStatus({ message: isEn ? "New notification received." : "Nouvelle notification reçue." });
+  }), [profile.id, setData, isEn]);
 
   const notifications = useMemo(() => data ?? [], [data]);
   const unread = notifications.filter((notification) => !notification.read_at).length;
@@ -181,13 +192,13 @@ function NotificationsContent() {
   const groups = useMemo(() => {
     const map = new Map<string, { label: string; items: AppNotification[] }>();
     filtered.forEach((notification) => {
-      const key = new Date(notification.created_at).toLocaleDateString("fr-FR");
-      const current = map.get(key) ?? { label: dayLabel(notification.created_at), items: [] };
+      const key = new Date(notification.created_at).toLocaleDateString(isEn ? "en-US" : "fr-FR");
+      const current = map.get(key) ?? { label: dayLabel(notification.created_at, lang), items: [] };
       current.items.push(notification);
       map.set(key, current);
     });
     return Array.from(map.values());
-  }, [filtered]);
+  }, [filtered, lang, isEn]);
 
   async function openNotification(notification: AppNotification) {
     setBusy(true);
@@ -271,9 +282,9 @@ function NotificationsContent() {
       <div className="study-page acct-page">
         <div className="ui-state is-error" role="alert">
           <span className="ui-state__icon"><IconAlert size={20} /></span>
-          <h1>Impossible de charger les notifications.</h1>
+          <h1>{isEn ? "Unable to load notifications." : "Impossible de charger les notifications."}</h1>
           <p className="ui-state__body">{error.message}</p>
-          <Button type="button" variant="secondary" onClick={() => void reload()}>Réessayer</Button>
+          <Button type="button" variant="secondary" onClick={() => void reload()}>{t("action.retry")}</Button>
         </div>
       </div>
     );
@@ -284,57 +295,64 @@ function NotificationsContent() {
       <header>
         <SceneBanner variant="notifications" className="notif-hero">
           <div>
-            <h1>Centre de notifications</h1>
-            <p>Récompenses, rappels de série, certificats et annonces arrivent ici en temps réel.</p>
+            <h1>{t("notif.title")}</h1>
+            <p>{t("notif.subtitle")}</p>
           </div>
-          <div className="notif-summary" aria-label="Résumé des notifications">
+          <div className="notif-summary" aria-label={isEn ? "Notifications summary" : "Résumé des notifications"}>
             <IconBell size={24} aria-hidden="true" />
             <strong>{unread}</strong>
-            <span>non lue{unread > 1 ? "s" : ""}</span>
-            <small>{notifications.length} au total</small>
+            <span>{isEn ? `unread` : `non lue${unread > 1 ? "s" : ""}`}</span>
+            <small>{notifications.length} {isEn ? "total" : "au total"}</small>
           </div>
         </SceneBanner>
       </header>
 
-      <section className="notif-toolbar" aria-label="Actions sur les notifications">
-        <div className="notif-filters" role="list" aria-label="Filtres">
-          <button type="button" className={filter === "all" ? "is-active" : undefined} onClick={() => setFilter("all")}>Toutes <span>{notifications.length}</span></button>
-          <button type="button" className={filter === "unread" ? "is-active" : undefined} onClick={() => setFilter("unread")}>Non lues <span>{unread}</span></button>
-          {TYPE_ORDER.map((type) => (
-            <button
-              key={type}
-              type="button"
-              className={filter === type ? "is-active" : undefined}
-              onClick={() => setFilter(type)}
-              disabled={typeCounts[type] === 0}
-            >
-              {typeConfig[type].label} <span>{typeCounts[type]}</span>
-            </button>
-          ))}
+      <section className="notif-toolbar" aria-label={isEn ? "Notification actions" : "Actions sur les notifications"}>
+        <div className="notif-filters" role="list" aria-label={isEn ? "Filters" : "Filtres"}>
+          <button type="button" className={filter === "all" ? "is-active" : undefined} onClick={() => setFilter("all")}>
+            {t("notif.filter_all")} <span>{notifications.length}</span>
+          </button>
+          <button type="button" className={filter === "unread" ? "is-active" : undefined} onClick={() => setFilter("unread")}>
+            {t("notif.filter_unread")} <span>{unread}</span>
+          </button>
+          {TYPE_ORDER.map((type) => {
+            const details = typeDetails(type, lang);
+            return (
+              <button
+                key={type}
+                type="button"
+                className={filter === type ? "is-active" : undefined}
+                onClick={() => setFilter(type)}
+                disabled={typeCounts[type] === 0}
+              >
+                {details.label} <span>{typeCounts[type]}</span>
+              </button>
+            );
+          })}
         </div>
         <Button type="button" variant="secondary" onClick={() => void markAll()} loading={busy} disabled={busy || unread === 0}>
-          Tout marquer comme lu
+          {t("notif.mark_all_read")}
         </Button>
       </section>
 
       {status && (
         <div className={`acct-status notif-status ${status.error ? "is-error" : ""}`} role={status.error ? "alert" : "status"} aria-live="polite">
           <span>{status.message}</span>
-          {status.undoId && <button type="button" onClick={() => undoDelete(status.undoId ?? "")}>Annuler</button>}
+          {status.undoId && <button type="button" onClick={() => undoDelete(status.undoId ?? "")}>{t("action.cancel")}</button>}
         </div>
       )}
 
       {notifications.length === 0 ? (
         <section className="notif-empty">
           <EmptyArt kind="notifications" />
-          <h2>Aucune notification pour le moment.</h2>
-          <p>Tes récompenses, rappels et certificats apparaîtront ici dès qu’ils seront disponibles.</p>
+          <h2>{t("notif.empty")}</h2>
+          <p>{isEn ? "Your rewards, streak alerts, and certificates will appear here in real time." : "Tes récompenses, rappels et certificats apparaîtront ici dès qu’ils seront disponibles."}</p>
         </section>
       ) : groups.length === 0 ? (
         <section className="notif-empty">
           <EmptyArt kind="search" />
-          <h2>Aucun résultat avec ce filtre.</h2>
-          <p>Change de filtre ou marque les notifications comme lues pour clarifier la liste.</p>
+          <h2>{isEn ? "No results with this filter." : "Aucun résultat avec ce filtre."}</h2>
+          <p>{isEn ? "Change the filter or mark notifications as read to clear the list." : "Change de filtre ou marque les notifications comme lues pour clarifier la liste."}</p>
         </section>
       ) : (
         <div className="notif-list">
@@ -347,6 +365,7 @@ function NotificationsContent() {
                     key={notification.id}
                     notification={notification}
                     busy={busy}
+                    lang={lang}
                     onOpen={(item) => void openNotification(item)}
                     onDelete={remove}
                   />

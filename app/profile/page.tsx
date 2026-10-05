@@ -26,6 +26,9 @@ import {
 } from "@/components/ui/Icon";
 import { useUserActions, useLearner } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
+import { useTranslation } from "@/lib/i18n";
+import { localizeRankTitle } from "@/lib/levels";
+import { RankBadge } from "@/components/levels/RankBadge";
 import { errorMessage } from "@/lib/errors";
 import { formatDate, formatNumber, formatRelative, formatShortDate, levelLabel } from "@/lib/format";
 import { getCertificatePdfUrl, listBadgesWithState, listMyCertificates } from "@/services/gamification.service";
@@ -211,6 +214,8 @@ function CertificatesList({
 
 function ProfileContent() {
   const { profile, level, streak } = useLearner();
+  const { lang } = useTranslation();
+  const isEn = lang === "en";
   const { updateProfile, updateAvatar, logout } = useUserActions();
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -365,41 +370,48 @@ function ProfileContent() {
           </SceneBanner>
 
           <section className="prof-hero" aria-labelledby="prof-title">
-            <div className="prof-avatar-stage">
+            <div className="prof-avatar-stage flex flex-col items-center gap-2">
               <Avatar name={profile.display_name} src={avatarPreview} size="xl" ringTone={avatarDraft ? "green" : "blue"} className="prof-avatar" />
-              {avatarDraft && <Badge tone="green" className="prof-avatar-badge">Aperçu</Badge>}
+              <RankBadge level={profile.level} size="md" showTierBadge />
+              {avatarDraft && <Badge tone="green" className="prof-avatar-badge">{isEn ? "Preview" : "Aperçu"}</Badge>}
             </div>
 
             <div className="prof-identity">
               <div className="prof-title-row">
                 <div>
                   <h1 id="prof-title">{profile.display_name}</h1>
-                  <p>@{profile.username} · membre depuis le {formatDate(profile.created_at)}</p>
+                  <p>@{profile.username} · {isEn ? "member since" : "membre depuis le"} {formatDate(profile.created_at)}</p>
                 </div>
                 <div className="prof-actions">
                   <Button type="button" variant="secondary" icon={<IconEdit size={15} />} onClick={() => setEditing((current) => !current)}>
-                    {editing ? "Fermer l’édition" : "Modifier le profil"}
+                    {editing ? (isEn ? "Close editing" : "Fermer l’édition") : (isEn ? "Edit profile" : "Modifier le profil")}
                   </Button>
                   <Button type="button" variant="ghost" loading={leaving} icon={<IconLogout size={15} />} onClick={() => void handleLogout()}>
-                    Déconnexion
+                    {isEn ? "Sign out" : "Déconnexion"}
                   </Button>
                 </div>
               </div>
 
-              <p className="prof-bio">{profile.bio || "Ajoute une bio pour expliquer ce que tu apprends, ce que tu pratiques et le prochain défi que tu veux réussir."}</p>
+              <p className="prof-bio">{profile.bio || (isEn ? "Add a bio to explain what you are learning and practicing." : "Ajoute une bio pour expliquer ce que tu apprends, ce que tu pratiques et le prochain défi que tu veux réussir.")}</p>
 
               <div className="prof-meta-row" aria-label="Informations du profil">
-                <span><IconAward size={16} /> {level?.title ?? "CyberPingo"}</span>
-                <span><IconClock size={16} /> Objectif {profile.daily_minutes} min/jour</span>
-                <span><IconFlame size={16} /> {streak} jour{streak > 1 ? "s" : ""} de série</span>
+                <span><IconAward size={16} /> {localizeRankTitle(profile.level, isEn ? "en" : "fr")}</span>
+                <span><IconClock size={16} /> {isEn ? "Goal" : "Objectif"} {profile.daily_minutes} {isEn ? "min/day" : "min/jour"}</span>
+                <span><IconFlame size={16} /> {streak} {isEn ? (streak > 1 ? "days streak" : "day streak") : `jour${streak > 1 ? "s" : ""} de série`}</span>
                 <span><IconCheck size={16} /> {levelLabel(profile.skill_level)}</span>
               </div>
 
               {level && (
                 <div className="prof-level-progress">
-                  <div>
-                    <strong>Niveau {level.level}</strong>
-                    <span>{level.next_title ? `Prochain titre : ${level.next_title}` : "Dernier palier débloqué"}</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <strong className="text-sm font-bold text-white">
+                      {isEn ? `Rank ${level.level}` : `Niveau ${level.level}`} · {localizeRankTitle(level.level, isEn ? "en" : "fr")}
+                    </strong>
+                    <span className="text-xs text-slate-300">
+                      {level.next_title
+                        ? (isEn ? `Next title: ${localizeRankTitle(level.next_level ?? 0, "en")}` : `Prochain titre : ${localizeRankTitle(level.next_level ?? 0, "fr")}`)
+                        : (isEn ? "Max rank tier unlocked" : "Dernier palier débloqué")}
+                    </span>
                   </div>
                   <ProgressBar value={level.progress_percentage} tone="brand" height="sm" label="Progression vers le niveau suivant" />
                 </div>

@@ -12,6 +12,8 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import { IconCheck, IconClock, IconLesson, IconTrophy } from "@/components/ui/Icon";
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
+import { useTranslation } from "@/lib/i18n";
+import { localizeLesson } from "@/lib/content-i18n";
 import { errorMessage } from "@/lib/errors";
 import { formatDuration } from "@/lib/format";
 import { equipmentBoxes, type EquipmentBoxData } from "@/lib/lesson-equipment";
@@ -25,6 +27,8 @@ function sequenceAround(sequence: { id: string; title: string }[], lessonId: str
 }
 
 function LessonView() {
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
   const params = useParams<{ id: string }>();
   const lessonId = params.id;
   const { profile } = useLearner();
@@ -44,10 +48,11 @@ function LessonView() {
   const [completionError, setCompletionError] = useState<string | null>(null);
 
   const { data, error, loading, reload } = useAsync(async () => {
-    const lesson = await getLesson(lessonId);
+    const rawLesson = await getLesson(lessonId);
+    const lesson = rawLesson ? localizeLesson(rawLesson, lang) : null;
     const progress = lesson ? await getMyLessonProgress(profile.id, lesson.id) : null;
     return { lesson, progress };
-  }, [lessonId, profile.id]);
+  }, [lessonId, profile.id, lang]);
 
   const lesson = data?.lesson ?? null;
   const sequence = useMemo(() => lesson ? sequenceAround(lesson.sequence, lesson.id) : { index: -1, previous: null, next: null }, [lesson]);
@@ -140,34 +145,38 @@ function LessonView() {
 
   return (
     <div className="study-page lesson-page">
-        {loading && <div className="study-empty" role="status"><h1>Chargement de la leçon…</h1></div>}
-        {error && !loading && <div className="study-empty" role="alert"><h1>Impossible de charger cette leçon.</h1><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>Réessayer</Button></div>}
-        {!loading && !error && !lesson && <div className="study-empty"><h1>Leçon introuvable.</h1><Link className="study-link" href="/courses">Retour aux cours</Link></div>}
+        {loading && <div className="study-empty" role="status"><h1>{isEn ? "Loading lesson…" : "Chargement de la leçon…"}</h1></div>}
+        {error && !loading && <div className="study-empty" role="alert"><h1>{isEn ? "Unable to load this lesson." : "Impossible de charger cette leçon."}</h1><p>{error.message}</p><Button variant="secondary" onClick={() => void reload()}>{t("action.retry")}</Button></div>}
+        {!loading && !error && !lesson && <div className="study-empty"><h1>{isEn ? "Lesson not found." : "Leçon introuvable."}</h1><Link className="study-link" href="/courses">{isEn ? "Back to courses" : "Retour aux cours"}</Link></div>}
         {lesson && (
           <>
             <Link className="study-link" href={`/courses/${lesson.course.slug}`}>← {lesson.course.title}</Link>
-            {preview && <div className="learning-banner learning-banner--preview">Mode aperçu : cette leçon ne donnera pas d’XP.</div>}
+            {preview && <div className="learning-banner learning-banner--preview">{isEn ? "Preview mode: this lesson will not award XP." : "Mode aperçu : cette leçon ne donnera pas d’XP."}</div>}
             {startError && <div className="settings-status is-error" role="alert">{startError}</div>}
             <header className="lesson-hero">
               <div>
                 <p className="lesson-hero__module">{lesson.module.title}</p>
                 <h1>{lesson.title}</h1>
                 <p>{lesson.summary}</p>
-                <div className="lesson-hero__meta"><span><IconLesson size={15} /> Leçon {sequence.index + 1} / {lesson.sequence.length}</span><span><IconClock size={15} /> {formatDuration(lesson.duration_minutes)}</span><span>+{lesson.xp_reward} XP</span></div>
+                <div className="lesson-hero__meta">
+                  <span><IconLesson size={15} /> {isEn ? `Lesson ${sequence.index + 1} / ${lesson.sequence.length}` : `Leçon ${sequence.index + 1} / ${lesson.sequence.length}`}</span>
+                  <span><IconClock size={15} /> {formatDuration(lesson.duration_minutes)}</span>
+                  <span>+{lesson.xp_reward} XP</span>
+                </div>
               </div>
               <div className="lesson-hero__progress"><strong>{completed ? 100 : readingPct} %</strong><ProgressBar value={completed ? 100 : readingPct} tone="blue" /></div>
             </header>
 
             <div className="lesson-reader-layout">
-              <aside className="lesson-progress-rail" aria-label="Progression de lecture">
-                <h2>Lecture</h2>
+              <aside className="lesson-progress-rail" aria-label={isEn ? "Reading progression" : "Progression de lecture"}>
+                <h2>{isEn ? "Reading" : "Lecture"}</h2>
                 <strong>{completed ? "100" : readingPct} %</strong>
-                <ProgressBar value={completed ? 100 : readingPct} tone={completed ? "green" : "blue"} height="sm" label="Progression de lecture" />
-                <p>{completed ? "Leçon validée." : remaining > 0 ? `Validation disponible dans ${remaining} s.` : "Tu peux valider quand tu es prêt."}</p>
+                <ProgressBar value={completed ? 100 : readingPct} tone={completed ? "green" : "blue"} height="sm" label={isEn ? "Reading progression" : "Progression de lecture"} />
+                <p>{completed ? (isEn ? "Lesson completed." : "Leçon validée.") : remaining > 0 ? (isEn ? `Validation available in ${remaining}s.` : `Validation disponible dans ${remaining} s.`) : (isEn ? "You can validate when you are ready." : "Tu peux valider quand tu es prêt.")}</p>
                 {saveError && <p className="lesson-progress-rail__error" role="alert">{saveError}</p>}
-                <nav aria-label="Leçons proches">
-                  {sequence.previous && <Link href={`/lessons/${sequence.previous.id}`}>Précédente</Link>}
-                  {sequence.next && <Link href={`/lessons/${sequence.next.id}`}>Suivante</Link>}
+                <nav aria-label={isEn ? "Adjacent lessons" : "Leçons proches"}>
+                  {sequence.previous && <Link href={`/lessons/${sequence.previous.id}`}>{isEn ? "Previous" : "Précédente"}</Link>}
+                  {sequence.next && <Link href={`/lessons/${sequence.next.id}`}>{isEn ? "Next" : "Suivante"}</Link>}
                 </nav>
               </aside>
               <article ref={articleRef} className="lesson-content">
@@ -177,29 +186,34 @@ function LessonView() {
                       <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9.5 5 2.5-5 2.5z" /></svg>
                     </div>
                     <figcaption>
-                      <strong>Vidéo du cours en préparation</strong>
+                      <strong>{isEn ? "Course video in production" : "Vidéo du cours en préparation"}</strong>
                       <span>{lesson.title}</span>
-                      <small>Emplacement réservé. Le contenu illustré et les schémas interactifs ci-dessous couvrent déjà l’essentiel.</small>
+                      <small>{isEn ? "Reserved slot. The illustrated walkthroughs and interactive diagrams below already cover the essentials." : "Emplacement réservé. Le contenu illustré et les schémas interactifs ci-dessous couvrent déjà l’essentiel."}</small>
                     </figcaption>
                   </figure>
                 )}
-                {lesson.blocks.length ? lesson.blocks.map((block, index) => <Fragment key={`${lesson.id}-${index}`}><LessonBlockRenderer block={block} />{equipmentAfter.get(index)?.map((box) => <EquipmentBox key={box.title} title={box.title} devices={box.devices} />)}</Fragment>) : <div className="study-empty"><p>Cette leçon ne contient pas encore de bloc de contenu.</p></div>}
+                {lesson.blocks.length ? lesson.blocks.map((block, index) => <Fragment key={`${lesson.id}-${index}`}><LessonBlockRenderer block={block} />{equipmentAfter.get(index)?.map((box) => <EquipmentBox key={box.title} title={box.title} devices={box.devices} />)}</Fragment>) : <div className="study-empty"><p>{isEn ? "This lesson has no content blocks yet." : "Cette leçon ne contient pas encore de bloc de contenu."}</p></div>}
               </article>
             </div>
 
             <section className="study-completion lesson-completion" aria-live="polite">
               <div>
-                <h2>{completed ? "Leçon terminée" : "Valide quand tu as parcouru l’essentiel."}</h2>
-                <p>{completed ? (alreadyCompleted ? "Tu peux relire cette leçon sans gagner une deuxième fois les XP." : `Bravo ! ${completionXp > 0 ? `+${completionXp} XP ont été ajoutés.` : "Aucun XP supplémentaire sur cette validation."}`) : "Le serveur impose un temps minimum de lecture avant la validation."}</p>
+                <h2>{completed ? (isEn ? "Lesson Completed" : "Leçon terminée") : (isEn ? "Complete once you have reviewed the key concepts." : "Valide quand tu as parcouru l’essentiel.")}</h2>
+                <p>{completed ? (alreadyCompleted ? (isEn ? "You can review this lesson anytime without earning repeat XP." : "Tu peux relire cette leçon sans gagner une deuxième fois les XP.") : (isEn ? `Well done! ${completionXp > 0 ? `+${completionXp} XP awarded.` : "No additional XP for this review."}` : `Bravo ! ${completionXp > 0 ? `+${completionXp} XP ont été ajoutés.` : "Aucun XP supplémentaire sur cette validation."}`)) : (isEn ? "A minimum reading time is required before completing." : "Le serveur impose un temps minimum de lecture avant la validation.")}</p>
               </div>
-              {!completed && <Button variant="success" onClick={() => void finishLesson()} loading={saving} disabled={starting || !startInfo || remaining > 0}>{remaining > 0 ? `Encore ${remaining} s` : "Terminer la leçon"}</Button>}
-              {completed && <div className="study-actions">{lesson.quiz ? <Link className="study-button" href={`/quiz/${lesson.quiz.id}`}>Passer le quiz</Link> : nextLessonId ? <Link className="study-button" href={`/lessons/${nextLessonId}`}>Leçon suivante</Link> : <Link className="study-button" href={`/courses/${lesson.course.slug}`}>Retour au parcours</Link>}<Badge tone="green"><IconTrophy size={13} /> Acquis</Badge></div>}
+              {!completed && <Button variant="success" onClick={() => void finishLesson()} loading={saving} disabled={starting || !startInfo || remaining > 0}>{remaining > 0 ? (isEn ? `${remaining}s remaining` : `Encore ${remaining} s`) : (isEn ? "Finish Lesson" : "Terminer la leçon")}</Button>}
+              {completed && (
+                <div className="study-actions">
+                  {lesson.quiz ? <Link className="study-button" href={`/quiz/${lesson.quiz.id}`}>{isEn ? "Take Quiz" : "Passer le quiz"}</Link> : nextLessonId ? <Link className="study-button" href={`/lessons/${nextLessonId}`}>{isEn ? "Next Lesson" : "Leçon suivante"}</Link> : <Link className="study-button" href={`/courses/${lesson.course.slug}`}>{isEn ? "Back to Track" : "Retour au parcours"}</Link>}
+                  <Badge tone="green"><IconTrophy size={13} /> {isEn ? "Earned" : "Acquis"}</Badge>
+                </div>
+              )}
               {completionError && <p className="settings-status is-error" role="alert">{completionError}</p>}
             </section>
 
-            <nav className="lesson-nav" aria-label="Navigation des leçons">
+            <nav className="lesson-nav" aria-label={isEn ? "Lesson navigation" : "Navigation des leçons"}>
               {sequence.previous ? <Link href={`/lessons/${sequence.previous.id}`}>← {sequence.previous.title}</Link> : <span />}
-              {sequence.next ? <Link href={`/lessons/${sequence.next.id}`}>{sequence.next.title} →</Link> : <Link href={`/courses/${lesson.course.slug}`}>Retour au parcours →</Link>}
+              {sequence.next ? <Link href={`/lessons/${sequence.next.id}`}>{sequence.next.title} →</Link> : <Link href={`/courses/${lesson.course.slug}`}>{isEn ? "Back to Track →" : "Retour au parcours →"}</Link>}
             </nav>
           </>
         )}
