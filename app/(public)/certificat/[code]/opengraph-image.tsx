@@ -2,7 +2,6 @@ import { ImageResponse } from "next/og";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { verifyCertificate } from "@/services/gamification.service";
 
-export const runtime = "edge";
 export const alt = "Certificat de réussite officiel CyberPingo";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -98,7 +97,7 @@ export default async function Image({ params }: { params: Promise<{ code: string
             {recipient}
           </div>
           <div style={{ fontSize: "20px", color: "#b5c5df" }}>
-            pour avoir validé l'examen de certification du parcours :
+            pour avoir validé l’examen de certification du parcours :
           </div>
           <div
             style={{
