@@ -123,12 +123,18 @@ function Mascot({ pose, reduced, interactive, active, rank = 3, onReady }: Scene
       white: new THREE.MeshPhysicalMaterial({ color: WHITE, roughness: 0.5, clearcoat: 0.3, clearcoatRoughness: 0.5 }),
       beak: new THREE.MeshPhysicalMaterial({ color: ORANGE, roughness: 0.38, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
       eye: new THREE.MeshPhysicalMaterial({ color: "#050816", roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.05 }),
+      iris: new THREE.MeshPhysicalMaterial({ color: "#0c4eb5", roughness: 0.15, clearcoat: 0.95, clearcoatRoughness: 0.08 }),
+      irisInner: new THREE.MeshStandardMaterial({ color: "#00d5ff", emissive: "#00b4d8", emissiveIntensity: 0.65, roughness: 0.2 }),
+      pupil: new THREE.MeshBasicMaterial({ color: "#040714" }),
       spark: new THREE.MeshBasicMaterial({ color: "#ffffff" }),
+      sparkSoft: new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.72 }),
+      blush: new THREE.MeshBasicMaterial({ color: "#ff6b8b", transparent: true, opacity: 0.35 }),
       trim: new THREE.MeshStandardMaterial({ color: CYAN, emissive: CYAN, emissiveIntensity: 1.6, roughness: 0.3 }),
       emblem: new THREE.MeshStandardMaterial({ color: CYAN, emissive: CYAN, emissiveIntensity: 1.9, roughness: 0.25 }),
       gold: new THREE.MeshStandardMaterial({ color: "#e5b95c", metalness: 0.85, roughness: 0.25 }),
+      buttonGold: new THREE.MeshStandardMaterial({ color: "#f3be53", metalness: 0.92, roughness: 0.18 }),
       bowtie: new THREE.MeshStandardMaterial({ color: "#0a1d47", roughness: 0.5 }),
-      tweed: new THREE.MeshStandardMaterial({ color: "#4a3525", roughness: 0.85 }),
+      tweed: new THREE.MeshStandardMaterial({ color: "#483222", roughness: 0.88, metalness: 0.05 }),
     }),
     [],
   );
@@ -328,6 +334,23 @@ function Mascot({ pose, reduced, interactive, active, rank = 3, onReady }: Scene
           <mesh geometry={geometry.seamR} material={m.trim} />
           <mesh geometry={geometry.emblem} material={m.emblem} position={[0, 0.2, 0.84]} scale={[0.3, 0.3, 1]} rotation={[0.06, 0, 0]} />
           <mesh geometry={geometry.emblemCore} material={m.emblem} position={[0, 0.2, 0.855]} scale={[0.3, 0.3, 1]} rotation={[0.06, 0, 0]} />
+          {/* Professor Tweed Blazer & Buttons when rank >= 7 */}
+          {rank >= 7 && (
+            <group position={[0, 0.15, 0.82]}>
+              <mesh position={[-0.32, -0.05, 0.02]} rotation={[0.06, 0.18, -0.25]} scale={[0.22, 0.62, 0.08]} material={m.tweed}>
+                <boxGeometry args={[1, 1, 1]} />
+              </mesh>
+              <mesh position={[0.32, -0.05, 0.02]} rotation={[0.06, -0.18, 0.25]} scale={[0.22, 0.62, 0.08]} material={m.tweed}>
+                <boxGeometry args={[1, 1, 1]} />
+              </mesh>
+              <mesh position={[0, -0.1, 0.08]} rotation={[Math.PI / 2, 0, 0]} material={m.buttonGold}>
+                <cylinderGeometry args={[0.04, 0.04, 0.025, 20]} />
+              </mesh>
+              <mesh position={[0, -0.32, 0.05]} rotation={[Math.PI / 2, 0, 0]} material={m.buttonGold}>
+                <cylinderGeometry args={[0.04, 0.04, 0.025, 20]} />
+              </mesh>
+            </group>
+          )}
           <mesh position={[0, 0.98, 0.04]} rotation={[Math.PI / 2, 0, 0]} scale={[1, 1, 0.8]} material={m.head}>
             <torusGeometry args={[0.76, 0.24, 24, 64]} />
           </mesh>
@@ -349,26 +372,59 @@ function Mascot({ pose, reduced, interactive, active, rank = 3, onReady }: Scene
               <sphereGeometry args={[0.5, 40, 32]} />
             </mesh>
 
-            <group ref={eyeL} position={[-0.3, 0.04, 0.8]}>
-              <mesh scale={[1, 1.28, 0.7]} material={m.eye}>
-                <sphereGeometry args={[0.135, 28, 24]} />
+            {/* Pixar-style deep expressive blue eyes */}
+            <group ref={eyeL} position={[-0.3, 0.04, 0.78]}>
+              <mesh scale={[1, 1.25, 0.65]} material={m.white}>
+                <sphereGeometry args={[0.155, 28, 24]} />
               </mesh>
-              <mesh position={[0.045, 0.07, 0.085]} material={m.spark}>
-                <sphereGeometry args={[0.036, 12, 10]} />
+              <mesh position={[0.02, 0.0, 0.06]} scale={[1, 1.15, 0.45]} material={m.iris}>
+                <sphereGeometry args={[0.13, 24, 20]} />
+              </mesh>
+              <mesh position={[0.025, 0.0, 0.09]} scale={[1, 1.1, 0.3]} material={m.irisInner}>
+                <sphereGeometry args={[0.095, 20, 16]} />
+              </mesh>
+              <mesh position={[0.025, 0.0, 0.11]} scale={[1, 1.05, 0.2]} material={m.pupil}>
+                <sphereGeometry args={[0.065, 18, 16]} />
+              </mesh>
+              <mesh position={[0.06, 0.045, 0.13]} material={m.spark}>
+                <sphereGeometry args={[0.032, 12, 10]} />
+              </mesh>
+              <mesh position={[-0.015, -0.035, 0.13]} material={m.sparkSoft}>
+                <sphereGeometry args={[0.016, 10, 8]} />
               </mesh>
             </group>
-            <group ref={eyeR} position={[0.3, 0.04, 0.8]}>
-              <mesh scale={[1, 1.28, 0.7]} material={m.eye}>
-                <sphereGeometry args={[0.135, 28, 24]} />
+            <group ref={eyeR} position={[0.3, 0.04, 0.78]}>
+              <mesh scale={[1, 1.25, 0.65]} material={m.white}>
+                <sphereGeometry args={[0.155, 28, 24]} />
               </mesh>
-              <mesh position={[0.045, 0.07, 0.085]} material={m.spark}>
-                <sphereGeometry args={[0.036, 12, 10]} />
+              <mesh position={[-0.02, 0.0, 0.06]} scale={[1, 1.15, 0.45]} material={m.iris}>
+                <sphereGeometry args={[0.13, 24, 20]} />
+              </mesh>
+              <mesh position={[-0.025, 0.0, 0.09]} scale={[1, 1.1, 0.3]} material={m.irisInner}>
+                <sphereGeometry args={[0.095, 20, 16]} />
+              </mesh>
+              <mesh position={[-0.025, 0.0, 0.11]} scale={[1, 1.05, 0.2]} material={m.pupil}>
+                <sphereGeometry args={[0.065, 18, 16]} />
+              </mesh>
+              <mesh position={[0.02, 0.045, 0.13]} material={m.spark}>
+                <sphereGeometry args={[0.032, 12, 10]} />
+              </mesh>
+              <mesh position={[-0.055, -0.035, 0.13]} material={m.sparkSoft}>
+                <sphereGeometry args={[0.016, 10, 8]} />
               </mesh>
             </group>
 
+            {/* Cute pink blush cheeks */}
+            <mesh position={[-0.42, -0.16, 0.72]} scale={[1.2, 0.65, 0.4]} material={m.blush}>
+              <sphereGeometry args={[0.09, 16, 12]} />
+            </mesh>
+            <mesh position={[0.42, -0.16, 0.72]} scale={[1.2, 0.65, 0.4]} material={m.blush}>
+              <sphereGeometry args={[0.09, 16, 12]} />
+            </mesh>
+
             {/* Gold glasses when rank >= 3 */}
             {rank >= 3 && (
-              <group position={[0, 0.04, 0.84]}>
+              <group position={[0, 0.04, 0.88]}>
                 <mesh position={[-0.3, 0, 0]} material={m.gold}>
                   <torusGeometry args={[0.2, 0.018, 12, 36]} />
                 </mesh>
@@ -410,12 +466,21 @@ function Mascot({ pose, reduced, interactive, active, rank = 3, onReady }: Scene
               <coneGeometry args={[0.14, 0.26, 24]} />
             </mesh>
 
-            <mesh position={[0.02, 0.98, -0.08]} rotation={[-0.62, 0, -0.32]} material={m.head}>
-              <capsuleGeometry args={[0.15, 0.55, 8, 16]} />
-            </mesh>
-            <mesh position={[0.12, 0.88, 0.0]} rotation={[-0.62, 0, -0.32]} material={m.trim} scale={[0.35, 1, 0.35]}>
-              <capsuleGeometry args={[0.1, 0.5, 4, 10]} />
-            </mesh>
+            {/* Crown feather tuft (Pixar reference tuft) */}
+            <group position={[0, 0.95, -0.05]}>
+              <mesh position={[0, 0.08, 0]} rotation={[-0.55, 0, 0]} material={m.head}>
+                <capsuleGeometry args={[0.11, 0.42, 8, 14]} />
+              </mesh>
+              <mesh position={[-0.1, 0.04, -0.02]} rotation={[-0.5, 0, -0.25]} material={m.head}>
+                <capsuleGeometry args={[0.09, 0.36, 8, 14]} />
+              </mesh>
+              <mesh position={[0.1, 0.04, -0.02]} rotation={[-0.5, 0, 0.25]} material={m.head}>
+                <capsuleGeometry args={[0.09, 0.36, 8, 14]} />
+              </mesh>
+              <mesh position={[0.04, 0.1, 0.02]} rotation={[-0.55, 0, 0.1]} material={m.trim} scale={[0.3, 0.8, 0.3]}>
+                <capsuleGeometry args={[0.06, 0.3, 4, 10]} />
+              </mesh>
+            </group>
           </group>
 
           <group ref={armR} position={[1.0, 0.55, 0.06]} rotation={[0, 0, 0.4]}>

@@ -11,6 +11,7 @@ export const TRANSLATIONS = {
     "nav.courses": "Cours",
     "nav.labs": "Labs",
     "nav.shop": "Boutique",
+    "nav.leaderboard": "Classement",
     "nav.progress": "Ma progression",
     "nav.skills": "Compétences",
     "nav.mentor": "Mentor IA",
@@ -43,6 +44,22 @@ export const TRANSLATIONS = {
     "cb.spent": "Dépensés",
     "cb.tagline": "La monnaie de ton apprentissage",
 
+    // Leaderboard
+    "leaderboard.title": "Ligue Hebdomadaire CyberPingo",
+    "leaderboard.subtitle": "Chaque niveau se mérite : gagne des CyberBits chaque semaine !",
+    "leaderboard.rewards": "Récompenses hebdomadaires",
+    "leaderboard.countdown": "Fin de ligue dans",
+    "leaderboard.your_rank": "Ton rang actuel",
+
+    // Daily Chest
+    "chest.title": "Coffre Mystère Quotidien",
+    "chest.open": "Ouvrir le coffre",
+    "chest.opened": "Coffre ouvert aujourd'hui",
+
+    // Theme
+    "theme.label": "Thème de grade",
+    "theme.rank_unlocked": "Débloqué au grade",
+
     // Exam & Cert
     "exam.title": "Examen final de certification",
     "exam.pass_threshold": "Seuil de réussite : 70 %",
@@ -63,6 +80,7 @@ export const TRANSLATIONS = {
     "nav.courses": "Courses",
     "nav.labs": "Hands-on Labs",
     "nav.shop": "CyberBits Shop",
+    "nav.leaderboard": "Leaderboard",
     "nav.progress": "My Progress",
     "nav.skills": "Skills Matrix",
     "nav.mentor": "AI Mentor",
@@ -94,6 +112,22 @@ export const TRANSLATIONS = {
     "cb.gained": "Earned",
     "cb.spent": "Spent",
     "cb.tagline": "The currency of your learning journey",
+
+    // Leaderboard
+    "leaderboard.title": "CyberPingo Weekly League",
+    "leaderboard.subtitle": "Every rank is earned: win CyberBits every week!",
+    "leaderboard.rewards": "Weekly Rewards",
+    "leaderboard.countdown": "League ends in",
+    "leaderboard.your_rank": "Your current rank",
+
+    // Daily Chest
+    "chest.title": "Daily Mystery Chest",
+    "chest.open": "Open chest",
+    "chest.opened": "Chest claimed today",
+
+    // Theme
+    "theme.label": "Rank theme",
+    "theme.rank_unlocked": "Unlocked at rank",
 
     // Exam & Cert
     "exam.title": "Final Certification Exam",

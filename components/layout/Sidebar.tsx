@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import {
   IconActivity, IconAI, IconArrowRight, IconBell, IconCourses, IconDashboard, IconFlame, IconGlobe, IconLesson,
-  IconMap, IconProfile, IconSettings, IconShield, IconTarget, IconUsers,
+  IconMap, IconProfile, IconSettings, IconShield, IconTarget, IconTrophy, IconUsers,
 } from "@/components/ui/Icon";
 import CoinIcon from "@/components/cyberbits/CoinIcon";
 
@@ -18,6 +18,7 @@ const LEARN_ITEMS: NavItem[] = [
   { href: "/courses", label: "Cours", Icon: IconCourses },
   { href: "/challenges", label: "Labs", Icon: IconShield },
   { href: "/boutique", label: "Boutique", Icon: CoinIcon as unknown as typeof IconDashboard },
+  { href: "/classement", label: "Classement", Icon: IconTrophy },
   { href: "/progression", label: "Ma progression", Icon: IconActivity },
   { href: "/competences", label: "Compétences", Icon: IconTarget },
   { href: "/mentor", label: "Mentor IA", Icon: IconAI },
@@ -34,6 +35,7 @@ const GUEST_ITEMS: NavItem[] = [
   { href: "/courses", label: "Cours", Icon: IconCourses },
   { href: "/challenges", label: "Labs", Icon: IconShield },
   { href: "/boutique", label: "Boutique", Icon: CoinIcon as unknown as typeof IconDashboard },
+  { href: "/classement", label: "Classement", Icon: IconTrophy },
   { href: "/parcours", label: "Parcours métiers", Icon: IconMap },
   { href: "/ressources", label: "Ressources", Icon: IconLesson },
 ];

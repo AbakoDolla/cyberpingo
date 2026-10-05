@@ -101,6 +101,12 @@ export const IconBolt = icon(
   `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />`
 );
 
+/** Sparkles / Étincelles / CyberBits Bonus */
+export const IconSparkles = icon(
+  `<path d="M12 3l1.9 4.8L19 9.7l-4.1 3.5 1.3 5.3L12 15.6l-4.2 2.9 1.3-5.3L5 9.7l5.1-1.9L12 3z"/>
+   <path d="M19 3l.7 1.8L21 5.3l-1.4 1.2.4 1.9L19 7.3l-1 1 .3-1.9L17 5.3l1.3-.5L19 3z"/>`
+);
+
 /** Streak / flamme */
 export const IconFlame = icon(
   `<path d="M12 2c0 5-5 7-5 11a5 5 0 0 0 10 0c0-4.5-5-6-5-11z"/>

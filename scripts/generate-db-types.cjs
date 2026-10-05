@@ -17,6 +17,7 @@ const SCALARS = {
   date: "string", time: "string", timetz: "string", timestamp: "string", timestamptz: "string", interval: "string",
   inet: "string", cidr: "string", bytea: "string",
   json: "Json", jsonb: "Json",
+  record: "Json",
   void: "undefined",
 };
 

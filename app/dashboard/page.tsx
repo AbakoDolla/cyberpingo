@@ -25,6 +25,7 @@ import {
 import Pingo from "@/components/mascot/Pingo";
 import { Pingo3D } from "@/components/mascot/Pingo3D";
 import DashboardCyberBitsCard from "@/components/cyberbits/DashboardCyberBitsCard";
+import DailyMysteryChest from "@/components/cyberbits/DailyMysteryChest";
 import SlugIcon from "@/components/ui/SlugIcon";
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
@@ -365,6 +366,7 @@ function LearnerDashboard() {
 
         <aside className="dash-side">
           <DashboardCyberBitsCard balance={cbBalance} />
+          <DailyMysteryChest currentBalance={cbBalance} />
 
           <WeekRhythm week={data.week} />
 

@@ -14,6 +14,8 @@ import { IDLE_STATE, decide, displayDuration, pickLine, type SchedulerState } fr
 import { listMascotLines } from "@/services/academy.service";
 import type { MascotEvent, MascotLine } from "@/types/api";
 
+import { speakRealisticVoice } from "@/lib/mascot/sound-effects";
+
 const SESSION_WELCOME = "cyberpingo.mascot.welcomed";
 const MAX_VOICE_MS = 30_000;
 
@@ -121,12 +123,20 @@ export default function MascotCoach() {
     schedule(duration);
 
     const current = prefsRef.current;
-    if (line.audio_url && current.voice && current.volume > 0) startVoice(line, mine, current.volume);
+    if (line.audio_url && current.voice && current.volume > 0) {
+      startVoice(line, mine, current.volume);
+    } else if (current.voice && current.volume > 0) {
+      speakRealisticVoice(line.text_fr, { volume: current.volume });
+    }
   }, [finish, startVoice]);
 
   const replay = useCallback((line: MascotLine) => {
     const volume = prefsRef.current.volume;
-    startVoice(line, token.current, volume > 0 ? volume : 0.8);
+    if (line.audio_url) {
+      startVoice(line, token.current, volume > 0 ? volume : 0.8);
+    } else {
+      speakRealisticVoice(line.text_fr, { volume: volume > 0 ? volume : 0.8 });
+    }
   }, [startVoice]);
 
   useEffect(() => onMascot((event) => {
@@ -161,7 +171,7 @@ export default function MascotCoach() {
   if (!active) return null;
   const { line, spoken, failed } = active;
   const showText = !spoken || prefs.subtitles;
-  const canReplay = Boolean(line.audio_url) && !spoken && !failed;
+  const canReplay = !spoken && !failed;
   return (
     <aside
       className="mascot-coach"
