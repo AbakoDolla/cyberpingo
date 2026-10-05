@@ -102,7 +102,7 @@ export interface AdminSubmission {
 export type ChallengeChanges = Partial<Pick<TablesUpdate<"challenges">, "slug" | "title" | "description" | "icon" | "period" | "metric" | "target" | "xp_reward" | "is_active" | "starts_at" | "ends_at" | "position">>;
 export type ChallengeCreate = Pick<TablesInsert<"challenges">, "slug" | "title" | "period" | "metric" | "target"> & ChallengeChanges;
 
-const COURSE_SELECT = "id, slug, title, short_description, description, thumbnail_url, level, category, icon, estimated_duration, status, access_level, position, completion_xp, certificate_enabled, created_by, created_at, updated_at, published_at, domain_id, cb_price, prerequisite_course_id";
+const COURSE_SELECT = "id, slug, title, short_description, description, thumbnail_url, level, category, icon, estimated_duration, status, access_level, position, completion_xp, certificate_enabled, created_by, created_at, updated_at, published_at, domain_id, cb_price, prerequisite_course_id, exam_pass_percentage, exam_duration_minutes, exam_question_count";
 const MODULE_SELECT = "id, course_id, title, description, position, created_at, updated_at";
 const LESSON_SELECT = "id, course_id, module_id, title, summary, content_type, content, duration_minutes, xp_reward, position, created_at, updated_at";
 const QUIZ_SELECT = "id, course_id, module_id, lesson_id, title, description, pass_percentage, position, created_at, updated_at";

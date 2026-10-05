@@ -59,8 +59,8 @@ const MINI = { slug: "parcours-eclair", lessons: ["eclair-1", "eclair-2", "eclai
 async function createMiniCourse() {
   const courseId = course("eclair");
   const moduleId = contentId("module", "eclair:1");
-  await sql(`insert into public.courses (id, slug, title, short_description, description, level, category, icon, estimated_duration, position)
-    values ($1, $2, 'Parcours éclair', 'Trois leçons et un quiz pour tester la certification.', 'Parcours de test.', 'debutant', 'Fondamentaux', 'fondamentaux', 30, 99)`, [courseId, MINI.slug]);
+  await sql(`insert into public.courses (id, slug, title, short_description, description, level, category, icon, estimated_duration, position, exam_question_count)
+    values ($1, $2, 'Parcours éclair', 'Trois leçons et un quiz pour tester la certification.', 'Parcours de test.', 'debutant', 'Fondamentaux', 'fondamentaux', 30, 99, 2)`, [courseId, MINI.slug]);
   await sql("insert into public.course_modules (id, course_id, title, description, position) values ($1, $2, 'Module éclair', 'Un seul module.', 1)", [moduleId, courseId]);
   for (const [index, key] of MINI.lessons.entries()) {
     await sql(`insert into public.lessons (id, course_id, module_id, title, summary, content, duration_minutes, xp_reward, position)
@@ -241,12 +241,21 @@ test("finishing a course issues a verifiable certificate", async () => {
   assert.equal((await as(ids.dave, "select status from public.enrollments"))[0].status, "active");
   const result = await rpc(ids.dave, "submit_quiz", { p_quiz_id: quiz(MINI.quiz), p_answers: await answerKey(quiz(MINI.quiz)) });
   assert.equal(result.course_completed.slug, MINI.slug);
-  assert.match(result.certificate.certificate_number, /^CP-\d{4}-\d{6}$/);
-  assert.match(result.certificate.verification_code, /^[A-Z0-9]{16}$/);
-  assert.deepEqual(result.new_badges.map((badge) => badge.slug).sort(), ["premier-cours", "premier-quiz", "premiere-certification"]);
+  assert.equal(result.certificate, null, "certificate is awarded only after the final exam");
 
-  const verified = await rpc(null, "verify_certificate", { p_code: result.certificate.verification_code.toLowerCase() });
-  assert.deepEqual([verified.found, verified.valid, verified.recipient_name, verified.course_slug], [true, true, "Dave", MINI.slug]);
+  const exam = await rpc(ids.dave, "start_course_exam", { p_course_id: course("eclair") });
+  const answers = {};
+  for (const q of exam.questions) {
+    const [opt] = await sql("select a.id from public.quiz_answers a where a.question_id = $1 and a.is_correct", [q.id]);
+    answers[q.id] = [opt.id];
+  }
+  const examResult = await rpc(ids.dave, "submit_course_exam", { p_attempt_id: exam.attempt_id, p_answers: answers });
+  assert.equal(examResult.passed, true);
+  assert.match(examResult.certificate.certificate_number, /^CP-\d{4}-\d{6}$/);
+  assert.match(examResult.certificate.verification_code, /^[A-Z0-9]{16}$/);
+
+  const verified = await rpc(null, "verify_certificate", { p_code: examResult.certificate.verification_code.toLowerCase() });
+  assert.deepEqual([verified.found, verified.valid, verified.recipient_name, verified.course_slug, verified.exam_percentage], [true, true, "Dave", MINI.slug, 100]);
   assert.deepEqual(await rpc(null, "verify_certificate", { p_code: "AAAAAAAAAAAAAAAA" }), { found: false, valid: false });
   assert.equal((await as(ids.bob, "select id from public.certificates")).length, 0);
 

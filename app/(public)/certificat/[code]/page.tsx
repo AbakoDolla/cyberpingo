@@ -107,10 +107,48 @@ export default async function CertificateVerificationPage({ params }: { params: 
           <dt>Parcours</dt>
           <dd>{cert.course_slug ? <Link href={`/parcours/${cert.course_slug}`}>{courseTitle}</Link> : courseTitle}</dd>
         </div>
+        {cert.exam_percentage ? (
+          <div>
+            <dt>Examen final</dt>
+            <dd style={{ color: "var(--cp-green, #3efa95)", fontWeight: 700 }}>{cert.exam_percentage} % (Validé)</dd>
+          </div>
+        ) : null}
         <div><dt>Délivré le</dt><dd>{cert.issued_at ? formatDate(cert.issued_at) : "Non renseigné"}</dd></div>
         <div><dt>Numéro de certificat</dt><dd className="cert-code">{cert.certificate_number ?? "Non renseigné"}</dd></div>
         <div><dt>Code de vérification</dt><dd className="cert-code">{grouped(verificationCode)}</dd></div>
       </dl>
+
+      {!revoked && (
+        <section className="cert-actions" style={{ display: "flex", flexWrap: "wrap", gap: "12px", margin: "24px 0" }}>
+          <a
+            href={`/api/certificat/${verificationCode}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="study-button"
+            style={{ textDecoration: "none" }}
+          >
+            Télécharger le certificat (PDF)
+          </a>
+          <a
+            href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(courseTitle)}&organizationName=CyberPingo&issueYear=${new Date(cert.issued_at ?? Date.now()).getFullYear()}&issueMonth=${new Date(cert.issued_at ?? Date.now()).getMonth() + 1}&certUrl=${encodeURIComponent(`https://cyberpingo.vercel.app/certificat/${verificationCode}`)}&certId=${encodeURIComponent(cert.certificate_number ?? verificationCode)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="study-button study-button--ghost"
+            style={{ textDecoration: "none" }}
+          >
+            Ajouter à mon profil LinkedIn
+          </a>
+          <a
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://cyberpingo.vercel.app/certificat/${verificationCode}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="study-button study-button--ghost"
+            style={{ textDecoration: "none" }}
+          >
+            Partager sur LinkedIn
+          </a>
+        </section>
+      )}
 
       <section className="cert-notes">
         <h2>Ce que cette vérification garantit</h2>

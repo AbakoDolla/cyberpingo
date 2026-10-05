@@ -187,7 +187,14 @@ function CourseDetailView() {
                   )
                 )}
                 {canContinue && <Link className="study-button" href={`/lessons/${nextLesson?.id}`}>{data.progress && data.progress.completed_lessons > 0 ? "Continuer" : "Commencer"}<IconArrowRight size={15} /></Link>}
-                {!nextLesson && data.progress && <Badge tone="green"><IconTrophy size={13} /> Parcours terminé</Badge>}
+                {!nextLesson && data.progress && (
+                  <>
+                    <Badge tone="green"><IconTrophy size={13} /> Parcours terminé</Badge>
+                    <Link className="study-button" href={`/courses/${slug}/examen`}>
+                      Examen final <IconArrowRight size={15} />
+                    </Link>
+                  </>
+                )}
               </div>
               {actionError && (
                 <div className="settings-status is-error flex items-center justify-between gap-3" role="alert">
@@ -200,6 +207,23 @@ function CourseDetailView() {
                 </div>
               )}
             </section>
+
+            {data.progress && data.progress.status === "completed" && (
+              <section className="p-6 rounded-2xl bg-gradient-to-r from-cyber-surface via-[#091b36] to-cyber-surface border border-cyber-cyan/40 my-6 flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <span className="p-3 rounded-xl bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/30">
+                    <IconCertificate size={28} />
+                  </span>
+                  <div>
+                    <h3 className="text-base font-bold text-white">Examen final de certification</h3>
+                    <p className="text-xs text-cyber-muted">25 questions · 40 minutes · Score minimum de 70 % requis pour décrocher le certificat officiel.</p>
+                  </div>
+                </div>
+                <Link href={`/courses/${slug}/examen`} className="study-button study-button--sm">
+                  Accéder à l’examen final <IconArrowRight size={14} />
+                </Link>
+              </section>
+            )}
 
             <section className="course-outline" aria-labelledby="modules-title">
               <h2 id="modules-title">Programme du parcours</h2>

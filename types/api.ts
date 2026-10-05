@@ -233,6 +233,7 @@ export interface CertificateVerification {
   issued_at?: string;
   revoked_at?: string | null;
   revoked_reason?: string | null;
+  exam_percentage?: number | null;
 }
 
 export interface MentorQuota { allowed: boolean; remaining: number; limit: number }
@@ -263,6 +264,9 @@ export interface CourseSummary {
   published_at: string | null;
   cb_price?: number | null;
   prerequisite_course_id?: string | null;
+  exam_pass_percentage?: number;
+  exam_duration_minutes?: number;
+  exam_question_count?: number;
   module_count: number;
   lesson_count: number;
   quiz_count: number;
