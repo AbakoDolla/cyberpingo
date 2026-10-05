@@ -235,8 +235,9 @@ function LearnerDashboard() {
           <div className="dash-hero-pingo">
             <Pingo3D
               pose={activeToday ? "celebrate" : "wave"}
+              rank={profile.level}
               label="Pingo, ta mascotte 3D"
-              fallback={<Pingo state="welcome" size={190} />}
+              fallback={<Pingo state="welcome" rank={profile.level} size={190} />}
             />
           </div>
           {!data.profile.onboarding_completed && (

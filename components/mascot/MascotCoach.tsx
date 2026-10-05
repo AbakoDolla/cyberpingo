@@ -171,7 +171,7 @@ export default function MascotCoach() {
       onMouseEnter={() => { hovering.current = true; }}
       onMouseLeave={() => { hovering.current = false; }}
     >
-      <div className="mascot-coach__pingo" aria-hidden="true"><Pingo state={EXPRESSION_STATE[line.expression]} size={64} /></div>
+      <div className="mascot-coach__pingo" aria-hidden="true"><Pingo state={EXPRESSION_STATE[line.expression]} rank={profile?.level ?? 1} size={64} /></div>
       <div className="mascot-coach__bubble">
         {showText ? <p className="mascot-coach__text">{line.text_fr}</p> : <p className="mascot-coach__text mascot-coach__text--voice">Pingo te parle…</p>}
         {canReplay && (

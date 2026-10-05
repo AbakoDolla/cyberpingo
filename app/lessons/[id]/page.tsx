@@ -15,6 +15,7 @@ import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDuration } from "@/lib/format";
 import { equipmentBoxes, type EquipmentBoxData } from "@/lib/lesson-equipment";
+import { pendingVideoTitle } from "@/lib/lesson-content";
 import { getLesson, getMyLessonProgress, saveLessonProgress, startLesson } from "@/services/lessons.service";
 import type { LessonCompletion, LessonStart } from "@/types/api";
 
@@ -170,6 +171,18 @@ function LessonView() {
                 </nav>
               </aside>
               <article ref={articleRef} className="lesson-content">
+                {!lesson.blocks.some((b) => b.type === "video" || (b.type === "callout" && pendingVideoTitle(b.content))) && (
+                  <figure className="lesson-media lesson-video-slot mb-6">
+                    <div className="lesson-video-slot__frame" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9.5 5 2.5-5 2.5z" /></svg>
+                    </div>
+                    <figcaption>
+                      <strong>Vidéo du cours en préparation</strong>
+                      <span>{lesson.title}</span>
+                      <small>Emplacement réservé. Le contenu illustré et les schémas interactifs ci-dessous couvrent déjà l’essentiel.</small>
+                    </figcaption>
+                  </figure>
+                )}
                 {lesson.blocks.length ? lesson.blocks.map((block, index) => <Fragment key={`${lesson.id}-${index}`}><LessonBlockRenderer block={block} />{equipmentAfter.get(index)?.map((box) => <EquipmentBox key={box.title} title={box.title} devices={box.devices} />)}</Fragment>) : <div className="study-empty"><p>Cette leçon ne contient pas encore de bloc de contenu.</p></div>}
               </article>
             </div>

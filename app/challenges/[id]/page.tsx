@@ -110,6 +110,16 @@ function ChallengeDetailView() {
               <div className="lab-layout__main">
                 {lab.briefing && <section className="lab-panel lab-briefing"><h2>Mise en situation</h2><p>{lab.briefing}</p></section>}
                 <LabEquipment slug={lab.slug} />
+                <figure className="lesson-media lesson-video-slot mb-4">
+                  <div className="lesson-video-slot__frame" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9.5 5 2.5-5 2.5z" /></svg>
+                  </div>
+                  <figcaption>
+                    <strong>Démonstration vidéo du lab en préparation</strong>
+                    <span>Scénario : {lab.title}</span>
+                    <small>Emplacement réservé. Résous le laboratoire avec le briefing, les objectifs et les outils ci-dessous.</small>
+                  </figcaption>
+                </figure>
                 <section className="lab-panel"><h2>Objectifs</h2><ul>{lab.objectives.map((objective) => <li key={objective}><IconCheck size={15} />{objective}</li>)}</ul></section>
                 {(lab.constraints.length > 0 || lab.tools.length > 0) && (
                   <section className="lab-panel lab-context" aria-label="Contraintes et outils">

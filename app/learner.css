@@ -537,4 +537,74 @@
   .learner-content, .ui-modal, .ui-modal__panel, .reward-toast-in, .reward-toast-level { animation: none; }
   .ui-skeleton { animation: none; }
   .study-button:hover, .ui-btn:hover, .sidebar-level:hover, .study-course-list > a:hover, .learner-avatar-link:hover { transform: none; }
+  .ambient-orb, .ambient-nodes span { animation: none; }
+}
+
+/* ---------- Ambient Aurora & Cyber Grid ---------- */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.22;
+  will-change: transform;
+}
+.ambient-orb--cyan {
+  width: 650px;
+  height: 650px;
+  top: -150px;
+  left: 5%;
+  background: radial-gradient(circle, #00d5ff, transparent 65%);
+  animation: ambient-drift-cyan 22s ease-in-out infinite alternate;
+}
+.ambient-orb--violet {
+  width: 750px;
+  height: 750px;
+  top: 10%;
+  right: -150px;
+  background: radial-gradient(circle, #7928ca, transparent 65%);
+  animation: ambient-drift-violet 26s ease-in-out infinite alternate;
+}
+.ambient-orb--blue {
+  width: 580px;
+  height: 580px;
+  bottom: 5%;
+  left: 30%;
+  background: radial-gradient(circle, #1765f5, transparent 65%);
+  animation: ambient-drift-blue 20s ease-in-out infinite alternate;
+}
+.ambient-nodes span {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #00d5ff;
+  box-shadow: 0 0 10px #00d5ff;
+  animation: ambient-twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-drift-cyan {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(60px, 40px, 0) scale(1.1); }
+  100% { transform: translate3d(-30px, 80px, 0) scale(0.95); }
+}
+@keyframes ambient-drift-violet {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-80px, -50px, 0) scale(1.08); }
+  100% { transform: translate3d(40px, 60px, 0) scale(0.92); }
+}
+@keyframes ambient-drift-blue {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(40px, -60px, 0) scale(1.15); }
+  100% { transform: translate3d(-50px, 30px, 0) scale(0.9); }
+}
+@keyframes ambient-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 0.85; transform: scale(1.4); }
 }

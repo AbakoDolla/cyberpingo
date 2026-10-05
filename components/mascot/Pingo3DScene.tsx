@@ -12,6 +12,7 @@ interface SceneProps {
   reduced: boolean;
   interactive: boolean;
   active: boolean;
+  rank?: number;
   onReady: () => void;
 }
 
@@ -90,7 +91,7 @@ function Rig() {
   return null;
 }
 
-function Mascot({ pose, reduced, interactive, active, onReady }: SceneProps) {
+function Mascot({ pose, reduced, interactive, active, rank = 3, onReady }: SceneProps) {
   const root = useRef<THREE.Group>(null);
   const turn = useRef<THREE.Group>(null);
   const head = useRef<THREE.Group>(null);
@@ -125,6 +126,9 @@ function Mascot({ pose, reduced, interactive, active, onReady }: SceneProps) {
       spark: new THREE.MeshBasicMaterial({ color: "#ffffff" }),
       trim: new THREE.MeshStandardMaterial({ color: CYAN, emissive: CYAN, emissiveIntensity: 1.6, roughness: 0.3 }),
       emblem: new THREE.MeshStandardMaterial({ color: CYAN, emissive: CYAN, emissiveIntensity: 1.9, roughness: 0.25 }),
+      gold: new THREE.MeshStandardMaterial({ color: "#e5b95c", metalness: 0.85, roughness: 0.25 }),
+      bowtie: new THREE.MeshStandardMaterial({ color: "#0a1d47", roughness: 0.5 }),
+      tweed: new THREE.MeshStandardMaterial({ color: "#4a3525", roughness: 0.85 }),
     }),
     [],
   );
@@ -361,6 +365,37 @@ function Mascot({ pose, reduced, interactive, active, onReady }: SceneProps) {
                 <sphereGeometry args={[0.036, 12, 10]} />
               </mesh>
             </group>
+
+            {/* Gold glasses when rank >= 3 */}
+            {rank >= 3 && (
+              <group position={[0, 0.04, 0.84]}>
+                <mesh position={[-0.3, 0, 0]} material={m.gold}>
+                  <torusGeometry args={[0.2, 0.018, 12, 36]} />
+                </mesh>
+                <mesh position={[0.3, 0, 0]} material={m.gold}>
+                  <torusGeometry args={[0.2, 0.018, 12, 36]} />
+                </mesh>
+                <mesh position={[0, 0.02, 0.02]} rotation={[0, 0, Math.PI / 2]} material={m.gold}>
+                  <capsuleGeometry args={[0.014, 0.16, 6, 12]} />
+                </mesh>
+              </group>
+            )}
+
+            {/* Navy bow tie when rank >= 5 */}
+            {rank >= 5 && (
+              <group position={[0, -0.62, 0.88]}>
+                <mesh scale={[0.09, 0.09, 0.07]} material={m.bowtie}>
+                  <sphereGeometry args={[0.5, 12, 12]} />
+                </mesh>
+                <mesh position={[-0.14, 0, 0]} rotation={[0, 0, Math.PI / 4]} scale={[0.16, 0.12, 0.06]} material={m.bowtie}>
+                  <coneGeometry args={[0.8, 1.2, 3]} />
+                </mesh>
+                <mesh position={[0.14, 0, 0]} rotation={[0, 0, -Math.PI / 4]} scale={[0.16, 0.12, 0.06]} material={m.bowtie}>
+                  <coneGeometry args={[0.8, 1.2, 3]} />
+                </mesh>
+              </group>
+            )}
+
             <mesh position={[-0.32, 0.27, 0.78]} rotation={[0, 0, 0.32]} material={m.eye}>
               <capsuleGeometry args={[0.025, 0.2, 4, 10]} />
             </mesh>
@@ -387,6 +422,11 @@ function Mascot({ pose, reduced, interactive, active, onReady }: SceneProps) {
             <mesh position={[0, -0.45, 0]} material={m.body}>
               <capsuleGeometry args={[0.21, 0.78, 10, 20]} />
             </mesh>
+            {rank >= 7 && (
+              <mesh position={[0, -0.45, -0.15]} scale={[1.05, 0.45, 0.4]} material={m.tweed}>
+                <sphereGeometry args={[0.22, 16, 16]} />
+              </mesh>
+            )}
             <mesh position={[0, -0.86, 0]} rotation={[Math.PI / 2, 0, 0]} material={m.trim}>
               <torusGeometry args={[0.215, 0.032, 10, 32]} />
             </mesh>
@@ -398,6 +438,11 @@ function Mascot({ pose, reduced, interactive, active, onReady }: SceneProps) {
             <mesh position={[0, -0.45, 0]} material={m.body}>
               <capsuleGeometry args={[0.21, 0.78, 10, 20]} />
             </mesh>
+            {rank >= 7 && (
+              <mesh position={[0, -0.45, -0.15]} scale={[1.05, 0.45, 0.4]} material={m.tweed}>
+                <sphereGeometry args={[0.22, 16, 16]} />
+              </mesh>
+            )}
             <mesh position={[0, -0.86, 0]} rotation={[Math.PI / 2, 0, 0]} material={m.trim}>
               <torusGeometry args={[0.215, 0.032, 10, 32]} />
             </mesh>
