@@ -117,3 +117,28 @@ body {
   background: rgba(0, 213, 255, 0.16);
 }
 
+/* ==========================================================================
+   Broadcast Announcement Ticker
+   ========================================================================== */
+@keyframes cp-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-cp-marquee {
+  animation: cp-marquee 30s linear infinite;
+}
+
+.animate-cp-marquee:hover,
+.animate-cp-marquee:focus-within {
+  animation-play-state: paused;
+}
+
+
