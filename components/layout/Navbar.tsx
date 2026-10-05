@@ -8,15 +8,7 @@ import LanguageToggle from "./LanguageToggle";
 import Avatar from "@/components/ui/Avatar";
 import { IconArrowRight, IconBolt, IconMenu, IconX } from "@/components/ui/Icon";
 import { useUser } from "@/context/UserContext";
-
-const links = [
-  { href: "/", label: "Accueil" },
-  { href: "/parcours", label: "Cours" },
-  { href: "/fonctionnalites", label: "Fonctionnalités" },
-  { href: "/ressources", label: "Ressources" },
-  { href: "/materiel", label: "Matériel" },
-  { href: "/a-propos", label: "À propos" },
-];
+import { useTranslation } from "@/lib/i18n";
 
 interface NavbarProps {
   motionEnabled: boolean;
@@ -29,7 +21,18 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const { hydrated, isAuthenticated, isStaff, profile } = useUser();
+  const { lang } = useTranslation();
+  const isEn = lang === "en";
   const spaceHref = isStaff ? "/admin" : "/dashboard";
+
+  const links = [
+    { href: "/", label: isEn ? "Home" : "Accueil" },
+    { href: "/parcours", label: isEn ? "Tracks & Courses" : "Cours" },
+    { href: "/fonctionnalites", label: isEn ? "Features" : "Fonctionnalités" },
+    { href: "/ressources", label: isEn ? "Resources" : "Ressources" },
+    { href: "/materiel", label: isEn ? "Hardware" : "Matériel" },
+    { href: "/a-propos", label: isEn ? "About" : "À propos" },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -52,19 +55,22 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
     >
       <div className="public-container nav-inner">
         <Logo variant="badge" />
-        <button
-          ref={menuButton}
-          type="button"
-          className="nav-menu-toggle"
-          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-expanded={open}
-          aria-controls="public-navigation"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <IconX size={24} /> : <IconMenu size={24} />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageToggle />
+          <button
+            ref={menuButton}
+            type="button"
+            className="nav-menu-toggle"
+            aria-label={open ? (isEn ? "Close menu" : "Fermer le menu") : (isEn ? "Open menu" : "Ouvrir le menu")}
+            aria-expanded={open}
+            aria-controls="public-navigation"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <IconX size={24} /> : <IconMenu size={24} />}
+          </button>
+        </div>
         <div id="public-navigation" className={`nav-content ${open ? "is-open" : ""}`}>
-          <nav aria-label="Navigation principale">
+          <nav aria-label={isEn ? "Main navigation" : "Navigation principale"}>
             {links.map((link) => (
               <Link
                 key={link.href}
@@ -80,20 +86,22 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
             <button
               type="button"
               className="motion-toggle"
-              aria-label="Activer les animations"
+              aria-label={isEn ? "Toggle animations" : "Activer les animations"}
               aria-pressed={motionEnabled}
-              title={motionEnabled ? "Désactiver les animations" : "Activer les animations"}
+              title={motionEnabled ? (isEn ? "Disable animations" : "Désactiver les animations") : (isEn ? "Enable animations" : "Activer les animations")}
               onClick={onToggleMotion}
             >
               <IconBolt size={20} />
             </button>
-            <LanguageToggle />
+            <div className="hidden lg:inline-flex">
+              <LanguageToggle />
+            </div>
             {!hydrated ? (
               <span className="nav-session-placeholder" aria-hidden="true" />
             ) : isAuthenticated ? (
               <>
                 <Link href={spaceHref} className="public-button button-primary" onClick={() => setOpen(false)}>
-                  {isStaff ? "Console admin" : "Mon espace"} <IconArrowRight size={16} />
+                  {isStaff ? (isEn ? "Admin Console" : "Console admin") : (isEn ? "My Dashboard" : "Mon espace")} <IconArrowRight size={16} />
                 </Link>
                 {profile && (
                   <Link href="/profile" className="nav-avatar" aria-label={`Mon profil (${profile.display_name})`} onClick={() => setOpen(false)}>
@@ -103,8 +111,8 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
               </>
             ) : (
               <>
-                <Link href="/login" className="public-button button-outline">Se connecter</Link>
-                <Link href="/register" className="public-button button-primary">S&apos;inscrire</Link>
+                <Link href="/login" className="public-button button-outline">{isEn ? "Sign In" : "Se connecter"}</Link>
+                <Link href="/register" className="public-button button-primary">{isEn ? "Sign Up" : "S'inscrire"}</Link>
               </>
             )}
           </div>

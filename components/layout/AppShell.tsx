@@ -105,7 +105,7 @@ export default function AppShell({ children, allowGuest = false }: { children: R
         <header className="learner-topbar">
           <div className="learner-topbar__logo md:hidden"><Logo /></div>
           {profile ? (
-            <div className="flex items-center gap-3">
+            <div className="learner-topbar__progress flex items-center gap-3">
               <dl className="learner-stats" aria-label="Ta progression">
                 <div className="learner-stat learner-stat--level" title={level ? `${level.title} · ${levelProgress} % vers le niveau suivant` : undefined}>
                   <span className="learner-ring" style={{ "--ring": `${levelProgress}` } as React.CSSProperties} aria-hidden="true"><span>{profile.level}</span></span>
