@@ -1,5 +1,3 @@
-import * as fs from "fs";
-import * as path from "path";
 import {
   beginText,
   endText,
@@ -29,8 +27,9 @@ import {
   FONT_INTER_REGULAR,
   FONT_INTER_SEMI_BOLD,
   FONT_MONO_MEDIUM,
+  SIGNATURE_PNG,
   WORDMARK_PNG,
-} from "@/supabase/functions/generate-certificate/brand";
+} from "@/lib/certificate-brand";
 
 export interface GenerateCertificateParams {
   recipientName: string;
@@ -258,21 +257,11 @@ export async function generateCertificatePdf(params: GenerateCertificateParams):
   pdf.catalog.getOrCreateViewerPreferences().setDisplayDocTitle(true);
 
   const fonts = await loadFonts(pdf);
-  const [wordmark, emblem] = await Promise.all([
+  const [wordmark, emblem, signatureImg] = await Promise.all([
     pdf.embedPng(fromBase64(WORDMARK_PNG)),
     pdf.embedPng(fromBase64(EMBLEM_PNG)),
+    pdf.embedPng(fromBase64(SIGNATURE_PNG)),
   ]);
-
-  // Load authentic signature if available
-  let signatureImg: PDFImage | null = null;
-  try {
-    const sigPath = path.join(process.cwd(), "public", "images", "signature.png");
-    if (fs.existsSync(sigPath)) {
-      signatureImg = await pdf.embedPng(fs.readFileSync(sigPath));
-    }
-  } catch (e) {
-    console.warn("Signature non chargée :", e);
-  }
 
   const page = pdf.addPage([CERTIFICATE_PAGE.width, CERTIFICATE_PAGE.height]);
   const { width } = CERTIFICATE_PAGE;
