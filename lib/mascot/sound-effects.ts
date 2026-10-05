@@ -168,3 +168,18 @@ export function speakRealisticVoice(text: string, options?: { volume?: number; o
 
   window.speechSynthesis.speak(utterance);
 }
+
+/** Stops any active speech synthesis */
+export function stopRealisticVoice() {
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+export function isSpeakingRealisticVoice(): boolean {
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    return window.speechSynthesis.speaking;
+  }
+  return false;
+}
+

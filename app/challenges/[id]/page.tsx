@@ -11,6 +11,7 @@ import LabEquipment from "@/components/equipment/LabEquipment";
 import LabReportForm from "@/components/challenges/LabReportForm";
 import LabTasks from "@/components/challenges/LabTasks";
 import LabTerminal from "@/components/challenges/LabTerminal";
+import LabAIAuditor from "@/components/ai-agent/LabAIAuditor";
 import PacketTracerGateway from "@/components/challenges/PacketTracerGateway";
 import { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
 import Badge from "@/components/ui/Badge";
@@ -133,6 +134,7 @@ function ChallengeDetailView() {
                 {tasks.length > 0 && <LabTasks tasks={tasks} signedIn={Boolean(userId)} signInHref={loginHref(`/challenges/${slug}`)} xpReward={lab.xp_reward} onSolved={taskSolved} />}
                 {!isTerminal && tasks.length === 0 && <section className="lab-panel"><h2>Questions du lab</h2><p>Les questions de ce lab sont en cours de rédaction par l’équipe.</p></section>}
                 {!isTerminal && solved && <section className="lab-panel lab-feedback-zone"><p className="lab-feedback is-correct" role="status"><IconTrophy size={16} /> Bravo, lab terminé ! Tu peux relire les fichiers à tout moment.</p></section>}
+                <LabAIAuditor labTitle={lab.title} labCategory={lab.category} />
                 {hasReport && userId && <LabReportForm labId={lab.id} userId={userId} published={published} />}
                 {isTerminal && (!userId ? (
                   <section className="lab-panel"><h2>Ta réponse</h2><p><IconLock size={15} /> Connecte-toi pour soumettre ton flag, suivre tes tentatives et gagner +{lab.xp_reward} XP.</p><div className="study-actions"><Link className="study-button" href={loginHref(`/challenges/${slug}`)}>Se connecter pour répondre</Link><Link className="study-button study-button--ghost" href="/register">Créer un compte gratuit</Link></div></section>
