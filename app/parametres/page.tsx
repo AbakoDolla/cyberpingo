@@ -419,17 +419,45 @@ function SettingsContent() {
               </div>
             )}
             <form className="set-form" onSubmit={(event) => void savePreferences(event)}>
-              <Select
-                label="Langue de l’interface"
-                value={lang}
-                onChange={(event) => setLanguage(event.target.value as Language)}
-                options={[
-                  { value: "fr", label: "Français (par défaut)" },
-                  { value: "en", label: "English" },
-                ]}
-                disabled={settingsLoading || busy !== null}
-              />
-              <Select label="Fuseau horaire" value={prefTimezone} onChange={(event) => setPrefTimezone(event.target.value)} options={timezoneOptions} disabled={settingsLoading || busy !== null} />
+              <div className="p-4 rounded-xl border border-cyber-border bg-cyber-surface/60 mb-4">
+                <label className="block text-sm font-semibold text-white mb-1">
+                  {lang === "en" ? "Platform Language / Langue de la plateforme" : "Langue de la plateforme / Platform Language"}
+                </label>
+                <p className="text-xs text-cyber-muted mb-3">
+                  {lang === "en"
+                    ? "Changes the language across the entire platform in real time: navigation, courses, and labs."
+                    : "Modifie la langue sur l’ensemble de la plateforme en temps réel : navigation, cours et labs."}
+                </p>
+                <div className="grid grid-cols-2 gap-3 max-w-md">
+                  <button
+                    type="button"
+                    onClick={() => setLanguage("fr")}
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border font-medium text-sm transition-all ${
+                      lang === "fr"
+                        ? "border-cyber-cyan bg-cyber-cyan/15 text-white shadow-[0_0_12px_rgba(0,240,255,0.25)]"
+                        : "border-cyber-border bg-cyber-bg text-cyber-muted hover:border-cyber-border-light hover:text-white"
+                    }`}
+                  >
+                    <span className="text-base" aria-hidden="true">🇫🇷</span>
+                    <span>Français</span>
+                    {lang === "fr" && <span className="text-[10px] uppercase font-bold text-cyber-cyan ml-1 bg-cyber-cyan/10 px-1.5 py-0.5 rounded">Actif</span>}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLanguage("en")}
+                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border font-medium text-sm transition-all ${
+                      lang === "en"
+                        ? "border-cyber-cyan bg-cyber-cyan/15 text-white shadow-[0_0_12px_rgba(0,240,255,0.25)]"
+                        : "border-cyber-border bg-cyber-bg text-cyber-muted hover:border-cyber-border-light hover:text-white"
+                    }`}
+                  >
+                    <span className="text-base" aria-hidden="true">🇬🇧</span>
+                    <span>English</span>
+                    {lang === "en" && <span className="text-[10px] uppercase font-bold text-cyber-cyan ml-1 bg-cyber-cyan/10 px-1.5 py-0.5 rounded">Active</span>}
+                  </button>
+                </div>
+              </div>
+              <Select label={lang === "en" ? "Timezone" : "Fuseau horaire"} value={prefTimezone} onChange={(event) => setPrefTimezone(event.target.value)} options={timezoneOptions} disabled={settingsLoading || busy !== null} />
               {settingsLoading ? (
                 <div className="set-switch-list" aria-busy="true">
                   {Array.from({ length: 4 }).map((_, index) => <span key={index} className="ui-skeleton set-switch-skeleton" />)}

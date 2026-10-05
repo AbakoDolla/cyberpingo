@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { useTranslation } from "@/lib/i18n";
-import { IconAI, IconActivity, IconCourses, IconDashboard, IconGlobe, IconProfile, IconShield } from "@/components/ui/Icon";
+import { IconActivity, IconCourses, IconDashboard, IconGlobe, IconProfile, IconShield, IconTrophy } from "@/components/ui/Icon";
 
 export default function MobileNav() {
   const pathname = usePathname();
@@ -17,7 +17,7 @@ export default function MobileNav() {
     { href: "/dashboard", label: isEn ? "Home" : "Accueil", Icon: IconDashboard },
     { href: "/courses", label: t("nav.courses"), Icon: IconCourses },
     { href: "/challenges", label: t("nav.labs"), Icon: IconShield },
-    { href: "/mentor", label: t("nav.mentor"), Icon: IconAI },
+    { href: "/classement", label: t("nav.leaderboard"), Icon: IconTrophy },
     { href: "/profile", label: t("nav.profile"), Icon: IconProfile },
   ];
 

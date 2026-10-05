@@ -12,7 +12,7 @@ export default function Logo({ className, variant = "default" }: LogoProps) {
       <Link href="/" aria-label="CyberPingo, accueil" className={`site-logo group ${className ?? ""}`}>
         <span className="site-logo__badge" aria-hidden="true">
           <Image
-            src="/images/mascot/professeur-pingo-face.png"
+            src="/images/brand/cyberpingo-mark-square.webp"
             alt=""
             width={192}
             height={192}
@@ -34,7 +34,7 @@ export default function Logo({ className, variant = "default" }: LogoProps) {
     <Link href="/" aria-label="CyberPingo, accueil" className={`site-logo group ${className ?? ""}`}>
       <span className="site-logo__badge" aria-hidden="true">
         <Image
-          src="/images/mascot/professeur-pingo-face.png"
+          src="/images/brand/cyberpingo-mark-square.webp"
           alt=""
           width={128}
           height={128}

@@ -11,7 +11,6 @@ import RewardToasts from "@/components/ui/RewardToasts";
 import MascotCoach from "@/components/mascot/MascotCoach";
 import CbBalanceChip from "@/components/cyberbits/CbBalanceChip";
 import AmbientBackground from "./AmbientBackground";
-import LanguageToggle from "./LanguageToggle";
 import { IconAlert, IconArrowRight, IconBell, IconBolt, IconFlame, IconLock } from "@/components/ui/Icon";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { formatNumber } from "@/lib/format";
@@ -126,7 +125,6 @@ export default function AppShell({ children, allowGuest = false }: { children: R
             <p className="learner-guest-note"><span aria-hidden="true" />Mode découverte : connecte-toi pour enregistrer ta progression.</p>
           ) : <span className="hidden md:block" />}
           <div className="learner-toplinks">
-            <LanguageToggle />
             {isStaff && <Link href="/admin" className="learner-admin-link">Console admin</Link>}
             <Link href="/ressources" className="learner-text-link hidden sm:inline-flex">Guides</Link>
             {profile && (

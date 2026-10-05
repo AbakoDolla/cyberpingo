@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
-import LanguageToggle from "./LanguageToggle";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { useTranslation } from "@/lib/i18n";
@@ -13,7 +12,7 @@ import {
 } from "@/components/ui/Icon";
 import CoinIcon from "@/components/cyberbits/CoinIcon";
 
-type NavItem = { href: string; label: string; Icon: typeof IconDashboard };
+type NavItem = { href: string; label: string; Icon: typeof IconDashboard; disabled?: boolean; badgeText?: string };
 
 const LEARN_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Tableau de bord", Icon: IconDashboard },
@@ -23,7 +22,7 @@ const LEARN_ITEMS: NavItem[] = [
   { href: "/classement", label: "Classement", Icon: IconTrophy },
   { href: "/progression", label: "Ma progression", Icon: IconActivity },
   { href: "/competences", label: "Compétences", Icon: IconTarget },
-  { href: "/mentor", label: "Mentor IA", Icon: IconAI },
+  { href: "/mentor", label: "Mentor IA", Icon: IconAI, disabled: true, badgeText: "Bientôt" },
 ];
 
 const ACCOUNT_ITEMS: NavItem[] = [
@@ -51,9 +50,26 @@ function NavGroup({ title, items, pathname, badge }: { title: string; items: Nav
   return (
     <div className="sidebar-group">
       <p className="sidebar-group__title">{title}</p>
-      {items.map(({ href, label, Icon }) => {
+      {items.map(({ href, label, Icon, disabled, badgeText }) => {
         const active = isActive(pathname, href);
         const count = badge?.(href) ?? 0;
+
+        if (disabled) {
+          return (
+            <div
+              key={href}
+              className="sidebar-link opacity-45 cursor-not-allowed select-none pointer-events-none"
+              aria-disabled="true"
+            >
+              <span className="sidebar-link__icon"><Icon size={17} strokeWidth={1.7} /></span>
+              <span className="sidebar-link__label">{label}</span>
+              <span className="text-[10px] font-mono font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/10 text-white/50 border border-white/10 ml-auto">
+                {badgeText || "Bientôt"}
+              </span>
+            </div>
+          );
+        }
+
         return (
           <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("sidebar-link", active && "is-active")}>
             <span className="sidebar-link__icon"><Icon size={17} strokeWidth={active ? 2.1 : 1.7} /></span>
@@ -99,7 +115,13 @@ export default function Sidebar() {
     { href: "/classement", label: t("nav.leaderboard"), Icon: IconTrophy },
     { href: "/progression", label: t("nav.progress"), Icon: IconActivity },
     { href: "/competences", label: t("nav.skills"), Icon: IconTarget },
-    { href: "/mentor", label: t("nav.mentor"), Icon: IconAI },
+    {
+      href: "/mentor",
+      label: t("nav.mentor"),
+      Icon: IconAI,
+      disabled: true,
+      badgeText: isEn ? "Soon" : "Bientôt",
+    },
   ];
 
   const accountItems: NavItem[] = [
@@ -148,10 +170,6 @@ export default function Sidebar() {
           <LevelMini />
         </>
       )}
-      <div className="sidebar-footer">
-        <span className="sidebar-footer__label">{isEn ? "Language" : "Langue"}</span>
-        <LanguageToggle />
-      </div>
     </aside>
   );
 }

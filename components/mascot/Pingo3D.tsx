@@ -49,12 +49,31 @@ export function Pingo3D({ pose = "idle", rank, className = "", fallback, interac
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
-    setSupported(hasWebGL());
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReduced(query.matches);
     const onChange = (event: MediaQueryListEvent) => setReduced(event.matches);
     query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
+
+    // Defer WebGL detection and scene loading until after main thread settles for instant page navigation
+    let cancel: (() => void) | undefined;
+    if (typeof window !== "undefined") {
+      const win = window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+        cancelIdleCallback?: (id: number) => void;
+      };
+      if (typeof win.requestIdleCallback === "function") {
+        const id = win.requestIdleCallback(() => setSupported(hasWebGL()), { timeout: 1200 });
+        cancel = () => win.cancelIdleCallback?.(id);
+      } else {
+        const id = setTimeout(() => setSupported(hasWebGL()), 400);
+        cancel = () => clearTimeout(id);
+      }
+    }
+
+    return () => {
+      query.removeEventListener("change", onChange);
+      cancel?.();
+    };
   }, []);
 
   useEffect(() => {

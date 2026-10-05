@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Logo from "./Logo";
-import LanguageToggle from "./LanguageToggle";
 import Avatar from "@/components/ui/Avatar";
 import { IconArrowRight, IconBolt, IconMenu, IconX } from "@/components/ui/Icon";
 import { useUser } from "@/context/UserContext";
@@ -56,7 +55,6 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
       <div className="public-container nav-inner">
         <Logo variant="badge" />
         <div className="flex items-center gap-2 lg:hidden">
-          <LanguageToggle />
           <button
             ref={menuButton}
             type="button"
@@ -93,9 +91,6 @@ export default function Navbar({ motionEnabled, onToggleMotion }: NavbarProps) {
             >
               <IconBolt size={20} />
             </button>
-            <div className="hidden lg:inline-flex">
-              <LanguageToggle />
-            </div>
             {!hydrated ? (
               <span className="nav-session-placeholder" aria-hidden="true" />
             ) : isAuthenticated ? (

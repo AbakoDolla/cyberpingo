@@ -29,6 +29,7 @@ import DailyMysteryChest from "@/components/cyberbits/DailyMysteryChest";
 import SlugIcon from "@/components/ui/SlugIcon";
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
+import { useTranslation } from "@/lib/i18n";
 import { dateInZone, effectiveStreak } from "@/lib/levels";
 import { formatDate, formatDuration, formatNumber, formatRelative, formatShortDate, greeting, levelLabel, plural } from "@/lib/format";
 import { getMyAcademy } from "@/services/academy.service";
