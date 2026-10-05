@@ -11,6 +11,7 @@ import LabEquipment from "@/components/equipment/LabEquipment";
 import LabReportForm from "@/components/challenges/LabReportForm";
 import LabTasks from "@/components/challenges/LabTasks";
 import LabTerminal from "@/components/challenges/LabTerminal";
+import LabAIAuditor from "@/components/ai-agent/LabAIAuditor";
 import PacketTracerGateway from "@/components/challenges/PacketTracerGateway";
 import { LAB_CATEGORY_LABELS } from "@/components/challenges/ChallengeCard";
 import Badge from "@/components/ui/Badge";
@@ -110,6 +111,16 @@ function ChallengeDetailView() {
               <div className="lab-layout__main">
                 {lab.briefing && <section className="lab-panel lab-briefing"><h2>Mise en situation</h2><p>{lab.briefing}</p></section>}
                 <LabEquipment slug={lab.slug} />
+                <figure className="lesson-media lesson-video-slot mb-4">
+                  <div className="lesson-video-slot__frame" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9.5 5 2.5-5 2.5z" /></svg>
+                  </div>
+                  <figcaption>
+                    <strong>Démonstration vidéo du lab en préparation</strong>
+                    <span>Scénario : {lab.title}</span>
+                    <small>Emplacement réservé. Résous le laboratoire avec le briefing, les objectifs et les outils ci-dessous.</small>
+                  </figcaption>
+                </figure>
                 <section className="lab-panel"><h2>Objectifs</h2><ul>{lab.objectives.map((objective) => <li key={objective}><IconCheck size={15} />{objective}</li>)}</ul></section>
                 {(lab.constraints.length > 0 || lab.tools.length > 0) && (
                   <section className="lab-panel lab-context" aria-label="Contraintes et outils">
@@ -123,6 +134,7 @@ function ChallengeDetailView() {
                 {tasks.length > 0 && <LabTasks tasks={tasks} signedIn={Boolean(userId)} signInHref={loginHref(`/challenges/${slug}`)} xpReward={lab.xp_reward} onSolved={taskSolved} />}
                 {!isTerminal && tasks.length === 0 && <section className="lab-panel"><h2>Questions du lab</h2><p>Les questions de ce lab sont en cours de rédaction par l’équipe.</p></section>}
                 {!isTerminal && solved && <section className="lab-panel lab-feedback-zone"><p className="lab-feedback is-correct" role="status"><IconTrophy size={16} /> Bravo, lab terminé ! Tu peux relire les fichiers à tout moment.</p></section>}
+                <LabAIAuditor labTitle={lab.title} labCategory={lab.category} />
                 {hasReport && userId && <LabReportForm labId={lab.id} userId={userId} published={published} />}
                 {isTerminal && (!userId ? (
                   <section className="lab-panel"><h2>Ta réponse</h2><p><IconLock size={15} /> Connecte-toi pour soumettre ton flag, suivre tes tentatives et gagner +{lab.xp_reward} XP.</p><div className="study-actions"><Link className="study-button" href={loginHref(`/challenges/${slug}`)}>Se connecter pour répondre</Link><Link className="study-button study-button--ghost" href="/register">Créer un compte gratuit</Link></div></section>

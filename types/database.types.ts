@@ -2408,6 +2408,12 @@ export type Database = {
         }
         Returns: Json
       }
+      get_leaderboard: {
+        Args: {
+          p_limit?: number
+        }
+        Returns: Json[]
+      }
       get_my_academy: {
         Args: never
         Returns: Json

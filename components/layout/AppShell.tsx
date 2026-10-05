@@ -10,6 +10,8 @@ import Avatar from "@/components/ui/Avatar";
 import RewardToasts from "@/components/ui/RewardToasts";
 import MascotCoach from "@/components/mascot/MascotCoach";
 import CbBalanceChip from "@/components/cyberbits/CbBalanceChip";
+import AmbientBackground from "./AmbientBackground";
+import LanguageToggle from "./LanguageToggle";
 import { IconAlert, IconArrowRight, IconBell, IconBolt, IconFlame, IconLock } from "@/components/ui/Icon";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { formatNumber } from "@/lib/format";
@@ -85,16 +87,25 @@ export default function AppShell({ children, allowGuest = false }: { children: R
   }
 
   const levelProgress = level?.progress_percentage ?? 0;
+  const rankTheme = (() => {
+    const lvl = profile?.level ?? 1;
+    if (lvl >= 9) return "legend";
+    if (lvl >= 7) return "amber";
+    if (lvl >= 5) return "amethyst";
+    if (lvl >= 3) return "emerald";
+    return "cyan";
+  })();
 
   return (
-    <div className="learner-shell">
+    <div className="learner-shell" data-rank-theme={rankTheme}>
+      <AmbientBackground />
       <a className="learner-skip-link" href="#contenu">Aller au contenu principal</a>
       <Sidebar />
       <div className="learner-main">
         <header className="learner-topbar">
           <div className="learner-topbar__logo md:hidden"><Logo /></div>
           {profile ? (
-            <div className="flex items-center gap-3">
+            <div className="learner-topbar__progress flex items-center gap-3">
               <dl className="learner-stats" aria-label="Ta progression">
                 <div className="learner-stat learner-stat--level" title={level ? `${level.title} · ${levelProgress} % vers le niveau suivant` : undefined}>
                   <span className="learner-ring" style={{ "--ring": `${levelProgress}` } as React.CSSProperties} aria-hidden="true"><span>{profile.level}</span></span>
@@ -115,6 +126,7 @@ export default function AppShell({ children, allowGuest = false }: { children: R
             <p className="learner-guest-note"><span aria-hidden="true" />Mode découverte : connecte-toi pour enregistrer ta progression.</p>
           ) : <span className="hidden md:block" />}
           <div className="learner-toplinks">
+            <LanguageToggle />
             {isStaff && <Link href="/admin" className="learner-admin-link">Console admin</Link>}
             <Link href="/ressources" className="learner-text-link hidden sm:inline-flex">Guides</Link>
             {profile && (

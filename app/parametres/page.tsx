@@ -30,6 +30,7 @@ import { levelLabel } from "@/lib/format";
 import { DAILY_GOALS } from "@/lib/navigation";
 import { passwordProblem, updateEmail, updatePassword } from "@/services/auth.service";
 import { getMySettings, updateMySettings, type ProfileChanges, type SettingsChanges } from "@/services/profile.service";
+import { useTranslation, type Language } from "@/lib/i18n";
 import type { LearningGoal, SkillLevel } from "@/types/api";
 
 const RESET_PHRASE = "RÉINITIALISER";
@@ -109,6 +110,7 @@ function CheckSwitch({
 function SettingsContent() {
   const router = useRouter();
   const { profile, timezone } = useLearner();
+  const { lang, setLanguage } = useTranslation();
   const { updateProfile, resetProgress, deleteAccount, logout, refresh } = useUserActions();
   const { data: settings, error: settingsError, loading: settingsLoading, reload: reloadSettings } = useAsync(() => getMySettings(profile.id), [profile.id]);
   const [statuses, setStatuses] = useState<Record<SectionKey, Status | null>>({
@@ -417,6 +419,16 @@ function SettingsContent() {
               </div>
             )}
             <form className="set-form" onSubmit={(event) => void savePreferences(event)}>
+              <Select
+                label="Langue de l’interface"
+                value={lang}
+                onChange={(event) => setLanguage(event.target.value as Language)}
+                options={[
+                  { value: "fr", label: "Français (par défaut)" },
+                  { value: "en", label: "English" },
+                ]}
+                disabled={settingsLoading || busy !== null}
+              />
               <Select label="Fuseau horaire" value={prefTimezone} onChange={(event) => setPrefTimezone(event.target.value)} options={timezoneOptions} disabled={settingsLoading || busy !== null} />
               {settingsLoading ? (
                 <div className="set-switch-list" aria-busy="true">

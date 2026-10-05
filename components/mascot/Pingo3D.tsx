@@ -8,6 +8,7 @@ const Scene = dynamic(() => import("./Pingo3DScene"), { ssr: false });
 
 interface Pingo3DProps {
   pose?: Pingo3DPose;
+  rank?: number;
   className?: string;
   fallback?: ReactNode;
   interactive?: boolean;
@@ -39,7 +40,7 @@ function hasWebGL() {
   }
 }
 
-export function Pingo3D({ pose = "idle", className = "", fallback, interactive = true, label = "Pingo, la mascotte 3D de CyberPingo" }: Pingo3DProps) {
+export function Pingo3D({ pose = "idle", rank, className = "", fallback, interactive = true, label = "Pingo, la mascotte 3D de CyberPingo" }: Pingo3DProps) {
   const host = useRef<HTMLDivElement>(null);
   const [supported, setSupported] = useState(false);
   const [near, setNear] = useState(false);
@@ -79,7 +80,7 @@ export function Pingo3D({ pose = "idle", className = "", fallback, interactive =
       {supported && near ? (
         <div className="pingo3d__canvas">
           <SceneBoundary onError={onFail}>
-            <Scene pose={pose} reduced={reduced} interactive={interactive} active={visible} onReady={onReady} />
+            <Scene pose={pose} rank={rank} reduced={reduced} interactive={interactive} active={visible} onReady={onReady} />
           </SceneBoundary>
         </div>
       ) : null}

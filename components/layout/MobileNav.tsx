@@ -4,31 +4,35 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
+import { useTranslation } from "@/lib/i18n";
 import { IconAI, IconActivity, IconCourses, IconDashboard, IconGlobe, IconProfile, IconShield } from "@/components/ui/Icon";
-
-const LEARNER_ITEMS = [
-  { href: "/dashboard", label: "Accueil", Icon: IconDashboard },
-  { href: "/courses", label: "Cours", Icon: IconCourses },
-  { href: "/challenges", label: "Labs", Icon: IconShield },
-  { href: "/mentor", label: "Mentor", Icon: IconAI },
-  { href: "/profile", label: "Profil", Icon: IconProfile },
-];
-
-const GUEST_ITEMS = [
-  { href: "/", label: "Accueil", Icon: IconGlobe },
-  { href: "/courses", label: "Cours", Icon: IconCourses },
-  { href: "/challenges", label: "Labs", Icon: IconShield },
-  { href: "/parcours", label: "Parcours", Icon: IconActivity },
-  { href: "/login", label: "Connexion", Icon: IconProfile },
-];
 
 export default function MobileNav() {
   const pathname = usePathname();
   const { hydrated, isAuthenticated } = useUser();
-  const items = hydrated && !isAuthenticated ? GUEST_ITEMS : LEARNER_ITEMS;
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
+
+  const learnerItems = [
+    { href: "/dashboard", label: isEn ? "Home" : "Accueil", Icon: IconDashboard },
+    { href: "/courses", label: t("nav.courses"), Icon: IconCourses },
+    { href: "/challenges", label: t("nav.labs"), Icon: IconShield },
+    { href: "/mentor", label: t("nav.mentor"), Icon: IconAI },
+    { href: "/profile", label: t("nav.profile"), Icon: IconProfile },
+  ];
+
+  const guestItems = [
+    { href: "/", label: isEn ? "Home" : "Accueil", Icon: IconGlobe },
+    { href: "/courses", label: t("nav.courses"), Icon: IconCourses },
+    { href: "/challenges", label: t("nav.labs"), Icon: IconShield },
+    { href: "/parcours", label: isEn ? "Tracks" : "Parcours", Icon: IconActivity },
+    { href: "/login", label: isEn ? "Sign In" : "Connexion", Icon: IconProfile },
+  ];
+
+  const items = hydrated && !isAuthenticated ? guestItems : learnerItems;
 
   return (
-    <nav className="learner-mobile-nav md:hidden" aria-label="Navigation principale">
+    <nav className="learner-mobile-nav md:hidden" aria-label={isEn ? "Main navigation" : "Navigation principale"}>
       {items.map(({ href, label, Icon }) => {
         const active = href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
         return (
@@ -41,3 +45,4 @@ export default function MobileNav() {
     </nav>
   );
 }
+

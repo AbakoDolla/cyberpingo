@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "./Logo";
+import LanguageToggle from "./LanguageToggle";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
+import { useTranslation } from "@/lib/i18n";
 import {
   IconActivity, IconAI, IconArrowRight, IconBell, IconCourses, IconDashboard, IconFlame, IconGlobe, IconLesson,
-  IconMap, IconProfile, IconSettings, IconShield, IconTarget, IconUsers,
+  IconMap, IconProfile, IconSettings, IconShield, IconTarget, IconTrophy, IconUsers,
 } from "@/components/ui/Icon";
 import CoinIcon from "@/components/cyberbits/CoinIcon";
 
@@ -18,6 +20,7 @@ const LEARN_ITEMS: NavItem[] = [
   { href: "/courses", label: "Cours", Icon: IconCourses },
   { href: "/challenges", label: "Labs", Icon: IconShield },
   { href: "/boutique", label: "Boutique", Icon: CoinIcon as unknown as typeof IconDashboard },
+  { href: "/classement", label: "Classement", Icon: IconTrophy },
   { href: "/progression", label: "Ma progression", Icon: IconActivity },
   { href: "/competences", label: "Compétences", Icon: IconTarget },
   { href: "/mentor", label: "Mentor IA", Icon: IconAI },
@@ -34,6 +37,7 @@ const GUEST_ITEMS: NavItem[] = [
   { href: "/courses", label: "Cours", Icon: IconCourses },
   { href: "/challenges", label: "Labs", Icon: IconShield },
   { href: "/boutique", label: "Boutique", Icon: CoinIcon as unknown as typeof IconDashboard },
+  { href: "/classement", label: "Classement", Icon: IconTrophy },
   { href: "/parcours", label: "Parcours métiers", Icon: IconMap },
   { href: "/ressources", label: "Ressources", Icon: IconLesson },
 ];
@@ -83,34 +87,71 @@ function LevelMini() {
 export default function Sidebar() {
   const pathname = usePathname();
   const { hydrated, isAuthenticated, isStaff, unreadNotifications } = useUser();
+  const { lang, t } = useTranslation();
+  const isEn = lang === "en";
   const guest = hydrated && !isAuthenticated;
+
+  const learnItems: NavItem[] = [
+    { href: "/dashboard", label: t("nav.dashboard"), Icon: IconDashboard },
+    { href: "/courses", label: t("nav.courses"), Icon: IconCourses },
+    { href: "/challenges", label: t("nav.labs"), Icon: IconShield },
+    { href: "/boutique", label: t("nav.shop"), Icon: CoinIcon as unknown as typeof IconDashboard },
+    { href: "/classement", label: t("nav.leaderboard"), Icon: IconTrophy },
+    { href: "/progression", label: t("nav.progress"), Icon: IconActivity },
+    { href: "/competences", label: t("nav.skills"), Icon: IconTarget },
+    { href: "/mentor", label: t("nav.mentor"), Icon: IconAI },
+  ];
+
+  const accountItems: NavItem[] = [
+    { href: "/notifications", label: t("nav.notifications"), Icon: IconBell },
+    { href: "/profile", label: t("nav.profile"), Icon: IconProfile },
+    { href: "/parametres", label: t("nav.settings"), Icon: IconSettings },
+  ];
+
+  const guestItems: NavItem[] = [
+    { href: "/", label: isEn ? "Home" : "Accueil", Icon: IconGlobe },
+    { href: "/courses", label: t("nav.courses"), Icon: IconCourses },
+    { href: "/challenges", label: t("nav.labs"), Icon: IconShield },
+    { href: "/boutique", label: t("nav.shop"), Icon: CoinIcon as unknown as typeof IconDashboard },
+    { href: "/classement", label: t("nav.leaderboard"), Icon: IconTrophy },
+    { href: "/parcours", label: isEn ? "Tracks" : "Parcours métiers", Icon: IconMap },
+    { href: "/ressources", label: t("nav.resources"), Icon: IconLesson },
+  ];
 
   return (
     <aside className="learner-sidebar">
       <Logo className="px-2 mb-7" />
       {guest ? (
         <>
-          <nav aria-label="Navigation découverte"><NavGroup title="Découvrir" items={GUEST_ITEMS} pathname={pathname} /></nav>
+          <nav aria-label={isEn ? "Discovery navigation" : "Navigation découverte"}>
+            <NavGroup title={isEn ? "Discover" : "Découvrir"} items={guestItems} pathname={pathname} />
+          </nav>
           <div className="sidebar-cta">
-            <strong>Garde ta progression.</strong>
-            <p>Crée ton compte gratuit pour gagner des XP, débloquer des badges et suivre ta série.</p>
-            <Link href="/register" className="study-button study-button--sm">Créer un compte <IconArrowRight size={14} /></Link>
+            <strong>{isEn ? "Keep your progress." : "Garde ta progression."}</strong>
+            <p>{isEn ? "Create your free account to earn XP, unlock badges and track your streak." : "Crée ton compte gratuit pour gagner des XP, débloquer des badges et suivre ta série."}</p>
+            <Link href="/register" className="study-button study-button--sm">
+              {isEn ? "Create account" : "Créer un compte"} <IconArrowRight size={14} />
+            </Link>
           </div>
         </>
       ) : (
         <>
-          <nav aria-label="Navigation de l’espace apprenant">
-            <NavGroup title="Apprendre" items={LEARN_ITEMS} pathname={pathname} />
-            <NavGroup title="Compte" items={ACCOUNT_ITEMS} pathname={pathname} badge={(href) => (href === "/notifications" ? unreadNotifications : 0)} />
+          <nav aria-label={isEn ? "Learner navigation" : "Navigation de l’espace apprenant"}>
+            <NavGroup title={isEn ? "Learn" : "Apprendre"} items={learnItems} pathname={pathname} />
+            <NavGroup title={isEn ? "Account" : "Compte"} items={accountItems} pathname={pathname} badge={(href) => (href === "/notifications" ? unreadNotifications : 0)} />
             {isStaff && (
               <Link href="/admin" className="sidebar-admin-link">
-                <IconUsers size={16} /> Console admin <IconArrowRight size={14} />
+                <IconUsers size={16} /> {isEn ? "Admin Console" : "Console admin"} <IconArrowRight size={14} />
               </Link>
             )}
           </nav>
           <LevelMini />
         </>
       )}
+      <div className="sidebar-footer">
+        <span className="sidebar-footer__label">{isEn ? "Language" : "Langue"}</span>
+        <LanguageToggle />
+      </div>
     </aside>
   );
 }

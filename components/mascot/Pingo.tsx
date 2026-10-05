@@ -16,6 +16,7 @@ export type PingoState =
 
 type PingoProps = {
   state?: PingoState;
+  rank?: number;
   size?: number;
   className?: string;
   title?: string;
@@ -24,7 +25,7 @@ type PingoProps = {
 const CYAN = "#00E5FF";
 const ORANGE = "#FF9F1C";
 
-export default function Pingo({ state = "idle", size = 200, className, title }: PingoProps) {
+export default function Pingo({ state = "idle", rank = 1, size = 200, className, title }: PingoProps) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const iris = `pingo-iris-${uid}`;
   const cloth = `pingo-cloth-${uid}`;
@@ -109,6 +110,15 @@ export default function Pingo({ state = "idle", size = 200, className, title }: 
               </g>
             </g>
 
+            {/* Round gold glasses when rank >= 3 */}
+            {rank >= 3 && (
+              <g className="pingo__glasses" stroke="#e5b95c" strokeWidth="2.2" fill="none">
+                <circle cx="82" cy="88" r="16.5" />
+                <circle cx="118" cy="88" r="16.5" />
+                <path d="M98.5 87 Q100 84.5 101.5 87" />
+              </g>
+            )}
+
             <path className="pingo__eyes-happy" d="M70 91 Q82 76 94 91 M106 91 Q118 76 130 91" stroke="#0a1633" strokeWidth="4.2" strokeLinecap="round" fill="none" />
             <path className="pingo__eyes-closed" d="M71 89 Q82 96 93 89 M107 89 Q118 96 129 89" stroke="#0a1633" strokeWidth="3.6" strokeLinecap="round" fill="none" />
 
@@ -116,6 +126,15 @@ export default function Pingo({ state = "idle", size = 200, className, title }: 
             <ellipse cx="134" cy="106" rx="6.5" ry="3.6" fill="#ff7aa8" opacity=".38" />
             <path className="pingo__beak" d="M91 104 C95 99.5 105 99.5 109 104 C106 111 103 115 100 116 C97 115 94 111 91 104 Z" fill={ORANGE} />
             <path d="M94 104.5 C97 103 103 103 106 104.5" stroke="#ffd08a" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+
+            {/* Navy bow tie when rank >= 5 */}
+            {rank >= 5 && (
+              <g className="pingo__bowtie" fill="#0d204d" stroke="#2563eb" strokeWidth="1">
+                <circle cx="100" cy="136" r="4.5" />
+                <polygon points="100,136 84,129 84,143" />
+                <polygon points="100,136 116,129 116,143" />
+              </g>
+            )}
           </g>
         </g>
 
@@ -135,6 +154,14 @@ export default function Pingo({ state = "idle", size = 200, className, title }: 
           strokeOpacity=".4"
           strokeWidth="1.2"
         />
+
+        {/* Tweed elbow patches when rank >= 7 */}
+        {rank >= 7 && (
+          <g className="pingo__patches" fill="#5c4033" opacity="0.9">
+            <ellipse cx="48" cy="172" rx="6" ry="10" transform="rotate(-15 48 172)" />
+            <ellipse cx="152" cy="172" rx="6" ry="10" transform="rotate(15 152 172)" />
+          </g>
+        )}
       </g>
 
       <g className="pingo__fx pingo__fx--stars" fill="#FFD166">

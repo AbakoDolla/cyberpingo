@@ -60,6 +60,33 @@ export interface RewardSummary {
   cyberbits?: CbReward | null;
 }
 
+export interface LeaderboardEntry {
+  user_id: string;
+  username: string;
+  display_name: string;
+  avatar_path: string | null;
+  avatar_url: string | null;
+  xp: number;
+  level: number;
+  current_streak: number;
+  rank_position: number;
+  reward_cb: number;
+  is_current_user?: boolean;
+}
+
+export interface WeeklyLeagueInfo {
+  ends_at: string;
+  seconds_remaining: number;
+  season_week: number;
+  total_participants: number;
+  rewards: Array<{
+    place: string;
+    cb: number;
+    badge: string;
+    label: string;
+  }>;
+}
+
 // ─── Learning RPCs ────────────────────────────────────────────────────────────
 
 export interface LessonStart {

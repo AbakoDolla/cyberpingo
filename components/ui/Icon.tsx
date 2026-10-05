@@ -101,6 +101,12 @@ export const IconBolt = icon(
   `<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />`
 );
 
+/** Sparkles / Étincelles / CyberBits Bonus */
+export const IconSparkles = icon(
+  `<path d="M12 3l1.9 4.8L19 9.7l-4.1 3.5 1.3 5.3L12 15.6l-4.2 2.9 1.3-5.3L5 9.7l5.1-1.9L12 3z"/>
+   <path d="M19 3l.7 1.8L21 5.3l-1.4 1.2.4 1.9L19 7.3l-1 1 .3-1.9L17 5.3l1.3-.5L19 3z"/>`
+);
+
 /** Streak / flamme */
 export const IconFlame = icon(
   `<path d="M12 2c0 5-5 7-5 11a5 5 0 0 0 10 0c0-4.5-5-6-5-11z"/>
@@ -363,4 +369,17 @@ export const IconVolume = icon(
   `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
    <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
    <path d="M19 5a10 10 0 0 1 0 14"/>`
+);
+
+/** Haut-parleur muet */
+export const IconVolumeOff = icon(
+  `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+   <line x1="23" y1="9" x2="17" y2="15"/>
+   <line x1="17" y1="9" x2="23" y2="15"/>`
+);
+
+/** Copier dans le presse-papier */
+export const IconCopy = icon(
+  `<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>`
 );
