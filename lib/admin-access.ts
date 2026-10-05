@@ -18,6 +18,7 @@ export const ADMIN_SECTIONS: readonly AdminSection[] = [
   { href: "/admin/mascotte", label: "Mascotte et voix" },
   { href: "/admin/badges", label: "Badges" },
   { href: "/admin/defis", label: "Défis" },
+  { href: "/admin/cyberbits", label: "CyberBits" },
   { href: "/admin/certificats", label: "Certificats" },
   { href: "/admin/notifications", label: "Notifications" },
   { href: "/admin/messages", label: "Messages" },

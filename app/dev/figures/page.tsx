@@ -5,6 +5,7 @@ import { FIGURE_SAMPLES } from "@/lib/figure-samples";
 import { serializeFigure, parseFigure } from "@/lib/figure-spec";
 
 export const metadata = { title: "Galerie des figures", robots: { index: false, follow: false } };
+export const dynamic = "force-dynamic";
 
 /** Development only: one sample of every figure kind, to review the drawings. */
 export default function FigureGallery() {

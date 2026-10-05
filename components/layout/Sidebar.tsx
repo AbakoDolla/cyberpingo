@@ -9,6 +9,7 @@ import {
   IconActivity, IconAI, IconArrowRight, IconBell, IconCourses, IconDashboard, IconFlame, IconGlobe, IconLesson,
   IconMap, IconProfile, IconSettings, IconShield, IconTarget, IconUsers,
 } from "@/components/ui/Icon";
+import CoinIcon from "@/components/cyberbits/CoinIcon";
 
 type NavItem = { href: string; label: string; Icon: typeof IconDashboard };
 
@@ -16,6 +17,7 @@ const LEARN_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Tableau de bord", Icon: IconDashboard },
   { href: "/courses", label: "Cours", Icon: IconCourses },
   { href: "/challenges", label: "Labs", Icon: IconShield },
+  { href: "/boutique", label: "Boutique", Icon: CoinIcon as unknown as typeof IconDashboard },
   { href: "/progression", label: "Ma progression", Icon: IconActivity },
   { href: "/competences", label: "Compétences", Icon: IconTarget },
   { href: "/mentor", label: "Mentor IA", Icon: IconAI },
@@ -31,6 +33,7 @@ const GUEST_ITEMS: NavItem[] = [
   { href: "/", label: "Accueil", Icon: IconGlobe },
   { href: "/courses", label: "Cours", Icon: IconCourses },
   { href: "/challenges", label: "Labs", Icon: IconShield },
+  { href: "/boutique", label: "Boutique", Icon: CoinIcon as unknown as typeof IconDashboard },
   { href: "/parcours", label: "Parcours métiers", Icon: IconMap },
   { href: "/ressources", label: "Ressources", Icon: IconLesson },
 ];

@@ -5,8 +5,8 @@ import type {
   CourseStatus, Lab, LabAsset, LabAssetKind, LabCategory, LabFormat, LabReport, LabSubmission, LabTask, LabTaskResult, ReportStatus, SkillLevel,
 } from "@/types/api";
 
-const LAB_COLUMNS = "id, slug, title, description, category, difficulty, xp_reward, objectives, hints, terminal_lines, flag_placeholder, status, position, course_id, format, briefing, constraints, tools, requires_computer, is_assessment, estimated_minutes";
-type LabRow = Pick<Tables<"labs">, "id" | "slug" | "title" | "description" | "category" | "difficulty" | "xp_reward" | "objectives" | "hints" | "terminal_lines" | "flag_placeholder" | "status" | "position" | "course_id" | "format" | "briefing" | "constraints" | "tools" | "requires_computer" | "is_assessment" | "estimated_minutes">;
+const LAB_COLUMNS = "id, slug, title, description, category, difficulty, xp_reward, objectives, hints, terminal_lines, flag_placeholder, status, position, course_id, format, briefing, constraints, tools, requires_computer, is_assessment, estimated_minutes, cb_price";
+type LabRow = Pick<Tables<"labs">, "id" | "slug" | "title" | "description" | "category" | "difficulty" | "xp_reward" | "objectives" | "hints" | "terminal_lines" | "flag_placeholder" | "status" | "position" | "course_id" | "format" | "briefing" | "constraints" | "tools" | "requires_computer" | "is_assessment" | "estimated_minutes" | "cb_price">;
 
 function toLab(row: LabRow, solvedAt: string | null): Lab {
   return {

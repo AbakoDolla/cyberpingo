@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import CourseArt from "@/components/art/CourseArt";
 import EmptyArt from "@/components/art/EmptyArt";
 import AppShell, { loginHref } from "@/components/layout/AppShell";
+import UnlockModal from "@/components/cyberbits/UnlockModal";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import ProgressBar from "@/components/ui/ProgressBar";
@@ -65,6 +66,7 @@ function CourseDetailView() {
   const guest = !userId;
   const [enrolling, setEnrolling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const { data, error, loading, reload, setData } = useAsync(async (): Promise<CoursePageData> => {
     const course = await getCourseBySlug(slug);
     if (!course || !userId) return { course, progress: null, lessons: [], quizResults: {} as QuizResults };
@@ -173,11 +175,30 @@ function CourseDetailView() {
                   <Link className="study-button" href={loginHref(coursePath)}>Se connecter pour commencer</Link>
                   <Link className="study-button study-button--ghost" href="/register">Créer un compte gratuit</Link>
                 </>}
-                {!guest && !data.progress && course.status === "published" && course.access_level === "free" && <Button variant="success" onClick={() => void enroll(course.id)} loading={enrolling}>S’inscrire gratuitement</Button>}
+                {!guest && !data.progress && course.status === "published" && course.access_level === "free" && (
+                  (course.cb_price ?? (course.level === "avance" ? 250 : course.level === "intermediaire" ? 120 : 0)) > 0 ? (
+                    <Button variant="primary" onClick={() => setUnlockModalOpen(true)}>
+                      Débloquer le parcours ({(course.cb_price ?? (course.level === "avance" ? 250 : course.level === "intermediaire" ? 120 : 0))} CB)
+                    </Button>
+                  ) : (
+                    <Button variant="success" onClick={() => void enroll(course.id)} loading={enrolling}>
+                      S’inscrire gratuitement
+                    </Button>
+                  )
+                )}
                 {canContinue && <Link className="study-button" href={`/lessons/${nextLesson?.id}`}>{data.progress && data.progress.completed_lessons > 0 ? "Continuer" : "Commencer"}<IconArrowRight size={15} /></Link>}
                 {!nextLesson && data.progress && <Badge tone="green"><IconTrophy size={13} /> Parcours terminé</Badge>}
               </div>
-              {actionError && <p className="settings-status is-error" role="alert">{actionError}</p>}
+              {actionError && (
+                <div className="settings-status is-error flex items-center justify-between gap-3" role="alert">
+                  <span>{actionError}</span>
+                  {actionError.includes("CyberBits") && (
+                    <Button variant="secondary" size="sm" onClick={() => setUnlockModalOpen(true)}>
+                      Débloquer avec mes CB
+                    </Button>
+                  )}
+                </div>
+              )}
             </section>
 
             <section className="course-outline" aria-labelledby="modules-title">
@@ -232,6 +253,23 @@ function CourseDetailView() {
                 </article>
               );})}
             </section>
+
+            <UnlockModal
+              open={unlockModalOpen}
+              onClose={() => setUnlockModalOpen(false)}
+              target={course ? {
+                kind: "course",
+                id: course.id,
+                slug: course.slug,
+                title: course.title,
+                price: course.cb_price ?? (course.level === "avance" ? 250 : course.level === "intermediaire" ? 120 : 0),
+                level: course.level,
+                category: course.category,
+              } : null}
+              onSuccess={() => {
+                void reload();
+              }}
+            />
           </>
         )}
     </div>

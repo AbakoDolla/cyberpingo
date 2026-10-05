@@ -9,6 +9,7 @@ import Logo from "./Logo";
 import Avatar from "@/components/ui/Avatar";
 import RewardToasts from "@/components/ui/RewardToasts";
 import MascotCoach from "@/components/mascot/MascotCoach";
+import CbBalanceChip from "@/components/cyberbits/CbBalanceChip";
 import { IconAlert, IconArrowRight, IconBell, IconBolt, IconFlame, IconLock } from "@/components/ui/Icon";
 import { useUser, useUserActions } from "@/context/UserContext";
 import { formatNumber } from "@/lib/format";
@@ -93,20 +94,23 @@ export default function AppShell({ children, allowGuest = false }: { children: R
         <header className="learner-topbar">
           <div className="learner-topbar__logo md:hidden"><Logo /></div>
           {profile ? (
-            <dl className="learner-stats" aria-label="Ta progression">
-              <div className="learner-stat learner-stat--level" title={level ? `${level.title} · ${levelProgress} % vers le niveau suivant` : undefined}>
-                <span className="learner-ring" style={{ "--ring": `${levelProgress}` } as React.CSSProperties} aria-hidden="true"><span>{profile.level}</span></span>
-                <span className="learner-stat__text"><dt>Niveau</dt><dd>{level?.title ?? profile.level}</dd></span>
-              </div>
-              <div className="learner-stat learner-stat--xp">
-                <span className="learner-stat__icon" aria-hidden="true"><IconBolt size={15} /></span>
-                <span className="learner-stat__text"><dt>XP</dt><dd>{formatNumber(profile.xp)}</dd></span>
-              </div>
-              <div className={`learner-stat learner-stat--streak${streak > 0 ? " is-hot" : ""}`}>
-                <span className="learner-stat__icon" aria-hidden="true"><IconFlame size={15} /></span>
-                <span className="learner-stat__text"><dt>Série</dt><dd>{streak} j</dd></span>
-              </div>
-            </dl>
+            <div className="flex items-center gap-3">
+              <dl className="learner-stats" aria-label="Ta progression">
+                <div className="learner-stat learner-stat--level" title={level ? `${level.title} · ${levelProgress} % vers le niveau suivant` : undefined}>
+                  <span className="learner-ring" style={{ "--ring": `${levelProgress}` } as React.CSSProperties} aria-hidden="true"><span>{profile.level}</span></span>
+                  <span className="learner-stat__text"><dt>Niveau</dt><dd>{level?.title ?? profile.level}</dd></span>
+                </div>
+                <div className="learner-stat learner-stat--xp">
+                  <span className="learner-stat__icon" aria-hidden="true"><IconBolt size={15} /></span>
+                  <span className="learner-stat__text"><dt>XP</dt><dd>{formatNumber(profile.xp)}</dd></span>
+                </div>
+                <div className={`learner-stat learner-stat--streak${streak > 0 ? " is-hot" : ""}`}>
+                  <span className="learner-stat__icon" aria-hidden="true"><IconFlame size={15} /></span>
+                  <span className="learner-stat__text"><dt>Série</dt><dd>{streak} j</dd></span>
+                </div>
+              </dl>
+              <CbBalanceChip />
+            </div>
           ) : guest ? (
             <p className="learner-guest-note"><span aria-hidden="true" />Mode découverte : connecte-toi pour enregistrer ta progression.</p>
           ) : <span className="hidden md:block" />}

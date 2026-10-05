@@ -8,7 +8,7 @@ import { ROLE_LABELS } from "@/lib/roles";
 import { canAccessAdminPath, sectionsFor } from "@/lib/admin-access";
 import Avatar from "@/components/ui/Avatar";
 import {
-  IconActivity, IconAward, IconBell, IconBrain, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconProfile, IconSend, IconShield,
+  IconActivity, IconAward, IconBell, IconBolt, IconBrain, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconProfile, IconSend, IconShield,
   IconStar, IconTerminal,
 } from "@/components/ui/Icon";
 
@@ -23,6 +23,7 @@ const ICONS: Record<string, typeof IconDashboard> = {
   "/admin/mascotte": IconStar,
   "/admin/badges": IconAward,
   "/admin/defis": IconShield,
+  "/admin/cyberbits": IconBolt,
   "/admin/certificats": IconCertificate,
   "/admin/notifications": IconBell,
   "/admin/messages": IconMail,

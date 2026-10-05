@@ -19,6 +19,7 @@ test("administrators reach every section except the audit log", () => {
   for (const section of ADMIN_SECTIONS) {
     assert.equal(canAccessAdminPath("admin", section.href), !section.superadminOnly, section.href);
   }
+  assert.equal(canAccessAdminPath("admin", "/admin/cyberbits"), true);
   assert.equal(canAccessAdminPath("admin", "/admin/journal"), false);
   assert.equal(canAccessAdminPath("admin", "/admin/journal/export"), false);
   assert.equal(canAccessAdminPath("admin", "/admin/mascotte"), true);
@@ -27,6 +28,7 @@ test("administrators reach every section except the audit log", () => {
 
 test("super-administrators reach every section", () => {
   for (const section of ADMIN_SECTIONS) assert.equal(canAccessAdminPath("superadmin", section.href), true, section.href);
+  assert.equal(canAccessAdminPath("superadmin", "/admin/cyberbits/prix"), true);
   assert.ok(sectionsFor("superadmin").some((section) => section.href === "/admin/journal"));
   assert.equal(sectionsFor("superadmin").length, ADMIN_SECTIONS.length);
 });

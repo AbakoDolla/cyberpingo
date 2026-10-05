@@ -2,6 +2,7 @@
 // models the services build from table rows. Table rows themselves come from database.types.ts.
 import type { Role } from "@/lib/roles";
 import type { Tables } from "@/types/database.types";
+import type { CbReward } from "./cyberbits";
 
 export type SkillLevel = "debutant" | "intermediaire" | "avance";
 export type LearningGoal = "decouvrir" | "professionnel" | "emploi" | "competences" | "certification";
@@ -56,6 +57,7 @@ export interface RewardSummary {
   certificate: { id: string; certificate_number: string; verification_code: string; course_title: string } | null;
   new_rank?: { slug: string; name: string; description: string; position: number } | null;
   new_skills?: { id: string; slug: string; name: string; state: SkillState }[];
+  cyberbits?: CbReward | null;
 }
 
 // ─── Learning RPCs ────────────────────────────────────────────────────────────
@@ -259,6 +261,8 @@ export interface CourseSummary {
   completion_xp: number;
   certificate_enabled: boolean;
   published_at: string | null;
+  cb_price?: number | null;
+  prerequisite_course_id?: string | null;
   module_count: number;
   lesson_count: number;
   quiz_count: number;
@@ -374,6 +378,7 @@ export interface Lab {
   requires_computer: boolean;
   is_assessment: boolean;
   estimated_minutes: number;
+  cb_price?: number | null;
   solved: boolean;
   solved_at: string | null;
 }

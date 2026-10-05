@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import LabArt from "@/components/art/LabArt";
 import AppShell, { loginHref } from "@/components/layout/AppShell";
+import UnlockModal from "@/components/cyberbits/UnlockModal";
 import LabAssets from "@/components/challenges/LabAssets";
 import LabEquipment from "@/components/equipment/LabEquipment";
 import LabReportForm from "@/components/challenges/LabReportForm";
@@ -36,6 +37,7 @@ function ChallengeDetailView() {
   const [result, setResult] = useState<LabSubmission | null>(null);
   const [checking, setChecking] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const { data, error, loading, reload, setData } = useAsync(async () => {
     const lab = await getLab(slug, userId);
     if (!lab) return { lab: null, tasks: [], assets: [] };
@@ -92,7 +94,7 @@ function ChallengeDetailView() {
               <div className="lab-hero__visual">
                 <div className="lab-hero__media" aria-hidden="true"><LabArt category={lab.category} className="lab-hero__art" photo sizes="(max-width: 1100px) 100vw, 66vw" priority /></div>
                 <div className="lab-hero__content">
-                  <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge><Badge tone="neutral">{FORMAT_LABELS[lab.format]}</Badge>{lab.is_assessment && <Badge tone="amber">Évaluation pratique</Badge>}{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone="green">+{lab.xp_reward} XP</Badge></div>
+                  <div className="course-detail-hero__badges"><Badge tone="purple">{LAB_CATEGORY_LABELS[lab.category]}</Badge><Badge tone="blue">{levelLabel(lab.difficulty)}</Badge><Badge tone="neutral">{FORMAT_LABELS[lab.format]}</Badge>{lab.is_assessment && <Badge tone="amber">Évaluation pratique</Badge>}{solved && <Badge tone="green"><IconCheck size={12} /> Résolu</Badge>}<Badge tone={(lab.cb_price === 0) ? "green" : "blue"}>{(lab.cb_price === 0) ? "Gratuit" : `${lab.cb_price ?? (lab.difficulty === "avance" ? 180 : lab.difficulty === "intermediaire" ? 80 : 30)} CB`}</Badge><Badge tone="green">+{lab.xp_reward} XP</Badge></div>
                   <h1>{lab.title.replace(/ ([:?!;])/g, "\u00A0$1")}</h1>
                   <p>{lab.description}</p>
                   <div className="lab-hero__facts" aria-label="Informations clés du lab">
@@ -125,7 +127,7 @@ function ChallengeDetailView() {
                 {isTerminal && (!userId ? (
                   <section className="lab-panel"><h2>Ta réponse</h2><p><IconLock size={15} /> Connecte-toi pour soumettre ton flag, suivre tes tentatives et gagner +{lab.xp_reward} XP.</p><div className="study-actions"><Link className="study-button" href={loginHref(`/challenges/${slug}`)}>Se connecter pour répondre</Link><Link className="study-button study-button--ghost" href="/register">Créer un compte gratuit</Link></div></section>
                 ) : (
-                <section className="lab-panel"><h2>Ta réponse</h2><div className="lab-answer"><Input id="lab-answer" label="Flag ou réponse" placeholder={lab.flag_placeholder} maxLength={300} value={answer} disabled={checking || solved} onChange={(event) => { setAnswer(event.target.value); setFormError(null); if (wrong) setResult(null); }} onKeyDown={(event) => { if (event.key === "Enter") void validate(); }} error={formError ?? undefined} /><Button variant="success" loading={checking} disabled={checking || solved} onClick={() => void validate()}>Valider</Button></div><div className="lab-feedback-zone" aria-live="polite">{wrong && <p className="lab-feedback is-wrong" role="status">Réponse incorrecte. {wrong.remaining_attempts} tentative{wrong.remaining_attempts > 1 ? "s" : ""} restante{wrong.remaining_attempts > 1 ? "s" : ""}. Relis les objectifs ou révèle un indice.</p>}{solved && <p className="lab-feedback is-correct" role="status"><IconTrophy size={16} /> Bravo, lab résolu ! {correct && "xp_awarded" in correct && correct.xp_awarded > 0 ? `+${correct.xp_awarded} XP.` : "Tu peux le relire à tout moment."}</p>}</div></section>
+                <section className="lab-panel"><h2>Ta réponse</h2><div className="lab-answer"><Input id="lab-answer" label="Flag ou réponse" placeholder={lab.flag_placeholder} maxLength={300} value={answer} disabled={checking || solved} onChange={(event) => { setAnswer(event.target.value); setFormError(null); if (wrong) setResult(null); }} onKeyDown={(event) => { if (event.key === "Enter") void validate(); }} error={formError ?? undefined} /><Button variant="success" loading={checking} disabled={checking || solved} onClick={() => void validate()}>Valider</Button></div>{formError && formError.includes("CyberBits") && (<div className="settings-status is-error flex items-center justify-between gap-3 mt-3" role="alert"><span>{formError}</span><Button variant="secondary" size="sm" onClick={() => setUnlockModalOpen(true)}>Débloquer ce lab ({lab.cb_price ?? (lab.difficulty === "avance" ? 180 : lab.difficulty === "intermediaire" ? 80 : 30)} CB)</Button></div>)}<div className="lab-feedback-zone" aria-live="polite">{wrong && <p className="lab-feedback is-wrong" role="status">Réponse incorrecte. {wrong.remaining_attempts} tentative{wrong.remaining_attempts > 1 ? "s" : ""} restante{wrong.remaining_attempts > 1 ? "s" : ""}. Relis les objectifs ou révèle un indice.</p>}{solved && <p className="lab-feedback is-correct" role="status"><IconTrophy size={16} /> Bravo, lab résolu ! {correct && "xp_awarded" in correct && correct.xp_awarded > 0 ? `+${correct.xp_awarded} XP.` : "Tu peux le relire à tout moment."}</p>}</div></section>
                 ))}
               </div>
               {!isTerminal && tasks.length > 0 && (
@@ -142,6 +144,23 @@ function ChallengeDetailView() {
               )}
               {isTerminal && <aside className="lab-hints"><h2>Indices progressifs</h2>{lab.hints.length === 0 ? <p>Aucun indice n’est nécessaire pour ce lab.</p> : <><ol>{lab.hints.slice(0, visibleHints).map((hint, index) => <li key={hint}><IconHint size={15} /> <span>Indice {index + 1} : {hint}</span></li>)}</ol>{visibleHints < lab.hints.length ? <Button variant="secondary" size="sm" onClick={() => setVisibleHints((count) => Math.min(lab.hints.length, count + 1))}>Révéler un indice</Button> : <p>Tous les indices sont affichés.</p>}</>}</aside>}
             </section>
+
+            <UnlockModal
+              open={unlockModalOpen}
+              onClose={() => setUnlockModalOpen(false)}
+              target={lab ? {
+                kind: "lab",
+                id: lab.id,
+                slug: lab.slug,
+                title: lab.title,
+                price: lab.cb_price ?? (lab.difficulty === "avance" ? 180 : lab.difficulty === "intermediaire" ? 80 : 30),
+                level: lab.difficulty,
+                category: lab.category,
+              } : null}
+              onSuccess={() => {
+                void reload();
+              }}
+            />
           </>
         )}
     </div>
