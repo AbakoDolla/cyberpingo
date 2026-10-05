@@ -209,6 +209,9 @@ function NotificationsContent() {
         const readAt = new Date().toISOString();
         setData((current) => (current ?? []).map((item) => item.id === notification.id ? { ...item, read_at: readAt } : item));
         setUnreadNotifications((count) => count - 1);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("cyberpingo:notification-read", { detail: { id: notification.id } }));
+        }
       }
       if (notification.link) router.push(notification.link);
     } catch (cause) {
@@ -227,6 +230,9 @@ function NotificationsContent() {
       setData((current) => (current ?? []).map((item) => ({ ...item, read_at: item.read_at ?? readAt })));
       setUnreadNotifications(0);
       setStatus({ message: "Toutes les notifications sont marquées comme lues." });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("cyberpingo:all-notifications-read"));
+      }
     } catch (cause) {
       setStatus({ message: errorMessage(cause, "Les notifications n’ont pas pu être mises à jour."), error: true });
     } finally {
@@ -243,6 +249,9 @@ function NotificationsContent() {
     });
     try {
       await deleteNotification(notification.id);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("cyberpingo:notification-read", { detail: { id: notification.id } }));
+      }
       setStatus((current) => current?.undoId === notification.id ? { message: "Notification supprimée définitivement." } : current);
     } catch (cause) {
       setData((current) => sortNotifications([notification, ...(current ?? [])]));
