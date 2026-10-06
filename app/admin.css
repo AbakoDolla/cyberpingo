@@ -10,9 +10,9 @@
 }
 
 .adm-shell {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .adm-skip-link {
@@ -848,19 +848,168 @@ button.adm-metric-card:hover {
   color: #ffdce2;
 }
 
+/* Executive Topbar & Shell Architecture */
+.adm-main-wrap {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 clamp(20px, 3vw, 40px);
+  background: rgba(3, 10, 24, 0.85);
+  border-bottom: 1px solid rgba(0, 213, 255, 0.12);
+  backdrop-filter: blur(16px);
+  position: sticky;
+  top: 0;
+  z-index: 15;
+}
+
+.adm-topbar__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.adm-topbar__pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(0, 229, 155, 0.08);
+  border: 1px solid rgba(0, 229, 155, 0.25);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #4ade80;
+  white-space: nowrap;
+}
+
+.adm-topbar__pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: adm-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes adm-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+
+.adm-topbar__divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(148, 163, 184, 0.2);
+  flex-shrink: 0;
+}
+
+.adm-topbar__breadcrumb {
+  font-size: 13.5px;
+  font-weight: 650;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-topbar__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.adm-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.adm-role-badge--superadmin {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.adm-role-badge--admin {
+  background: rgba(0, 213, 255, 0.12);
+  border: 1px solid rgba(0, 213, 255, 0.35);
+  color: #38bdf8;
+}
+
+.adm-topbar-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 13px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #cbd5e1;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  transition: all 160ms ease;
+  white-space: nowrap;
+}
+
+.adm-topbar-link:hover {
+  color: #fff;
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(0, 213, 255, 0.3);
+}
+
+.adm-topbar-link--primary {
+  background: rgba(154, 100, 255, 0.15);
+  border-color: rgba(154, 100, 255, 0.35);
+  color: #c084fc;
+}
+
+.adm-topbar-link--primary:hover {
+  background: rgba(154, 100, 255, 0.28);
+  color: #f3e8ff;
+  border-color: rgba(154, 100, 255, 0.6);
+}
+
 @media (min-width: 980px) {
+  .adm-mobile-header {
+    display: none !important;
+  }
+
   .adm-shell {
-    grid-template-columns: 284px minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
+    display: flex !important;
+    flex-direction: row !important;
+    min-height: 100vh;
+    width: 100%;
   }
 
   .adm-sidebar {
-    position: sticky;
+    width: 284px !important;
+    min-width: 284px !important;
+    max-width: 284px !important;
+    flex: 0 0 284px !important;
+    position: sticky !important;
+    top: 0;
     height: 100vh;
     align-content: start;
     border-right: 1px solid var(--cp-line);
-    border-bottom: 0;
+    border-bottom: 0 !important;
     overflow-y: auto;
+    z-index: 20;
   }
 
   .adm-nav {
@@ -878,6 +1027,43 @@ button.adm-metric-card:hover {
 
   .adm-chart-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 979px) {
+  .adm-topbar {
+    display: none !important;
+  }
+
+  .adm-mobile-header {
+    display: flex !important;
+  }
+
+  .adm-sidebar {
+    position: fixed !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 284px !important;
+    z-index: 60 !important;
+    transform: translateX(-100%);
+    transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    border-right: 1px solid rgba(0, 213, 255, 0.2);
+    border-bottom: 0 !important;
+  }
+
+  .adm-sidebar.is-open {
+    transform: translateX(0) !important;
+  }
+
+  .adm-sidebar-close-btn {
+    display: grid !important;
+  }
+
+  .adm-main-wrap {
+    width: 100%;
+    min-width: 0;
   }
 }
 

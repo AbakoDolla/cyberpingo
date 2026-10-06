@@ -219,32 +219,11 @@ export function getWeeklyLeagueInfo(): WeeklyLeagueInfo {
   };
 }
 
-/** Fallback cohorts reflecting active learners mapped to our 20 earned level tiers */
-const MONTHLY_COMMUNITY_ROSTER: Array<Omit<LeaderboardEntry, "rank_position" | "reward_cb">> = [
-  { user_id: "u-1", username: "alex_cyber", display_name: "Alexandre V.", avatar_path: null, avatar_url: null, xp: 28450, level: 12, current_streak: 28 },
-  { user_id: "u-2", username: "clara_soc", display_name: "Clara M.", avatar_path: null, avatar_url: null, xp: 21200, level: 11, current_streak: 24 },
-  { user_id: "u-3", username: "nicolas_pentest", display_name: "Nicolas B.", avatar_path: null, avatar_url: null, xp: 17400, level: 10, current_streak: 21 },
-  { user_id: "u-4", username: "sarah_defense", display_name: "Sarah D.", avatar_path: null, avatar_url: null, xp: 13180, level: 9, current_streak: 19 },
-  { user_id: "u-5", username: "lucas_forensic", display_name: "Lucas R.", avatar_path: null, avatar_url: null, xp: 9820, level: 8, current_streak: 15 },
-  { user_id: "u-6", username: "yasmine_cloud", display_name: "Yasmine K.", avatar_path: null, avatar_url: null, xp: 7890, level: 7, current_streak: 14 },
-  { user_id: "u-7", username: "thomas_kernel", display_name: "Thomas L.", avatar_path: null, avatar_url: null, xp: 5250, level: 6, current_streak: 12 },
-  { user_id: "u-8", username: "emma_sec", display_name: "Emma G.", avatar_path: null, avatar_url: null, xp: 3780, level: 5, current_streak: 9 },
-  { user_id: "u-9", username: "julien_crypto", display_name: "Julien M.", avatar_path: null, avatar_url: null, xp: 2850, level: 5, current_streak: 8 },
-  { user_id: "u-10", username: "ines_osint", display_name: "Inès B.", avatar_path: null, avatar_url: null, xp: 2140, level: 4, current_streak: 6 },
-];
-
-const WEEKLY_COMMUNITY_ROSTER: Array<Omit<LeaderboardEntry, "rank_position" | "reward_cb">> = [
-  { user_id: "u-2", username: "clara_soc", display_name: "Clara M.", avatar_path: null, avatar_url: null, xp: 1850, level: 11, current_streak: 24 },
-  { user_id: "u-1", username: "alex_cyber", display_name: "Alexandre V.", avatar_path: null, avatar_url: null, xp: 1620, level: 12, current_streak: 28 },
-  { user_id: "u-4", username: "sarah_defense", display_name: "Sarah D.", avatar_path: null, avatar_url: null, xp: 1390, level: 9, current_streak: 19 },
-  { user_id: "u-3", username: "nicolas_pentest", display_name: "Nicolas B.", avatar_path: null, avatar_url: null, xp: 1150, level: 10, current_streak: 21 },
-  { user_id: "u-6", username: "yasmine_cloud", display_name: "Yasmine K.", avatar_path: null, avatar_url: null, xp: 980, level: 7, current_streak: 14 },
-  { user_id: "u-5", username: "lucas_forensic", display_name: "Lucas R.", avatar_path: null, avatar_url: null, xp: 820, level: 8, current_streak: 15 },
-  { user_id: "u-8", username: "emma_sec", display_name: "Emma G.", avatar_path: null, avatar_url: null, xp: 640, level: 5, current_streak: 9 },
-  { user_id: "u-7", username: "thomas_kernel", display_name: "Thomas L.", avatar_path: null, avatar_url: null, xp: 510, level: 6, current_streak: 12 },
-  { user_id: "u-10", username: "ines_osint", display_name: "Inès B.", avatar_path: null, avatar_url: null, xp: 420, level: 4, current_streak: 6 },
-  { user_id: "u-9", username: "julien_crypto", display_name: "Julien M.", avatar_path: null, avatar_url: null, xp: 310, level: 5, current_streak: 8 },
-];
+/**
+ * Leaderboard & Ligue hebdomadaire/mensuelle CyberPingo.
+ * Seuls les vrais profils apprenants de la base de données Supabase sont affichés.
+ * Aucun compte fictif ou mock n'est injecté.
+ */
 
 function assignRewards(rank: number, period: LeaderboardPeriod): number {
   if (period === "weekly") {
@@ -269,14 +248,14 @@ export async function getLeaderboard(
 ): Promise<LeaderboardEntry[]> {
   const supabase = getSupabaseBrowserClient();
 
+  // 1. Tenter la fonction RPC get_leaderboard (performante et sécurisée)
   try {
     const { data, error } = await supabase.rpc("get_leaderboard", { p_limit: 50 });
     if (!error && data && Array.isArray(data) && data.length > 0) {
       const mapped = data.map((row: any, idx: number) => {
         const rawXp = Number(row.xp ?? 0);
-        // For weekly, calculate weekly score proportional to streak/recent momentum or raw XP
         const displayXp = period === "weekly"
-          ? Math.max(120, Math.round((rawXp % 2000) + (Number(row.current_streak ?? 1) * 45)))
+          ? Math.max(0, Math.round((rawXp % 2000) + (Number(row.current_streak ?? 1) * 45)))
           : rawXp;
 
         return {
@@ -294,7 +273,6 @@ export async function getLeaderboard(
         };
       });
 
-      // Sort by displayXp descending
       mapped.sort((a, b) => b.xp - a.xp);
       return mapped.map((item, idx) => ({
         ...item,
@@ -303,18 +281,50 @@ export async function getLeaderboard(
       }));
     }
   } catch {
-    // Graceful fallback to community rosters
+    // Si la RPC n'est pas accessible, basculer sur la requête directe
   }
 
-  // Fallback: merge community roster with current user if known
-  const roster = period === "weekly" ? WEEKLY_COMMUNITY_ROSTER : MONTHLY_COMMUNITY_ROSTER;
-  return roster.map((item, idx) => {
-    const rank = idx + 1;
-    return {
-      ...item,
-      rank_position: rank,
-      reward_cb: assignRewards(rank, period),
-      is_current_user: Boolean(currentUserId && item.user_id === currentUserId),
-    };
-  });
+  // 2. Requête directe sur la table réelle profiles (aucun faux profil)
+  try {
+    const { data: realProfiles, error: pErr } = await supabase
+      .from("profiles")
+      .select("id, username, display_name, avatar_path, xp, level, current_streak")
+      .order("xp", { ascending: false })
+      .limit(50);
+
+    if (!pErr && realProfiles && realProfiles.length > 0) {
+      const mapped = realProfiles.map((row: any, idx: number) => {
+        const rawXp = Number(row.xp ?? 0);
+        const displayXp = period === "weekly"
+          ? Math.max(0, Math.round((rawXp % 2000) + (Number(row.current_streak ?? 1) * 45)))
+          : rawXp;
+
+        return {
+          user_id: String(row.id),
+          username: String(row.username ?? ""),
+          display_name: String(row.display_name ?? row.username ?? "Apprenant"),
+          avatar_path: row.avatar_path ?? null,
+          avatar_url: avatarUrl(row.avatar_path),
+          xp: displayXp,
+          level: Number(row.level ?? 1),
+          current_streak: Number(row.current_streak ?? 0),
+          rank_position: idx + 1,
+          reward_cb: assignRewards(idx + 1, period),
+          is_current_user: Boolean(currentUserId && row.id === currentUserId),
+        };
+      });
+
+      mapped.sort((a, b) => b.xp - a.xp);
+      return mapped.map((item, idx) => ({
+        ...item,
+        rank_position: idx + 1,
+        reward_cb: assignRewards(idx + 1, period),
+      }));
+    }
+  } catch {
+    // Échec de connexion réseau
+  }
+
+  // Aucun faux profil : renvoyer tableau vide si la base ne contient encore aucun compte
+  return [];
 }

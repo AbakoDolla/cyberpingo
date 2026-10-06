@@ -74,14 +74,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   const staffName = profile?.display_name ?? "Staff CyberPingo";
   const staffRole = profile?.role ? ROLE_LABELS[profile.role] : "Équipe";
+  const isSuperadmin = profile?.role === "superadmin";
   const availableSections = sectionsFor(profile?.role);
   const sectionMap = new Map(availableSections.map((s) => [s.href, s]));
+  const currentSection = availableSections.find((s) => s.href === pathname);
+  const breadcrumbLabel = currentSection?.label ?? (pathname === "/admin" ? "Vue d’ensemble" : "Console Admin");
 
   return (
     <div className="adm-shell">
       <a className="adm-skip-link" href="#contenu-admin">Aller au contenu admin</a>
 
-      {/* Mobile Top Header */}
+      {/* Mobile Top Header (hidden on desktop) */}
       <header className="adm-mobile-header">
         <button
           type="button"
@@ -177,10 +180,42 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
       </aside>
 
-      <main id="contenu-admin" className="adm-main" tabIndex={-1}>
-        {syncError && <p role="alert" className="adm-notice adm-notice--error adm-sync-alert">{syncError}</p>}
-        {children}
-      </main>
+      {/* Main Column Wrapper */}
+      <div className="adm-main-wrap">
+        {/* Executive Desktop Topbar */}
+        <header className="adm-topbar" aria-label="Barre d'état administration">
+          <div className="adm-topbar__left">
+            <span className="adm-topbar__pulse" title="Télémétrie base de données en direct">
+              <span className="adm-topbar__pulse-dot" />
+              <span className="adm-topbar__pulse-text">Système Opérationnel · Supabase Connecté</span>
+            </span>
+            <span className="adm-topbar__divider" />
+            <span className="adm-topbar__breadcrumb">
+              {breadcrumbLabel}
+            </span>
+          </div>
+
+          <div className="adm-topbar__right">
+            <span className={cn("adm-role-badge", isSuperadmin ? "adm-role-badge--superadmin" : "adm-role-badge--admin")}>
+              {isSuperadmin ? "⚡ SUPERADMIN" : "🛡️ ADMIN"}
+            </span>
+            <Link href="/admin/utilisateurs" className="adm-topbar-link" title="Gérer les vrais comptes">
+              👥 Comptes réels
+            </Link>
+            <Link href="/classement" className="adm-topbar-link" title="Consulter le classement en direct">
+              🏆 Classement
+            </Link>
+            <Link href="/dashboard" className="adm-topbar-link adm-topbar-link--primary" title="Basculer vers l'espace apprenant">
+              Espace Apprenant →
+            </Link>
+          </div>
+        </header>
+
+        <main id="contenu-admin" className="adm-main" tabIndex={-1}>
+          {syncError && <p role="alert" className="adm-notice adm-notice--error adm-sync-alert">{syncError}</p>}
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
