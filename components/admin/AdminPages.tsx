@@ -23,6 +23,7 @@ import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import OverviewPanel from "./OverviewPanel";
 import LearnersPanel from "./LearnersPanel";
+import SecuritySocPanel from "./SecuritySocPanel";
 import AdminCourseEditor from "./AdminCourseEditor";
 import RealtimeDashboard from "@/components/realtime/RealtimeDashboard";
 import { AdminEmpty, AdminError, AdminLoading, AdminPageHeader, ConfirmModal, Notice } from "./AdminState";
@@ -32,6 +33,10 @@ import { IconPlus, IconTrash } from "@/components/ui/Icon";
 export { AdminBadgesPage, AdminChallengesPage, AdminLabsPage } from "./AdminCatalogPages";
 export { AdminCompetencesPage, AdminMascottePage, AdminRendusPage } from "./AdminAcademyPages";
 export { AdminCertificatesPage, AdminLogsPage, AdminMessagesPage, AdminNotificationsPage } from "./AdminOpsPages";
+
+export function AdminSecuritySocPage() {
+  return <SecuritySocPanel />;
+}
 
 const COURSE_STATUS_OPTIONS = [
   { value: "all", label: "Tous les statuts" },

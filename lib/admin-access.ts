@@ -9,6 +9,7 @@ export interface AdminSection {
 
 export const ADMIN_SECTIONS: readonly AdminSection[] = [
   { href: "/admin", label: "Vue d’ensemble" },
+  { href: "/admin/securite", label: "Centre Sécurité & SOC" },
   { href: "/admin/utilisateurs", label: "Utilisateurs" },
   { href: "/admin/cours", label: "Cours" },
   { href: "/admin/import", label: "Import IA" },

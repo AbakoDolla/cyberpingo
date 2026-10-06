@@ -15,6 +15,7 @@ import {
 
 const ICONS: Record<string, typeof IconDashboard> = {
   "/admin": IconDashboard,
+  "/admin/securite": IconShield,
   "/admin/utilisateurs": IconProfile,
   "/admin/cours": IconCourses,
   "/admin/import": IconActivity,
@@ -34,7 +35,7 @@ const ICONS: Record<string, typeof IconDashboard> = {
 const NAV_GROUPS = [
   {
     title: "Pilotage & Sécurité",
-    hrefs: ["/admin", "/admin/utilisateurs", "/admin/journal"],
+    hrefs: ["/admin", "/admin/securite", "/admin/utilisateurs", "/admin/journal"],
   },
   {
     title: "Pédagogie & Labs",
