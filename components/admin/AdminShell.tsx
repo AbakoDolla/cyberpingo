@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/context/UserContext";
@@ -8,8 +9,8 @@ import { ROLE_LABELS } from "@/lib/roles";
 import { canAccessAdminPath, sectionsFor } from "@/lib/admin-access";
 import Avatar from "@/components/ui/Avatar";
 import {
-  IconActivity, IconAward, IconBell, IconBolt, IconBrain, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconProfile, IconSend, IconShield,
-  IconStar, IconTerminal,
+  IconActivity, IconAward, IconBell, IconBolt, IconBrain, IconCertificate, IconCourses, IconDashboard, IconList, IconMail, IconMenu, IconProfile, IconSend, IconShield,
+  IconStar, IconTerminal, IconX,
 } from "@/components/ui/Icon";
 
 const ICONS: Record<string, typeof IconDashboard> = {
@@ -30,9 +31,33 @@ const ICONS: Record<string, typeof IconDashboard> = {
   "/admin/journal": IconList,
 };
 
+const NAV_GROUPS = [
+  {
+    title: "Pilotage & Sécurité",
+    hrefs: ["/admin", "/admin/utilisateurs", "/admin/journal"],
+  },
+  {
+    title: "Pédagogie & Labs",
+    hrefs: ["/admin/cours", "/admin/labs", "/admin/rendus", "/admin/competences"],
+  },
+  {
+    title: "Gamification & Économie",
+    hrefs: ["/admin/cyberbits", "/admin/defis", "/admin/badges", "/admin/certificats", "/admin/mascotte"],
+  },
+  {
+    title: "Système & Diffusion",
+    hrefs: ["/admin/notifications", "/admin/messages", "/admin/import"],
+  },
+];
+
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { hydrated, configured, isAuthenticated, isStaff, profile, syncError } = useUser();
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
 
   if (!configured) {
     return <GuardFrame><GuardCard title="Service non configuré" detail="La console est momentanément indisponible." /></GuardFrame>;
@@ -49,31 +74,95 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   const staffName = profile?.display_name ?? "Staff CyberPingo";
   const staffRole = profile?.role ? ROLE_LABELS[profile.role] : "Équipe";
-  const sections = sectionsFor(profile?.role);
+  const availableSections = sectionsFor(profile?.role);
+  const sectionMap = new Map(availableSections.map((s) => [s.href, s]));
 
   return (
     <div className="adm-shell">
       <a className="adm-skip-link" href="#contenu-admin">Aller au contenu admin</a>
-      <aside className="adm-sidebar" aria-label="Console admin">
-        <Link href="/admin" className="adm-brand">
+
+      {/* Mobile Top Header */}
+      <header className="adm-mobile-header">
+        <button
+          type="button"
+          className="adm-mobile-toggle"
+          aria-label={mobileNavOpen ? "Fermer le menu de navigation" : "Ouvrir le menu de navigation"}
+          onClick={() => setMobileNavOpen((prev) => !prev)}
+        >
+          {mobileNavOpen ? <IconX size={20} /> : <IconMenu size={20} />}
+        </button>
+        <Link href="/admin" className="adm-mobile-brand">
           <span className="adm-brand__mark">CP</span>
-          <span>
-            <span className="adm-brand__title">Console admin</span>
-            <span className="adm-brand__meta">Opérations CyberPingo</span>
-          </span>
+          <span className="adm-mobile-brand__title">CyberPingo Admin</span>
         </Link>
+        <Link href="/dashboard" className="adm-mobile-exit-link" title="Retour à l'espace apprenant">
+          Apprenant →
+        </Link>
+      </header>
+
+      {/* Mobile Backdrop */}
+      {mobileNavOpen && (
+        <div
+          className="adm-backdrop"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Admin Sidebar */}
+      <aside className={cn("adm-sidebar", mobileNavOpen && "is-open")} aria-label="Console admin">
+        <div className="adm-sidebar-top">
+          <Link href="/admin" className="adm-brand">
+            <span className="adm-brand__mark">CP</span>
+            <span>
+              <span className="adm-brand__title">Console Admin</span>
+              <span className="adm-brand__meta">Supervision CyberPingo</span>
+            </span>
+          </Link>
+          <button
+            type="button"
+            className="adm-sidebar-close-btn"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Fermer le panneau"
+          >
+            <IconX size={18} />
+          </button>
+        </div>
+
         <nav className="adm-nav" aria-label="Navigation admin">
-          {sections.map(({ href, label }) => {
-            const Icon = ICONS[href] ?? IconDashboard;
-            const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
+          {NAV_GROUPS.map((group) => {
+            const groupSections = group.hrefs
+              .map((href) => sectionMap.get(href))
+              .filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+            if (groupSections.length === 0) return null;
+
             return (
-              <Link key={href} href={href} aria-current={active ? "page" : undefined} className={cn("adm-nav-link", active && "is-active")}>
-                <span className="adm-nav-link__icon"><Icon size={16} /></span>
-                <span>{label}</span>
-              </Link>
+              <div key={group.title} className="adm-nav-group">
+                <span className="adm-nav-group__title">{group.title}</span>
+                <div className="adm-nav-group__items">
+                  {groupSections.map(({ href, label }) => {
+                    const Icon = ICONS[href] ?? IconDashboard;
+                    const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        aria-current={active ? "page" : undefined}
+                        className={cn("adm-nav-link", active && "is-active")}
+                      >
+                        <span className="adm-nav-link__icon"><Icon size={16} /></span>
+                        <span className="adm-nav-link__label">{label}</span>
+                        {active && <span className="adm-nav-link__dot" aria-hidden="true" />}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </nav>
+
         <div className="adm-staff-card">
           <div className="adm-staff">
             <Avatar name={staffName} src={profile?.avatar_url} size="sm" ringTone="none" />
@@ -82,9 +171,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <span className="adm-staff__role">{staffRole}</span>
             </p>
           </div>
-          <Link href="/dashboard" className="adm-learner-link">Retour espace apprenant</Link>
+          <Link href="/dashboard" className="adm-learner-link">
+            ← Espace apprenant
+          </Link>
         </div>
       </aside>
+
       <main id="contenu-admin" className="adm-main" tabIndex={-1}>
         {syncError && <p role="alert" className="adm-notice adm-notice--error adm-sync-alert">{syncError}</p>}
         {children}

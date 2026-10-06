@@ -15,6 +15,7 @@ import { useUser } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDate, formatDuration, formatNumber } from "@/lib/format";
+import { playFailureSound, playSuccessSound } from "@/lib/mascot/sound-effects";
 import { getCourseBySlug } from "@/services/courses.service";
 import { getCourseExamStatus, startCourseExam, submitCourseExam } from "@/services/exam.service";
 import type { ExamQuestion, ExamStartResult, ExamStatus, ExamSubmitResult } from "@/types/exam";
@@ -57,9 +58,15 @@ function ExamPageView() {
     submitCourseExam(examState.attempt_id, answers)
       .then((res) => {
         setSubmitResult(res);
+        if (res.passed) {
+          playSuccessSound();
+        } else {
+          playFailureSound();
+        }
         void reload();
       })
       .catch(() => {
+        playFailureSound();
         setErrorMsg("Le temps est écoulé. Les réponses ont été enregistrées.");
       })
       .finally(() => {
@@ -116,8 +123,14 @@ function ExamPageView() {
     try {
       const res = await submitCourseExam(examState.attempt_id, answers);
       setSubmitResult(res);
+      if (res.passed) {
+        playSuccessSound();
+      } else {
+        playFailureSound();
+      }
       void reload();
     } catch (err) {
+      playFailureSound();
       setErrorMsg(errorMessage(err, "Échec lors de la validation de l’examen."));
     } finally {
       setSubmitting(false);
@@ -158,20 +171,31 @@ function ExamPageView() {
 
             {/* Certificate Awarded CTA */}
             {submitResult.certificate && (
-              <div className="p-6 rounded-xl bg-cyber-surface/90 border border-cyber-cyan/40 max-w-lg mx-auto mb-6 space-y-4 text-left">
-                <div className="flex items-center gap-3">
-                  <IconCertificate size={28} className="text-cyber-cyan" />
-                  <div>
-                    <strong className="block text-white text-base">Certificat officiel CyberPingo</strong>
-                    <span className="text-xs text-cyber-muted font-mono">N° {submitResult.certificate.certificate_number}</span>
+              <div className="p-6 rounded-2xl bg-gradient-to-r from-[#06152a] via-[#092244] to-[#06152a] border-2 border-amber-400/60 shadow-lg shadow-amber-500/10 max-w-xl mx-auto mb-6 space-y-4 text-left">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-amber-400/10 border border-amber-400/40 text-amber-300">
+                    <IconCertificate size={32} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold tracking-widest text-amber-300 uppercase bg-amber-400/15 px-2 py-0.5 rounded-full border border-amber-400/30">
+                        Diplôme Officiel Délivré
+                      </span>
+                    </div>
+                    <strong className="block text-white text-lg font-bold mt-1">
+                      Certificat d&apos;Accomplissement &amp; d&apos;Expertise
+                    </strong>
+                    <span className="text-xs text-cyber-cyan font-mono block mt-0.5">
+                      Enregistrement officiel : {submitResult.certificate.certificate_number}
+                    </span>
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2 pt-2">
+                <div className="flex flex-wrap gap-2.5 pt-2 border-t border-cyber-line/50">
                   <Link
                     href={`/certificat/${submitResult.certificate.verification_code}`}
-                    className="study-button study-button--sm"
+                    className="study-button study-button--sm bg-gradient-to-r from-amber-400 to-amber-300 text-black font-bold border-none hover:brightness-110"
                   >
-                    Voir mon certificat en ligne
+                    Consulter mon diplôme officiel en ligne
                   </Link>
                   <a
                     href={`/api/certificat/${submitResult.certificate.verification_code}/pdf`}
@@ -179,7 +203,7 @@ function ExamPageView() {
                     rel="noopener noreferrer"
                     className="study-button study-button--sm study-button--ghost"
                   >
-                    Télécharger le PDF officiel
+                    Télécharger le PDF haute fidélité
                   </a>
                 </div>
               </div>

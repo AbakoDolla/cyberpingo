@@ -23,6 +23,7 @@ import { useTranslation } from "@/lib/i18n";
 import { localizeLab, localizeLevel } from "@/lib/content-i18n";
 import { errorMessage } from "@/lib/errors";
 import { levelLabel } from "@/lib/format";
+import { playFailureSound, playSuccessSound } from "@/lib/mascot/sound-effects";
 import { getLab, listLabAssets, listLabTasks } from "@/services/labs.service";
 import type { LabFormat, LabSubmission, LabTaskResult } from "@/types/api";
 
@@ -74,8 +75,14 @@ function ChallengeDetailView() {
     try {
       const submission = await submitLab(lab.id, value);
       setResult(submission);
-      if (submission.correct) setData((current) => current?.lab ? { ...current, lab: { ...current.lab, solved: true, solved_at: new Date().toISOString() } } : current);
+      if (submission.correct) {
+        playSuccessSound();
+        setData((current) => current?.lab ? { ...current, lab: { ...current.lab, solved: true, solved_at: new Date().toISOString() } } : current);
+      } else {
+        playFailureSound();
+      }
     } catch (cause) {
+      playFailureSound();
       setFormError(errorMessage(cause, isEn ? "Your answer could not be verified." : "Ta réponse n’a pas pu être vérifiée."));
     } finally {
       setChecking(false);

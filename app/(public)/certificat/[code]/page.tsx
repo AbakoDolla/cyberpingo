@@ -6,6 +6,7 @@ import { formatDate } from "@/lib/format";
 import { verifyCertificate } from "@/services/gamification.service";
 import type { CertificateVerification } from "@/types/api";
 import CertificateLookupForm from "../CertificateLookupForm";
+import CertificateDiplomaCard from "@/components/certificate/CertificateDiplomaCard";
 
 // Revocations must show up immediately, so this page is never served from a cache.
 export const dynamic = "force-dynamic";
@@ -87,16 +88,31 @@ export default async function CertificateVerificationPage({ params }: { params: 
   return (
     <div className="public-container inner-page">
       <Link className="back-link" href="/certificat">← Vérifier un autre code</Link>
+
+      {/* Diplôme Haute Fidélité Interactif & Imprimable */}
+      <CertificateDiplomaCard
+        recipientName={recipientName}
+        courseTitle={courseTitle}
+        courseSlug={cert.course_slug}
+        certificateNumber={cert.certificate_number ?? "CP-PENDING"}
+        verificationCode={verificationCode}
+        issuedAt={cert.issued_at}
+        examPercentage={cert.exam_percentage}
+        valid={!revoked}
+        revokedAt={cert.revoked_at}
+        revokedReason={cert.revoked_reason}
+      />
+
       <section className="cert-verdict" data-state={revoked ? "revoked" : "valid"} aria-live="polite">
         <span className="cert-verdict-icon" aria-hidden="true">{revoked ? <IconX size={26} /> : <IconCheck size={26} />}</span>
         <div>
-          <p className="cert-verdict-kicker">{revoked ? "Certificat révoqué" : "Certificat authentique"}</p>
+          <p className="cert-verdict-kicker">{revoked ? "Certificat révoqué" : "Certificat authentique vérifié"}</p>
           <h1>{revoked
             ? "Ce certificat n’est plus valide."
             : <>{recipientName} a terminé <span>{courseTitle}</span>.</>}</h1>
           <p>{revoked
             ? `CyberPingo a révoqué ce certificat${cert.revoked_at ? ` le ${formatDate(cert.revoked_at)}` : ""}. Il ne doit plus être accepté comme preuve de formation.`
-            : "Ce certificat a été délivré par CyberPingo et n’a pas été révoqué à ce jour."}</p>
+            : "Ce certificat a été délivré par le Conseil Académique CyberPingo et est authentifié en temps réel dans notre registre décentralisé."}</p>
           {revoked && cert.revoked_reason && <p className="cert-verdict-reason"><strong>Motif :</strong> {cert.revoked_reason}</p>}
         </div>
       </section>
@@ -104,51 +120,19 @@ export default async function CertificateVerificationPage({ params }: { params: 
       <dl className="cert-facts">
         <div className="cert-holder"><dt>Titulaire</dt><dd>{recipientName}</dd></div>
         <div>
-          <dt>Parcours</dt>
+          <dt>Parcours d&apos;expertise</dt>
           <dd>{cert.course_slug ? <Link href={`/parcours/${cert.course_slug}`}>{courseTitle}</Link> : courseTitle}</dd>
         </div>
         {cert.exam_percentage ? (
           <div>
-            <dt>Examen final</dt>
-            <dd style={{ color: "var(--cp-green, #3efa95)", fontWeight: 700 }}>{cert.exam_percentage} % (Validé)</dd>
+            <dt>Examen terminal</dt>
+            <dd style={{ color: "var(--cp-green, #3efa95)", fontWeight: 700 }}>{cert.exam_percentage} % (Validé · Seuil 70 %)</dd>
           </div>
         ) : null}
         <div><dt>Délivré le</dt><dd>{cert.issued_at ? formatDate(cert.issued_at) : "Non renseigné"}</dd></div>
-        <div><dt>Numéro de certificat</dt><dd className="cert-code">{cert.certificate_number ?? "Non renseigné"}</dd></div>
-        <div><dt>Code de vérification</dt><dd className="cert-code">{grouped(verificationCode)}</dd></div>
+        <div><dt>Numéro d&apos;enregistrement</dt><dd className="cert-code">{cert.certificate_number ?? "Non renseigné"}</dd></div>
+        <div><dt>Code unique de vérification</dt><dd className="cert-code">{grouped(verificationCode)}</dd></div>
       </dl>
-
-      {!revoked && (
-        <section className="cert-actions" style={{ display: "flex", flexWrap: "wrap", gap: "12px", margin: "24px 0" }}>
-          <a
-            href={`/api/certificat/${verificationCode}/pdf`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="study-button"
-            style={{ textDecoration: "none" }}
-          >
-            Télécharger le certificat (PDF)
-          </a>
-          <a
-            href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=${encodeURIComponent(courseTitle)}&organizationName=CyberPingo&issueYear=${new Date(cert.issued_at ?? Date.now()).getFullYear()}&issueMonth=${new Date(cert.issued_at ?? Date.now()).getMonth() + 1}&certUrl=${encodeURIComponent(`https://cyberpingo.vercel.app/certificat/${verificationCode}`)}&certId=${encodeURIComponent(cert.certificate_number ?? verificationCode)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="study-button study-button--ghost"
-            style={{ textDecoration: "none" }}
-          >
-            Ajouter à mon profil LinkedIn
-          </a>
-          <a
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://cyberpingo.vercel.app/certificat/${verificationCode}`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="study-button study-button--ghost"
-            style={{ textDecoration: "none" }}
-          >
-            Partager sur LinkedIn
-          </a>
-        </section>
-      )}
 
       <section className="cert-notes">
         <h2>Ce que cette vérification garantit</h2>

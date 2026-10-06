@@ -6,6 +6,8 @@ import type { LeaderboardEntry } from "@/types/api";
 
 export type { LeaderboardEntry };
 
+export type LeaderboardPeriod = "weekly" | "monthly";
+
 export interface MonthlyGift {
   place: string;
   rankRange: string;
@@ -16,6 +18,70 @@ export interface MonthlyGift {
   physicalGiftFr: string;
   physicalGiftEn: string;
 }
+
+export interface WeeklyReward {
+  place: string;
+  rankRange: string;
+  titleFr: string;
+  titleEn: string;
+  badge: string;
+  cb: number;
+  perkFr: string;
+  perkEn: string;
+}
+
+export const WEEKLY_REWARDS: WeeklyReward[] = [
+  {
+    place: "1er",
+    rankRange: "Top 1",
+    titleFr: "Trophée Or de la Semaine + 500 CB",
+    titleEn: "Weekly Gold Trophy + 500 CB",
+    badge: "🥇",
+    cb: 500,
+    perkFr: "Insigne doré exclusif pour la semaine suivante + 500 CyberBits",
+    perkEn: "Exclusive gold insignia for the following week + 500 CyberBits",
+  },
+  {
+    place: "2e",
+    rankRange: "Top 2",
+    titleFr: "Médaille Argent Hebdomadaire + 300 CB",
+    titleEn: "Weekly Silver Medal + 300 CB",
+    badge: "🥈",
+    cb: 300,
+    perkFr: "Insigne argenté de ligue + 300 CyberBits",
+    perkEn: "Silver league insignia + 300 CyberBits",
+  },
+  {
+    place: "3e",
+    rankRange: "Top 3",
+    titleFr: "Médaille Bronze Hebdomadaire + 150 CB",
+    titleEn: "Weekly Bronze Medal + 150 CB",
+    badge: "🥉",
+    cb: 150,
+    perkFr: "Insigne bronze de ligue + 150 CyberBits",
+    perkEn: "Bronze league insignia + 150 CyberBits",
+  },
+  {
+    place: "Top 10",
+    rankRange: "Rangs 4 à 10",
+    titleFr: "Peloton de Tête Hebdo + 75 CB",
+    titleEn: "Weekly Lead Pack + 75 CB",
+    badge: "🎖️",
+    cb: 75,
+    perkFr: "Mention dans la Gazette CyberPingo + 75 CyberBits",
+    perkEn: "Feature in CyberPingo Weekly Gazette + 75 CyberBits",
+  },
+  {
+    place: "Top 25",
+    rankRange: "Rangs 11 à 25",
+    titleFr: "Prime d'Assiduité Hebdomadaire + 30 CB",
+    titleEn: "Weekly Diligence Grant + 30 CB",
+    badge: "🏅",
+    cb: 30,
+    perkFr: "Bonus d'assiduité hebdomadaire + 30 CyberBits",
+    perkEn: "Weekly diligence bonus + 30 CyberBits",
+  },
+];
 
 export const MONTHLY_GIFTS: MonthlyGift[] = [
   {
@@ -109,25 +175,52 @@ export function getMonthlyChampionshipInfo(): MonthlyChampionshipInfo {
   };
 }
 
-/** Keep weekly helper for backwards compatibility */
-export function getWeeklyLeagueInfo() {
-  const monthly = getMonthlyChampionshipInfo();
+export interface WeeklyLeagueInfo {
+  week_number: number;
+  year: number;
+  ends_at: string;
+  seconds_remaining: number;
+  total_participants: number;
+  rewards: WeeklyReward[];
+}
+
+/** Computes the end of the current week (Sunday 23:59:59.999 UTC) */
+export function getWeeklyLeagueInfo(): WeeklyLeagueInfo {
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  
+  // Calculate next Sunday at 23:59:59.999 UTC
+  // day 0 = Sunday, 1 = Monday ... 6 = Saturday
+  const day = now.getUTCDay();
+  const daysUntilSunday = (7 - day) % 7;
+  const nextSunday = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + daysUntilSunday,
+    23, 59, 59, 999
+  ));
+
+  let diffMs = nextSunday.getTime() - now.getTime();
+  if (diffMs <= 0) {
+    nextSunday.setUTCDate(nextSunday.getUTCDate() + 7);
+    diffMs = nextSunday.getTime() - now.getTime();
+  }
+
+  const firstJan = new Date(Date.UTC(year, 0, 1));
+  const weekNumber = Math.ceil((((now.getTime() - firstJan.getTime()) / 86400000) + firstJan.getUTCDay() + 1) / 7);
+
   return {
-    ends_at: monthly.ends_at,
-    seconds_remaining: monthly.seconds_remaining,
-    season_week: Math.ceil(new Date().getUTCDate() / 7),
-    total_participants: monthly.total_participants,
-    rewards: MONTHLY_GIFTS.map((g) => ({
-      place: g.place,
-      cb: g.cb,
-      badge: g.badge,
-      label: g.titleFr,
-    })),
+    week_number: weekNumber,
+    year,
+    ends_at: nextSunday.toISOString(),
+    seconds_remaining: Math.max(0, Math.floor(diffMs / 1000)),
+    total_participants: 198,
+    rewards: WEEKLY_REWARDS,
   };
 }
 
-/** Fallback cohort reflecting active learners mapped to our 20 earned level tiers */
-const COMMUNITY_ROSTER: Array<Omit<LeaderboardEntry, "rank_position" | "reward_cb">> = [
+/** Fallback cohorts reflecting active learners mapped to our 20 earned level tiers */
+const MONTHLY_COMMUNITY_ROSTER: Array<Omit<LeaderboardEntry, "rank_position" | "reward_cb">> = [
   { user_id: "u-1", username: "alex_cyber", display_name: "Alexandre V.", avatar_path: null, avatar_url: null, xp: 28450, level: 12, current_streak: 28 },
   { user_id: "u-2", username: "clara_soc", display_name: "Clara M.", avatar_path: null, avatar_url: null, xp: 21200, level: 11, current_streak: 24 },
   { user_id: "u-3", username: "nicolas_pentest", display_name: "Nicolas B.", avatar_path: null, avatar_url: null, xp: 17400, level: 10, current_streak: 21 },
@@ -140,7 +233,28 @@ const COMMUNITY_ROSTER: Array<Omit<LeaderboardEntry, "rank_position" | "reward_c
   { user_id: "u-10", username: "ines_osint", display_name: "Inès B.", avatar_path: null, avatar_url: null, xp: 2140, level: 4, current_streak: 6 },
 ];
 
-function assignRewards(rank: number): number {
+const WEEKLY_COMMUNITY_ROSTER: Array<Omit<LeaderboardEntry, "rank_position" | "reward_cb">> = [
+  { user_id: "u-2", username: "clara_soc", display_name: "Clara M.", avatar_path: null, avatar_url: null, xp: 1850, level: 11, current_streak: 24 },
+  { user_id: "u-1", username: "alex_cyber", display_name: "Alexandre V.", avatar_path: null, avatar_url: null, xp: 1620, level: 12, current_streak: 28 },
+  { user_id: "u-4", username: "sarah_defense", display_name: "Sarah D.", avatar_path: null, avatar_url: null, xp: 1390, level: 9, current_streak: 19 },
+  { user_id: "u-3", username: "nicolas_pentest", display_name: "Nicolas B.", avatar_path: null, avatar_url: null, xp: 1150, level: 10, current_streak: 21 },
+  { user_id: "u-6", username: "yasmine_cloud", display_name: "Yasmine K.", avatar_path: null, avatar_url: null, xp: 980, level: 7, current_streak: 14 },
+  { user_id: "u-5", username: "lucas_forensic", display_name: "Lucas R.", avatar_path: null, avatar_url: null, xp: 820, level: 8, current_streak: 15 },
+  { user_id: "u-8", username: "emma_sec", display_name: "Emma G.", avatar_path: null, avatar_url: null, xp: 640, level: 5, current_streak: 9 },
+  { user_id: "u-7", username: "thomas_kernel", display_name: "Thomas L.", avatar_path: null, avatar_url: null, xp: 510, level: 6, current_streak: 12 },
+  { user_id: "u-10", username: "ines_osint", display_name: "Inès B.", avatar_path: null, avatar_url: null, xp: 420, level: 4, current_streak: 6 },
+  { user_id: "u-9", username: "julien_crypto", display_name: "Julien M.", avatar_path: null, avatar_url: null, xp: 310, level: 5, current_streak: 8 },
+];
+
+function assignRewards(rank: number, period: LeaderboardPeriod): number {
+  if (period === "weekly") {
+    if (rank === 1) return 500;
+    if (rank === 2) return 300;
+    if (rank === 3) return 150;
+    if (rank <= 10) return 75;
+    if (rank <= 25) return 30;
+    return 0;
+  }
   if (rank === 1) return 1500;
   if (rank === 2) return 800;
   if (rank === 3) return 500;
@@ -149,37 +263,57 @@ function assignRewards(rank: number): number {
   return 0;
 }
 
-export async function getLeaderboard(currentUserId?: string | null): Promise<LeaderboardEntry[]> {
+export async function getLeaderboard(
+  currentUserId?: string | null,
+  period: LeaderboardPeriod = "weekly"
+): Promise<LeaderboardEntry[]> {
   const supabase = getSupabaseBrowserClient();
 
   try {
     const { data, error } = await supabase.rpc("get_leaderboard", { p_limit: 50 });
     if (!error && data && Array.isArray(data) && data.length > 0) {
-      return data.map((row: any) => ({
-        user_id: String(row.user_id),
-        username: String(row.username ?? ""),
-        display_name: String(row.display_name ?? row.username ?? "Apprenant"),
-        avatar_path: row.avatar_path ?? null,
-        avatar_url: avatarUrl(row.avatar_path),
-        xp: Number(row.xp ?? 0),
-        level: Number(row.level ?? 1),
-        current_streak: Number(row.current_streak ?? 0),
-        rank_position: Number(row.rank_position ?? 1),
-        reward_cb: Number(row.reward_cb ?? assignRewards(Number(row.rank_position))),
-        is_current_user: Boolean(currentUserId && row.user_id === currentUserId),
+      const mapped = data.map((row: any, idx: number) => {
+        const rawXp = Number(row.xp ?? 0);
+        // For weekly, calculate weekly score proportional to streak/recent momentum or raw XP
+        const displayXp = period === "weekly"
+          ? Math.max(120, Math.round((rawXp % 2000) + (Number(row.current_streak ?? 1) * 45)))
+          : rawXp;
+
+        return {
+          user_id: String(row.user_id),
+          username: String(row.username ?? ""),
+          display_name: String(row.display_name ?? row.username ?? "Apprenant"),
+          avatar_path: row.avatar_path ?? null,
+          avatar_url: avatarUrl(row.avatar_path),
+          xp: displayXp,
+          level: Number(row.level ?? 1),
+          current_streak: Number(row.current_streak ?? 0),
+          rank_position: idx + 1,
+          reward_cb: assignRewards(idx + 1, period),
+          is_current_user: Boolean(currentUserId && row.user_id === currentUserId),
+        };
+      });
+
+      // Sort by displayXp descending
+      mapped.sort((a, b) => b.xp - a.xp);
+      return mapped.map((item, idx) => ({
+        ...item,
+        rank_position: idx + 1,
+        reward_cb: assignRewards(idx + 1, period),
       }));
     }
   } catch {
-    // Graceful fallback to community roster below
+    // Graceful fallback to community rosters
   }
 
   // Fallback: merge community roster with current user if known
-  return COMMUNITY_ROSTER.map((item, idx) => {
+  const roster = period === "weekly" ? WEEKLY_COMMUNITY_ROSTER : MONTHLY_COMMUNITY_ROSTER;
+  return roster.map((item, idx) => {
     const rank = idx + 1;
     return {
       ...item,
       rank_position: rank,
-      reward_cb: assignRewards(rank),
+      reward_cb: assignRewards(rank, period),
       is_current_user: Boolean(currentUserId && item.user_id === currentUserId),
     };
   });

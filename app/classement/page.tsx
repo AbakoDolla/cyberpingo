@@ -24,36 +24,54 @@ import { playCoinClink, playTrophyChime } from "@/lib/mascot/sound-effects";
 import {
   getLeaderboard,
   getMonthlyChampionshipInfo,
+  getWeeklyLeagueInfo,
   MONTHLY_GIFTS,
+  WEEKLY_REWARDS,
   type LeaderboardEntry,
+  type LeaderboardPeriod,
   type MonthlyChampionshipInfo,
+  type WeeklyLeagueInfo,
 } from "@/services/leaderboard.service";
 
 function formatCountdown(totalSeconds: number): { days: number; hours: number; minutes: number; seconds: number } {
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const safe = Math.max(0, totalSeconds);
+  const days = Math.floor(safe / 86400);
+  const hours = Math.floor((safe % 86400) / 3600);
+  const minutes = Math.floor((safe % 3600) / 60);
+  const seconds = safe % 60;
   return { days, hours, minutes, seconds };
 }
 
 export default function ClassementPage() {
-  const { lang, t } = useTranslation();
+  const { lang } = useTranslation();
   const { profile } = useUser();
   const userId = profile?.id ?? null;
 
+  const [period, setPeriod] = useState<LeaderboardPeriod>("weekly");
+
+  const [weeklyInfo, setWeeklyInfo] = useState<WeeklyLeagueInfo>(() => getWeeklyLeagueInfo());
+  const [weeklySeconds, setWeeklySeconds] = useState<number>(() => getWeeklyLeagueInfo().seconds_remaining);
+
   const [championship, setChampionship] = useState<MonthlyChampionshipInfo>(() => getMonthlyChampionshipInfo());
-  const [secondsLeft, setSecondsLeft] = useState<number>(() => getMonthlyChampionshipInfo().seconds_remaining);
+  const [monthlySeconds, setMonthlySeconds] = useState<number>(() => getMonthlyChampionshipInfo().seconds_remaining);
 
   const { data: entries, loading, error, reload } = useAsync<LeaderboardEntry[]>(
-    () => getLeaderboard(userId),
-    [userId],
+    () => getLeaderboard(userId, period),
+    [userId, period],
   );
 
-  // Live countdown ticker
+  // Live countdown ticker for both periods
   useEffect(() => {
     const timer = setInterval(() => {
-      setSecondsLeft((prev) => {
+      setWeeklySeconds((prev) => {
+        if (prev <= 1) {
+          const fresh = getWeeklyLeagueInfo();
+          setWeeklyInfo(fresh);
+          return fresh.seconds_remaining;
+        }
+        return prev - 1;
+      });
+      setMonthlySeconds((prev) => {
         if (prev <= 1) {
           const fresh = getMonthlyChampionshipInfo();
           setChampionship(fresh);
@@ -65,7 +83,8 @@ export default function ClassementPage() {
     return () => clearInterval(timer);
   }, []);
 
-  const time = useMemo(() => formatCountdown(secondsLeft), [secondsLeft]);
+  const activeSeconds = period === "weekly" ? weeklySeconds : monthlySeconds;
+  const time = useMemo(() => formatCountdown(activeSeconds), [activeSeconds]);
 
   const top1 = entries?.[0] ?? null;
   const top2 = entries?.[1] ?? null;
@@ -87,34 +106,87 @@ export default function ClassementPage() {
           <div className="leaderboard-hero-content">
             <div className="leaderboard-badge-row">
               <span className="badge badge-primary">
-                <IconTrophy size={14} /> {lang === "fr" ? `Championnat Mensuel • ${monthName} ${championship.year}` : `Monthly Championship • ${monthName} ${championship.year}`}
+                {period === "weekly" ? (
+                  <><IconBolt size={14} /> {lang === "fr" ? `Ligue Hebdomadaire • Semaine ${weeklyInfo.week_number}` : `Weekly League • Week ${weeklyInfo.week_number}`}</>
+                ) : (
+                  <><IconTrophy size={14} /> {lang === "fr" ? `Championnat Mensuel • ${monthName} ${championship.year}` : `Monthly Championship • ${monthName} ${championship.year}`}</>
+                )}
               </span>
               <span className="badge badge-muted">
-                <IconBolt size={14} /> {lang === "fr" ? "Ligue d'Élite CyberPingo" : "CyberPingo Elite League"}
+                <IconFlame size={14} /> {lang === "fr" ? "Compétition Active" : "Active Competition"}
               </span>
             </div>
             <h1 className="leaderboard-title">
-              {lang === "fr" ? (
-                <>Classement Mensuel & <span className="text-cyan">Cadeaux Réels</span></>
+              {period === "weekly" ? (
+                lang === "fr" ? (
+                  <>Classement Hebdo & <span className="text-cyan">Bourses CyberBits</span></>
+                ) : (
+                  <>Weekly Leaderboard & <span className="text-cyan">CyberBits Grants</span></>
+                )
               ) : (
-                <>Monthly Leaderboard & <span className="text-cyan">Real Rewards</span></>
+                lang === "fr" ? (
+                  <>Championnat Mensuel & <span className="text-cyan">Cadeaux Réels</span></>
+                ) : (
+                  <>Monthly Championship & <span className="text-cyan">Real Gifts</span></>
+                )
               )}
             </h1>
             <p className="leaderboard-subtitle">
-              {lang === "fr"
-                ? "Chaque mois, les meilleurs apprenants remportent de véritables récompenses physiques (Clés YubiKey 5 NFC, livres spécialisés, packs goodies) ainsi que des bourses en CyberBits."
-                : "Every month, top security learners win real physical hardware (YubiKey 5 NFC keys, specialized books, exclusive swag) and substantial CyberBits grants."}
+              {period === "weekly"
+                ? (lang === "fr"
+                  ? "Chaque semaine le dimanche à 23h59 UTC, les apprenants les plus actifs récoltent des bourses en CyberBits et de prestigieux insignes de ligue."
+                  : "Every Sunday at 23:59 UTC, top active security learners earn substantial CyberBits bounties and prestige league insignias.")
+                : (lang === "fr"
+                  ? "Chaque mois, les premiers du classement remportent de véritables cadeaux physiques (Clés YubiKey 5 NFC, livres spécialisés, packs goodies) expédiés à domicile."
+                  : "Every month, overall leaders win genuine hardware (YubiKey 5 NFC keys, specialized books, exclusive swag boxes) delivered worldwide.")}
             </p>
+
+            {/* Segmented Period Switcher */}
+            <div className="leaderboard-period-tabs" role="tablist" aria-label={lang === "fr" ? "Période de classement" : "Leaderboard period"}>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={period === "weekly"}
+                className={`period-tab-btn ${period === "weekly" ? "active" : ""}`}
+                onClick={() => {
+                  setPeriod("weekly");
+                  playCoinClink();
+                }}
+              >
+                <IconBolt size={16} />
+                <span className="tab-title">{lang === "fr" ? "Cette Semaine" : "This Week"}</span>
+                <span className="tab-pill">{time.days > 0 ? `${time.days}j ` : ""}{time.hours}h</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={period === "monthly"}
+                className={`period-tab-btn ${period === "monthly" ? "active" : ""}`}
+                onClick={() => {
+                  setPeriod("monthly");
+                  playTrophyChime();
+                }}
+              >
+                <IconTrophy size={16} />
+                <span className="tab-title">{lang === "fr" ? "Ce Mois-ci" : "This Month"}</span>
+                <span className="tab-pill prize-pill">🎁 {lang === "fr" ? "Cadeaux Réels" : "Real Gifts"}</span>
+              </button>
+            </div>
           </div>
 
           {/* Countdown card */}
           <div
             className="league-timer-card"
             onMouseEnter={() => playTrophyChime()}
-            title={lang === "fr" ? "Clôture le dernier jour du mois à 23h59 UTC" : "Resets last day of the month at 23:59 UTC"}
+            title={period === "weekly"
+              ? (lang === "fr" ? "Clôture ce dimanche à 23h59 UTC" : "Resets this Sunday at 23:59 UTC")
+              : (lang === "fr" ? "Clôture le dernier jour du mois à 23h59 UTC" : "Resets last day of the month at 23:59 UTC")}
           >
             <div className="league-timer-label">
-              <IconClock size={16} /> {lang === "fr" ? "Fin du championnat dans" : "Championship ends in"}
+              <IconClock size={16} />
+              {period === "weekly"
+                ? (lang === "fr" ? "Clôture hebdo dans" : "Weekly reset in")
+                : (lang === "fr" ? "Fin du championnat dans" : "Championship ends in")}
             </div>
             <div className="league-timer-grid">
               <div className="league-timer-segment">
@@ -140,62 +212,113 @@ export default function ClassementPage() {
           </div>
         </header>
 
-        {/* Monthly Gifts Showcase */}
-        <section className="monthly-gifts-section" aria-label={lang === "fr" ? "Dotations et cadeaux mensuels" : "Monthly gifts and prizes"}>
-          <div className="monthly-gifts-header">
-            <h2>
-              <IconGift size={22} style={{ color: "#f59e0b" }} />
-              {lang === "fr" ? "Dotations du Mois en Jeu" : "Featured Monthly Prizes"}
-            </h2>
-            <span className="monthly-gifts-tag">
-              <IconSparkles size={13} /> {lang === "fr" ? "Expédition offerte aux vainqueurs" : "Free worldwide shipping for winners"}
-            </span>
-          </div>
+        {/* Featured Rewards / Gifts Showcase based on active tab */}
+        {period === "monthly" ? (
+          <section className="monthly-gifts-section" aria-label={lang === "fr" ? "Dotations et cadeaux mensuels" : "Monthly gifts and prizes"}>
+            <div className="monthly-gifts-header">
+              <h2>
+                <IconGift size={22} style={{ color: "#f59e0b" }} />
+                {lang === "fr" ? "Dotations du Mois en Jeu" : "Featured Monthly Prizes"}
+              </h2>
+              <span className="monthly-gifts-tag">
+                <IconSparkles size={13} /> {lang === "fr" ? "Expédition offerte aux vainqueurs" : "Free worldwide shipping for winners"}
+              </span>
+            </div>
 
-          <div className="monthly-gifts-grid">
-            {MONTHLY_GIFTS.map((gift, idx) => {
-              const isPhysical = gift.cb >= 500;
-              const cardClass = idx === 0 ? "gift-top-1" : idx === 1 ? "gift-top-2" : idx === 2 ? "gift-top-3" : "";
-              return (
-                <article
-                  key={idx}
-                  className={`monthly-gift-card ${cardClass}`}
-                  onClick={() => playCoinClink()}
-                >
-                  <div className="monthly-gift-top-row">
-                    <span className="monthly-gift-rank">
-                      <span className="monthly-gift-badge">{gift.badge}</span>
-                      {gift.rankRange}
-                    </span>
-                    {isPhysical ? (
-                      <span className="gift-physical-pill">
-                        🎁 {lang === "fr" ? "Cadeau physique" : "Physical gift"}
+            <div className="monthly-gifts-grid">
+              {MONTHLY_GIFTS.map((gift, idx) => {
+                const isPhysical = gift.cb >= 500;
+                const cardClass = idx === 0 ? "gift-top-1" : idx === 1 ? "gift-top-2" : idx === 2 ? "gift-top-3" : "";
+                return (
+                  <article
+                    key={idx}
+                    className={`monthly-gift-card ${cardClass}`}
+                    onClick={() => playCoinClink()}
+                  >
+                    <div className="monthly-gift-top-row">
+                      <span className="monthly-gift-rank">
+                        <span className="monthly-gift-badge">{gift.badge}</span>
+                        {gift.rankRange}
                       </span>
-                    ) : (
+                      {isPhysical ? (
+                        <span className="gift-physical-pill">
+                          🎁 {lang === "fr" ? "Cadeau physique" : "Physical gift"}
+                        </span>
+                      ) : (
+                        <span className="gift-digital-pill">
+                          ⭐ {lang === "fr" ? "Titre d'honneur" : "Honorable title"}
+                        </span>
+                      )}
+                    </div>
+
+                    <h3 className="monthly-gift-title">
+                      {lang === "fr" ? gift.titleFr : gift.titleEn}
+                    </h3>
+                    <p className="monthly-gift-desc">
+                      {lang === "fr" ? gift.physicalGiftFr : gift.physicalGiftEn}
+                    </p>
+
+                    <div className="monthly-gift-footer">
+                      <span className="text-muted">{lang === "fr" ? "Prime virtuelle" : "Virtual grant"}</span>
+                      <span className="monthly-gift-cb">
+                        <IconSparkles size={14} /> +{formatNumber(gift.cb)} CB
+                      </span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ) : (
+          <section className="monthly-gifts-section" aria-label={lang === "fr" ? "Bourses de ligue hebdomadaires" : "Weekly league bounties"}>
+            <div className="monthly-gifts-header">
+              <h2>
+                <IconBolt size={22} style={{ color: "#00d5ff" }} />
+                {lang === "fr" ? "Bourses de la Ligue Hebdomadaire" : "Weekly League Grants"}
+              </h2>
+              <span className="monthly-gifts-tag" style={{ background: "rgba(0, 213, 255, 0.15)", borderColor: "rgba(0, 213, 255, 0.35)", color: "#00d5ff" }}>
+                <IconSparkles size={13} /> {lang === "fr" ? "Attribution automatique chaque dimanche" : "Auto-distributed every Sunday"}
+              </span>
+            </div>
+
+            <div className="monthly-gifts-grid">
+              {WEEKLY_REWARDS.map((reward, idx) => {
+                const cardClass = idx === 0 ? "gift-top-1" : idx === 1 ? "gift-top-2" : idx === 2 ? "gift-top-3" : "";
+                return (
+                  <article
+                    key={idx}
+                    className={`monthly-gift-card ${cardClass}`}
+                    onClick={() => playCoinClink()}
+                  >
+                    <div className="monthly-gift-top-row">
+                      <span className="monthly-gift-rank">
+                        <span className="monthly-gift-badge">{reward.badge}</span>
+                        {reward.rankRange}
+                      </span>
                       <span className="gift-digital-pill">
-                        ⭐ {lang === "fr" ? "Titre d'honneur" : "Honorable title"}
+                        ⚡ {lang === "fr" ? "Prime Hebdo" : "Weekly Grant"}
                       </span>
-                    )}
-                  </div>
+                    </div>
 
-                  <h3 className="monthly-gift-title">
-                    {lang === "fr" ? gift.titleFr : gift.titleEn}
-                  </h3>
-                  <p className="monthly-gift-desc">
-                    {lang === "fr" ? gift.physicalGiftFr : gift.physicalGiftEn}
-                  </p>
+                    <h3 className="monthly-gift-title">
+                      {lang === "fr" ? reward.titleFr : reward.titleEn}
+                    </h3>
+                    <p className="monthly-gift-desc">
+                      {lang === "fr" ? reward.perkFr : reward.perkEn}
+                    </p>
 
-                  <div className="monthly-gift-footer">
-                    <span className="text-muted">{lang === "fr" ? "Prime virtuelle" : "Virtual grant"}</span>
-                    <span className="monthly-gift-cb">
-                      <IconSparkles size={14} /> +{formatNumber(gift.cb)} CB
-                    </span>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+                    <div className="monthly-gift-footer">
+                      <span className="text-muted">{lang === "fr" ? "Bourse CB" : "CB Bounty"}</span>
+                      <span className="monthly-gift-cb" style={{ color: "#00d5ff" }}>
+                        <IconSparkles size={14} /> +{formatNumber(reward.cb)} CB
+                      </span>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Current User Standout (if logged in) */}
         {currentUserEntry && (
@@ -219,14 +342,18 @@ export default function ClassementPage() {
                 <span className="text-muted text-sm">{localizeRankTitle(currentUserEntry.level, lang)}</span>
               </div>
               <div className="standing-meta">
-                <span><IconBolt size={13} /> {formatNumber(currentUserEntry.xp)} XP</span>
+                <span><IconBolt size={13} /> {formatNumber(currentUserEntry.xp)} XP {period === "weekly" ? (lang === "fr" ? "cette sem." : "this wk") : ""}</span>
                 {currentUserEntry.current_streak > 0 && (
                   <span><IconFlame size={13} /> {currentUserEntry.current_streak} {lang === "fr" ? "j de série" : "day streak"}</span>
                 )}
               </div>
             </div>
             <div className="standing-reward">
-              <span className="standing-reward-label">{lang === "fr" ? "Prime estimée fin de mois" : "Estimated month-end prize"}</span>
+              <span className="standing-reward-label">
+                {period === "weekly"
+                  ? (lang === "fr" ? "Prime estimée ce dimanche" : "Estimated Sunday prize")
+                  : (lang === "fr" ? "Prime estimée fin de mois" : "Estimated month-end prize")}
+              </span>
               <span className="standing-reward-cb">
                 <IconSparkles size={14} /> +{currentUserEntry.reward_cb} CB
               </span>
@@ -252,7 +379,8 @@ export default function ClassementPage() {
                 </span>
                 <div className="podium-xp"><IconBolt size={13} /> {formatNumber(top2.xp)} XP</div>
                 <div className="podium-prize silver">
-                  🎁 Bon 50€ + {top2.reward_cb} CB
+                  {period === "monthly" ? "🎁 Bon 50€ + " : "🥈 Médaille Argent + "}
+                  {top2.reward_cb} CB
                 </div>
                 <div className="podium-pillar pillar-2">
                   <span className="podium-rank-tag">2</span>
@@ -275,7 +403,8 @@ export default function ClassementPage() {
                 </span>
                 <div className="podium-xp"><IconBolt size={14} /> {formatNumber(top1.xp)} XP</div>
                 <div className="podium-prize gold">
-                  🏆 YubiKey 5 NFC + {top1.reward_cb} CB
+                  {period === "monthly" ? "🏆 YubiKey 5 NFC + " : "🥇 Trophée Or + "}
+                  {top1.reward_cb} CB
                 </div>
                 <div className="podium-pillar pillar-1">
                   <span className="podium-rank-tag">1</span>
@@ -298,7 +427,8 @@ export default function ClassementPage() {
                 </span>
                 <div className="podium-xp"><IconBolt size={13} /> {formatNumber(top3.xp)} XP</div>
                 <div className="podium-prize bronze">
-                  📦 Swag Box + {top3.reward_cb} CB
+                  {period === "monthly" ? "📦 Swag Box + " : "🥉 Médaille Bronze + "}
+                  {top3.reward_cb} CB
                 </div>
                 <div className="podium-pillar pillar-3">
                   <span className="podium-rank-tag">3</span>
@@ -330,9 +460,15 @@ export default function ClassementPage() {
         {!loading && entries && rest.length > 0 && (
           <section className="leaderboard-table-card" aria-label={lang === "fr" ? "Liste complète des participants" : "Complete participants roster"}>
             <div className="leaderboard-table-header">
-              <h2>{lang === "fr" ? `Peloton de la Ligue (${entries.length} participants)` : `League Roster (${entries.length} participants)`}</h2>
+              <h2>
+                {period === "weekly"
+                  ? (lang === "fr" ? `Peloton Hebdomadaire (${entries.length} participants)` : `Weekly League Roster (${entries.length} participants)`)
+                  : (lang === "fr" ? `Peloton Mensuel (${entries.length} participants)` : `Monthly Championship Roster (${entries.length} participants)`)}
+              </h2>
               <span className="text-muted text-sm">
-                {lang === "fr" ? "Dotations et CyberBits attribués le dernier jour du mois" : "Prizes and CyberBits rewarded on the last day of each month"}
+                {period === "weekly"
+                  ? (lang === "fr" ? "Points et bourses remis chaque dimanche soir" : "Bounties and medals awarded every Sunday night")
+                  : (lang === "fr" ? "Dotations et bourses attribuées le dernier jour du mois" : "Prizes and CyberBits rewarded on the last day of each month")}
               </span>
             </div>
 
@@ -344,8 +480,8 @@ export default function ClassementPage() {
                     <th scope="col" className="col-user">{lang === "fr" ? "Apprenant" : "Learner"}</th>
                     <th scope="col" className="col-level">{lang === "fr" ? "Insigne & Niveau" : "Badge & Level"}</th>
                     <th scope="col" className="col-streak">{lang === "fr" ? "Série" : "Streak"}</th>
-                    <th scope="col" className="col-xp">XP</th>
-                    <th scope="col" className="col-reward">{lang === "fr" ? "Prime Mensuelle" : "Monthly Reward"}</th>
+                    <th scope="col" className="col-xp">XP {period === "weekly" ? (lang === "fr" ? "Hebdo" : "Wk") : ""}</th>
+                    <th scope="col" className="col-reward">{lang === "fr" ? "Prime" : "Reward"}</th>
                   </tr>
                 </thead>
                 <tbody>

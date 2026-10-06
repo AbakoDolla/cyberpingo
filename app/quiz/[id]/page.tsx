@@ -12,6 +12,7 @@ import { IconArrowRight, IconCheck, IconLesson, IconTrophy } from "@/components/
 import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
+import { playSuccessSound, playFailureSound } from "@/lib/mascot/sound-effects";
 import { getCourseBySlug, orderedLessons } from "@/services/courses.service";
 import { getMyQuizAttempts, getQuiz } from "@/services/quiz.service";
 import type { QuizQuestion, QuizQuestionResult, QuizSubmission } from "@/types/api";
@@ -75,7 +76,13 @@ function QuizView() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      setResult(await submitQuiz(quiz.id, answers));
+      const res = await submitQuiz(quiz.id, answers);
+      setResult(res);
+      if (res.passed) {
+        playSuccessSound();
+      } else {
+        playFailureSound();
+      }
     } catch (cause) {
       setSubmitError(errorMessage(cause, "Ton résultat n’a pas pu être enregistré."));
     } finally {

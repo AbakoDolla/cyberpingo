@@ -107,7 +107,7 @@ export function playTrophySound(volume = 0.4) {
   });
 }
 
-/** Gentle success chime */
+/** Gentle success chime (two-tone ascending cyber chime) */
 export function playSuccessChime(volume = 0.3) {
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -121,15 +121,54 @@ export function playSuccessChime(volume = 0.3) {
   osc.frequency.setValueAtTime(1174.66, now + 0.09); // D6
 
   gain.gain.setValueAtTime(volume, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
 
   osc.connect(gain);
   gain.connect(ctx.destination);
 
   osc.start(now);
-  osc.stop(now + 0.35);
+  osc.stop(now + 0.38);
 }
 
+/**
+ * Modern cyber failure / error sound:
+ * Two subtle low-frequency descending tones (gentle soft cue, non-jarring but distinct).
+ */
+export function playFailureSound(volume = 0.35) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  // Tone 1: 240 Hz descending to 160 Hz
+  const osc1 = ctx.createOscillator();
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+
+  osc1.type = "sawtooth";
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(600, now);
+  filter.frequency.exponentialRampToValueAtTime(200, now + 0.32);
+
+  osc1.frequency.setValueAtTime(220, now); // A3
+  osc1.frequency.setValueAtTime(164.81, now + 0.12); // E3
+
+  gain.gain.setValueAtTime(volume * 0.7, now);
+  gain.gain.setValueAtTime(volume * 0.8, now + 0.12);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+  osc1.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc1.start(now);
+  osc1.stop(now + 0.4);
+}
+
+export const playSuccessSound = playSuccessChime;
+export const playTaskSuccessSound = playSuccessChime;
+export const playCorrectAnswerSound = playSuccessChime;
+export const playErrorSound = playFailureSound;
+export const playWrongAnswerSound = playFailureSound;
 export const playCoinClink = playCoinSound;
 export const playChestFanfare = playChestOpenSound;
 export const playTrophyChime = playTrophySound;

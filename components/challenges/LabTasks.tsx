@@ -8,6 +8,7 @@ import ProgressBar from "@/components/ui/ProgressBar";
 import { IconCheck, IconHint, IconLock } from "@/components/ui/Icon";
 import { useUserActions } from "@/context/UserContext";
 import { errorMessage } from "@/lib/errors";
+import { playSuccessSound, playFailureSound } from "@/lib/mascot/sound-effects";
 import type { LabTask, LabTaskResult } from "@/types/api";
 
 interface LabTasksProps {
@@ -37,10 +38,12 @@ function TaskRow({ task, index, signedIn, onSolved }: { task: LabTask; index: nu
     try {
       const result = await submitLabTask(task.id, value);
       if (result.correct) {
+        playSuccessSound();
         setRemaining(null);
         setExplanation(result.explanation);
         onSolved(task.id, result);
       } else {
+        playFailureSound();
         setRemaining(result.remaining_attempts);
       }
     } catch (cause) {

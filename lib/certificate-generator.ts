@@ -62,6 +62,7 @@ const GREEN = rgb(0.063, 0.878, 0.541);
 const NIGHT = rgb(0.02, 0.031, 0.086);
 const NAVY = rgb(0.059, 0.09, 0.165);
 const WHITE = rgb(1, 1, 1);
+const GOLD = rgb(0.96, 0.77, 0.26);
 const QR_INK = rgb(0.02, 0.031, 0.086);
 
 const fromBase64 = (value: string): Uint8Array => Uint8Array.from(Buffer.from(value, "base64"));
@@ -233,6 +234,26 @@ function drawBackdrop(page: PDFPage) {
   gradientBar(page, 0, height - 6, width, 6, [BLUE, PURPLE, GREEN]);
   roundedRect(page, 22, 22, width - 44, height - 50, 22, { color: NAVY, opacity: 0.55, borderColor: BLUE, borderWidth: 1.2, borderOpacity: 0.6 });
   roundedRect(page, 31, 31, width - 62, height - 68, 15, { borderColor: PURPLE, borderWidth: 0.6, borderOpacity: 0.32 });
+
+  // Ornaments & Security Corner Rosettes (Gold & Cyan)
+  const inset = 36;
+  const arm = 22;
+  // Top-left
+  page.drawLine({ start: { x: inset, y: height - inset }, end: { x: inset + arm, y: height - inset }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawLine({ start: { x: inset, y: height - inset }, end: { x: inset, y: height - inset - arm }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawCircle({ x: inset + 4, y: height - inset - 4, size: 2.2, color: CYAN, opacity: 0.9 });
+  // Top-right
+  page.drawLine({ start: { x: width - inset, y: height - inset }, end: { x: width - inset - arm, y: height - inset }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawLine({ start: { x: width - inset, y: height - inset }, end: { x: width - inset, y: height - inset - arm }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawCircle({ x: width - inset - 4, y: height - inset - 4, size: 2.2, color: CYAN, opacity: 0.9 });
+  // Bottom-left
+  page.drawLine({ start: { x: inset, y: inset }, end: { x: inset + arm, y: inset }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawLine({ start: { x: inset, y: inset }, end: { x: inset, y: inset + arm }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawCircle({ x: inset + 4, y: inset + 4, size: 2.2, color: CYAN, opacity: 0.9 });
+  // Bottom-right
+  page.drawLine({ start: { x: width - inset, y: inset }, end: { x: width - inset - arm, y: inset }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawLine({ start: { x: width - inset, y: inset }, end: { x: width - inset, y: inset + arm }, thickness: 1.4, color: GOLD, opacity: 0.85 });
+  page.drawCircle({ x: width - inset - 4, y: inset + 4, size: 2.2, color: CYAN, opacity: 0.9 });
 }
 
 function drawDivider(page: PDFPage, y: number) {
@@ -276,12 +297,14 @@ export async function generateCertificatePdf(params: GenerateCertificateParams):
   // Mascot seal on bottom left
   const sealX = 106;
   const sealY = 114;
-  page.drawCircle({ x: sealX, y: sealY, size: 56, color: NIGHT, opacity: 0.7, borderColor: BLUE, borderWidth: 1.1, borderOpacity: 0.7 });
+  page.drawCircle({ x: sealX, y: sealY, size: 56, color: NIGHT, opacity: 0.75, borderColor: GOLD, borderWidth: 1.5, borderOpacity: 0.85 });
   page.drawCircle({ x: sealX, y: sealY, size: 50, borderColor: PURPLE, borderWidth: 0.7, borderOpacity: 0.6 });
   const mascot = emblem.scale(76 / emblem.width);
   page.drawImage(emblem, { x: sealX - mascot.width / 2, y: sealY - mascot.height / 2, width: mascot.width, height: mascot.height });
+  spaced(page, "SCEAU OFFICIEL", { anchor: sealX, y: sealY - 42, size: 6.2, font: fonts.textBold, color: GOLD, spacing: 1.5, center: true });
 
-  spaced(page, "CERTIFICAT DE RÉUSSITE", { anchor: width / 2, y: 482, size: 10.5, font: fonts.displayMedium, color: CYAN, spacing: 3.4, center: true });
+  spaced(page, "ACADÉMIE DE CYBERSÉCURITÉ DÉFENSIVE", { anchor: width / 2, y: 494, size: 7.2, font: fonts.displayMedium, color: GOLD, spacing: 2.2, center: true });
+  spaced(page, "CERTIFICAT DE RÉUSSITE & D'EXPERTISE", { anchor: width / 2, y: 480, size: 10.5, font: fonts.displayMedium, color: CYAN, spacing: 3.2, center: true });
   drawDivider(page, 465);
 
   centered(page, "Décerné à", fonts.text, 12.5, 436, MUTED);
@@ -296,7 +319,7 @@ export async function generateCertificatePdf(params: GenerateCertificateParams):
   gradientBar(page, width / 2 - 130, y - 16, 260, 2.6, [BLUE, PURPLE, GREEN]);
 
   y -= 46;
-  centered(page, "pour avoir terminé avec succès le parcours", fonts.text, 12.5, y, MUTED);
+  centered(page, "pour avoir terminé avec succès le parcours officiel", fonts.text, 12.5, y, MUTED);
   const title = printable(fonts.textBold, params.courseTitle) || "Parcours CyberPingo";
   const titleSize = fitSize(fonts.textBold, title, 25, width - 220, 16);
   const titleLines = wrap(fonts.textBold, title, titleSize, width - 220);
@@ -306,13 +329,18 @@ export async function generateCertificatePdf(params: GenerateCertificateParams):
   });
   y -= (titleLines.length - 1) * (titleSize + 8);
 
-  // Attestation line: mentioning the 70% exam pass
-  const attestY = y - 38;
+  // Attestation line: mentioning the 70% exam pass and score distinction
+  if (params.examPercentage) {
+    y -= 20;
+    centered(page, `★  EXAMEN TERMINAL VALIDÉ AVEC DISTINCTION (${params.examPercentage} %)  ★`, fonts.textBold, 9.5, y, GOLD);
+  }
+
+  const attestY = y - 26;
   const examText = params.examPercentage
-    ? `Examen final validé avec un score officiel de ${params.examPercentage} % (seuil de réussite : 70 %).`
-    : "Toutes les leçons du parcours ont été suivies et l'examen final a été validé avec succès.";
+    ? `Examen officiel validé avec un score de ${params.examPercentage} % (seuil d'admission : 70 %).`
+    : "L'ensemble des modules d'évaluation théorique et pratique a été validé avec succès.";
   centered(page, examText, fonts.text, 10.5, attestY, INK);
-  centered(page, "Ce certificat officiel se vérifie en ligne à tout moment avec le code ci-dessous ou le QR code.", fonts.text, 9.5, attestY - 16, MUTED);
+  centered(page, "Ce certificat officiel est vérifiable publiquement à tout moment avec le code unique ou le QR code.", fonts.text, 9.5, attestY - 16, MUTED);
 
   gradientBar(page, 58, 188, width - 116, 0.8, [PURPLE, BLUE, PURPLE], 0.35, 40);
 
