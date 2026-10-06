@@ -161,8 +161,17 @@
 .lab-tasks .lab-tasks__list { margin: 0; gap: 12px; counter-reset: none; }
 .lab-tasks .lab-task { align-items: flex-start; gap: 14px; padding: 16px; border: 1px solid var(--cp-line); border-radius: 16px; background: rgba(3, 12, 27, 0.7); transition: border-color 200ms var(--cp-ease); }
 .lab-tasks .lab-task.is-solved { border-color: rgba(62, 250, 149, 0.34); }
+.lab-tasks .lab-task.is-locked {
+  border-color: rgba(255, 184, 107, 0.22);
+  background: rgba(3, 12, 27, 0.45);
+}
 .lab-task__index { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 auto; border-radius: 50%; background: rgba(0, 213, 255, 0.14); color: var(--cp-cyan); font-size: 13px; font-weight: 700; }
 .lab-task.is-solved .lab-task__index { background: rgba(62, 250, 149, 0.2); color: var(--cp-green); }
+.lab-task.is-locked .lab-task__index {
+  background: rgba(255, 184, 107, 0.14);
+  color: var(--cp-amber);
+  border: 1px dashed rgba(255, 184, 107, 0.4);
+}
 .lab-task__body { display: grid; gap: 10px; min-width: 0; flex: 1 1 auto; }
 .lab-tasks .lab-task__body p { margin: 0; }
 .lab-tasks .lab-task__prompt { color: #f1f7ff; font-weight: 500; }
@@ -498,6 +507,8 @@
 .lab-rail__steps a > span, .lab-rail__steps a > svg { display: grid; place-items: center; width: 22px; height: 22px; flex: 0 0 auto; border-radius: 50%; background: rgba(0, 213, 255, 0.14); color: var(--cp-cyan); font-size: 12px; font-weight: 700; }
 .lab-rail__steps li.is-solved a { color: #c9f9df; }
 .lab-rail__steps li.is-solved a > svg { background: rgba(62, 250, 149, 0.2); color: var(--cp-green); padding: 4px; }
+.lab-rail__steps li.is-locked { opacity: 0.6; }
+.lab-rail__steps .lab-rail__step-locked { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; color: var(--cp-subtle); font-size: 13.5px; cursor: not-allowed; }
 .lab-rail__facts { display: grid; gap: 10px; margin: 0; padding-top: 14px; border-top: 1px solid var(--cp-line); }
 .lab-rail__facts div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .lab-rail__facts dt { color: var(--cp-subtle); font-size: 13.5px; }

@@ -13,6 +13,7 @@ import { useLearner, useUserActions } from "@/context/UserContext";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { playSuccessSound, playFailureSound } from "@/lib/mascot/sound-effects";
+import { validateQuestionAnswers } from "@/lib/quiz/requirements";
 import { getCourseBySlug, orderedLessons } from "@/services/courses.service";
 import { getMyQuizAttempts, getQuiz } from "@/services/quiz.service";
 import type { QuizQuestion, QuizQuestionResult, QuizSubmission } from "@/types/api";
@@ -49,8 +50,21 @@ function QuizView() {
   }, [quizId, profile.id]);
 
   const quiz = data?.quiz ?? null;
-  const allAnswered = Boolean(quiz?.questions.length && quiz.questions.every((question) => (answers[question.id] ?? []).length > 0));
-  const answeredCount = quiz?.questions.filter((question) => (answers[question.id] ?? []).length > 0).length ?? 0;
+  const questionValidations = useMemo(() => {
+    if (!quiz?.questions) return {};
+    const map: Record<string, ReturnType<typeof validateQuestionAnswers>> = {};
+    for (const q of quiz.questions) {
+      map[q.id] = validateQuestionAnswers(q, answers[q.id] ?? []);
+    }
+    return map;
+  }, [quiz?.questions, answers]);
+
+  const allAnswered = Boolean(
+    quiz?.questions.length &&
+      quiz.questions.every((question) => questionValidations[question.id]?.isSatisfied)
+  );
+  const answeredCount =
+    quiz?.questions.filter((question) => questionValidations[question.id]?.isSatisfied).length ?? 0;
   const nextLesson = useMemo(() => nextLessonId(quiz?.lesson?.id, data?.course ? orderedLessons(data.course) : []), [quiz?.lesson?.id, data?.course]);
   const attemptCopy = data?.attempts
     ? data.attempts.attempts
@@ -72,7 +86,18 @@ function QuizView() {
 
   async function submit() {
     if (!quiz) return;
-    if (!allAnswered) { setSubmitError("Réponds à toutes les questions avant de valider."); return; }
+    const unsatisfied = quiz.questions.find((q) => !questionValidations[q.id]?.isSatisfied);
+    if (unsatisfied) {
+      const v = questionValidations[unsatisfied.id];
+      if (!v || v.selected === 0) {
+        setSubmitError(`Réponds à la question "${unsatisfied.prompt.slice(0, 60)}..." avant de valider.`);
+      } else {
+        setSubmitError(
+          `La question "${unsatisfied.prompt.slice(0, 60)}..." exige au moins ${v.required} réponses (${v.selected} choisie${v.selected > 1 ? "s" : ""}, encore ${v.missing} requise${v.missing > 1 ? "s" : ""}).`
+        );
+      }
+      return;
+    }
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -138,7 +163,16 @@ function QuizView() {
                 <p className="quiz-keyboard-hint">Astuce clavier : utilise Tab pour passer d’une réponse à l’autre, puis Entrée ou Espace pour sélectionner.</p>
                 {quiz.questions.map((question) => <QuestionCard key={question.id} question={question} selected={answers[question.id] ?? []} onSelect={(answerId) => selectAnswer(question, answerId)} disabled={submitting} />)}
                 {submitError && <p className="settings-status is-error" role="alert">{submitError}</p>}
-                <div className="quiz-submit"><Button variant="success" onClick={() => void submit()} loading={submitting} disabled={!allAnswered}>Corriger mon quiz</Button><p>{allAnswered ? "Prêt pour la correction." : "Sélectionne au moins une réponse par question."}</p></div>
+                <div className="quiz-submit">
+                  <Button variant="success" onClick={() => void submit()} loading={submitting} disabled={!allAnswered}>
+                    Corriger mon quiz
+                  </Button>
+                  <p>
+                    {allAnswered
+                      ? "Toutes les réponses attendues sont complètes. Prêt pour la correction."
+                      : `Complète toutes les questions : ${quiz.questions.length - answeredCount} restante${quiz.questions.length - answeredCount > 1 ? "s" : ""} avec des sélections incomplètes.`}
+                  </p>
+                </div>
               </section>
             )}
           </>

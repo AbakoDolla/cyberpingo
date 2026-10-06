@@ -16,6 +16,7 @@ import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDate, formatDuration, formatNumber } from "@/lib/format";
 import { playFailureSound, playSuccessSound } from "@/lib/mascot/sound-effects";
+import { validateQuestionAnswers } from "@/lib/quiz/requirements";
 import { getCourseBySlug } from "@/services/courses.service";
 import { getCourseExamStatus, startCourseExam, submitCourseExam } from "@/services/exam.service";
 import type { ExamQuestion, ExamStartResult, ExamStatus, ExamSubmitResult } from "@/types/exam";
@@ -118,6 +119,21 @@ function ExamPageView() {
 
   async function handleSubmit() {
     if (!examState || submitting) return;
+    const unsatisfiedIdx = examState.questions.findIndex((q) => !questionValidations[q.id]?.isSatisfied);
+    if (unsatisfiedIdx !== -1) {
+      const unsatisfiedQ = examState.questions[unsatisfiedIdx];
+      const v = questionValidations[unsatisfiedQ.id];
+      setCurrentIdx(unsatisfiedIdx);
+      if (!v || v.selected === 0) {
+        setErrorMsg(`La question ${unsatisfiedIdx + 1} doit être répondue avant de soumettre l’examen.`);
+      } else {
+        setErrorMsg(
+          `La question ${unsatisfiedIdx + 1} requiert au moins ${v.required} réponses (${v.selected} choisie${v.selected > 1 ? "s" : ""}, encore ${v.missing} requise${v.missing > 1 ? "s" : ""}).`
+        );
+      }
+      return;
+    }
+
     setSubmitting(true);
     setErrorMsg(null);
     try {
@@ -138,7 +154,19 @@ function ExamPageView() {
   }
 
   const currentQ: ExamQuestion | null = examState?.questions[currentIdx] ?? null;
-  const answeredCount = Object.keys(answers).filter((k) => (answers[k]?.length ?? 0) > 0).length;
+  const currentValidation = currentQ ? validateQuestionAnswers(currentQ, answers[currentQ.id] ?? []) : null;
+
+  const questionValidations = useMemo(() => {
+    if (!examState?.questions) return {};
+    const map: Record<string, ReturnType<typeof validateQuestionAnswers>> = {};
+    for (const q of examState.questions) {
+      map[q.id] = validateQuestionAnswers(q, answers[q.id] ?? []);
+    }
+    return map;
+  }, [examState?.questions, answers]);
+
+  const satisfiedCount = examState?.questions.filter((q) => questionValidations[q.id]?.isSatisfied).length ?? 0;
+  const allSatisfied = Boolean(examState?.questions.length && satisfiedCount === examState.questions.length);
   const totalQ = examState?.total_questions ?? 0;
 
   return (
@@ -281,7 +309,9 @@ function ExamPageView() {
               <span className="text-xs font-bold uppercase tracking-wider text-cyber-subtle">
                 Question {currentIdx + 1} / {totalQ}
               </span>
-              <Badge tone="blue">{answeredCount} répondu{answeredCount > 1 ? "s" : ""}</Badge>
+              <Badge tone={satisfiedCount === totalQ ? "green" : "blue"}>
+                {satisfiedCount} / {totalQ} validée{satisfiedCount > 1 ? "s" : ""}
+              </Badge>
             </div>
             <div className={`flex items-center gap-2 font-mono font-bold text-base ${remainingSecs < 300 ? "text-amber-400 animate-pulse" : "text-cyber-cyan"}`}>
               <IconClock size={16} />
@@ -292,18 +322,31 @@ function ExamPageView() {
           {/* Stepper Grid */}
           <nav className="flex gap-1.5 flex-wrap p-2 rounded-lg bg-cyber-surface/50 border border-cyber-line/50" aria-label="Sélecteur de question">
             {examState.questions.map((q, idx) => {
-              const answered = (answers[q.id]?.length ?? 0) > 0;
+              const qValidation = questionValidations[q.id];
               const isCurrent = idx === currentIdx;
+              const isSatisfied = qValidation?.isSatisfied ?? false;
+              const isPartial = Boolean(qValidation && qValidation.selected > 0 && !isSatisfied);
               return (
                 <button
                   key={q.id}
                   type="button"
-                  onClick={() => setCurrentIdx(idx)}
+                  onClick={() => {
+                    if (idx > currentIdx && !currentValidation?.isSatisfied) {
+                      setErrorMsg(
+                        `Tu dois compléter la question actuelle (${currentValidation?.label}) avant de continuer.`
+                      );
+                      return;
+                    }
+                    setErrorMsg(null);
+                    setCurrentIdx(idx);
+                  }}
                   className={`w-7 h-7 rounded text-xs font-bold transition-all ${
                     isCurrent
                       ? "bg-cyber-cyan text-cyber-black shadow-glow-cyan"
-                      : answered
+                      : isSatisfied
                       ? "bg-cyber-surface border border-cyber-green text-cyber-green"
+                      : isPartial
+                      ? "bg-amber-500/20 border border-amber-500/70 text-amber-300"
                       : "bg-cyber-surface border border-cyber-line text-cyber-muted hover:border-cyber-cyan"
                   }`}
                   aria-label={`Aller à la question ${idx + 1}`}
@@ -317,11 +360,45 @@ function ExamPageView() {
           {/* Question Card */}
           <article className="p-6 rounded-2xl bg-cyber-surface border border-cyber-line space-y-6">
             <div>
-              <span className="text-xs text-cyber-cyan font-bold uppercase tracking-wider">
-                {currentQ.module_title}
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-cyber-cyan font-bold uppercase tracking-wider">
+                  {currentQ.module_title}
+                </span>
+                {currentQ.question_type === "multiple_choice" && currentValidation && (
+                  <Badge tone={currentValidation.isSatisfied ? "green" : "purple"}>
+                    {currentValidation.required} réponses obligatoires ({currentValidation.selected} / {currentValidation.required})
+                  </Badge>
+                )}
+              </div>
               <h2 className="text-lg font-bold text-white mt-1">{currentQ.prompt}</h2>
             </div>
+
+            {currentQ.question_type === "multiple_choice" && currentValidation && (
+              <div
+                className={`p-3 rounded-lg text-xs flex items-center gap-2 ${
+                  currentValidation.isSatisfied
+                    ? "bg-cyber-green/10 border border-cyber-green/30 text-cyber-green"
+                    : "bg-amber-500/10 border border-amber-500/30 text-amber-300"
+                }`}
+                role="note"
+              >
+                {currentValidation.isSatisfied ? (
+                  <>
+                    <IconCheck size={14} className="shrink-0" />
+                    <span>
+                      Sélection valide ({currentValidation.selected} réponses choisies). Tu peux continuer vers la suite.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <IconAlert size={14} className="shrink-0" />
+                    <span>
+                      Question à choix multiples : {currentValidation.required} réponses sont requises avant de continuer (actuellement {currentValidation.selected} / {currentValidation.required}).
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
 
             <div className="space-y-3">
               {currentQ.options.map((opt) => {
@@ -330,7 +407,10 @@ function ExamPageView() {
                   <button
                     key={opt.id}
                     type="button"
-                    onClick={() => handleSelectOption(currentQ.id, opt.id, currentQ.question_type)}
+                    onClick={() => {
+                      handleSelectOption(currentQ.id, opt.id, currentQ.question_type);
+                      setErrorMsg(null);
+                    }}
                     className={`w-full p-4 rounded-xl border text-left text-sm font-medium transition-all flex items-center justify-between ${
                       selected
                         ? "bg-cyber-cyan/15 border-cyber-cyan text-white shadow-soft"
@@ -347,21 +427,47 @@ function ExamPageView() {
             </div>
 
             {/* Stepper buttons */}
-            <div className="flex items-center justify-between pt-4 border-t border-cyber-line/60">
+            <div className="flex items-center justify-between pt-4 border-t border-cyber-line/60 gap-3">
               <Button
                 variant="secondary"
                 disabled={currentIdx === 0}
-                onClick={() => setCurrentIdx((i) => Math.max(0, i - 1))}
+                onClick={() => {
+                  setErrorMsg(null);
+                  setCurrentIdx((i) => Math.max(0, i - 1));
+                }}
               >
                 Précédente
               </Button>
               {currentIdx < totalQ - 1 ? (
-                <Button variant="secondary" onClick={() => setCurrentIdx((i) => Math.min(totalQ - 1, i + 1))}>
-                  Suivante <IconArrowRight size={14} />
-                </Button>
+                <div className="flex items-center gap-2">
+                  {!currentValidation?.isSatisfied && (
+                    <span className="text-xs text-amber-400 hidden sm:inline">
+                      {currentValidation?.label} requise pour continuer
+                    </span>
+                  )}
+                  <Button
+                    variant={currentValidation?.isSatisfied ? "primary" : "secondary"}
+                    disabled={!currentValidation?.isSatisfied}
+                    onClick={() => {
+                      if (!currentValidation?.isSatisfied) {
+                        setErrorMsg(`Réponds d'abord aux exigences de cette question (${currentValidation?.label}).`);
+                        return;
+                      }
+                      setErrorMsg(null);
+                      setCurrentIdx((i) => Math.min(totalQ - 1, i + 1));
+                    }}
+                  >
+                    Suivante <IconArrowRight size={14} />
+                  </Button>
+                </div>
               ) : (
-                <Button variant="success" loading={submitting} onClick={() => void handleSubmit()}>
-                  Soumettre l’examen ({answeredCount}/{totalQ})
+                <Button
+                  variant="success"
+                  loading={submitting}
+                  disabled={!allSatisfied || submitting}
+                  onClick={() => void handleSubmit()}
+                >
+                  Soumettre l’examen ({satisfiedCount}/{totalQ})
                 </Button>
               )}
             </div>

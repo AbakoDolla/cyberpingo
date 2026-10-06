@@ -169,7 +169,30 @@ function ChallengeDetailView() {
                 <aside className="lab-rail" aria-label={isEn ? "Lab summary" : "Récapitulatif du lab"}>
                   <h2>{isEn ? "Lab Path" : "Parcours du lab"}</h2>
                   <ol className="lab-rail__steps">
-                    {tasks.map((task, index) => <li key={task.id} className={task.solved ? "is-solved" : undefined}><a href={`#task-row-${task.id}`}>{task.solved ? <IconCheck size={13} /> : <span aria-hidden="true">{index + 1}</span>}Question {index + 1}</a></li>)}
+                    {tasks.map((task, index) => {
+                      const isLocked = index > 0 && !(tasks[0]?.solved);
+                      return (
+                        <li
+                          key={task.id}
+                          className={task.solved ? "is-solved" : isLocked ? "is-locked" : undefined}
+                        >
+                          {isLocked ? (
+                            <span
+                              className="lab-rail__step-locked flex items-center gap-1.5 opacity-60 text-cyber-muted cursor-not-allowed"
+                              title={isEn ? "Answer Question 1 first to unlock" : "Réponds d'abord à la Question 1 pour débloquer"}
+                            >
+                              <IconLock size={12} className="text-amber-400" />
+                              <span>Question {index + 1}</span>
+                            </span>
+                          ) : (
+                            <a href={`#task-row-${task.id}`} className="flex items-center gap-1.5">
+                              {task.solved ? <IconCheck size={13} /> : <span aria-hidden="true">{index + 1}</span>}
+                              <span>Question {index + 1}</span>
+                            </a>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ol>
                   <dl className="lab-rail__facts">
                     <div><dt>{isEn ? "Reward" : "Récompense"}</dt><dd>+{lab.xp_reward} XP</dd></div>

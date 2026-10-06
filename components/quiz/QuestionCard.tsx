@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { IconCheck, IconX } from "@/components/ui/Icon";
+import { getRequiredAnswersCount, validateQuestionAnswers } from "@/lib/quiz/requirements";
 import { cn } from "@/lib/utils";
 import type { QuizQuestion, QuizQuestionResult } from "@/types/api";
 
@@ -29,11 +30,49 @@ const answerLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export default function QuestionCard({ question, selected, onSelect, disabled = false, result }: QuestionCardProps) {
   const feedbackId = result ? `question-${question.id}-feedback` : undefined;
+  const currentSelection = result?.selected ?? selected;
+  const validation = validateQuestionAnswers(question, currentSelection);
+  const isMultiple = question.question_type === "multiple_choice";
 
   return (
     <article className="question-card" aria-labelledby={`question-${question.id}`}>
-      <div className="question-card__meta"><span>{typeLabel[question.question_type]}</span><span>{difficultyLabel[question.difficulty]}</span><span>+{question.xp_reward} XP</span></div>
+      <div className="question-card__meta">
+        <span>{typeLabel[question.question_type]}</span>
+        {isMultiple && (
+          <span className="font-semibold text-cyber-cyan">
+            {validation.required} réponse{validation.required > 1 ? "s" : ""} requise{validation.required > 1 ? "s" : ""}
+          </span>
+        )}
+        <span>{difficultyLabel[question.difficulty]}</span>
+        <span>+{question.xp_reward} XP</span>
+        {!result && (
+          <span
+            className={cn(
+              "question-card__status-badge",
+              validation.isSatisfied ? "is-satisfied" : "is-incomplete",
+            )}
+            title={validation.label}
+          >
+            {validation.isSatisfied ? "✓ Complète" : validation.label}
+          </span>
+        )}
+      </div>
       <h2 id={`question-${question.id}`}>{question.prompt}</h2>
+      {isMultiple && !result && (
+        <div
+          className={cn(
+            "question-card__hint-bar",
+            validation.isSatisfied ? "is-ready" : "is-pending",
+          )}
+          role="note"
+        >
+          <span>
+            {validation.isSatisfied
+              ? `✓ Sélection valide : ${validation.selected} réponse${validation.selected > 1 ? "s" : ""} choisie${validation.selected > 1 ? "s" : ""}. Tu peux valider ou modifier.`
+              : `⚠️ Sélection incomplète : cette question exige au moins ${validation.required} réponses (${validation.selected} / ${validation.required} choisie${validation.selected > 1 ? "s" : ""}). Sélectionne encore ${validation.missing} réponse${validation.missing > 1 ? "s" : ""} avant de pouvoir valider.`}
+          </span>
+        </div>
+      )}
       {question.image_url && <Image className="question-card__image" src={question.image_url} alt="Illustration de la question" width={900} height={506} sizes="(max-width: 900px) 100vw, 760px" unoptimized />}
       <div className="question-card__answers" role="group" aria-labelledby={`question-${question.id}`} aria-describedby={feedbackId}>
         {question.answers.map((answer, index) => {
