@@ -174,48 +174,188 @@ export const playChestFanfare = playChestOpenSound;
 export const playTrophyChime = playTrophySound;
 
 /**
- * Natural voice synthesized speech modeled on calm male teacher reading (as in vo-scene6.wav):
- * clear diction, measured pace (rate ~0.92), warm pedagogical pitch (pitch ~0.94).
+ * Synthèse vocale réaliste (TTS) propulsée par la voix "cyberpingo" sur ElevenLabs v3
+ * avec balisages émotionnels automatiques (via `/api/tts`), et repli Web Speech API hors-ligne.
  */
-export function speakRealisticVoice(text: string, options?: { volume?: number; onEnd?: () => void }) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+let activeAudio: HTMLAudioElement | null = null;
+let activeAbortController: AbortController | null = null;
+let pendingUnlockCleanup: (() => void) | null = null;
+const ttsBlobCache = new Map<string, string>();
+
+function clearPendingUnlock(): void {
+  if (pendingUnlockCleanup) {
+    pendingUnlockCleanup();
+    pendingUnlockCleanup = null;
+  }
+}
+
+function speakFallbackBrowserVoice(
+  text: string,
+  options?: { volume?: number; onEnd?: () => void; onStart?: () => void }
+) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    options?.onEnd?.();
+    return;
+  }
 
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = "fr-FR";
   utterance.volume = options?.volume ?? 0.85;
-  utterance.rate = 0.92; // Deliberate, clear diction
-  utterance.pitch = 0.94; // Calm, warm male teacher tone
+  utterance.rate = 0.92;
+  utterance.pitch = 0.94;
 
   const voices = window.speechSynthesis.getVoices();
-  // Prefer natural French male voices
-  const preferredVoice = voices.find(
-    (v) =>
-      v.lang.startsWith("fr") &&
-      (/thomas|henri|paul|claude|nicolas|remi|daniel|male|homme/i.test(v.name) ||
-        (/google/i.test(v.name) && v.lang === "fr-FR"))
-  ) || voices.find((v) => v.lang.startsWith("fr"));
+  const preferredVoice =
+    voices.find(
+      (v) =>
+        v.lang.startsWith("fr") &&
+        (/thomas|henri|paul|claude|nicolas|remi|daniel|male|homme/i.test(v.name) ||
+          (/google/i.test(v.name) && v.lang === "fr-FR"))
+    ) || voices.find((v) => v.lang.startsWith("fr"));
 
   if (preferredVoice) {
     utterance.voice = preferredVoice;
   }
 
+  if (options?.onStart) {
+    utterance.onstart = options.onStart;
+  }
   if (options?.onEnd) {
     utterance.onend = options.onEnd;
+    utterance.onerror = options.onEnd;
   }
 
   window.speechSynthesis.speak(utterance);
 }
 
+export function speakRealisticVoice(
+  text: string,
+  options?: {
+    volume?: number;
+    expression?: string;
+    lineId?: string;
+    onEnd?: () => void;
+    onStart?: () => void;
+  }
+) {
+  if (typeof window === "undefined") return;
+
+  stopRealisticVoice();
+
+  const cleaned = text.trim();
+  if (!cleaned) {
+    options?.onEnd?.();
+    return;
+  }
+
+  const expression = options?.expression ?? "encouraging";
+  const volume = Math.max(0, Math.min(1, options?.volume ?? 0.85));
+  const cacheKey = `${expression}::${options?.lineId ?? ""}::${cleaned.slice(0, 900)}`;
+
+  const playBlobUrl = (blobUrl: string) => {
+    const audio = new Audio(blobUrl);
+    audio.volume = volume;
+    activeAudio = audio;
+
+    audio.onplay = () => {
+      options?.onStart?.();
+    };
+    audio.onended = () => {
+      if (activeAudio === audio) activeAudio = null;
+      options?.onEnd?.();
+    };
+    audio.onerror = () => {
+      if (activeAudio === audio) activeAudio = null;
+      options?.onEnd?.();
+    };
+
+    audio.play().catch((err: unknown) => {
+      const isAutoplayBlocked =
+        err instanceof DOMException && err.name === "NotAllowedError";
+      if (isAutoplayBlocked) {
+        clearPendingUnlock();
+        const resumeOnGesture = () => {
+          clearPendingUnlock();
+          if (activeAudio === audio) {
+            audio.play().catch(() => {
+              if (activeAudio === audio) activeAudio = null;
+              options?.onEnd?.();
+            });
+          }
+        };
+        window.addEventListener("pointerdown", resumeOnGesture, { once: true });
+        window.addEventListener("keydown", resumeOnGesture, { once: true });
+        pendingUnlockCleanup = () => {
+          window.removeEventListener("pointerdown", resumeOnGesture);
+          window.removeEventListener("keydown", resumeOnGesture);
+        };
+      } else {
+        if (activeAudio === audio) activeAudio = null;
+        speakFallbackBrowserVoice(cleaned, options);
+      }
+    });
+  };
+
+  const cachedUrl = ttsBlobCache.get(cacheKey);
+  if (cachedUrl) {
+    playBlobUrl(cachedUrl);
+    return;
+  }
+
+  const controller = new AbortController();
+  activeAbortController = controller;
+
+  fetch("/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: cleaned,
+      expression,
+      lineId: options?.lineId,
+    }),
+    signal: controller.signal,
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error(`TTS HTTP ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      ttsBlobCache.set(cacheKey, blobUrl);
+      if (activeAbortController === controller) {
+        activeAbortController = null;
+        playBlobUrl(blobUrl);
+      }
+    })
+    .catch((err: unknown) => {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      if (activeAbortController === controller) {
+        activeAbortController = null;
+      }
+      speakFallbackBrowserVoice(cleaned, options);
+    });
+}
+
 /** Stops any active speech synthesis */
 export function stopRealisticVoice() {
+  clearPendingUnlock();
+  if (activeAbortController) {
+    activeAbortController.abort();
+    activeAbortController = null;
+  }
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.currentTime = 0;
+    activeAudio = null;
+  }
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
     window.speechSynthesis.cancel();
   }
 }
 
 export function isSpeakingRealisticVoice(): boolean {
+  if (activeAbortController) return true;
+  if (activeAudio && !activeAudio.paused && !activeAudio.ended) return true;
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
     return window.speechSynthesis.speaking;
   }

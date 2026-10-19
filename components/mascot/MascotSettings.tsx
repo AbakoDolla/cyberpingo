@@ -12,8 +12,19 @@ export default function MascotSettings({ idPrefix = "mascot" }: { idPrefix?: str
         <span><strong>Interventions de Pingo</strong><small>Il réagit à tes réussites, tes badges et tes passages de niveau.</small></span>
       </label>
       <label className="mascot-settings__row" htmlFor={`${idPrefix}-voice`}>
-        <input id={`${idPrefix}-voice`} type="checkbox" checked={prefs.voice} disabled={!prefs.auto} onChange={(event) => update({ voice: event.target.checked })} />
-        <span><strong>Voix</strong><small>Joue les enregistrements quand il y en a. Sans audio, le texte s’affiche seul.</small></span>
+        <input
+          id={`${idPrefix}-voice`}
+          type="checkbox"
+          checked={prefs.voice}
+          disabled={!prefs.auto}
+          onChange={(event) =>
+            update({
+              voice: event.target.checked,
+              ...(event.target.checked && prefs.volume <= 0 ? { volume: 0.85 } : {}),
+            })
+          }
+        />
+        <span><strong>Voix CyberPingo</strong><small>Active par défaut avec la voix officielle CyberPingo.</small></span>
       </label>
       <label className="mascot-settings__row" htmlFor={`${idPrefix}-subtitles`}>
         <input id={`${idPrefix}-subtitles`} type="checkbox" checked={prefs.subtitles} disabled={!prefs.auto} onChange={(event) => update({ subtitles: event.target.checked })} />

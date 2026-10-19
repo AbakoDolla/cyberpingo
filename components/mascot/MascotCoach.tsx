@@ -14,7 +14,8 @@ import { IDLE_STATE, decide, displayDuration, pickLine, type SchedulerState } fr
 import { listMascotLines } from "@/services/academy.service";
 import type { MascotEvent, MascotLine } from "@/types/api";
 
-import { speakRealisticVoice } from "@/lib/mascot/sound-effects";
+import { DEFAULT_MASCOT_LINES } from "@/lib/mascot/elevenlabs";
+import { speakRealisticVoice, stopRealisticVoice } from "@/lib/mascot/sound-effects";
 
 const SESSION_WELCOME = "cyberpingo.mascot.welcomed";
 const MAX_VOICE_MS = 30_000;
@@ -43,7 +44,7 @@ export default function MascotCoach() {
   const { profile } = useUser();
   const pathname = usePathname();
   const [prefs] = useMascotPrefs();
-  const [lines, setLines] = useState<MascotLine[]>([]);
+  const [lines, setLines] = useState<MascotLine[]>([...DEFAULT_MASCOT_LINES]);
   const [active, setActive] = useState<Active | null>(null);
   const [panel, setPanel] = useState(false);
 
@@ -52,6 +53,7 @@ export default function MascotCoach() {
   const scheduler = useRef<SchedulerState>(IDLE_STATE);
   const timer = useRef<number | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
+  const unlockCleanup = useRef<(() => void) | null>(null);
   const token = useRef(0);
   const lastLine = useRef<string | null>(null);
   const hovering = useRef(false);
@@ -62,49 +64,77 @@ export default function MascotCoach() {
 
   const hasProfile = Boolean(profile);
   useEffect(() => {
-    if (!hasProfile) return;
     let cancelled = false;
-    listMascotLines().then((rows) => { if (!cancelled) setLines(rows); }).catch(() => undefined);
+    listMascotLines().then((rows) => { if (!cancelled && rows.length > 0) setLines(rows); }).catch(() => undefined);
     return () => { cancelled = true; };
   }, [hasProfile]);
+
+  const clearUnlock = useCallback(() => {
+    if (unlockCleanup.current) {
+      unlockCleanup.current();
+      unlockCleanup.current = null;
+    }
+  }, []);
 
   const finish = useCallback((expected?: number) => {
     if (expected !== undefined && expected !== token.current) return;
     token.current += 1;
+    clearUnlock();
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = null;
     if (audio.current) { audio.current.pause(); audio.current = null; }
+    stopRealisticVoice();
     scheduler.current = { activePriority: 0, activeUntil: 0, lastEnd: Date.now() };
     setActive(null);
     setPanel(false);
-  }, []);
+  }, [clearUnlock]);
 
   const startVoice = useCallback((line: MascotLine, mine: number, volume: number) => {
     if (!line.audio_url) return;
+    clearUnlock();
+    stopRealisticVoice();
     if (audio.current) { audio.current.pause(); audio.current = null; }
     const element = new Audio(line.audio_url);
     element.volume = volume;
     audio.current = element;
+    const markSpoken = () => {
+      if (mine !== token.current) return;
+      scheduler.current = { ...scheduler.current, activeUntil: Date.now() + MAX_VOICE_MS };
+      arm.current(MAX_VOICE_MS);
+      setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: true, failed: false } : value));
+    };
     const markFailed = () => {
       if (mine !== token.current) return;
       setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: false, failed: true } : value));
     };
     element.addEventListener("ended", () => finish(mine));
     element.addEventListener("error", markFailed);
-    element.play().then(() => {
-      if (mine !== token.current) return;
-      scheduler.current = { ...scheduler.current, activeUntil: Date.now() + MAX_VOICE_MS };
-      arm.current(MAX_VOICE_MS);
-      setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: true, failed: false } : value));
-    }).catch((error: unknown) => {
-      // A blocked autoplay stays replayable; any other failure means the recording itself is unusable.
-      if ((error as { name?: string } | null)?.name !== "NotAllowedError") markFailed();
+    element.play().then(markSpoken).catch((error: unknown) => {
+      // Si la politique d'autoplay du navigateur bloque la lecture avant le premier clic,
+      // on relance automatiquement la voix CyberPingo dès la première interaction de l'utilisateur.
+      if ((error as { name?: string } | null)?.name === "NotAllowedError") {
+        const resumeOnGesture = () => {
+          clearUnlock();
+          if (mine !== token.current || audio.current !== element) return;
+          element.play().then(markSpoken).catch(() => undefined);
+        };
+        window.addEventListener("pointerdown", resumeOnGesture, { once: true });
+        window.addEventListener("keydown", resumeOnGesture, { once: true });
+        unlockCleanup.current = () => {
+          window.removeEventListener("pointerdown", resumeOnGesture);
+          window.removeEventListener("keydown", resumeOnGesture);
+        };
+      } else {
+        markFailed();
+      }
     });
-  }, [finish]);
+  }, [clearUnlock, finish]);
 
   const present = useCallback((line: MascotLine, event: MascotEvent) => {
+    clearUnlock();
     if (timer.current) window.clearTimeout(timer.current);
     if (audio.current) { audio.current.pause(); audio.current = null; }
+    stopRealisticVoice();
     const mine = ++token.current;
     const now = Date.now();
     const duration = displayDuration(line.text_fr);
@@ -126,16 +156,29 @@ export default function MascotCoach() {
     if (line.audio_url && current.voice && current.volume > 0) {
       startVoice(line, mine, current.volume);
     } else if (current.voice && current.volume > 0) {
-      speakRealisticVoice(line.text_fr, { volume: current.volume });
+      speakRealisticVoice(line.text_fr, {
+        volume: current.volume,
+        expression: line.expression,
+        lineId: line.id,
+        onStart: () => {
+          if (mine !== token.current) return;
+          setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: true, failed: false } : value));
+        },
+        onEnd: () => finish(mine),
+      });
     }
-  }, [finish, startVoice]);
+  }, [clearUnlock, finish, startVoice]);
 
   const replay = useCallback((line: MascotLine) => {
     const volume = prefsRef.current.volume;
     if (line.audio_url) {
-      startVoice(line, token.current, volume > 0 ? volume : 0.8);
+      startVoice(line, token.current, volume > 0 ? volume : 0.85);
     } else {
-      speakRealisticVoice(line.text_fr, { volume: volume > 0 ? volume : 0.8 });
+      speakRealisticVoice(line.text_fr, {
+        volume: volume > 0 ? volume : 0.85,
+        expression: line.expression,
+        lineId: line.id,
+      });
     }
   }, [startVoice]);
 

@@ -6,9 +6,31 @@ import { DEFAULT_PREFS, PREFS_KEY, parsePrefs, type MascotPrefs } from "@/lib/ma
 const listeners = new Set<() => void>();
 let cachedRaw: string | null | undefined;
 let cached: MascotPrefs = DEFAULT_PREFS;
+const VOICE_DEFAULT_MIGRATION_KEY = "cyberpingo.mascot.cyberpingo_v1";
 
 function readRaw(): string | null {
-  try { return window.localStorage.getItem(PREFS_KEY); } catch { return null; }
+  try {
+    const raw = window.localStorage.getItem(PREFS_KEY);
+    if (window.localStorage.getItem(VOICE_DEFAULT_MIGRATION_KEY) !== "1") {
+      window.localStorage.setItem(VOICE_DEFAULT_MIGRATION_KEY, "1");
+      if (raw) {
+        const parsed = parsePrefs(raw);
+        if (!parsed.voice || parsed.volume <= 0) {
+          const upgraded: MascotPrefs = {
+            ...parsed,
+            voice: true,
+            volume: parsed.volume > 0 ? parsed.volume : DEFAULT_PREFS.volume,
+          };
+          const serialized = JSON.stringify(upgraded);
+          window.localStorage.setItem(PREFS_KEY, serialized);
+          return serialized;
+        }
+      }
+    }
+    return raw;
+  } catch {
+    return null;
+  }
 }
 
 function snapshot(): MascotPrefs {

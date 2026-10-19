@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { IconCheck, IconCopy, IconVolume, IconVolumeOff, IconBolt } from "@/components/ui/Icon";
+import { useMascotPrefs } from "@/components/mascot/useMascotPrefs";
 import { speakRealisticVoice, stopRealisticVoice } from "@/lib/mascot/sound-effects";
 import ChatMessage from "@/components/mentor/ChatMessage";
 import type { MentorMessage } from "@/types";
@@ -28,9 +29,32 @@ export default function PacedAgentResponse({
   const [isTyping, setIsTyping] = useState(isPaced && fullContent.length > 0);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [prefs] = useMascotPrefs();
   const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const autoSpokenRef = useRef<string | null>(null);
 
   const isCompleted = displayedLength >= fullContent.length;
+
+  useEffect(() => {
+    if (!isCompleted || !showVoiceControls || !fullContent.trim()) return;
+    if (!prefs.voice || prefs.volume <= 0) return;
+    if (autoSpokenRef.current === message.id) return;
+    autoSpokenRef.current = message.id;
+
+    const cleanText = fullContent
+      .replace(/###/g, "")
+      .replace(/[*_`]/g, "")
+      .replace(/\[.*?\]\(.*?\)/g, "")
+      .trim();
+
+    setIsSpeaking(true);
+    speakRealisticVoice(cleanText, {
+      volume: prefs.volume,
+      expression: "explanation",
+      onStart: () => setIsSpeaking(true),
+      onEnd: () => setIsSpeaking(false),
+    });
+  }, [isCompleted, showVoiceControls, fullContent, message.id, prefs.voice, prefs.volume]);
 
   useEffect(() => {
     if (!isPaced) {
@@ -80,6 +104,9 @@ export default function PacedAgentResponse({
         .replace(/\[.*?\]\(.*?\)/g, "")
         .trim();
       speakRealisticVoice(cleanText, {
+        volume: prefs.volume > 0 ? prefs.volume : 0.85,
+        expression: "explanation",
+        onStart: () => setIsSpeaking(true),
         onEnd: () => setIsSpeaking(false),
       });
     }

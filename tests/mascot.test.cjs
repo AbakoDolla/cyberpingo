@@ -8,6 +8,7 @@ const { EVENT_PRIORITY, MASCOT_EVENTS, MASCOT_EXPRESSIONS, EXPRESSION_STATE, mas
 const { COOLDOWN_MS, IDLE_STATE, decide, pickLine, displayDuration } = load("lib/mascot/scheduler");
 const { DEFAULT_PREFS, parsePrefs } = load("lib/mascot/prefs");
 const { MAX_VOICE_BYTES, MAX_VOICE_SECONDS, VOICE_EXTENSIONS, formatVoiceTime, normalizeVoiceType, pickRecorderMime, voiceCoverage } = load("lib/mascot/voice");
+const { CYBERPINGO_VOICE_ID, CYBERPINGO_MODEL_ID, DEFAULT_MASCOT_LINES, autoTagForElevenLabs, resolveCyberPingoAudioUrl } = load("lib/mascot/elevenlabs");
 
 const line = (id, event, priority = 5) => ({ id, event, expression: "happy", text_fr: "x", audio_url: null, voice_credit: null, priority });
 const rewards = (extra = {}) => ({ xp_gained: 10, leveled_up: false, new_badges: [], completed_challenges: [], course_completed: null, new_rank: null, new_skills: [], ...extra });
@@ -67,7 +68,7 @@ test("display time scales with the text but stays bounded", () => {
   assert.equal(displayDuration("x".repeat(500)), 9000);
 });
 
-test("preferences fall back to safe defaults on broken storage", () => {
+test("preferences fall back to safe defaults on broken storage and enable CyberPingo voice by default", () => {
   assert.deepEqual(parsePrefs(null), DEFAULT_PREFS);
   assert.deepEqual(parsePrefs("not json"), DEFAULT_PREFS);
   assert.equal(parsePrefs(JSON.stringify({ volume: 7 })).volume, 1);
@@ -76,6 +77,19 @@ test("preferences fall back to safe defaults on broken storage", () => {
   assert.equal(parsePrefs(JSON.stringify({ auto: false })).auto, false);
   assert.equal(parsePrefs(JSON.stringify({ auto: "no" })).auto, true);
   assert.equal(DEFAULT_PREFS.auto && DEFAULT_PREFS.subtitles, true);
+  assert.equal(DEFAULT_PREFS.voice, true);
+  assert.ok(DEFAULT_PREFS.volume > 0);
+});
+
+test("CyberPingo ElevenLabs voice auto-tags expressions and resolves all 30 built-in mascot audio files", () => {
+  assert.equal(CYBERPINGO_VOICE_ID, "IUovyCa9veb0Bu5IUFy9");
+  assert.equal(CYBERPINGO_MODEL_ID, "eleven_v3");
+  assert.equal(DEFAULT_MASCOT_LINES.length, 30);
+  for (const item of DEFAULT_MASCOT_LINES) {
+    assert.equal(resolveCyberPingoAudioUrl(item.id, null), `/audio/mascot/${item.id}.mp3`);
+  }
+  const tagged = autoTagForElevenLabs("Bravo ! Tu as réussi cet exercice.", "celebration");
+  assert.match(tagged, /^\[[a-z\s]+\]/i);
 });
 test("recorded voices are normalised to a type the bucket accepts", () => {
   assert.equal(normalizeVoiceType("audio/webm;codecs=opus"), "audio/webm");
