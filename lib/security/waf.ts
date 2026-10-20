@@ -273,6 +273,23 @@ const MALICIOUS_BOT_USER_AGENTS = [
   /\boffline\s*explorer\b/i,
 ];
 
+const SEARCH_ENGINE_BOT_USER_AGENTS = [
+  /\bgooglebot\b/i,
+  /\bgoogle-inspectiontool\b/i,
+  /\bgoogleother\b/i,
+  /\bapis-google\b/i,
+  /\bmediapartners-google\b/i,
+  /\badsbot-google\b/i,
+  /\bbingbot\b/i,
+  /\bduckduckbot\b/i,
+  /\bapplebot\b/i,
+  /\byandexbot\b/i,
+  /\bslurp\b/i,
+  /\bfacebookexternalhit\b/i,
+  /\btwitterbot\b/i,
+  /\blinkedinbot\b/i,
+];
+
 // ─── Core Inspection Function ─────────────────────────────────────────────────
 
 export interface RequestDetails {
@@ -325,6 +342,18 @@ export function inspectRequest(req: RequestDetails): WafDecision {
         retryAfter: 3600,
       };
     }
+  }
+
+  // Allow official search engine & social preview crawlers on public GET/HEAD routes without rate-limit throttling
+  if (
+    (req.method === "GET" || req.method === "HEAD") &&
+    !pathname.startsWith("/admin") &&
+    !pathname.startsWith("/api/") &&
+    SEARCH_ENGINE_BOT_USER_AGENTS.some((pattern) => pattern.test(userAgent))
+  ) {
+    return {
+      allowed: true,
+    };
   }
 
   // 2. DDoS & High-Frequency Burst Protection
