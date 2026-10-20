@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import intro from "@/data/pingo-intro.json";
+import { useMascotPrefs } from "@/components/mascot/useMascotPrefs";
 import { IconPause, IconPlay } from "@/components/ui/Icon";
 import { isSyntheticVoice } from "@/lib/mascot/voice";
 
@@ -10,18 +11,62 @@ const BARS = [38, 62, 46, 78, 54, 92, 66, 48, 84, 58, 72, 40, 88, 52, 68, 44, 80
 
 export default function PingoIntroPlayer() {
   const audio = useRef<HTMLAudioElement>(null);
+  const [prefs] = useMascotPrefs();
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [failed, setFailed] = useState(false);
+  const manualPauseRef = useRef(false);
+
+  useEffect(() => {
+    const element = audio.current;
+    if (!element || !prefs.voice || prefs.volume <= 0) return;
+    element.volume = prefs.volume;
+    let started = false;
+
+    const cleanupUnlock = () => {
+      window.removeEventListener("pointerup", unlock, true);
+      window.removeEventListener("click", unlock, true);
+      window.removeEventListener("touchend", unlock, true);
+      window.removeEventListener("keydown", unlock, true);
+    };
+
+    const unlock = () => {
+      if (started || manualPauseRef.current || !audio.current) {
+        cleanupUnlock();
+        return;
+      }
+      audio.current.play().then(() => {
+        started = true;
+        cleanupUnlock();
+      }).catch(() => undefined);
+    };
+
+    element.play().then(() => {
+      started = true;
+    }).catch((err: unknown) => {
+      if ((err as { name?: string } | null)?.name === "NotAllowedError") {
+        window.addEventListener("pointerup", unlock, { capture: true, passive: true });
+        window.addEventListener("click", unlock, { capture: true, passive: true });
+        window.addEventListener("touchend", unlock, { capture: true, passive: true });
+        window.addEventListener("keydown", unlock, { capture: true, passive: true });
+      } else {
+        setFailed(true);
+      }
+    });
+
+    return cleanupUnlock;
+  }, [prefs.voice, prefs.volume]);
 
   const toggle = async () => {
     const element = audio.current;
     if (!element) return;
     if (!element.paused) {
+      manualPauseRef.current = true;
       element.pause();
       return;
     }
     try {
+      manualPauseRef.current = false;
       setFailed(false);
       await element.play();
     } catch {
@@ -60,7 +105,8 @@ export default function PingoIntroPlayer() {
         <audio
           ref={audio}
           src={intro.audio}
-          preload="none"
+          preload="auto"
+          autoPlay
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onEnded={() => { setPlaying(false); setProgress(0); }}

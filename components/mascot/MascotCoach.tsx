@@ -15,10 +15,10 @@ import { listMascotLines } from "@/services/academy.service";
 import type { MascotEvent, MascotLine } from "@/types/api";
 
 import { DEFAULT_MASCOT_LINES } from "@/lib/mascot/elevenlabs";
-import { speakRealisticVoice, stopRealisticVoice } from "@/lib/mascot/sound-effects";
+import { playCyberPingoAudioUrl, speakRealisticVoice, stopRealisticVoice } from "@/lib/mascot/sound-effects";
 
-const SESSION_WELCOME = "cyberpingo.mascot.welcomed";
 const MAX_VOICE_MS = 30_000;
+let welcomedInMemory = false;
 
 function daysSince(date: string | null) {
   if (!date) return 0;
@@ -26,19 +26,11 @@ function daysSince(date: string | null) {
   return Number.isNaN(time) ? 0 : (Date.now() - time) / 86_400_000;
 }
 
-function once(key: string) {
-  try {
-    if (window.sessionStorage.getItem(key)) return false;
-    window.sessionStorage.setItem(key, "1");
-    return true;
-  } catch { return false; }
-}
-
 interface Active { line: MascotLine; event: MascotEvent; spoken: boolean; failed: boolean }
 
 /**
- * Pingo as a mentor. One voice at a time, a priority between events, and a text fallback: a missing or
- * blocked recording never hides the line and nothing here can block a lesson.
+ * Pingo as a mentor. One voice at a time, a priority between events, and automatic CyberPingo
+ * ElevenLabs voice playback by default without requiring the user to press a Play button first.
  */
 export default function MascotCoach() {
   const { profile } = useUser();
@@ -52,10 +44,9 @@ export default function MascotCoach() {
   const linesRef = useRef(lines);
   const scheduler = useRef<SchedulerState>(IDLE_STATE);
   const timer = useRef<number | null>(null);
-  const audio = useRef<HTMLAudioElement | null>(null);
-  const unlockCleanup = useRef<(() => void) | null>(null);
   const token = useRef(0);
   const lastLine = useRef<string | null>(null);
+  const spokenRoutes = useRef<Set<string>>(new Set());
   const hovering = useRef(false);
   const arm = useRef<(ms: number) => void>(() => undefined);
 
@@ -69,83 +60,49 @@ export default function MascotCoach() {
     return () => { cancelled = true; };
   }, [hasProfile]);
 
-  const clearUnlock = useCallback(() => {
-    if (unlockCleanup.current) {
-      unlockCleanup.current();
-      unlockCleanup.current = null;
-    }
-  }, []);
-
   const finish = useCallback((expected?: number) => {
     if (expected !== undefined && expected !== token.current) return;
     token.current += 1;
-    clearUnlock();
     if (timer.current) window.clearTimeout(timer.current);
     timer.current = null;
-    if (audio.current) { audio.current.pause(); audio.current = null; }
     stopRealisticVoice();
     scheduler.current = { activePriority: 0, activeUntil: 0, lastEnd: Date.now() };
     setActive(null);
     setPanel(false);
-  }, [clearUnlock]);
+  }, []);
 
   const startVoice = useCallback((line: MascotLine, mine: number, volume: number) => {
     if (!line.audio_url) return;
-    clearUnlock();
-    stopRealisticVoice();
-    if (audio.current) { audio.current.pause(); audio.current = null; }
-    const element = new Audio(line.audio_url);
-    element.volume = volume;
-    audio.current = element;
-    const markSpoken = () => {
-      if (mine !== token.current) return;
-      scheduler.current = { ...scheduler.current, activeUntil: Date.now() + MAX_VOICE_MS };
-      arm.current(MAX_VOICE_MS);
-      setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: true, failed: false } : value));
-    };
-    const markFailed = () => {
-      if (mine !== token.current) return;
-      setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: false, failed: true } : value));
-    };
-    element.addEventListener("ended", () => finish(mine));
-    element.addEventListener("error", markFailed);
-    element.play().then(markSpoken).catch((error: unknown) => {
-      // Si la politique d'autoplay du navigateur bloque la lecture avant le premier clic,
-      // on maintient la bulle active et on lance automatiquement la voix CyberPingo dès le premier geste.
-      if ((error as { name?: string } | null)?.name === "NotAllowedError") {
-        arm.current(25_000);
-        const resumeOnGesture = () => {
-          clearUnlock();
-          if (mine !== token.current || audio.current !== element) return;
-          element.play().then(markSpoken).catch(() => undefined);
-        };
-        window.addEventListener("pointerdown", resumeOnGesture, { once: true });
-        window.addEventListener("click", resumeOnGesture, { once: true });
-        window.addEventListener("touchstart", resumeOnGesture, { once: true });
-        window.addEventListener("keydown", resumeOnGesture, { once: true });
-        unlockCleanup.current = () => {
-          window.removeEventListener("pointerdown", resumeOnGesture);
-          window.removeEventListener("click", resumeOnGesture);
-          window.removeEventListener("touchstart", resumeOnGesture);
-          window.removeEventListener("keydown", resumeOnGesture);
-        };
-      } else {
-        markFailed();
-      }
+    // Garde la bulle ouverte jusqu'à la fin de la voix (ou jusqu'au premier geste si l'onglet vient d'être ouvert à froid)
+    scheduler.current = { ...scheduler.current, activeUntil: Date.now() + MAX_VOICE_MS };
+    arm.current(MAX_VOICE_MS);
+    playCyberPingoAudioUrl(line.audio_url, {
+      volume,
+      onStart: () => {
+        if (mine !== token.current) return;
+        scheduler.current = { ...scheduler.current, activeUntil: Date.now() + MAX_VOICE_MS };
+        arm.current(MAX_VOICE_MS);
+        setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: true, failed: false } : value));
+      },
+      onEnd: () => finish(mine),
+      onError: () => {
+        if (mine !== token.current) return;
+        setActive((value) => (value && value.line.id === line.id ? { ...value, spoken: false, failed: true } : value));
+      },
     });
-  }, [clearUnlock, finish]);
+  }, [finish]);
 
   const present = useCallback((line: MascotLine, event: MascotEvent) => {
-    clearUnlock();
     if (timer.current) window.clearTimeout(timer.current);
-    if (audio.current) { audio.current.pause(); audio.current = null; }
     stopRealisticVoice();
     const mine = ++token.current;
     const now = Date.now();
     const duration = displayDuration(line.text_fr);
     scheduler.current = { activePriority: EVENT_PRIORITY[event], activeUntil: now + duration, lastEnd: scheduler.current.lastEnd };
     lastLine.current = line.id;
-    setActive({ line, event, spoken: false, failed: false });
+    const current = prefsRef.current;
+    const voiceEnabled = current.voice && current.volume > 0;
+    setActive({ line, event, spoken: voiceEnabled, failed: false });
     setPanel(false);
     const schedule = (ms: number) => {
       if (timer.current) window.clearTimeout(timer.current);
@@ -157,10 +114,9 @@ export default function MascotCoach() {
     arm.current = schedule;
     schedule(duration);
 
-    const current = prefsRef.current;
-    if (line.audio_url && current.voice && current.volume > 0) {
+    if (line.audio_url && voiceEnabled) {
       startVoice(line, mine, current.volume);
-    } else if (current.voice && current.volume > 0) {
+    } else if (voiceEnabled) {
       speakRealisticVoice(line.text_fr, {
         volume: current.volume,
         expression: line.expression,
@@ -172,7 +128,7 @@ export default function MascotCoach() {
         onEnd: () => finish(mine),
       });
     }
-  }, [clearUnlock, finish, startVoice]);
+  }, [finish, startVoice]);
 
   const replay = useCallback((line: MascotLine) => {
     const volume = prefsRef.current.volume;
@@ -197,29 +153,37 @@ export default function MascotCoach() {
 
   useEffect(() => () => {
     if (timer.current) window.clearTimeout(timer.current);
-    if (audio.current) audio.current.pause();
+    stopRealisticVoice();
   }, []);
 
   const lastActivity = profile?.last_activity_date ?? null;
-  const ready = hasProfile && lines.length > 0;
+  const ready = lines.length > 0;
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || pathname === "/a-propos") return;
     const wait = window.setTimeout(() => {
-      if (once(SESSION_WELCOME)) emitMascot([daysSince(lastActivity) >= 7 ? "return_after_absence" : "welcome"]);
-    }, 1600);
+      if (!welcomedInMemory) {
+        welcomedInMemory = true;
+        emitMascot([daysSince(lastActivity) >= 7 ? "return_after_absence" : "welcome"]);
+      }
+    }, 250);
     return () => window.clearTimeout(wait);
-  }, [ready, lastActivity]);
+  }, [ready, lastActivity, pathname]);
 
   useEffect(() => {
     if (!ready || !pathname.startsWith("/lessons/")) return;
-    const wait = window.setTimeout(() => { if (once(`cyberpingo.mascot.lesson:${pathname}`)) emitMascot(["lesson_start"]); }, 2400);
+    const wait = window.setTimeout(() => {
+      if (!spokenRoutes.current.has(pathname)) {
+        spokenRoutes.current.add(pathname);
+        emitMascot(["lesson_start"]);
+      }
+    }, 250);
     return () => window.clearTimeout(wait);
   }, [ready, pathname]);
 
   if (!active) return null;
   const { line, spoken, failed } = active;
   const showText = !spoken || prefs.subtitles;
-  const canReplay = !spoken && !failed;
+  const canReplay = !prefs.voice && !spoken && !failed;
   return (
     <aside
       className="mascot-coach"

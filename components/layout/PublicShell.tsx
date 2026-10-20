@@ -4,6 +4,7 @@ import { useState } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import AmbientBackground from "./AmbientBackground";
+import MascotCoach from "@/components/mascot/MascotCoach";
 
 export default function PublicShell({ children }: { children: React.ReactNode }) {
   const [motionEnabled, setMotionEnabled] = useState(true);
@@ -14,6 +15,7 @@ export default function PublicShell({ children }: { children: React.ReactNode })
       <Navbar motionEnabled={motionEnabled} onToggleMotion={() => setMotionEnabled(!motionEnabled)} />
       <main id="main-content">{children}</main>
       <Footer />
+      <MascotCoach />
     </div>
   );
 }

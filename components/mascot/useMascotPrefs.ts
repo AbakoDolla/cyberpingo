@@ -6,7 +6,7 @@ import { DEFAULT_PREFS, PREFS_KEY, parsePrefs, type MascotPrefs } from "@/lib/ma
 const listeners = new Set<() => void>();
 let cachedRaw: string | null | undefined;
 let cached: MascotPrefs = DEFAULT_PREFS;
-const VOICE_DEFAULT_MIGRATION_KEY = "cyberpingo.mascot.cyberpingo_v1";
+const VOICE_DEFAULT_MIGRATION_KEY = "cyberpingo.mascot.cyberpingo_v2";
 
 function readRaw(): string | null {
   try {
@@ -15,9 +15,10 @@ function readRaw(): string | null {
       window.localStorage.setItem(VOICE_DEFAULT_MIGRATION_KEY, "1");
       if (raw) {
         const parsed = parsePrefs(raw);
-        if (!parsed.voice || parsed.volume <= 0) {
+        if (!parsed.auto || !parsed.voice || parsed.volume <= 0) {
           const upgraded: MascotPrefs = {
             ...parsed,
+            auto: true,
             voice: true,
             volume: parsed.volume > 0 ? parsed.volume : DEFAULT_PREFS.volume,
           };

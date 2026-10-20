@@ -36,7 +36,7 @@ export default function PacedAgentResponse({
   const isCompleted = displayedLength >= fullContent.length;
 
   useEffect(() => {
-    if (!isCompleted || !showVoiceControls || !fullContent.trim()) return;
+    if (!showVoiceControls || !fullContent.trim()) return;
     if (!prefs.voice || prefs.volume <= 0) return;
     if (autoSpokenRef.current === message.id) return;
     autoSpokenRef.current = message.id;
@@ -54,7 +54,7 @@ export default function PacedAgentResponse({
       onStart: () => setIsSpeaking(true),
       onEnd: () => setIsSpeaking(false),
     });
-  }, [isCompleted, showVoiceControls, fullContent, message.id, prefs.voice, prefs.volume]);
+  }, [showVoiceControls, fullContent, message.id, prefs.voice, prefs.volume]);
 
   useEffect(() => {
     if (!isPaced) {

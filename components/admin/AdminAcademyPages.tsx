@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -18,6 +18,7 @@ import {
   autoTagForElevenLabs,
 } from "@/lib/mascot/elevenlabs";
 import { MASCOT_EVENTS, MASCOT_EVENT_LABELS, MASCOT_EXPRESSIONS, MASCOT_EXPRESSION_LABELS } from "@/lib/mascot/events";
+import { playCyberPingoAudioUrl, stopRealisticVoice } from "@/lib/mascot/sound-effects";
 import { voiceCoverage } from "@/lib/mascot/voice";
 import {
   adminReviewSubmission, createDomain, createMascotLine, createSkill, createSkillLink, deleteDomain, deleteMascotLine, deleteSkill,
@@ -555,31 +556,42 @@ export function AdminMascottePage() {
   const [syncing, setSyncing] = useState(false);
   const [syncNotice, setSyncNotice] = useState<Flash>(null);
   const [playingId, setPlayingId] = useState<string | null>(null);
-  const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
+  const autoPlayedRef = useRef(false);
+
+  useEffect(() => {
+    if (autoPlayedRef.current || !catalog.data || catalog.data.length === 0) return;
+    const firstVoiced =
+      catalog.data.find((line) => line.event === "welcome" && line.audio_url && line.is_active) ??
+      catalog.data.find((line) => Boolean(line.audio_url && line.is_active));
+    if (!firstVoiced?.audio_url) return;
+    autoPlayedRef.current = true;
+    setPlayingId(firstVoiced.id);
+    playCyberPingoAudioUrl(firstVoiced.audio_url, {
+      volume: 0.85,
+      onStart: () => setPlayingId(firstVoiced.id),
+      onEnd: () => setPlayingId((current) => (current === firstVoiced.id ? null : current)),
+      onError: () => setPlayingId((current) => (current === firstVoiced.id ? null : current)),
+    });
+  }, [catalog.data]);
+
+  useEffect(() => () => {
+    stopRealisticVoice();
+  }, []);
 
   function togglePlayLine(line: MascotLineRow) {
     if (!line.audio_url) return;
-    if (playingId === line.id && previewAudio) {
-      previewAudio.pause();
+    if (playingId === line.id) {
+      stopRealisticVoice();
       setPlayingId(null);
-      setPreviewAudio(null);
       return;
     }
-    if (previewAudio) {
-      previewAudio.pause();
-    }
-    const audio = new Audio(line.audio_url);
-    audio.onended = () => {
-      setPlayingId(null);
-      setPreviewAudio(null);
-    };
-    audio.onerror = () => {
-      setPlayingId(null);
-      setPreviewAudio(null);
-    };
     setPlayingId(line.id);
-    setPreviewAudio(audio);
-    void audio.play();
+    playCyberPingoAudioUrl(line.audio_url, {
+      volume: 0.85,
+      onStart: () => setPlayingId(line.id),
+      onEnd: () => setPlayingId((current) => (current === line.id ? null : current)),
+      onError: () => setPlayingId((current) => (current === line.id ? null : current)),
+    });
   }
 
   async function handleSyncCyberPingo() {

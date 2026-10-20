@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import MascotCoach from "@/components/mascot/MascotCoach";
 import Hero from "./Hero";
 import ChallengesSection from "./ChallengesSection";
 import ProgressionSection from "./ProgressionSection";
@@ -170,6 +171,7 @@ export default function LandingPage({ courses, labs, catalogUnavailable = false 
         <section className="public-container faq-section" id="faq" aria-labelledby="faq-title"><div><span className="heading-icon"><IconLesson size={24} /></span><h2 id="faq-title">Avant de te lancer</h2><p>Pas besoin d’être expert.<br />Juste d’être curieux.</p></div><div className="faq-questions">{publicFaq.map(({ question, answer }) => <details key={question}><summary>{question}<IconChevronDown size={18} /></summary><p>{answer}</p></details>)}</div></section>
       </main>
       <Footer />
+      <MascotCoach />
       {selectedPreview && <CourseDialog preview={selectedPreview} onClose={() => setSelectedPreview(null)} returnFocusTo={courseTrigger.current} />}
     </div>
   );

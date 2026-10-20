@@ -175,18 +175,211 @@ export const playTrophyChime = playTrophySound;
 
 /**
  * Synthèse vocale réaliste (TTS) propulsée par la voix "cyberpingo" sur ElevenLabs v3
- * avec balisages émotionnels automatiques (via `/api/tts`), et repli Web Speech API hors-ligne.
+ * avec balisages émotionnels automatiques (via `/api/tts`), lecture Web Audio API + HTMLAudioElement
+ * pré-déverrouillée pour parler automatiquement sans nécessiter de bouton Play.
  */
 let activeAudio: HTMLAudioElement | null = null;
+let activeBufferSource: AudioBufferSourceNode | null = null;
 let activeAbortController: AbortController | null = null;
 let pendingUnlockCleanup: (() => void) | null = null;
+let globalUnlockerInstalled = false;
+let playbackGeneration = 0;
 const ttsBlobCache = new Map<string, string>();
+const audioBufferCache = new Map<string, AudioBuffer>();
+
+const GESTURE_EVENTS = ["pointerdown", "pointerup", "mouseup", "click", "touchend", "keydown"] as const;
+
+function installGlobalAudioUnlocker(): void {
+  if (typeof window === "undefined" || globalUnlockerInstalled) return;
+  globalUnlockerInstalled = true;
+
+  const unlock = () => {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === "suspended") {
+      ctx.resume().catch(() => undefined);
+    }
+  };
+
+  for (const evt of GESTURE_EVENTS) {
+    window.addEventListener(evt, unlock, { capture: true, passive: true });
+  }
+}
+
+if (typeof window !== "undefined") {
+  installGlobalAudioUnlocker();
+}
 
 function clearPendingUnlock(): void {
   if (pendingUnlockCleanup) {
     pendingUnlockCleanup();
     pendingUnlockCleanup = null;
   }
+}
+
+/**
+ * Lit automatiquement un fichier ou flux audio CyberPingo (`/audio/mascot/...`, `/audio/pingo-intro.mp3`, ou blob TTS)
+ * sans que l'utilisateur ait besoin d'appuyer sur un bouton Play :
+ * 1. Utilise Web Audio API (`AudioContext`) si déjà déverrouillé (fonctionne même après `setTimeout` ou `fetch` asynchrone).
+ * 2. Tente immédiatement `HTMLAudioElement.play()`.
+ * 3. Si le navigateur bloque l'autoplay à froid (avant toute interaction sur l'onglet), arme un écouteur global
+ *    qui ne se retire qu'une fois la lecture réellement démarrée.
+ */
+export function playCyberPingoAudioUrl(
+  url: string,
+  options?: {
+    volume?: number;
+    onStart?: () => void;
+    onEnd?: () => void;
+    onError?: () => void;
+  }
+): void {
+  if (typeof window === "undefined" || !url) return;
+
+  installGlobalAudioUnlocker();
+  stopRealisticVoice();
+
+  const gen = ++playbackGeneration;
+  const volume = Math.max(0, Math.min(1, options?.volume ?? 0.85));
+  let started = false;
+
+  const notifyStart = () => {
+    if (started || gen !== playbackGeneration) return;
+    started = true;
+    clearPendingUnlock();
+    options?.onStart?.();
+  };
+
+  // Si l'AudioContext est déjà en état "running", on peut jouer via AudioBufferSourceNode
+  // même en dehors d'un clic direct (après un délai ou un fetch réseau).
+  const ctx = getAudioContext();
+  const playViaWebAudio = async (): Promise<boolean> => {
+    if (!ctx || gen !== playbackGeneration) return false;
+    if (ctx.state === "suspended") {
+      try {
+        await ctx.resume();
+      } catch {
+        return false;
+      }
+    }
+    if ((ctx.state as string) !== "running" || gen !== playbackGeneration) return false;
+
+    try {
+      let decoded = audioBufferCache.get(url);
+      if (!decoded) {
+        const res = await fetch(url);
+        if (!res.ok) return false;
+        const arr = await res.arrayBuffer();
+        decoded = await ctx.decodeAudioData(arr.slice(0));
+        audioBufferCache.set(url, decoded);
+      }
+      // Si une autre voix a pris la main pendant le chargement, on abandonne
+      if (started || gen !== playbackGeneration) return true;
+
+      const source = ctx.createBufferSource();
+      const gainNode = ctx.createGain();
+      gainNode.gain.value = volume;
+      source.buffer = decoded;
+      source.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      activeBufferSource = source;
+      source.onended = () => {
+        if (activeBufferSource === source) {
+          activeBufferSource = null;
+        }
+        if (gen === playbackGeneration) {
+          options?.onEnd?.();
+        }
+      };
+      source.start(0);
+      notifyStart();
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Essai immédiat via HTMLAudioElement (et Web Audio en parallèle si déjà actif)
+  const audio = new Audio(url);
+  audio.preload = "auto";
+  audio.volume = volume;
+  activeAudio = audio;
+
+  audio.onplay = () => {
+    notifyStart();
+  };
+  audio.onended = () => {
+    if (activeAudio === audio) activeAudio = null;
+    if (gen === playbackGeneration) options?.onEnd?.();
+  };
+  audio.onerror = () => {
+    if (activeAudio === audio) activeAudio = null;
+    if (!started && gen === playbackGeneration) options?.onError?.();
+  };
+
+  if (ctx && (ctx.state as string) === "running") {
+    // Web Audio est déjà déverrouillé : contourne 100 % des blocages d'autoplay post-navigation
+    activeAudio = null;
+    void playViaWebAudio().then((ok) => {
+      if (!ok && gen === playbackGeneration) {
+        activeAudio = audio;
+        audio.play().catch(() => undefined);
+      }
+    });
+    return;
+  }
+
+  audio.play().then(() => {
+    notifyStart();
+  }).catch((err: unknown) => {
+    if (gen !== playbackGeneration) return;
+    const isAutoplayBlocked =
+      (err as { name?: string } | null)?.name === "NotAllowedError";
+    if (!isAutoplayBlocked) {
+      if (activeAudio === audio) activeAudio = null;
+      options?.onError?.();
+      return;
+    }
+
+    // Pré-charge le buffer audio pendant que l'onglet attend le tout premier geste utilisateur
+    if (ctx && !audioBufferCache.has(url)) {
+      fetch(url)
+        .then((r) => (r.ok ? r.arrayBuffer() : null))
+        .then((arr) => (arr ? ctx.decodeAudioData(arr.slice(0)) : null))
+        .then((buf) => {
+          if (buf) audioBufferCache.set(url, buf);
+        })
+        .catch(() => undefined);
+    }
+
+    clearPendingUnlock();
+    const tryUnlockAndPlay = () => {
+      if (started || gen !== playbackGeneration || activeAudio !== audio) {
+        clearPendingUnlock();
+        return;
+      }
+      if (ctx && ctx.state === "suspended") {
+        ctx.resume().catch(() => undefined);
+      }
+      audio
+        .play()
+        .then(() => {
+          notifyStart();
+        })
+        .catch(() => {
+          void playViaWebAudio();
+        });
+    };
+
+    for (const evt of GESTURE_EVENTS) {
+      window.addEventListener(evt, tryUnlockAndPlay, { capture: true, passive: true });
+    }
+    pendingUnlockCleanup = () => {
+      for (const evt of GESTURE_EVENTS) {
+        window.removeEventListener(evt, tryUnlockAndPlay, { capture: true });
+      }
+    };
+  });
 }
 
 function speakFallbackBrowserVoice(
@@ -255,46 +448,11 @@ export function speakRealisticVoice(
   const cacheKey = `${expression}::${options?.lineId ?? ""}::${cleaned.slice(0, 900)}`;
 
   const playBlobUrl = (blobUrl: string) => {
-    const audio = new Audio(blobUrl);
-    audio.volume = volume;
-    activeAudio = audio;
-
-    audio.onplay = () => {
-      options?.onStart?.();
-    };
-    audio.onended = () => {
-      if (activeAudio === audio) activeAudio = null;
-      options?.onEnd?.();
-    };
-    audio.onerror = () => {
-      if (activeAudio === audio) activeAudio = null;
-      options?.onEnd?.();
-    };
-
-    audio.play().catch((err: unknown) => {
-      const isAutoplayBlocked =
-        err instanceof DOMException && err.name === "NotAllowedError";
-      if (isAutoplayBlocked) {
-        clearPendingUnlock();
-        const resumeOnGesture = () => {
-          clearPendingUnlock();
-          if (activeAudio === audio) {
-            audio.play().catch(() => {
-              if (activeAudio === audio) activeAudio = null;
-              options?.onEnd?.();
-            });
-          }
-        };
-        window.addEventListener("pointerdown", resumeOnGesture, { once: true });
-        window.addEventListener("keydown", resumeOnGesture, { once: true });
-        pendingUnlockCleanup = () => {
-          window.removeEventListener("pointerdown", resumeOnGesture);
-          window.removeEventListener("keydown", resumeOnGesture);
-        };
-      } else {
-        if (activeAudio === audio) activeAudio = null;
-        speakFallbackBrowserVoice(cleaned, options);
-      }
+    playCyberPingoAudioUrl(blobUrl, {
+      volume,
+      onStart: options?.onStart,
+      onEnd: options?.onEnd,
+      onError: () => speakFallbackBrowserVoice(cleaned, options),
     });
   };
 
@@ -338,10 +496,20 @@ export function speakRealisticVoice(
 
 /** Stops any active speech synthesis */
 export function stopRealisticVoice() {
+  playbackGeneration += 1;
   clearPendingUnlock();
   if (activeAbortController) {
     activeAbortController.abort();
     activeAbortController = null;
+  }
+  if (activeBufferSource) {
+    try {
+      activeBufferSource.onended = null;
+      activeBufferSource.stop();
+    } catch {
+      // Ignore if already stopped
+    }
+    activeBufferSource = null;
   }
   if (activeAudio) {
     activeAudio.pause();
@@ -354,7 +522,7 @@ export function stopRealisticVoice() {
 }
 
 export function isSpeakingRealisticVoice(): boolean {
-  if (activeAbortController) return true;
+  if (activeAbortController || activeBufferSource) return true;
   if (activeAudio && !activeAudio.paused && !activeAudio.ended) return true;
   if (typeof window !== "undefined" && "speechSynthesis" in window) {
     return window.speechSynthesis.speaking;
