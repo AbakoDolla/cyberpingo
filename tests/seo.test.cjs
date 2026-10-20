@@ -128,4 +128,10 @@ test("robots.ts and manifest.ts expose valid search engine crawl rules and PWA m
   assert.equal(m.short_name, SITE_NAME);
   assert.equal(m.lang, "fr-FR");
   assert.ok(m.icons.length >= 2);
+
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const googleVerifyPath = path.join(__dirname, "..", "public", "google8d9429c90cbfa863.html");
+  assert.ok(fs.existsSync(googleVerifyPath));
+  assert.equal(fs.readFileSync(googleVerifyPath, "utf8").trim(), "google-site-verification: google8d9429c90cbfa863.html");
 });
