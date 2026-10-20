@@ -956,6 +956,8 @@ function isAllowedOrigin(originOrReferer: string): boolean {
       hostname === "127.0.0.1" ||
       hostname === "cyberpingo.vercel.app" ||
       hostname.endsWith(".vercel.app") ||
+      hostname === "cyberpingo.tech" ||
+      hostname.endsWith(".cyberpingo.tech") ||
       hostname.endsWith("cyberpingo.com") ||
       hostname.endsWith("cyberpingo.fr")
     );
