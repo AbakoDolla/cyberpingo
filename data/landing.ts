@@ -83,8 +83,12 @@ export const publicTestimonial = {
 
 export const publicFaq = [
   {
-    question: "Je n’y connais rien en cybersécurité. Je peux commencer ?",
-    answer: "Oui ! Les parcours débutants commencent sans prérequis. Tu avances à ton rythme avec des leçons courtes, puis des quiz pour vérifier ce que tu as compris.",
+    question: "Comment apprendre la cybersécurité gratuitement en partant de zéro ?",
+    answer: "Sur CyberPingo, tu peux apprendre la cybersécurité gratuitement et sans prérequis : commence par le parcours « Les bases de la cybersécurité », poursuis avec les réseaux et Linux, puis entraîne-toi sur la sécurité web, l’analyse de logs SOC et le pentest éthique grâce à des laboratoires simulés dans ton navigateur.",
+  },
+  {
+    question: "Je n’y connais rien en cybersécurité. Par où commencer pour débuter ?",
+    answer: "Oui, nos cours de cybersécurité pour débutants partent de zéro. Tu avances à ton rythme avec des leçons courtes en français, des quiz expliqués et des exercices pratiques sans rien installer.",
   },
   {
     question: "Comment fonctionnent les XP et les badges ?",

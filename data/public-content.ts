@@ -11,6 +11,44 @@ export interface Article {
 
 export const articles: Article[] = [
   {
+    slug: "apprendre-la-cybersecurite",
+    title: "Apprendre la cybersécurité gratuitement : par où commencer ?",
+    category: "Guide débutant",
+    minutes: 7,
+    courseSlug: "fondamentaux",
+    description: "La feuille de route complète pour apprendre la cybersécurité en partant de zéro : fondamentaux, réseaux, Linux, sécurité web, analyse de logs SOC et hacking éthique.",
+    sections: [
+      {
+        title: "1. Maîtriser les fondamentaux de la sécurité informatique",
+        text: "Pour apprendre la cybersécurité efficacement, commence par comprendre ce que l’on protège : la confidentialité, l’intégrité et la disponibilité des données. Adopte immédiatement les bons réflexes d’hygiène numérique : gestionnaire de mots de passe, authentification multifacteur (MFA), sauvegardes régulières et détection du phishing.",
+        checklist: [
+          "Comprendre le modèle CIA (Confidentialité, Intégrité, Disponibilité).",
+          "Sécuriser ses comptes avec des mots de passe uniques et le MFA.",
+          "Distinguer une erreur technique d’une attaque par ingénierie sociale.",
+        ],
+      },
+      {
+        title: "2. Comprendre les réseaux informatiques et Linux",
+        text: "On ne peut pas protéger un système que l’on ne comprend pas. Apprends comment circulent les paquets sur un réseau (IPv4, IPv6, DNS, HTTPS, pare-feu) et comment administrer un serveur Linux en ligne de commande : permissions de fichiers, processus, journaux système et accès SSH.",
+        checklist: [
+          "Lire une adresse IP, un port réseau et une requête DNS ou HTTP.",
+          "Naviguer dans le terminal Linux et gérer les droits utilisateurs.",
+          "Identifier les services exposés et réduire la surface d’attaque.",
+        ],
+      },
+      {
+        title: "3. Pratiquer sur des laboratoires : sécurité web, logs SOC et pentest éthique",
+        text: "La théorie ne suffit pas : entraîne-toi sur des environnements simulés et légaux. Sur CyberPingo, tu progresses avec des cours interactifs, des analyses de journaux (Blue Team / SOC) et des défis d’audit autorisé (Red Team / Pentest) directement dans ton navigateur, sans rien installer.",
+        checklist: [
+          "Analyser des logs pour reconstruire la chronologie d’un incident.",
+          "Comprendre les vulnérabilités web courantes (OWASP Top 10).",
+          "Pratiquer uniquement dans un cadre légal, isolé et autorisé.",
+        ],
+      },
+    ],
+    source: { label: "ANSSI, SecNumacadémie & bonnes pratiques", url: "https://cyber.gouv.fr/bonnes-pratiques-protegez-vous" },
+  },
+  {
     slug: "securiser-ses-comptes", title: "Tes comptes méritent mieux qu’un seul mot de passe",
     category: "Vie numérique", minutes: 5, courseSlug: "securite-web",
     description: "Une méthode concrète pour protéger ta messagerie, tes réseaux sociaux et leurs moyens de récupération.",

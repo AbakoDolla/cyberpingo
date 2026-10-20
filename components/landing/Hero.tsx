@@ -80,9 +80,9 @@ export default function Hero() {
           <span className="hero-badge"><IconShield size={17} /> La cybersécurité, c&apos;est pour toi !</span>
           <h1 id="hero-title">Apprends la cybersécurité <span>pas à pas, comme un jeu !</span></h1>
           <p className="hero-description">
-            CyberPingo est une plateforme d&apos;apprentissage interactive qui te
-            permet de maîtriser la cybersécurité, du niveau débutant à avancé,
-            à travers des leçons courtes, des défis pratiques et un suivi de ta progression.
+            Pour <strong>apprendre la cybersécurité gratuitement en ligne</strong> : CyberPingo te
+            guide du niveau débutant à avancé avec des cours en français, des laboratoires pratiques
+            (Linux, réseaux, sécurité web, SOC, pentest) et un suivi de ta progression.
           </p>
           <div className="hero-actions">
             {isAuthenticated ? (

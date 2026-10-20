@@ -4,17 +4,23 @@ import type { CourseDetail, CourseSummary } from "@/types/api";
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://cyberpingo.vercel.app").replace(/\/+$/, "");
 export const SITE_NAME = "CyberPingo";
-export const SITE_TAGLINE = "CyberPingo — Apprends la cybersécurité pas à pas, pratique et protège";
+export const SITE_TAGLINE = "Apprendre la cybersécurité gratuitement en ligne (Cours, Labs & Défis) · CyberPingo";
 export const SITE_DESCRIPTION =
-  "Plateforme francophone d’apprentissage de la cybersécurité : cours interactifs, laboratoires pratiques (Linux, réseaux, sécurité web, analyse de logs SOC, pentest éthique), quiz, défis et badges avec Pingo.";
+  "Apprendre la cybersécurité gratuitement et pas à pas en français : cours interactifs pour débutants et avancés, laboratoires pratiques (Linux, réseaux, sécurité web, analyse de logs SOC, pentest éthique), quiz et défis sur CyberPingo.";
 export const DEFAULT_OG_IMAGE = "/images/og-cyberpingo.jpg";
 
 export const SEO_KEYWORDS: string[] = [
-  "cybersécurité",
   "apprendre la cybersécurité",
+  "apprendre la cybersécurité gratuitement",
+  "apprendre la cybersécurité en ligne",
+  "apprendre la cybersécurité débutant",
+  "comment débuter en cybersécurité",
+  "cours de cybersécurité gratuit",
   "formation cybersécurité gratuite",
   "cours cybersécurité en français",
+  "cybersécurité",
   "sécurité informatique",
+  "apprendre le hacking éthique",
   "ethical hacking",
   "pentest",
   "test d'intrusion",
