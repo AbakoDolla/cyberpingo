@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { Article } from "@/data/public-content";
 import type { CourseDetail, CourseSummary } from "@/types/api";
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://cyberpingo.vercel.app").replace(/\/+$/, "");
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://cyberpingo.tech").replace(/\/+$/, "");
 export const SITE_NAME = "CyberPingo";
 export const SITE_TAGLINE = "Apprendre la cybersécurité gratuitement en ligne (Cours, Labs & Défis) · CyberPingo";
 export const SITE_DESCRIPTION =

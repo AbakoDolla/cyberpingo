@@ -25,7 +25,7 @@ export const ANTI_TAMPER_SCRIPT = `
 
   // 3. Domain Integrity Validation
   try {
-    var allowedHosts = ['cyberpingo.vercel.app', 'localhost', '127.0.0.1'];
+    var allowedHosts = ['cyberpingo.tech', 'cyberpingo.vercel.app', 'localhost', '127.0.0.1'];
     var currentHost = window.location.hostname.toLowerCase();
     var isAllowed = allowedHosts.some(function(host) {
       return currentHost === host || currentHost.endsWith('.' + host) || currentHost.endsWith('.vercel.app');

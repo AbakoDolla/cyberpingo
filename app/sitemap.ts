@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { publicPaths } from "@/data/landing";
 import { articles, informationPages } from "@/data/public-content";
 import { SITE_URL } from "@/lib/seo";
@@ -7,8 +8,25 @@ import { listPublishedCourses } from "@/services/courses.service";
 
 export const revalidate = 3600;
 
+async function resolveBaseUrl(): Promise<string> {
+  try {
+    const hdrs = await headers();
+    const host = (hdrs.get("x-forwarded-host") || hdrs.get("host") || "").split(",")[0].trim().toLowerCase();
+    if (host === "cyberpingo.tech" || host === "www.cyberpingo.tech") {
+      return `https://${host}`;
+    }
+    if (host === "cyberpingo.vercel.app") {
+      return "https://cyberpingo.vercel.app";
+    }
+  } catch {
+    // Static generation or unit test context
+  }
+  return SITE_URL;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  const baseUrl = await resolveBaseUrl();
 
   const staticRoutes: Array<{
     path: string;
@@ -56,19 +74,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const entries: MetadataRoute.Sitemap = [
     ...staticRoutes.map((route) => ({
-      url: `${SITE_URL}${route.path}`,
+      url: `${baseUrl}${route.path}`,
       lastModified: now,
       changeFrequency: route.changeFrequency,
       priority: route.priority,
     })),
     ...Array.from(courseSlugs).map((slug) => ({
-      url: `${SITE_URL}/parcours/${slug}`,
+      url: `${baseUrl}/parcours/${slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.9,
     })),
     ...articles.map((article) => ({
-      url: `${SITE_URL}/ressources/${article.slug}`,
+      url: `${baseUrl}/ressources/${article.slug}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.85,
