@@ -271,12 +271,54 @@ const BUILTIN_AUDIO_BY_ID = new Map<string, string>(
   DEFAULT_MASCOT_LINES.map((line) => [line.id, line.audio_url!])
 );
 
+function normalizeMascotText(text?: string | null): string {
+  return (text ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[’']/g, "'")
+    .replace(/\s+/g, " ");
+}
+
+const BUILTIN_AUDIO_BY_TEXT = new Map<string, string>(
+  DEFAULT_MASCOT_LINES.map((line) => [normalizeMascotText(line.text_fr), line.audio_url!])
+);
+
 /**
  * Résout l'URL audio CyberPingo d'une réplique (garantit l'utilisation de la voix CyberPingo
- * pour toutes les répliques officielles même si `audio_url` est vide en base).
+ * pour toutes les répliques officielles même si `audio_url` est vide en base ou si l'UUID diffère).
  */
-export function resolveCyberPingoAudioUrl(id: string, currentUrl?: string | null): string | null {
-  const builtin = BUILTIN_AUDIO_BY_ID.get(id);
-  if (builtin) return builtin;
+export function resolveCyberPingoAudioUrl(
+  id: string,
+  currentUrl?: string | null,
+  textFr?: string | null
+): string | null {
+  const builtinById = BUILTIN_AUDIO_BY_ID.get(id);
+  if (builtinById) return builtinById;
+  if (textFr) {
+    const builtinByText = BUILTIN_AUDIO_BY_TEXT.get(normalizeMascotText(textFr));
+    if (builtinByText) return builtinByText;
+  }
   return currentUrl ?? null;
 }
+
+/**
+ * Garantit que le crédit vocal indique explicitement la voix CyberPingo (ElevenLabs)
+ * pour toutes les pistes CyberPingo.
+ */
+export function resolveCyberPingoVoiceCredit(
+  audioUrl?: string | null,
+  currentCredit?: string | null
+): string | null {
+  if (!audioUrl) return currentCredit ?? null;
+  if (
+    audioUrl.startsWith("/audio/mascot/") ||
+    audioUrl.startsWith("/audio/pingo") ||
+    audioUrl.startsWith("/audio/professeur-pingo") ||
+    !currentCredit ||
+    /en attendant une voix humaine/i.test(currentCredit)
+  ) {
+    return CYBERPINGO_VOICE_CREDIT;
+  }
+  return currentCredit;
+}
+

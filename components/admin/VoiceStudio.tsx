@@ -2,13 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
-import { IconMic, IconPlay, IconStop, IconTrash, IconUpload } from "@/components/ui/Icon";
+import { IconBolt, IconMic, IconPlay, IconStop, IconTrash, IconUpload } from "@/components/ui/Icon";
 import { errorMessage } from "@/lib/errors";
+import {
+  CYBERPINGO_VOICE_CREDIT,
+  resolveCyberPingoAudioUrl,
+} from "@/lib/mascot/elevenlabs";
 import { MAX_VOICE_BYTES, MAX_VOICE_SECONDS, formatVoiceTime, normalizeVoiceType, pickRecorderMime } from "@/lib/mascot/voice";
 import { uploadMascotVoice } from "@/services/admin.service";
+import type { MascotExpression } from "@/types/api";
 import { Notice } from "./AdminState";
 
-type Phase = "idle" | "requesting" | "recording" | "uploading";
+type Phase = "idle" | "requesting" | "recording" | "uploading" | "generating";
 
 interface Take {
   blob: Blob;
@@ -21,6 +26,10 @@ interface VoiceStudioProps {
   lineKey: string;
   value: string;
   onChange: (url: string) => void;
+  text?: string;
+  expression?: MascotExpression;
+  lineId?: string;
+  onCreditChange?: (credit: string) => void;
 }
 
 function micErrorMessage(cause: unknown): string {
@@ -32,7 +41,15 @@ function micErrorMessage(cause: unknown): string {
 }
 
 /** Records a voice take in the browser or imports a file, stores it in the `mascot-voice` bucket and hands back its public URL. */
-export default function VoiceStudio({ lineKey, value, onChange }: VoiceStudioProps) {
+export default function VoiceStudio({
+  lineKey,
+  value,
+  onChange,
+  text,
+  expression = "encouraging",
+  lineId,
+  onCreditChange,
+}: VoiceStudioProps) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [seconds, setSeconds] = useState(0);
   const [take, setTake] = useState<Take | null>(null);
@@ -155,9 +172,63 @@ export default function VoiceStudio({ lineKey, value, onChange }: VoiceStudioPro
     void store(file, "Fichier importé. Enregistre la réplique pour le conserver.");
   }
 
+  async function generateCyberPingo() {
+    const cleanText = (text ?? "").trim();
+    if (!cleanText) {
+      setMessage({ kind: "error", text: "Saisis d’abord le texte de la réplique pour générer la voix CyberPingo." });
+      return;
+    }
+    setPhase("generating");
+    setMessage(null);
+    dropTake();
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: cleanText, expression, lineId }),
+      });
+      if (res.ok) {
+        const blob = await res.blob();
+        if (blob.size > 500) {
+          try {
+            const uploadedUrl = await uploadMascotVoice(lineKey, new File([blob], `${lineKey}.mp3`, { type: "audio/mpeg" }));
+            onChange(uploadedUrl);
+            onCreditChange?.(CYBERPINGO_VOICE_CREDIT);
+            setMessage({
+              kind: "success",
+              text: "Voix CyberPingo (ElevenLabs v3 + balisages expressifs auto) générée et prête !",
+            });
+            setPhase("idle");
+            return;
+          } catch {
+            // Si le bucket Storage n'est pas accessible ou si c'est une réplique officielle, on utilise le fichier intégré ou l'aperçu
+          }
+        }
+      }
+      const builtinUrl = resolveCyberPingoAudioUrl(lineId ?? lineKey, null, cleanText);
+      if (builtinUrl) {
+        onChange(builtinUrl);
+        onCreditChange?.(CYBERPINGO_VOICE_CREDIT);
+        setMessage({
+          kind: "success",
+          text: `Audio officiel CyberPingo (${builtinUrl}) associé avec balisages expressifs.`,
+        });
+      } else {
+        setMessage({
+          kind: "error",
+          text: "Impossible de générer l’audio via ElevenLabs pour cette nouvelle réplique (vérifie ELEVENLABS_API_KEY).",
+        });
+      }
+    } catch (cause) {
+      setMessage({ kind: "error", text: errorMessage(cause, "La génération ElevenLabs CyberPingo a échoué.") });
+    } finally {
+      setPhase("idle");
+    }
+  }
+
   return (
-    <fieldset className="voice-studio" disabled={phase === "uploading"}>
-      <legend className="voice-studio__legend">Voix humaine</legend>
+    <fieldset className="voice-studio" disabled={phase === "uploading" || phase === "generating"}>
+      <legend className="voice-studio__legend">Voix CyberPingo (ElevenLabs v3) ou prise micro</legend>
 
       {phase === "recording" ? (
         <div className="voice-studio__live" role="status" aria-live="polite">
@@ -168,6 +239,17 @@ export default function VoiceStudio({ lineKey, value, onChange }: VoiceStudioPro
         </div>
       ) : (
         <div className="voice-studio__actions">
+          <Button
+            type="button"
+            size="sm"
+            variant="primary"
+            icon={<IconBolt size={16} />}
+            loading={phase === "generating"}
+            disabled={busy}
+            onClick={() => void generateCyberPingo()}
+          >
+            Voix CyberPingo (ElevenLabs)
+          </Button>
           <Button
             type="button" size="sm" variant="secondary" icon={<IconMic size={16} />}
             loading={phase === "requesting"} disabled={!recordingSupported || busy} onClick={() => void start()}

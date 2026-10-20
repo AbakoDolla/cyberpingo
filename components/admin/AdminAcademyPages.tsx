@@ -6,17 +6,23 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import SlugIcon from "@/components/ui/SlugIcon";
-import { IconCheck, IconPlus, IconSend, IconStar, IconTarget, IconTrash } from "@/components/ui/Icon";
+import { IconBolt, IconCheck, IconPlay, IconPlus, IconSend, IconStar, IconStop, IconTarget, IconTrash, IconVolume } from "@/components/ui/Icon";
 import { useAsync } from "@/hooks/useAsync";
 import { errorMessage } from "@/lib/errors";
 import { formatDateTime, formatNumber } from "@/lib/format";
 import { linkKindLabel } from "@/lib/academy-view";
+import {
+  CYBERPINGO_MODEL_ID,
+  CYBERPINGO_VOICE_CREDIT,
+  CYBERPINGO_VOICE_ID,
+  autoTagForElevenLabs,
+} from "@/lib/mascot/elevenlabs";
 import { MASCOT_EVENTS, MASCOT_EVENT_LABELS, MASCOT_EXPRESSIONS, MASCOT_EXPRESSION_LABELS } from "@/lib/mascot/events";
 import { voiceCoverage } from "@/lib/mascot/voice";
 import {
   adminReviewSubmission, createDomain, createMascotLine, createSkill, createSkillLink, deleteDomain, deleteMascotLine, deleteSkill,
-  deleteSkillLink, listDomains, listLabSubmissions, listMascotLines, listSkillLinkTargets, listSkillLinks, listSkills, updateDomain,
-  updateMascotLine, updateSkill,
+  deleteSkillLink, listDomains, listLabSubmissions, listMascotLines, listSkillLinkTargets, listSkillLinks, listSkills,
+  syncCyberPingoMascotVoices, updateDomain, updateMascotLine, updateSkill,
   type AdminSubmission, type DomainInput, type DomainRow, type MascotLineInput, type MascotLineRow, type SkillInput, type SkillLinkKind,
   type SkillLinkRow, type SkillLinkTargets, type SkillRow, type SubmissionStatus,
 } from "@/services/admin.service";
@@ -546,6 +552,55 @@ export function AdminMascottePage() {
   const [search, setSearch] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
   const [sort, setSort] = useState<CatalogSort>("position");
+  const [syncing, setSyncing] = useState(false);
+  const [syncNotice, setSyncNotice] = useState<Flash>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
+
+  function togglePlayLine(line: MascotLineRow) {
+    if (!line.audio_url) return;
+    if (playingId === line.id && previewAudio) {
+      previewAudio.pause();
+      setPlayingId(null);
+      setPreviewAudio(null);
+      return;
+    }
+    if (previewAudio) {
+      previewAudio.pause();
+    }
+    const audio = new Audio(line.audio_url);
+    audio.onended = () => {
+      setPlayingId(null);
+      setPreviewAudio(null);
+    };
+    audio.onerror = () => {
+      setPlayingId(null);
+      setPreviewAudio(null);
+    };
+    setPlayingId(line.id);
+    setPreviewAudio(audio);
+    void audio.play();
+  }
+
+  async function handleSyncCyberPingo() {
+    setSyncing(true);
+    setSyncNotice(null);
+    try {
+      const synced = await syncCyberPingoMascotVoices();
+      catalog.setData(synced);
+      setSyncNotice({
+        kind: "success",
+        text: `Voix CyberPingo (ElevenLabs ${CYBERPINGO_MODEL_ID} · ${CYBERPINGO_VOICE_ID}) synchronisée sur ${synced.length} répliques avec balisages expressifs automatiques.`,
+      });
+    } catch (cause) {
+      setSyncNotice({
+        kind: "error",
+        text: errorMessage(cause, "Impossible de synchroniser les voix CyberPingo."),
+      });
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   const rows = useMemo(
     () => sortCatalogRows(
@@ -579,17 +634,56 @@ export function AdminMascottePage() {
   return (
     <div>
       <AdminPageHeader
-        title="Mascotte et voix"
-        description="Les répliques que Pingo prononce selon les événements de la formation. Aucune phrase n’est écrite en dur dans l’application : tout vient d’ici."
-        action={<Button size="sm" icon={<IconPlus size={16} />} onClick={() => catalog.open(null)}>Nouvelle réplique</Button>}
+        title="Mascotte et voix CyberPingo"
+        description="Les répliques que Pingo prononce par défaut sur toute la plateforme avec la voix ElevenLabs « cyberpingo » et les balisages expressifs humains."
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              icon={<IconBolt size={16} />}
+              loading={syncing}
+              onClick={() => void handleSyncCyberPingo()}
+            >
+              Synchroniser voix CyberPingo
+            </Button>
+            <Button size="sm" icon={<IconPlus size={16} />} onClick={() => catalog.open(null)}>
+              Nouvelle réplique
+            </Button>
+          </div>
+        }
       />
-      <p className="mascot-admin-note">
-        La voix passe par des enregistrements crédités. Enregistre une prise depuis ton micro ou importe un fichier, puis crédite la personne qui parle ; une voix de synthèse peut servir de remplaçante, à condition d’être indiquée comme telle dans le crédit. Sans audio, la réplique s’affiche en sous-titre uniquement.
-      </p>
+
+      <section className="adm-panel mb-5" aria-label="Configuration vocale ElevenLabs CyberPingo">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge tone="green">Voix CyberPingo active par défaut</Badge>
+              <Badge tone="blue">ElevenLabs {CYBERPINGO_MODEL_ID}</Badge>
+              <Badge tone="purple">Balisages humains auto</Badge>
+              <span className="text-xs font-mono text-slate-400">ID: {CYBERPINGO_VOICE_ID}</span>
+            </div>
+            <p className="text-sm text-slate-200 font-medium">
+              Toutes les répliques de Pingo et du Coach IA utilisent la voix personnalisée <strong>cyberpingo</strong> avec intonations naturelles automatiques (<code>[warmly]</code>, <code>[enthusiastic]</code>, <code>[proud]</code>, <code>[thoughtful]</code>, <code>[gentle]</code>).
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 min-w-[260px]">
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption -- presentation preview for admin */}
+            <audio controls preload="none" src="/audio/pingo-intro.mp3" className="h-9 w-full sm:w-64" />
+          </div>
+        </div>
+      </section>
+
+      {syncNotice && (
+        <div className="mb-4">
+          <Notice kind={syncNotice.kind}>{syncNotice.text}</Notice>
+        </div>
+      )}
+
       {catalog.data && coverage.total > 0 && (
         <section className="voice-coverage" aria-label="Couverture vocale">
           <div className="voice-coverage__head">
-            <strong>{coverage.voiced} sur {coverage.total} répliques actives ont une voix</strong>
+            <strong>{coverage.voiced} sur {coverage.total} répliques actives ont une voix CyberPingo</strong>
             <span>{coverage.percent} %</span>
           </div>
           <div className="voice-coverage__track" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={coverage.percent} aria-label="Répliques avec voix">
@@ -598,10 +692,7 @@ export function AdminMascottePage() {
           <p>
             {coverage.missing > 0
               ? `${plural(coverage.missing, "réplique reste", "répliques restent")} sans voix. `
-              : "Toutes les répliques actives sont prononcées. "}
-            {coverage.synthetic > 0
-              ? `${plural(coverage.synthetic, "voix est", "voix sont")} de synthèse : à remplacer par un enregistrement humain.`
-              : coverage.missing === 0 ? "Toutes les voix sont humaines." : ""}
+              : "Toutes les répliques actives sont prononcées par défaut avec la voix officielle CyberPingo (ElevenLabs v3 + balisages expressifs automatiques)."}
           </p>
         </section>
       )}
@@ -619,7 +710,7 @@ export function AdminMascottePage() {
           filterLabel="Événement" filter={eventFilter} onFilter={setEventFilter}
           filterOptions={[{ value: "all", label: "Tous les événements" }, ...EVENT_OPTIONS]}
           sort={sort} onSort={setSort} sortOptions={MASCOT_SORT_OPTIONS}
-          summary={`${plural(rows.length, "réplique affichée", "répliques affichées")} sur ${formatNumber(total)} · ${plural(voiced, "avec voix", "avec voix")}`}
+          summary={`${plural(rows.length, "réplique affichée", "répliques affichées")} sur ${formatNumber(total)} · ${plural(voiced, "avec voix CyberPingo", "avec voix CyberPingo")}`}
         />
         <CatalogBody
           catalog={catalog}
@@ -627,22 +718,45 @@ export function AdminMascottePage() {
           loadingLabel="Chargement des répliques…"
           emptyAll="Aucune réplique pour le moment. Pingo reste muet tant que tu n’en ajoutes pas."
           emptyFiltered="Aucune réplique ne correspond à ces filtres."
-          renderRow={(line) => (
-            <CatalogRow
-              key={line.id}
-              active={catalog.editing?.id === line.id}
-              onSelect={() => catalog.open(line)}
-              icon={<IconStar size={18} />}
-              title={line.text_fr}
-              meta={`${MASCOT_EVENT_LABELS[line.event]} · ${MASCOT_EXPRESSION_LABELS[line.expression]} · priorité ${line.priority}`}
-              aside={
-                <>
-                  {!line.is_active && <Badge tone="amber">Inactive</Badge>}
-                  <Badge tone={line.audio_url ? "green" : "neutral"}>{line.audio_url ? "Voix" : "Texte seul"}</Badge>
-                </>
-              }
-            />
-          )}
+          renderRow={(line) => {
+            const isCyberPingo = Boolean(
+              line.audio_url &&
+              (line.audio_url.startsWith("/audio/mascot/") || /cyberpingo/i.test(line.voice_credit ?? ""))
+            );
+            const isPlaying = playingId === line.id;
+            return (
+              <CatalogRow
+                key={line.id}
+                active={catalog.editing?.id === line.id}
+                onSelect={() => catalog.open(line)}
+                icon={<IconVolume size={18} />}
+                title={line.text_fr}
+                meta={`${MASCOT_EVENT_LABELS[line.event]} · ${MASCOT_EXPRESSION_LABELS[line.expression]} · priorité ${line.priority} · ${line.voice_credit ?? CYBERPINGO_VOICE_CREDIT}`}
+                aside={
+                  <div className="flex items-center gap-2">
+                    {line.audio_url && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePlayLine(line);
+                        }}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/25 transition-colors"
+                        title={isPlaying ? "Arrêter l’écoute" : "Écouter la voix CyberPingo"}
+                      >
+                        {isPlaying ? <IconStop size={13} /> : <IconPlay size={13} />}
+                        <span>{isPlaying ? "Stop" : "Écouter"}</span>
+                      </button>
+                    )}
+                    {!line.is_active && <Badge tone="amber">Inactive</Badge>}
+                    <Badge tone={line.audio_url ? "green" : "neutral"}>
+                      {isCyberPingo ? "Voix CyberPingo" : line.audio_url ? "Voix" : "Texte seul"}
+                    </Badge>
+                  </div>
+                }
+              />
+            );
+          }}
         />
       </CatalogLayout>
     </div>
@@ -660,11 +774,15 @@ function MascotLineEditor({ line, defaultEvent, nextPosition: suggested, flash, 
   const [text, setText] = useState(line?.text_fr ?? "");
   const [priority, setPriority] = useState(String(line?.priority ?? 5));
   const [audioUrl, setAudioUrl] = useState(line?.audio_url ?? "");
-  const [credit, setCredit] = useState(line?.voice_credit ?? "");
+  const [credit, setCredit] = useState(line?.voice_credit ?? CYBERPINGO_VOICE_CREDIT);
   const [isActive, setIsActive] = useState(line?.is_active ?? true);
   const [position, setPosition] = useState(String(line?.position ?? suggested));
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const taggedPreview = useMemo(
+    () => autoTagForElevenLabs(text, expression, line?.id),
+    [text, expression, line?.id]
+  );
 
   function validate(): string | null {
     const sentence = text.trim();
@@ -730,11 +848,27 @@ function MascotLineEditor({ line, defaultEvent, nextPosition: suggested, flash, 
         <Field label={`Réplique (${text.length}/280)`}>
           <Textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={280} />
         </Field>
+        {taggedPreview && (
+          <div className="rounded-lg border border-cyan-500/25 bg-cyan-950/20 p-3 text-xs space-y-1">
+            <span className="block font-bold text-cyan-300 uppercase tracking-wider">
+              Balisage expressif automatique (ElevenLabs {CYBERPINGO_MODEL_ID})
+            </span>
+            <p className="font-mono text-slate-300 break-words">{taggedPreview}</p>
+          </div>
+        )}
         <div className="grid gap-4 sm:grid-cols-2">
           <Input id={`${id}-priority`} label="Priorité (1 à 10)" type="number" inputMode="numeric" min={1} max={10} value={priority} onChange={(e) => setPriority(e.target.value)} />
           <Input id={`${id}-position`} label="Position" type="number" inputMode="numeric" value={position} onChange={(e) => setPosition(e.target.value)} />
         </div>
-        <VoiceStudio lineKey={line?.id ?? `nouvelle-${event}`} value={audioUrl.trim()} onChange={setAudioUrl} />
+        <VoiceStudio
+          lineKey={line?.id ?? `nouvelle-${event}`}
+          value={audioUrl.trim()}
+          onChange={setAudioUrl}
+          text={text}
+          expression={expression}
+          lineId={line?.id}
+          onCreditChange={setCredit}
+        />
         <Input id={`${id}-credit`} label="Crédit de la voix" value={credit} onChange={(e) => setCredit(e.target.value)} placeholder="Nom de la personne qui a enregistré" maxLength={120} />
         <details className="voice-studio__advanced">
           <summary>Utiliser un lien audio existant</summary>

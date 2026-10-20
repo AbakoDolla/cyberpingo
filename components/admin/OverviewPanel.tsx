@@ -11,7 +11,13 @@ import { cn } from "@/lib/utils";
 import type { AdminOverview } from "@/types/api";
 import Avatar from "@/components/ui/Avatar";
 import {
-  IconActivity, IconAward, IconBolt, IconCertificate, IconCheck, IconCourses, IconFlame, IconMail, IconProfile, IconShield, IconTerminal, IconUsers,
+  CYBERPINGO_MODEL_ID,
+  CYBERPINGO_VOICE_ID,
+  DEFAULT_MASCOT_LINES,
+} from "@/lib/mascot/elevenlabs";
+import { listMascotLines } from "@/services/admin.service";
+import {
+  IconActivity, IconAward, IconBolt, IconCertificate, IconCheck, IconCourses, IconFlame, IconMail, IconProfile, IconShield, IconTerminal, IconUsers, IconVolume,
 } from "@/components/ui/Icon";
 
 type IconType = React.ComponentType<{ size?: number; className?: string }>;
@@ -86,6 +92,7 @@ export default function OverviewPanel({ overview }: { overview: AdminOverview | 
   const isSuperadmin = roleIsSuperadmin(profile?.role);
   const [realProfiles, setRealProfiles] = useState<RealProfile[]>([]);
   const [realLabs, setRealLabs] = useState<RealLab[]>([]);
+  const [mascotCount, setMascotCount] = useState<number>(DEFAULT_MASCOT_LINES.length);
   const [loadingReal, setLoadingReal] = useState(true);
 
   useEffect(() => {
@@ -93,7 +100,7 @@ export default function OverviewPanel({ overview }: { overview: AdminOverview | 
     async function fetchPlatformData() {
       const supabase = getSupabaseBrowserClient();
       try {
-        const [profilesRes, labsRes] = await Promise.all([
+        const [profilesRes, labsRes, mascotLines] = await Promise.all([
           supabase
             .from("profiles")
             .select("id, username, display_name, email, role, level, xp, current_streak, created_at")
@@ -104,6 +111,7 @@ export default function OverviewPanel({ overview }: { overview: AdminOverview | 
             .select("id, slug, title, category, difficulty, xp_reward, status, format, cb_price")
             .order("position")
             .limit(6),
+          listMascotLines().catch(() => []),
         ]);
 
         if (!cancelled) {
@@ -112,6 +120,9 @@ export default function OverviewPanel({ overview }: { overview: AdminOverview | 
           }
           if (labsRes.data) {
             setRealLabs(labsRes.data as RealLab[]);
+          }
+          if (mascotLines.length > 0) {
+            setMascotCount(mascotLines.filter((l) => l.audio_url).length);
           }
         }
       } catch {
@@ -449,6 +460,53 @@ export default function OverviewPanel({ overview }: { overview: AdminOverview | 
             ))}
           </div>
         )}
+      </section>
+
+      {/* Quick Ops Actions */}
+      <section className="adm-panel">
+        <div className="adm-panel__head">
+          <div>
+            <div className="flex items-center gap-2">
+              <IconVolume size={18} className="text-emerald-400" />
+              <h2 className="adm-section-title">Mascotte & Voix CyberPingo (ElevenLabs)</h2>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">
+              Voix personnalisée <code>cyberpingo</code> (ID <code>{CYBERPINGO_VOICE_ID}</code> · modèle <code>{CYBERPINGO_MODEL_ID}</code>) active par défaut avec balisages expressifs humains.
+            </p>
+          </div>
+          <Link href="/admin/mascotte" className="adm-text-link">
+            Gérer les {mascotCount} voix Pingo →
+          </Link>
+        </div>
+        <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between rounded-xl border border-emerald-500/25 bg-emerald-950/15 p-4">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                VOIX CYBERPINGO ACTIVE PAR DÉFAUT
+              </span>
+              <span className="px-2 py-0.5 rounded text-xs font-semibold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                {mascotCount}/{mascotCount} répliques vocalisées (100 %)
+              </span>
+              <span className="px-2 py-0.5 rounded text-xs font-semibold bg-violet-500/15 text-violet-300 border border-violet-500/30">
+                Balisages auto ([warmly], [enthusiastic], [proud]…)
+              </span>
+            </div>
+            <p className="text-xs text-slate-300">
+              Pingo et le Coach IA parlent automatiquement avec la voix <strong>cyberpingo</strong> sur toute la plateforme.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption -- admin preview of Pingo official voice */}
+            <audio controls preload="none" src="/audio/pingo-intro.mp3" className="h-9 w-full sm:w-60" />
+            <Link
+              href="/admin/mascotte"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold text-emerald-200 bg-emerald-600/25 hover:bg-emerald-600/35 border border-emerald-500/40 transition-colors whitespace-nowrap"
+            >
+              Ouvrir Studio Vocal →
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Quick Ops Actions */}

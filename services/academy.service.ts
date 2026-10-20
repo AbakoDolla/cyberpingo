@@ -4,6 +4,7 @@ import {
   CYBERPINGO_VOICE_CREDIT,
   DEFAULT_MASCOT_LINES,
   resolveCyberPingoAudioUrl,
+  resolveCyberPingoVoiceCredit,
 } from "@/lib/mascot/elevenlabs";
 import type { Academy, MascotEvent, MascotExpression, MascotLine } from "@/types/api";
 
@@ -25,13 +26,13 @@ export async function listMascotLines(): Promise<MascotLine[]> {
       return [...DEFAULT_MASCOT_LINES];
     }
     return rows.map((row) => {
-      const resolvedAudio = resolveCyberPingoAudioUrl(row.id, row.audio_url);
+      const resolvedAudio = resolveCyberPingoAudioUrl(row.id, row.audio_url, row.text_fr);
       return {
         ...row,
         event: row.event as MascotEvent,
         expression: row.expression as MascotExpression,
         audio_url: resolvedAudio,
-        voice_credit: resolvedAudio ? (row.voice_credit ?? CYBERPINGO_VOICE_CREDIT) : row.voice_credit,
+        voice_credit: resolveCyberPingoVoiceCredit(resolvedAudio, row.voice_credit) ?? CYBERPINGO_VOICE_CREDIT,
       };
     });
   } catch {

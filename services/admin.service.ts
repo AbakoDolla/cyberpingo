@@ -1,6 +1,12 @@
 import { FunctionsHttpError, type RealtimeChannel } from "@supabase/supabase-js";
 import { AppError, toAppError, unwrap } from "@/lib/errors";
 import { parseLessonBlocks } from "@/lib/lesson-content";
+import {
+  CYBERPINGO_VOICE_CREDIT,
+  DEFAULT_MASCOT_LINES,
+  resolveCyberPingoAudioUrl,
+  resolveCyberPingoVoiceCredit,
+} from "@/lib/mascot/elevenlabs";
 import { MAX_VOICE_BYTES, VOICE_EXTENSIONS, normalizeVoiceType } from "@/lib/mascot/voice";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Role } from "@/lib/roles";
@@ -539,17 +545,127 @@ export async function adminReviewSubmission(id: string, status: Exclude<Submissi
   unwrap(await supabase().rpc("admin_review_submission", { p_id: id, p_status: status, p_feedback: feedback }), "Le rendu n’a pas pu être évalué.");
 }
 
+function defaultMascotLineRows(): MascotLineRow[] {
+  const now = new Date().toISOString();
+  return DEFAULT_MASCOT_LINES.map((line, index) => ({
+    id: line.id,
+    event: line.event,
+    expression: line.expression,
+    text_fr: line.text_fr,
+    audio_url: line.audio_url ?? `/audio/mascot/${line.id}.mp3`,
+    voice_credit: line.voice_credit ?? CYBERPINGO_VOICE_CREDIT,
+    priority: line.priority,
+    is_active: true,
+    position: index + 1,
+    created_at: now,
+    updated_at: now,
+  }));
+}
+
+function normalizeMascotLineRow(row: MascotLineRow): MascotLineRow {
+  const audio_url = resolveCyberPingoAudioUrl(row.id, row.audio_url, row.text_fr);
+  const voice_credit = resolveCyberPingoVoiceCredit(audio_url, row.voice_credit);
+  return {
+    ...row,
+    audio_url,
+    voice_credit,
+  };
+}
+
 export async function listMascotLines(): Promise<MascotLineRow[]> {
-  const rows = unwrap(await supabase().from("mascot_lines").select("*").order("event").order("priority", { ascending: false }).order("position"), "Impossible de charger les répliques de Pingo.") ?? [];
-  return rows as MascotLineRow[];
+  try {
+    const rawRows = (unwrap(
+      await supabase()
+        .from("mascot_lines")
+        .select("*")
+        .order("event")
+        .order("priority", { ascending: false })
+        .order("position"),
+      "Impossible de charger les répliques de Pingo.",
+    ) ?? []) as MascotLineRow[];
+
+    if (rawRows.length === 0) {
+      const fallback = defaultMascotLineRows();
+      void supabase()
+        .from("mascot_lines")
+        .upsert(
+          fallback.map(({ created_at: _c, updated_at: _u, ...insertRow }) => insertRow),
+          { onConflict: "id" }
+        );
+      return fallback;
+    }
+
+    const normalizedRows = rawRows.map((row) => {
+      const normalized = normalizeMascotLineRow(row);
+      if (row.audio_url !== normalized.audio_url || row.voice_credit !== normalized.voice_credit) {
+        void supabase()
+          .from("mascot_lines")
+          .update({
+            audio_url: normalized.audio_url,
+            voice_credit: normalized.voice_credit,
+          })
+          .eq("id", row.id);
+      }
+      return normalized;
+    });
+
+    // Garantir que les 30 répliques officielles CyberPingo sont toutes présentes
+    const existingIds = new Set(normalizedRows.map((r) => r.id));
+    const existingTexts = new Set(normalizedRows.map((r) => r.text_fr.trim().toLowerCase()));
+    const missingDefaults = defaultMascotLineRows().filter(
+      (def) => !existingIds.has(def.id) && !existingTexts.has(def.text_fr.trim().toLowerCase())
+    );
+
+    if (missingDefaults.length > 0) {
+      void supabase()
+        .from("mascot_lines")
+        .upsert(
+          missingDefaults.map(({ created_at: _c, updated_at: _u, ...insertRow }) => insertRow),
+          { onConflict: "id" }
+        );
+    }
+
+    return [...normalizedRows, ...missingDefaults];
+  } catch {
+    return defaultMascotLineRows();
+  }
+}
+
+export async function syncCyberPingoMascotVoices(): Promise<MascotLineRow[]> {
+  const defaults = defaultMascotLineRows();
+  try {
+    await supabase()
+      .from("mascot_lines")
+      .upsert(
+        defaults.map(({ created_at: _c, updated_at: _u, ...insertRow }) => insertRow),
+        { onConflict: "id" }
+      );
+  } catch {
+    // Ignore write failure if offline; listMascotLines still normalizes all rows
+  }
+  return listMascotLines();
 }
 
 export async function createMascotLine(input: MascotLineInput): Promise<MascotLineRow> {
-  return unwrap(await supabase().from("mascot_lines").insert(input).select("*").single(), "La réplique n’a pas pu être créée.") as MascotLineRow;
+  const normalizedInput: MascotLineInput = {
+    ...input,
+    voice_credit: resolveCyberPingoVoiceCredit(input.audio_url, input.voice_credit),
+  };
+  return normalizeMascotLineRow(
+    unwrap(await supabase().from("mascot_lines").insert(normalizedInput).select("*").single(), "La réplique n’a pas pu être créée.") as MascotLineRow
+  );
 }
 
 export async function updateMascotLine(lineId: string, input: MascotLineInput): Promise<MascotLineRow> {
-  return unwrap(await supabase().from("mascot_lines").update(input).eq("id", lineId).select("*").single(), "La réplique n’a pas pu être enregistrée.") as MascotLineRow;
+  const audio_url = input.audio_url ?? resolveCyberPingoAudioUrl(lineId, input.audio_url, input.text_fr);
+  const normalizedInput: MascotLineInput = {
+    ...input,
+    audio_url,
+    voice_credit: resolveCyberPingoVoiceCredit(audio_url, input.voice_credit),
+  };
+  return normalizeMascotLineRow(
+    unwrap(await supabase().from("mascot_lines").update(normalizedInput).eq("id", lineId).select("*").single(), "La réplique n’a pas pu être enregistrée.") as MascotLineRow
+  );
 }
 
 export async function deleteMascotLine(lineId: string): Promise<void> {

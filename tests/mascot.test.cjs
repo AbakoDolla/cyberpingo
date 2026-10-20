@@ -8,7 +8,15 @@ const { EVENT_PRIORITY, MASCOT_EVENTS, MASCOT_EXPRESSIONS, EXPRESSION_STATE, mas
 const { COOLDOWN_MS, IDLE_STATE, decide, pickLine, displayDuration } = load("lib/mascot/scheduler");
 const { DEFAULT_PREFS, parsePrefs } = load("lib/mascot/prefs");
 const { MAX_VOICE_BYTES, MAX_VOICE_SECONDS, VOICE_EXTENSIONS, formatVoiceTime, normalizeVoiceType, pickRecorderMime, voiceCoverage } = load("lib/mascot/voice");
-const { CYBERPINGO_VOICE_ID, CYBERPINGO_MODEL_ID, DEFAULT_MASCOT_LINES, autoTagForElevenLabs, resolveCyberPingoAudioUrl } = load("lib/mascot/elevenlabs");
+const {
+  CYBERPINGO_VOICE_CREDIT,
+  CYBERPINGO_VOICE_ID,
+  CYBERPINGO_MODEL_ID,
+  DEFAULT_MASCOT_LINES,
+  autoTagForElevenLabs,
+  resolveCyberPingoAudioUrl,
+  resolveCyberPingoVoiceCredit,
+} = load("lib/mascot/elevenlabs");
 
 const line = (id, event, priority = 5) => ({ id, event, expression: "happy", text_fr: "x", audio_url: null, voice_credit: null, priority });
 const rewards = (extra = {}) => ({ xp_gained: 10, leveled_up: false, new_badges: [], completed_challenges: [], course_completed: null, new_rank: null, new_skills: [], ...extra });
@@ -129,4 +137,29 @@ test("voice coverage counts only active lines and splits human from synthetic vo
     { audio_url: null, is_active: false },
   ]);
   assert.deepEqual(result, { total: 3, voiced: 2, synthetic: 1, human: 1, percent: 67, missing: 1 });
+});
+
+test("admin and learner mascot lines always resolve CyberPingo audio URL and credit", () => {
+  assert.equal(CYBERPINGO_VOICE_ID, "IUovyCa9veb0Bu5IUFy9");
+  assert.equal(CYBERPINGO_MODEL_ID, "eleven_v3");
+  assert.equal(DEFAULT_MASCOT_LINES.length, 30);
+
+  // Resolves by UUID even when DB audio_url is null
+  assert.equal(
+    resolveCyberPingoAudioUrl("da285d27-f5dc-9470-288b-5239d3b4d73b", null),
+    "/audio/mascot/da285d27-f5dc-9470-288b-5239d3b4d73b.mp3"
+  );
+
+  // Resolves by text_fr even if the DB row has a different UUID
+  assert.equal(
+    resolveCyberPingoAudioUrl("00000000-0000-0000-0000-000000000000", null, "Exact ! Continue sur cette lancée."),
+    "/audio/mascot/ff1f8c62-0c3e-8b51-17fb-1aa2e1e0e778.mp3"
+  );
+
+  // Credits CyberPingo voice explicitly
+  assert.equal(
+    resolveCyberPingoVoiceCredit("/audio/mascot/da285d27-f5dc-9470-288b-5239d3b4d73b.mp3", null),
+    CYBERPINGO_VOICE_CREDIT
+  );
+  assert.match(autoTagForElevenLabs("Exact ! Continue sur cette lancée.", "happy"), /^\[/);
 });
