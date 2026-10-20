@@ -4,23 +4,34 @@ import SceneBanner from "@/components/art/SceneBanner";
 import Catalog from "@/components/public/Catalog";
 import ReloadButton from "@/components/public/ReloadButton";
 import { errorMessage } from "@/lib/errors";
+import { buildBreadcrumbJsonLd, buildCourseListJsonLd, buildPageMetadata } from "@/lib/seo";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { listPublishedCourses } from "@/services/courses.service";
 
 export const revalidate = 300;
-export const metadata: Metadata = {
-  title: "Parcours CyberPingo",
-  description: "Explore les programmes de cybersécurité publiés par CyberPingo, leur niveau, leur durée et leur programme détaillé.",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "Parcours de formation en cybersécurité",
+  description: "Explore les programmes de cybersécurité publiés par CyberPingo (Fondamentaux, Réseaux, Linux, Sécurité Web, Analyse de logs SOC, Pentest éthique), leur niveau, leur durée et leur programme détaillé.",
+  path: "/parcours",
+  image: "/images/features/parcours.webp",
+  keywords: ["parcours cybersécurité", "programme formation cybersécurité", "cours linux sécurité", "cours pentest", "cours analyse logs"],
+});
 
 export default async function CatalogPage() {
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", path: "/" },
+    { name: "Parcours", path: "/parcours" },
+  ]);
   const client = createSupabasePublicClient();
-  if (!client) return <div className="public-container inner-page"><section className="public-state public-state--warning"><h1>Catalogue indisponible.</h1><p>Le catalogue est momentanément indisponible. Réessaie dans quelques instants. Les parcours publiés ne peuvent pas être lus.</p></section></div>;
+  if (!client) return <div className="public-container inner-page"><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} /><section className="public-state public-state--warning"><h1>Catalogue indisponible.</h1><p>Le catalogue est momentanément indisponible. Réessaie dans quelques instants. Les parcours publiés ne peuvent pas être lus.</p></section></div>;
   try {
     const courses = await listPublishedCourses(client);
+    const coursesJsonLd = buildCourseListJsonLd(courses);
     const lessonCount = courses.reduce((sum, course) => sum + course.lesson_count, 0);
     const quizCount = courses.reduce((sum, course) => sum + course.quiz_count, 0);
     return <div className="public-container inner-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {courses.length > 0 && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(coursesJsonLd) }} />}
       <SceneBanner variant="library" anchor="end" className="page-heading page-heading--split">
         <div>
           <h1>Ton prochain réflexe<br /><span>commence ici.</span></h1>

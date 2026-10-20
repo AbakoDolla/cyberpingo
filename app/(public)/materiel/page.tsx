@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { CATEGORY_LABELS, COURSE_LABELS, equipment, photoCredit, type Equipment, type EquipmentCategory } from "@/data/equipment";
+import { buildBreadcrumbJsonLd, buildPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Le matériel en photos",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Le matériel informatique et réseau en photos réelles",
   description: "Switch, routeur, pare-feu, serveur, NAS, portable, smartphone, clé de sécurité : chaque équipement d’une entreprise ou d’un foyer en photo réelle, avec son risque et le bon réflexe.",
-};
+  path: "/materiel",
+  image: "/images/equipment/hero.webp",
+  keywords: ["matériel réseau", "switch routeur pare-feu", "clé de sécurité FIDO2", "NAS sauvegarde", "sécurité matérielle"],
+});
 
 const SECTIONS: Array<{ id: EquipmentCategory; intro: string }> = [
   { id: "entreprise", intro: "Réseau, serveurs, postes et sécurité physique : ce que tu croises dans une PME, une association ou une école." },
@@ -47,8 +51,13 @@ function DeviceCard({ device, priority }: { device: Equipment; priority: boolean
 
 export default function EquipmentPage() {
   const counts = Object.fromEntries(SECTIONS.map((section) => [section.id, equipment.filter((device) => device.category === section.id).length])) as Record<EquipmentCategory, number>;
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", path: "/" },
+    { name: "Matériel", path: "/materiel" },
+  ]);
   let first = true;
   return <div className="public-container inner-page">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
     <header className="page-hero equip-hero">
       <Image className="page-hero__image" src="/images/equipment/hero.webp" alt="Une mosaïque de photos : commutateur, routeur, serveur, portable, smartphone et clé de sécurité." fill priority sizes="(max-width: 1100px) 100vw, 1392px" />
       <div className="page-hero__shade" aria-hidden="true" />

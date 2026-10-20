@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,6 +7,7 @@ import { publicFaq } from "@/data/landing";
 import ContactForm from "@/components/public/ContactForm";
 import PingoIntroPlayer from "@/components/public/PingoIntroPlayer";
 import { IconChevronDown } from "@/components/ui/Icon";
+import { buildBreadcrumbJsonLd, buildFaqJsonLd, buildPageMetadata } from "@/lib/seo";
 
 const specialTitles: Record<string, string> = { faq: "Les réponses avant de commencer.", contact: "Un retour peut tout améliorer." };
 const specialDescriptions: Record<string, string> = {
@@ -14,9 +16,19 @@ const specialDescriptions: Record<string, string> = {
 };
 export const dynamicParams = false;
 export function generateStaticParams() { return [...Object.keys(informationPages), "faq", "contact"].map((section) => ({ section })); }
-export async function generateMetadata({ params }: { params: Promise<{ section: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ section: string }> }): Promise<Metadata> {
   const { section } = await params;
-  return { title: informationPages[section]?.title ?? specialTitles[section] ?? "Page introuvable", description: informationPages[section]?.introduction ?? specialDescriptions[section] };
+  const page = informationPages[section];
+  const title = page?.title ?? specialTitles[section];
+  const description = page?.introduction ?? specialDescriptions[section];
+  if (!title || !description) return { title: "Page introuvable", robots: { index: false, follow: false } };
+  return buildPageMetadata({
+    title,
+    description,
+    path: `/${section}`,
+    image: page?.hero?.src,
+    imageAlt: page?.hero?.alt ?? title,
+  });
 }
 
 const faqExtras = [
@@ -38,7 +50,14 @@ export default async function InformationPage({ params }: { params: Promise<{ se
   if (!title) notFound();
   const hero = page?.hero;
   const actions = heroActions[slug];
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", path: "/" },
+    { name: title, path: `/${slug}` },
+  ]);
+  const faqJsonLd = slug === "faq" ? buildFaqJsonLd([...publicFaq, ...faqExtras]) : null;
   return <div className="public-container inner-page">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+    {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
     {hero && page ? <header className="page-hero">
       <Image className="page-hero__image" src={hero.src} alt={hero.alt} fill priority sizes="(max-width: 1100px) 100vw, 1392px" />
       <div className="page-hero__shade" aria-hidden="true" />

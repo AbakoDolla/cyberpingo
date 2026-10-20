@@ -1,5 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import {
+  DEFAULT_OG_IMAGE,
+  SEO_KEYWORDS,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TAGLINE,
+  SITE_URL,
+  buildOrganizationJsonLd,
+} from "@/lib/seo";
 import "./globals.css";
 import "./intro.css";
 import "./learner.css";
@@ -39,28 +48,74 @@ const jetbrainsMono = localFont({
   preload: false, // Non critique pour le LCP — chargé à la demande
 });
 
+export const viewport: Viewport = {
+  themeColor: "#050814",
+  colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export const metadata: Metadata = {
   title: {
-    default: "CyberPingo — Apprends. Pratique. Protège.",
-    template: "%s · CyberPingo",
+    default: SITE_TAGLINE,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "Apprends la cybersécurité pas à pas, comme un jeu. Des leçons courtes, des quiz et des défis pratiques pour développer les bons réflexes avec CyberPingo.",
-  icons: { icon: "/images/cyberpingo-transparent.png" },
-  metadataBase: new URL("https://cyberpingo.vercel.app"),
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: SEO_KEYWORDS,
+  authors: [{ name: "Équipe CyberPingo", url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: "education",
+  icons: {
+    icon: "/images/cyberpingo-transparent.png",
+    apple: "/images/cyberpingo-official.png",
+  },
+  manifest: "/manifest.webmanifest",
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/",
+    languages: {
+      "fr-FR": "/",
+      fr: "/",
+      "x-default": "/",
+    },
+  },
   openGraph: {
     type: "website",
-    siteName: "CyberPingo",
+    siteName: SITE_NAME,
     locale: "fr_FR",
-    title: "CyberPingo, apprends, comprends, réussis",
-    description: "Apprends la cybersécurité pas à pas, avec des leçons courtes, des labs et des badges.",
-    images: [{ url: "/images/og-cyberpingo.jpg", width: 1200, height: 630, alt: "CyberPingo, apprends, comprends, réussis" }],
+    url: "/",
+    title: SITE_TAGLINE,
+    description: SITE_DESCRIPTION,
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: SITE_TAGLINE }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "CyberPingo, apprends, comprends, réussis",
-    description: "Apprends la cybersécurité pas à pas, avec des leçons courtes, des labs et des badges.",
-    images: ["/images/og-cyberpingo.jpg"],
+    title: SITE_TAGLINE,
+    description: SITE_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
   },
 };
 
@@ -69,8 +124,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const orgJsonLd = buildOrganizationJsonLd();
   return (
     <html lang="fr" data-scroll-behavior="smooth" className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+      </head>
       <body className="font-body bg-cyber-black text-white antialiased min-h-screen">
         <Providers>{children}</Providers>
       </body>

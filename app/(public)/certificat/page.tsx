@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import SceneBanner from "@/components/art/SceneBanner";
+import { buildPageMetadata } from "@/lib/seo";
 import CertificateLookupForm from "./CertificateLookupForm";
 
-export const metadata: Metadata = {
-  title: "Vérifier un certificat",
-  description: "Contrôle l’authenticité d’un certificat CyberPingo à partir de son code de vérification.",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "Vérifier un certificat de cybersécurité",
+  description: "Contrôle l’authenticité d’un certificat CyberPingo à partir de son code de vérification officiel de 16 caractères.",
+  path: "/certificat",
+  image: "/images/banners/banner-certificate.webp",
+  keywords: ["certificat cybersécurité", "vérification certificat CyberPingo", "attestation formation cybersécurité"],
+});
 
 export default async function CertificateLookupPage({ searchParams }: { searchParams: Promise<{ code?: string | string[] }> }) {
   const { code } = await searchParams;

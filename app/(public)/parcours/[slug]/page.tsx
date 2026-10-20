@@ -3,7 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Badge from "@/components/ui/Badge";
 import ReloadButton from "@/components/public/ReloadButton";
+import { publicPaths } from "@/data/landing";
 import { errorMessage } from "@/lib/errors";
+import { buildBreadcrumbJsonLd, buildCourseDetailJsonLd, buildPageMetadata } from "@/lib/seo";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { formatDuration, levelLabel, plural } from "@/lib/format";
 import { getCourseBySlug } from "@/services/courses.service";
@@ -13,13 +15,34 @@ export const revalidate = 300;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  const pathMatch = publicPaths.find((item) => item.courseSlug === slug);
+  const coverImage = pathMatch?.image ? `/images/${pathMatch.image}` : "/images/og-cyberpingo.jpg";
   const client = createSupabasePublicClient();
-  if (!client) return { title: "Parcours" };
+  if (!client) {
+    return buildPageMetadata({
+      title: pathMatch?.title ?? "Parcours cybersécurité",
+      description: pathMatch?.description ?? "Programme détaillé du parcours de cybersécurité sur CyberPingo.",
+      path: `/parcours/${slug}`,
+      image: coverImage,
+    });
+  }
   try {
     const course = await getCourseBySlug(slug, client);
-    return { title: course?.title ?? "Parcours introuvable", description: course?.short_description || course?.description };
+    if (!course) return { title: "Parcours introuvable", robots: { index: false, follow: false } };
+    return buildPageMetadata({
+      title: `${course.title} — Formation Cybersécurité (${levelLabel(course.level)})`,
+      description: course.short_description || course.description,
+      path: `/parcours/${course.slug}`,
+      image: coverImage,
+      keywords: [course.title, course.category, ...(pathMatch?.topics ?? [])],
+    });
   } catch {
-    return { title: "Parcours" };
+    return buildPageMetadata({
+      title: pathMatch?.title ?? "Parcours cybersécurité",
+      description: pathMatch?.description ?? "Programme détaillé du parcours de cybersécurité sur CyberPingo.",
+      path: `/parcours/${slug}`,
+      image: coverImage,
+    });
   }
 }
 
@@ -34,11 +57,19 @@ export default async function CourseProgram({ params }: { params: Promise<{ slug
     return <div className="public-container inner-page"><Link className="back-link" href="/parcours">← Tous les parcours</Link><section className="public-state public-state--error"><h1>Parcours indisponible.</h1><p>{errorMessage(error, "Impossible de charger ce parcours pour le moment.")}</p><ReloadButton /></section></div>;
   }
   if (!course) notFound();
+  const courseJsonLd = buildCourseDetailJsonLd(course);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", path: "/" },
+    { name: "Parcours", path: "/parcours" },
+    { name: course.title, path: `/parcours/${course.slug}` },
+  ]);
   const registerHref = `/register?next=/courses/${course.slug}`;
   const loginHref = `/login?next=/courses/${course.slug}`;
   const lessonTotal = course.modules.reduce((sum, module) => sum + module.lessons.length, 0);
   const moduleQuizTotal = course.modules.reduce((sum, module) => sum + module.quizzes.length, 0);
   return <div className="public-container inner-page">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
     <Link className="back-link" href="/parcours">← Tous les parcours</Link>
     <header className="page-heading page-heading--course">
       <div>

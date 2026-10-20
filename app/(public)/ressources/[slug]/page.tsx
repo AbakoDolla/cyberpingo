@@ -1,19 +1,39 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { articleCover, articles } from "@/data/public-content";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildPageMetadata } from "@/lib/seo";
+
 export const dynamicParams = false;
 export function generateStaticParams() { return articles.map((article) => ({ slug: article.slug })); }
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const article = articles.find((item) => item.slug === slug);
-  return { title: article?.title ?? "Guide introuvable", description: article?.description };
+  if (!article) return { title: "Guide introuvable", robots: { index: false, follow: false } };
+  return buildPageMetadata({
+    title: article.title,
+    description: article.description,
+    path: `/ressources/${article.slug}`,
+    image: articleCover(article.slug).src,
+    type: "article",
+    keywords: [article.title, article.category, "guide cybersécurité", article.source.label],
+  });
 }
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = articles.find((item) => item.slug === slug);
   if (!article) notFound();
+  const cover = articleCover(article.slug);
+  const articleJsonLd = buildArticleJsonLd(article, cover.src);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", path: "/" },
+    { name: "Guides et ressources", path: "/ressources" },
+    { name: article.title, path: `/ressources/${article.slug}` },
+  ]);
   return <div className="public-container inner-page">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
     <Link href="/ressources" className="back-link">← Tous les guides</Link>
     <header className="page-heading page-heading--article page-heading--cover">
       <div className="article-head__copy"><h1>{article.title}</h1><p>{article.description}</p><div className="page-facts"><span>{article.category}</span><span>{article.minutes} min de lecture</span></div></div>

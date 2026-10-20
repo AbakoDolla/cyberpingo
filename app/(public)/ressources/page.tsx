@@ -1,13 +1,28 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import ResourceLibrary from "@/components/public/ResourceLibrary";
 import { articles } from "@/data/public-content";
 import { equipment, equipmentById, type Equipment } from "@/data/equipment";
-export const metadata = { title: "Guides et ressources", description: "Des guides pratiques en français pour protéger ses comptes, repérer le phishing et apprendre avec méthode." };
+import { buildBreadcrumbJsonLd, buildPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = buildPageMetadata({
+  title: "Guides et ressources de cybersécurité",
+  description: "Des guides pratiques en français pour protéger ses comptes, repérer le phishing, analyser ses premiers logs, monter un labo éthique et tester ses sauvegardes.",
+  path: "/ressources",
+  image: "/images/resources/hero.webp",
+  keywords: ["guides cybersécurité", "protéger ses comptes", "repérer le phishing", "sauvegardes 3-2-1", "analyse de logs débutant"],
+});
+
 const PROMO = ["switch", "pare-feu", "nas", "cle-securite"].map(equipmentById).filter((device): device is Equipment => Boolean(device));
 export default function ResourcesPage() {
   const categories = new Set(articles.map((article) => article.category));
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Accueil", path: "/" },
+    { name: "Guides et ressources", path: "/ressources" },
+  ]);
   return <div className="public-container inner-page">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
     <header className="page-hero">
       <Image className="page-hero__image" src="/images/resources/hero.webp" alt="Une bibliothèque de guides, un cadenas et Pingo qui lit un livre." fill priority sizes="(max-width: 1100px) 100vw, 1392px" />
       <div className="page-hero__shade" aria-hidden="true" />
