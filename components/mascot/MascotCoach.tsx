@@ -111,17 +111,22 @@ export default function MascotCoach() {
     element.addEventListener("error", markFailed);
     element.play().then(markSpoken).catch((error: unknown) => {
       // Si la politique d'autoplay du navigateur bloque la lecture avant le premier clic,
-      // on relance automatiquement la voix CyberPingo dès la première interaction de l'utilisateur.
+      // on maintient la bulle active et on lance automatiquement la voix CyberPingo dès le premier geste.
       if ((error as { name?: string } | null)?.name === "NotAllowedError") {
+        arm.current(25_000);
         const resumeOnGesture = () => {
           clearUnlock();
           if (mine !== token.current || audio.current !== element) return;
           element.play().then(markSpoken).catch(() => undefined);
         };
         window.addEventListener("pointerdown", resumeOnGesture, { once: true });
+        window.addEventListener("click", resumeOnGesture, { once: true });
+        window.addEventListener("touchstart", resumeOnGesture, { once: true });
         window.addEventListener("keydown", resumeOnGesture, { once: true });
         unlockCleanup.current = () => {
           window.removeEventListener("pointerdown", resumeOnGesture);
+          window.removeEventListener("click", resumeOnGesture);
+          window.removeEventListener("touchstart", resumeOnGesture);
           window.removeEventListener("keydown", resumeOnGesture);
         };
       } else {
