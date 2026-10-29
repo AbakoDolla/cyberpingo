@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, Fragment } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
+import CiscoAcademyVideoPlayer from "@/components/courses/CiscoAcademyVideoPlayer";
 import LessonBlockRenderer from "@/components/courses/LessonBlockRenderer";
 import EquipmentBox from "@/components/equipment/EquipmentBox";
 import Badge from "@/components/ui/Badge";
@@ -181,18 +182,23 @@ function LessonView() {
               </aside>
               <article ref={articleRef} className="lesson-content">
                 {!lesson.blocks.some((b) => b.type === "video" || (b.type === "callout" && pendingVideoTitle(b.content))) && (
-                  <figure className="lesson-media lesson-video-slot mb-6">
-                    <div className="lesson-video-slot__frame" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9.5 5 2.5-5 2.5z" /></svg>
-                    </div>
-                    <figcaption>
-                      <strong>{isEn ? "Course video in production" : "Vidéo du cours en préparation"}</strong>
-                      <span>{lesson.title}</span>
-                      <small>{isEn ? "Reserved slot. The illustrated walkthroughs and interactive diagrams below already cover the essentials." : "Emplacement réservé. Le contenu illustré et les schémas interactifs ci-dessous couvrent déjà l’essentiel."}</small>
-                    </figcaption>
-                  </figure>
+                  <CiscoAcademyVideoPlayer
+                    mode="lesson"
+                    className="mb-6"
+                    lessonInput={{
+                      id: lesson.id,
+                      videoTitle: lesson.title,
+                      lessonTitle: lesson.title,
+                      summary: lesson.summary,
+                      moduleTitle: lesson.module.title,
+                      courseTitle: lesson.course.title,
+                      courseSlug: lesson.course.slug,
+                      durationMinutes: lesson.duration_minutes,
+                      blocks: lesson.blocks,
+                    }}
+                  />
                 )}
-                {lesson.blocks.length ? lesson.blocks.map((block, index) => <Fragment key={`${lesson.id}-${index}`}><LessonBlockRenderer block={block} />{equipmentAfter.get(index)?.map((box) => <EquipmentBox key={box.title} title={box.title} devices={box.devices} />)}</Fragment>) : <div className="study-empty"><p>{isEn ? "This lesson has no content blocks yet." : "Cette leçon ne contient pas encore de bloc de contenu."}</p></div>}
+                {lesson.blocks.length ? lesson.blocks.map((block, index) => <Fragment key={`${lesson.id}-${index}`}><LessonBlockRenderer block={block} lessonContext={{ id: lesson.id, lessonTitle: lesson.title, summary: lesson.summary, moduleTitle: lesson.module.title, courseTitle: lesson.course.title, courseSlug: lesson.course.slug, durationMinutes: lesson.duration_minutes, blocks: lesson.blocks }} />{equipmentAfter.get(index)?.map((box) => <EquipmentBox key={box.title} title={box.title} devices={box.devices} />)}</Fragment>) : <div className="study-empty"><p>{isEn ? "This lesson has no content blocks yet." : "Cette leçon ne contient pas encore de bloc de contenu."}</p></div>}
               </article>
             </div>
 

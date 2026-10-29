@@ -528,3 +528,825 @@
 @media (max-width: 767px) {
   .learner-topbar { position: static; }
 }
+
+/* ---------- Cisco Networking Academy Interactive Video Player ---------- */
+.lesson-media.netacad-player {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  border: 1px solid rgba(0, 213, 255, 0.28);
+  border-radius: 20px;
+  background: linear-gradient(180deg, #040c1b 0%, #061326 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.lesson-media.netacad-player.is-fullscreen {
+  border-radius: 0;
+  height: 100vh;
+  grid-template-rows: auto 1fr auto auto auto;
+}
+
+.netacad-player__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(0, 213, 255, 0.16);
+  background: rgba(3, 10, 23, 0.85);
+}
+.netacad-player__brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.netacad-player__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 213, 255, 0.35);
+  background: rgba(0, 213, 255, 0.12);
+  color: #a8ecff;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.netacad-player__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #64748b;
+}
+.netacad-player__dot[data-playing="true"] {
+  background: var(--cp-green, #3efa95);
+  box-shadow: 0 0 10px rgba(62, 250, 149, 0.85);
+}
+.netacad-player__series {
+  color: #dbe8f8;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.netacad-player__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cp-subtle, #8ea3c0);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+}
+
+.netacad-player__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 360px;
+  padding: 18px 20px 16px;
+  background:
+    radial-gradient(640px 260px at 85% 10%, rgba(0, 213, 255, 0.11), transparent 70%),
+    radial-gradient(520px 240px at 12% 90%, rgba(139, 92, 246, 0.1), transparent 70%),
+    linear-gradient(180deg, rgba(5, 15, 31, 0.96), rgba(3, 10, 22, 0.99));
+}
+
+.netacad-player__hud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+.netacad-player__chapter-tag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+}
+.netacad-player__chapter-tag strong {
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: rgba(23, 101, 245, 0.25);
+  border: 1px solid rgba(59, 139, 255, 0.4);
+  color: #93c5fd;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+}
+.netacad-player__chapter-tag span {
+  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 680;
+}
+
+.netacad-player__voice-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(15, 23, 42, 0.7);
+  color: var(--cp-subtle, #94a3b8);
+  font-size: 12px;
+}
+.netacad-player__voice-indicator[data-active="true"] {
+  border-color: rgba(0, 213, 255, 0.45);
+  color: #bdf4ff;
+}
+.netacad-player__wave {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+.netacad-player__wave i {
+  display: block;
+  width: 2.5px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--cp-cyan, #00d5ff);
+  transform: scaleY(0.35);
+  transform-origin: bottom center;
+  transition: transform 180ms ease;
+}
+.netacad-player__voice-indicator[data-active="true"] .netacad-player__wave i:nth-child(1) { transform: scaleY(0.95); }
+.netacad-player__voice-indicator[data-active="true"] .netacad-player__wave i:nth-child(2) { transform: scaleY(0.6); }
+.netacad-player__voice-indicator[data-active="true"] .netacad-player__wave i:nth-child(3) { transform: scaleY(1); }
+.netacad-player__voice-indicator[data-active="true"] .netacad-player__wave i:nth-child(4) { transform: scaleY(0.5); }
+
+.netacad-player__scene {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+.netacad-scene {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+.netacad-scene--pitfalls,
+.netacad-scene--summary {
+  grid-template-columns: 1fr 1fr;
+}
+
+.netacad-scene__card,
+.netacad-scene__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 14px;
+  background: rgba(8, 21, 42, 0.78);
+  min-width: 0;
+}
+.netacad-scene__card--primary {
+  border-color: rgba(0, 213, 255, 0.28);
+  background: linear-gradient(160deg, rgba(10, 27, 54, 0.9), rgba(5, 15, 31, 0.9));
+}
+.netacad-scene__card--warn {
+  border-color: rgba(255, 184, 107, 0.34);
+  background: rgba(28, 18, 14, 0.65);
+}
+.netacad-scene__card--safe {
+  border-color: rgba(62, 250, 149, 0.32);
+  background: rgba(8, 28, 24, 0.65);
+}
+.netacad-scene__card--action {
+  justify-content: center;
+  border-color: rgba(0, 213, 255, 0.35);
+  background: linear-gradient(145deg, rgba(12, 34, 66, 0.92), rgba(7, 20, 40, 0.92));
+}
+.netacad-scene__eyebrow {
+  color: var(--cp-cyan, #00d5ff);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.netacad-scene__card h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.netacad-scene__card p,
+.netacad-scene__note {
+  margin: 0;
+  color: #dbe8f8;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.netacad-topology-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+.netacad-topology-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(3, 10, 23, 0.75);
+  transition: border-color 200ms ease, transform 200ms ease, background-color 200ms ease;
+}
+.netacad-topology-node.is-active {
+  border-color: var(--cp-cyan, #00d5ff);
+  background: rgba(0, 213, 255, 0.14);
+  transform: translateY(-2px);
+}
+.netacad-topology-node.is-passed {
+  border-color: rgba(62, 250, 149, 0.35);
+}
+.netacad-topology-node__step {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 213, 255, 0.16);
+  color: var(--cp-cyan, #00d5ff);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+.netacad-topology-node div {
+  display: grid;
+  min-width: 0;
+}
+.netacad-topology-node strong {
+  color: #f1f7ff;
+  font-size: 12px;
+  line-height: 1.25;
+}
+.netacad-topology-node small {
+  color: var(--cp-subtle, #8ea3c0);
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.netacad-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.netacad-checklist li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(2, 8, 20, 0.55);
+  color: #cbd5e1;
+  font-size: 13.5px;
+  line-height: 1.45;
+  transition: border-color 200ms ease, background-color 200ms ease, color 200ms ease;
+}
+.netacad-checklist li.is-highlighted {
+  border-color: rgba(0, 213, 255, 0.32);
+  background: rgba(0, 213, 255, 0.08);
+  color: #f8fafc;
+}
+.netacad-checklist__index {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 213, 255, 0.18);
+  color: var(--cp-cyan, #00d5ff);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.netacad-checklist__index--warn {
+  background: rgba(255, 184, 107, 0.22);
+  color: #ffb86b;
+}
+.netacad-checklist__index--safe {
+  background: rgba(62, 250, 149, 0.2);
+  color: #3efa95;
+}
+
+.netacad-scene__visual {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.netacad-figure-frame {
+  max-height: 340px;
+  overflow: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 213, 255, 0.22);
+  background: rgba(3, 11, 24, 0.9);
+  padding: 6px;
+}
+.netacad-figure-frame .fg {
+  margin: 0;
+}
+
+.netacad-animated-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 213, 255, 0.24);
+  background: rgba(4, 14, 29, 0.88);
+  height: 100%;
+}
+.netacad-animated-flow__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.netacad-animated-flow__head span {
+  color: #fff;
+  font-weight: 680;
+  font-size: 15px;
+}
+.netacad-animated-flow__head small {
+  color: var(--cp-cyan, #00d5ff);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+}
+.netacad-animated-flow__nodes {
+  display: grid;
+  gap: 8px;
+}
+.netacad-animated-flow__segment {
+  display: grid;
+  gap: 4px;
+}
+.netacad-flow-box {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(8, 22, 44, 0.8);
+}
+.netacad-flow-box.is-current {
+  border-color: var(--cp-cyan, #00d5ff);
+  background: rgba(0, 213, 255, 0.14);
+  box-shadow: 0 0 18px rgba(0, 213, 255, 0.16);
+}
+.netacad-flow-box.is-done {
+  border-color: rgba(62, 250, 149, 0.36);
+}
+.netacad-flow-box__badge {
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(0, 213, 255, 0.16);
+  color: var(--cp-cyan, #00d5ff);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+.netacad-flow-box strong {
+  color: #f8fafc;
+  font-size: 13.5px;
+}
+.netacad-flow-box small {
+  color: var(--cp-subtle, #94a3b8);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11.5px;
+}
+.netacad-flow-connector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 18px;
+  color: var(--cp-subtle, #64748b);
+  font-size: 11.5px;
+}
+.netacad-flow-connector.is-flowing {
+  color: var(--cp-cyan, #00d5ff);
+}
+.netacad-flow-connector__line {
+  width: 2px;
+  height: 12px;
+  background: currentColor;
+}
+
+.netacad-terminal {
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 213, 255, 0.28);
+  background: #020814;
+  overflow: hidden;
+  min-width: 0;
+}
+.netacad-terminal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+  background: #071529;
+}
+.netacad-terminal__dots {
+  display: inline-flex;
+  gap: 6px;
+}
+.netacad-terminal__dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.35);
+}
+.netacad-terminal__dots span:first-child { background: #fb7185; }
+.netacad-terminal__dots span:nth-child(2) { background: #fbbf24; }
+.netacad-terminal__dots span:nth-child(3) { background: #34d399; }
+.netacad-terminal__bar strong {
+  color: #cbd5e1;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+}
+.netacad-terminal__tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(62, 250, 149, 0.15);
+  color: #6ee7b7;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+.netacad-terminal__body {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12.5px;
+}
+.netacad-terminal__step {
+  display: grid;
+  gap: 5px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.14);
+}
+.netacad-terminal__step:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.netacad-terminal__cmd {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: #f8fafc;
+}
+.netacad-terminal__prompt {
+  color: var(--cp-cyan, #00d5ff);
+  font-weight: 700;
+}
+.netacad-terminal__out {
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #93c5fd;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.netacad-terminal__note {
+  margin: 0;
+  color: #a7f3d0;
+  font-family: var(--font-inter, sans-serif);
+  font-size: 12.5px;
+}
+
+.netacad-replay-btn {
+  margin-top: 8px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 213, 255, 0.45);
+  background: rgba(0, 213, 255, 0.14);
+  color: #e8fbff;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.netacad-replay-btn:hover {
+  background: rgba(0, 213, 255, 0.24);
+}
+
+.netacad-player__poster {
+  position: absolute;
+  inset: auto 20px 56px 20px;
+  display: flex;
+  justify-content: flex-start;
+  pointer-events: none;
+}
+.netacad-player__big-play {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 18px 10px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 213, 255, 0.55);
+  background: rgba(3, 12, 27, 0.92);
+  color: #fff;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55), 0 0 24px rgba(0, 213, 255, 0.22);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+.netacad-player__big-play:hover {
+  transform: translateY(-2px);
+  border-color: #00d5ff;
+  background: rgba(6, 20, 42, 0.96);
+}
+.netacad-player__big-play-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00d5ff, #2563eb);
+  color: #020817;
+  flex: 0 0 auto;
+}
+.netacad-player__big-play-text {
+  display: grid;
+  gap: 2px;
+}
+.netacad-player__big-play-text strong {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #fff;
+}
+.netacad-player__big-play-text small {
+  font-size: 12px;
+  color: #a8ecff;
+}
+
+.netacad-player__captions {
+  margin-top: 14px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 213, 255, 0.2);
+  background: rgba(2, 6, 16, 0.88);
+  color: #f1f7ff;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.netacad-player__timeline {
+  display: flex;
+  gap: 4px;
+  padding: 8px 18px;
+  background: #030a17;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+.netacad-timeline-seg {
+  position: relative;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.22);
+  overflow: hidden;
+  cursor: pointer;
+}
+.netacad-timeline-seg:hover {
+  background: rgba(148, 163, 184, 0.36);
+}
+.netacad-timeline-seg__fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #00d5ff, #3b82f6);
+  transform-origin: left center;
+  transition: transform 120ms linear;
+}
+.netacad-timeline-seg.is-done .netacad-timeline-seg__fill {
+  background: var(--cp-green, #3efa95);
+}
+
+.netacad-player__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  padding: 10px 18px;
+  background: rgba(3, 10, 23, 0.94);
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+.netacad-player__controls-left,
+.netacad-player__controls-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.netacad-ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 11px;
+  border-radius: 9px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.75);
+  color: #e2e8f0;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.netacad-ctrl-btn:hover:not(:disabled) {
+  border-color: rgba(0, 213, 255, 0.45);
+  color: #fff;
+}
+.netacad-ctrl-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.netacad-ctrl-btn--primary {
+  border-color: rgba(0, 213, 255, 0.5);
+  background: rgba(0, 213, 255, 0.16);
+  color: #fff;
+}
+.netacad-ctrl-btn.is-active {
+  border-color: var(--cp-cyan, #00d5ff);
+  background: rgba(0, 213, 255, 0.18);
+  color: #fff;
+}
+.netacad-player__time {
+  color: var(--cp-subtle, #94a3b8);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  margin-left: 4px;
+}
+
+.netacad-player__chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 18px 14px;
+  background: rgba(2, 8, 19, 0.96);
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+.netacad-chapter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.6);
+  color: #cbd5e1;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.netacad-chapter-pill:hover {
+  border-color: rgba(0, 213, 255, 0.35);
+  color: #fff;
+}
+.netacad-chapter-pill.is-active {
+  border-color: var(--cp-cyan, #00d5ff);
+  background: rgba(0, 213, 255, 0.14);
+  color: #fff;
+}
+.netacad-chapter-pill.is-done {
+  border-color: rgba(62, 250, 149, 0.3);
+}
+.netacad-chapter-pill__num {
+  color: var(--cp-cyan, #00d5ff);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+.netacad-chapter-pill.is-done .netacad-chapter-pill__num {
+  color: var(--cp-green, #3efa95);
+}
+
+.netacad-player__transcript {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px;
+  border-top: 1px solid rgba(0, 213, 255, 0.2);
+  background: #020712;
+  max-height: 320px;
+  overflow: auto;
+}
+.netacad-player__transcript-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.netacad-player__transcript-head strong {
+  color: #f8fafc;
+  font-size: 14px;
+}
+.netacad-player__transcript-head small {
+  color: var(--cp-subtle, #94a3b8);
+  font-size: 12.5px;
+}
+.netacad-player__transcript-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.netacad-player__transcript-list li {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.55);
+}
+.netacad-player__transcript-list li.is-current {
+  border-color: rgba(0, 213, 255, 0.4);
+  background: rgba(0, 213, 255, 0.08);
+}
+.netacad-player__transcript-list li button {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.netacad-player__transcript-list li button span {
+  color: var(--cp-cyan, #00d5ff);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+.netacad-player__transcript-list li button small {
+  margin-left: auto;
+  color: var(--cp-subtle, #94a3b8);
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 11.5px;
+}
+.netacad-player__transcript-list li p {
+  margin: 6px 0 0;
+  color: #cbd5e1;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+@media (max-width: 860px) {
+  .netacad-scene,
+  .netacad-scene--pitfalls,
+  .netacad-scene--summary {
+    grid-template-columns: 1fr;
+  }
+  .netacad-player__poster {
+    position: static;
+    margin-top: 12px;
+  }
+}

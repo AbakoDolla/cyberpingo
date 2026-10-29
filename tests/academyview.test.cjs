@@ -82,3 +82,70 @@ test("parseCallout labels a callout from its first words and keeps the rest as t
   assert.deepEqual(parseCallout("Packet Tracer s’exécute sur ton ordinateur."), { kind: "note", label: "À retenir", body: "Packet Tracer s’exécute sur ton ordinateur." });
   assert.equal(parseCallout("Objectifs :").body, "Objectifs :");
 });
+
+test("buildLessonVideoSpec and buildLabVideoSpec generate multi-chapter Cisco NetAcad video specs", () => {
+  const video = load("lib/academy-video");
+  const lessonSpec = video.buildLessonVideoSpec({
+    lessonTitle: "Les 7 couches OSI et le modèle TCP/IP",
+    videoTitle: "Le modèle OSI en 5 minutes",
+    courseTitle: "Introduction aux Réseaux",
+    moduleTitle: "Modèles de communication",
+    level: "beginner",
+    blocks: [
+      { type: "callout", content: "Objectifs : nommer les 7 couches OSI ; associer une unité de données (PDU) à chaque couche." },
+      { type: "callout", content: "Mise en situation : le PC d'Awa affiche cable branché mais pas d'accès internet." },
+      {
+        type: "schema",
+        content: JSON.stringify({
+          v: 1,
+          kind: "layers",
+          title: "Les 7 couches OSI",
+          layers: [
+            { label: "7. Application", text: "HTTP, DNS, TLS" },
+            { label: "1. Physique", text: "Bits sur câble ou fibre" }
+          ]
+        })
+      },
+      { type: "text", content: "Chaque couche ajoute son en-tête avant d'envoyer les données vers la couche inférieure." },
+      { type: "code", content: "$ ip addr\n2: eth0: <BROADCAST,MULTICAST,UP> state UP\n    inet 192.168.1.42/24" },
+      { type: "callout", content: "Erreurs fréquentes : tester le DNS avant de vérifier le câble et l'adresse IP." },
+      { type: "callout", content: "Sécurité : ne jamais exposer un équipement non chiffré sur le WAN." },
+      { type: "callout", content: "À retenir : diagnostiquer de la couche 1 vers la couche 7 évite les fausses pistes." }
+    ]
+  });
+
+  assert.equal(lessonSpec.mode, "lesson");
+  assert.equal(lessonSpec.title, "Le modèle OSI en 5 minutes");
+  assert.equal(lessonSpec.domain, "osi");
+  assert.equal(lessonSpec.chapters.length, 6);
+  assert.ok(lessonSpec.totalDurationSeconds >= 60);
+  assert.equal(lessonSpec.chapters[1].figure.kind, "layers");
+  assert.equal(lessonSpec.chapters[1].figure.title, "Les 7 couches OSI");
+  assert.ok(lessonSpec.chapters[3].terminalSteps.length >= 1);
+
+  const labSpec = video.buildLabVideoSpec({
+    lab: {
+      id: "lab-arp-1",
+      title: "Inspection d'une capture ARP",
+      category: "Network",
+      difficulty: "easy",
+      points: 100,
+      estimatedMinutes: 15,
+      summary: "Analyse une capture ARP pour repérer une passerelle usurpée.",
+      briefing: "Un poste du réseau signale des coupures intermittentes vers la passerelle.",
+      objectives: ["Identifier l'adresse IP de la passerelle", "Repérer deux adresses MAC différentes pour la même IP"],
+      tools: ["Journal ARP fourni", "Table des hôtes"],
+      constraints: ["Lecture seule des journaux fournis"],
+      hints: [{ id: "h1", order: 1, costXp: 0, text: "Compare les annonces gratuites ARP." }]
+    },
+    assets: [{ id: "a1", title: "capture-arp.log", kind: "log", content: "192.168.1.1 is-at aa:bb:cc:dd:ee:01" }],
+    tasks: [
+      { id: "t1", order: 1, title: "IP passerelle", prompt: "Quelle est l'adresse IP de la passerelle ?", placeholder: "192.168.x.x", formatHint: "IPv4", points: 50 }
+    ]
+  });
+
+  assert.equal(labSpec.mode, "lab");
+  assert.equal(labSpec.chapters.length, 5);
+  assert.ok(labSpec.chapters.every((ch) => ch.narration.length > 20));
+});
+
