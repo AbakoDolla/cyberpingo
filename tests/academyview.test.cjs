@@ -136,8 +136,22 @@ test("buildLessonVideoSpec and buildLabVideoSpec generate multi-chapter Cisco Ne
     assert.equal(ch.captions[0].startRatio, 0);
     assert.equal(ch.captions[ch.captions.length - 1].endRatio, 1);
     assert.equal(ch.captions.map((c) => c.text).join(" "), ch.narration);
+    assert.equal(ch.visualSlides.length, ch.captions.length);
+    for (let i = 0; i < ch.captions.length; i++) {
+      const cap = ch.captions[i];
+      assert.ok(cap.visualSlide && cap.visualSlide.src, `missing visualSlide on caption ${i} of ${ch.id}`);
+      assert.ok(fs.existsSync(path.join(root, "public", cap.visualSlide.src)), `missing caption slide file: ${cap.visualSlide.src}`);
+      assert.ok(typeof cap.conceptTag === "string" && cap.conceptTag.length > 0);
+      assert.ok(Array.isArray(cap.keywords) && cap.keywords.length >= 1);
+      if (i > 0) {
+        assert.notEqual(
+          cap.visualSlide.src,
+          ch.captions[i - 1].visualSlide.src,
+          `consecutive sentences in ${ch.id} should display distinct illustrations`
+        );
+      }
+    }
     assert.ok(Array.isArray(ch.audioPlaylist) && ch.audioPlaylist.length >= 2);
-    assert.ok(Array.isArray(ch.visualSlides) && ch.visualSlides.length >= 2);
     for (const audioUrl of ch.audioPlaylist) {
       assert.ok(fs.existsSync(path.join(root, "public", audioUrl)), `missing ElevenLabs audio file: ${audioUrl}`);
     }

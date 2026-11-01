@@ -104,14 +104,23 @@ export default function CiscoAcademyVideoPlayer({
     if (manualSlideIndex !== null && manualSlideIndex < chapterSlides.length) {
       return manualSlideIndex;
     }
-    return Math.min(
-      chapterSlides.length - 1,
-      Math.floor(chapterProgress * chapterSlides.length)
-    );
-  }, [chapterSlides.length, manualSlideIndex, chapterProgress]);
+    return Math.min(chapterSlides.length - 1, safeCaptionIndex);
+  }, [chapterSlides.length, manualSlideIndex, safeCaptionIndex]);
 
   const activeSlide: AcademyVideoVisualSlide | undefined =
-    chapterSlides[activeSlideIndex] ?? chapterSlides[0];
+    (manualSlideIndex === null ? activeCaptionItem.visualSlide : undefined) ??
+    chapterSlides[activeSlideIndex] ??
+    chapterSlides[0];
+
+  const activeKeywords: string[] = useMemo(() => {
+    if (activeCaptionItem.keywords?.length) return activeCaptionItem.keywords;
+    return [activeSlide?.title ?? videoSpec.domainLabel].slice(0, 3);
+  }, [activeCaptionItem.keywords, activeSlide?.title, videoSpec.domainLabel]);
+
+  const activeConceptTag: string =
+    activeCaptionItem.conceptTag ||
+    activeSlide?.badge ||
+    (isEn ? `Illustration ${safeCaptionIndex + 1}` : `Illustration ${safeCaptionIndex + 1}`);
 
   const spokenKeyRef = useRef<string | null>(null);
 
@@ -129,9 +138,13 @@ export default function CiscoAcademyVideoPlayer({
     setVoiceActive(false);
   }, []);
 
-  // Reset manual slide selection when switching chapters and prefetch first sentences
+  // Automatically follow the spoken sentence's illustration whenever sentence or chapter advances
   useEffect(() => {
     setManualSlideIndex(null);
+  }, [chapterIndex, safeCaptionIndex]);
+
+  // Prefetch first sentences when switching chapters
+  useEffect(() => {
     const voiceLang = isEn ? "en" : "fr";
     const firstCaption = chapterCaptions[0]?.text;
     const secondCaption = chapterCaptions[1]?.text;
@@ -397,29 +410,45 @@ export default function CiscoAcademyVideoPlayer({
     }
   };
 
+  const sentenceProgressRatio = useMemo(() => {
+    if (chapterCaptions.length <= 1) return Math.max(chapterProgress, 0.35);
+    return Math.max(chapterProgress, (safeCaptionIndex + 1) / chapterCaptions.length);
+  }, [chapterCaptions.length, chapterProgress, safeCaptionIndex]);
+
   const activeNodeIndex = useMemo(() => {
     const count = currentChapter?.nodes?.length ?? 5;
+    if (chapterCaptions.length > 1) {
+      return Math.min(
+        count - 1,
+        Math.floor((safeCaptionIndex / Math.max(1, chapterCaptions.length - 1)) * (count - 1))
+      );
+    }
     return Math.min(count - 1, Math.floor(chapterProgress * count));
-  }, [currentChapter?.nodes?.length, chapterProgress]);
+  }, [currentChapter?.nodes?.length, chapterCaptions.length, safeCaptionIndex, chapterProgress]);
 
   const activeBulletIndex = useMemo(() => {
     const count = Math.max(1, currentChapter?.bullets?.length ?? 1);
-    return Math.min(count - 1, Math.floor(chapterProgress * count));
-  }, [currentChapter?.bullets?.length, chapterProgress]);
+    return Math.min(count - 1, Math.floor(sentenceProgressRatio * count));
+  }, [currentChapter?.bullets?.length, sentenceProgressRatio]);
 
   const visibleTerminalStepCount = useMemo(() => {
     const total = currentChapter?.terminalSteps?.length ?? 1;
     if (!hasStarted && !isPlaying) return total;
-    return Math.max(1, Math.min(total, Math.ceil((chapterProgress + 0.18) * total)));
-  }, [currentChapter?.terminalSteps?.length, chapterProgress, hasStarted, isPlaying]);
+    return Math.max(1, Math.min(total, Math.ceil(sentenceProgressRatio * total)));
+  }, [currentChapter?.terminalSteps?.length, sentenceProgressRatio, hasStarted, isPlaying]);
 
   const renderVisualShowcase = (compact = false) => {
     if (!activeSlide) return null;
+    const transitionKey = `${currentChapter.id}-${activeSlideIndex}-${activeSlide.src}`;
     return (
       <div className={`netacad-visual-showcase ${compact ? "netacad-visual-showcase--compact" : ""}`}>
-        <div className="netacad-visual-showcase__frame" data-playing={isPlaying ? "true" : "false"}>
+        <div
+          key={transitionKey}
+          className="netacad-visual-showcase__frame is-entering"
+          data-playing={isPlaying ? "true" : "false"}
+          data-speaking={voiceActive ? "true" : "false"}
+        >
           <img
-            key={activeSlide.src}
             src={activeSlide.src}
             alt={activeSlide.alt}
             className={`netacad-visual-showcase__img ${activeSlide.kind === "topology" ? "is-diagram" : ""}`}
@@ -428,12 +457,37 @@ export default function CiscoAcademyVideoPlayer({
           <div className="netacad-visual-showcase__overlay">
             <div className="netacad-visual-showcase__top">
               <span className="netacad-visual-showcase__badge">{activeSlide.badge}</span>
-              {activeSlide.credit && (
-                <span className="netacad-visual-showcase__credit">{activeSlide.credit}</span>
-              )}
+              <span className="netacad-visual-showcase__sync-pill">
+                <i className="netacad-visual-showcase__sync-dot" aria-hidden="true" />
+                {activeConceptTag} · {activeSlideIndex + 1}/{Math.max(1, chapterSlides.length)}
+              </span>
             </div>
+
+            {activeKeywords.length > 0 && (
+              <div
+                className="netacad-visual-keywords"
+                aria-label={isEn ? "Spoken concepts illustrated" : "Concepts illustrés en direct"}
+              >
+                {activeKeywords.map((kw, kIdx) => (
+                  <span
+                    key={`${transitionKey}-kw-${kIdx}`}
+                    className="netacad-visual-keyword-chip"
+                    style={{ animationDelay: `${kIdx * 110}ms` }}
+                  >
+                    <span className="netacad-visual-keyword-chip__spark" aria-hidden="true">✦</span>
+                    {kw}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <div className="netacad-visual-showcase__caption">
-              <strong>{activeSlide.title}</strong>
+              <div className="netacad-visual-showcase__title-row">
+                <strong>{activeSlide.title}</strong>
+                {activeSlide.credit && (
+                  <small className="netacad-visual-showcase__credit">{activeSlide.credit}</small>
+                )}
+              </div>
               <p>{activeSlide.caption}</p>
               {!compact && (activeSlide.risk || activeSlide.habit) && (
                 <div className="netacad-visual-showcase__chips">
@@ -457,22 +511,37 @@ export default function CiscoAcademyVideoPlayer({
           <div
             className="netacad-slide-strip"
             role="tablist"
-            aria-label={isEn ? "Chapter illustrative visuals" : "Illustrations réelles du chapitre"}
+            aria-label={isEn ? "Illustrations synchronized with voice" : "Illustrations synchronisées avec la voix"}
           >
-            {chapterSlides.map((slide, idx) => (
-              <button
-                key={slide.id}
-                type="button"
-                role="tab"
-                aria-selected={idx === activeSlideIndex}
-                className={`netacad-slide-thumb ${idx === activeSlideIndex ? "is-active" : ""}`}
-                onClick={() => setManualSlideIndex(idx)}
-                title={slide.title}
-              >
-                <img src={slide.src} alt="" loading="lazy" />
-                <span>{slide.title}</span>
-              </button>
-            ))}
+            {chapterSlides.map((slide, idx) => {
+              const isCurrent = idx === activeSlideIndex;
+              const isRevealed = idx < activeSlideIndex;
+              return (
+                <button
+                  key={`${slide.id}-${idx}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isCurrent}
+                  className={`netacad-slide-thumb ${isCurrent ? "is-active" : isRevealed ? "is-revealed" : "is-upcoming"}`}
+                  onClick={() => {
+                    if (idx < chapterCaptions.length) {
+                      selectChapter(chapterIndex, isPlaying, idx);
+                    } else {
+                      setManualSlideIndex(idx);
+                    }
+                  }}
+                  title={`${idx + 1}. ${slide.title}`}
+                >
+                  <div className="netacad-slide-thumb__media">
+                    <img src={slide.src} alt="" loading="lazy" />
+                    <span className="netacad-slide-thumb__step">
+                      {isCurrent && voiceActive ? "🔊" : isRevealed ? "✓" : idx + 1}
+                    </span>
+                  </div>
+                  <span>{slide.title}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -714,7 +783,7 @@ export default function CiscoAcademyVideoPlayer({
                   </span>
                   <ul className="netacad-checklist netacad-checklist--compact">
                     {(currentChapter.pitfalls ?? currentChapter.bullets).map((item, idx) => (
-                      <li key={idx} className="is-highlighted">
+                      <li key={idx} className={idx <= activeBulletIndex ? "is-highlighted" : ""}>
                         <span className="netacad-checklist__index netacad-checklist__index--warn">!</span>
                         <span>{item}</span>
                       </li>
@@ -734,7 +803,15 @@ export default function CiscoAcademyVideoPlayer({
                   </span>
                   <ul className="netacad-checklist netacad-checklist--compact">
                     {(currentChapter.safeguards ?? []).map((item, idx) => (
-                      <li key={idx} className="is-highlighted">
+                      <li
+                        key={idx}
+                        className={
+                          safeCaptionIndex >= Math.max(1, chapterCaptions.length - 1) ||
+                          idx <= activeBulletIndex
+                            ? "is-highlighted"
+                            : ""
+                        }
+                      >
                         <span className="netacad-checklist__index netacad-checklist__index--safe">✓</span>
                         <span>{item}</span>
                       </li>
@@ -764,7 +841,7 @@ export default function CiscoAcademyVideoPlayer({
                 <p>{currentChapter.highlightBody}</p>
                 <ul className="netacad-checklist netacad-checklist--compact">
                   {currentChapter.bullets.map((bullet, idx) => (
-                    <li key={idx} className="is-highlighted">
+                    <li key={idx} className={idx <= activeBulletIndex ? "is-highlighted" : ""}>
                       <span className="netacad-checklist__index netacad-checklist__index--safe">✓</span>
                       <span>{bullet}</span>
                     </li>
@@ -837,13 +914,18 @@ export default function CiscoAcademyVideoPlayer({
           </div>
         )}
 
-        {/* Closed Captions (CC) Subtitle Bar synchronized with spoken sentence */}
+        {/* Closed Captions (CC) Subtitle Bar synchronized with spoken sentence & active illustration */}
         {showCaptions && activeCaption && (
           <div
             className="netacad-player__captions"
             data-speaking={voiceActive ? "true" : "false"}
             aria-live="polite"
           >
+            {activeSlide && (
+              <span className="netacad-player__captions-thumb" aria-hidden="true">
+                <img src={activeSlide.src} alt="" />
+              </span>
+            )}
             <small className="netacad-player__captions-idx" aria-hidden="true">
               {voiceActive ? "🔊" : "CC"} {safeCaptionIndex + 1}/{chapterCaptions.length}
             </small>

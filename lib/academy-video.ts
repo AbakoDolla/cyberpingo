@@ -26,6 +26,9 @@ export interface VideoCaption {
   startRatio: number;
   endRatio: number;
   text: string;
+  visualSlide?: AcademyVideoVisualSlide;
+  conceptTag?: string;
+  keywords?: string[];
 }
 
 export interface VideoTerminalStep {
@@ -441,14 +444,97 @@ type LessonEquipmentMap = Record<
 const LESSON_EQUIPMENT = (lessonEquipmentData as { lessons: LessonEquipmentMap }).lessons ?? {};
 
 const DOMAIN_EQUIPMENT_DEFAULTS: Record<VideoDomain, string[]> = {
-  osi: ["cable-ethernet", "fibre-optique", "switch", "routeur", "pare-feu", "point-acces-wifi"],
-  network: ["switch", "routeur", "pare-feu", "point-acces-wifi", "baie", "panneau-brassage"],
-  linux: ["serveur", "raspberry-pi", "portable", "nas", "disque-externe", "cle-usb"],
-  logs: ["serveur", "pare-feu", "routeur", "baie", "nas", "poste-fixe"],
-  web: ["serveur", "pare-feu", "portable", "smartphone", "cle-securite", "routeur"],
-  pentest: ["serveur", "pare-feu", "routeur", "raspberry-pi", "disque-externe", "portable"],
-  crypto: ["cle-securite", "serveur", "portable", "disque-externe", "nas", "smartphone"],
-  fundamentals: ["smartphone", "portable", "cle-securite", "box-internet", "disque-externe", "lecteur-badge"],
+  osi: [
+    "cable-ethernet",
+    "fibre-optique",
+    "switch",
+    "routeur",
+    "pare-feu",
+    "point-acces-wifi",
+    "serveur",
+    "panneau-brassage",
+    "baie",
+    "poste-fixe",
+  ],
+  network: [
+    "switch",
+    "routeur",
+    "box-internet",
+    "pare-feu",
+    "point-acces-wifi",
+    "cable-ethernet",
+    "fibre-optique",
+    "baie",
+    "panneau-brassage",
+    "imprimante-bureau",
+    "poste-fixe",
+    "serveur",
+  ],
+  linux: [
+    "serveur",
+    "raspberry-pi",
+    "portable",
+    "nas",
+    "disque-externe",
+    "cle-usb",
+    "poste-fixe",
+    "baie",
+    "onduleur",
+  ],
+  logs: [
+    "serveur",
+    "pare-feu",
+    "routeur",
+    "baie",
+    "nas",
+    "poste-fixe",
+    "switch",
+    "camera-ip",
+    "lecteur-badge",
+  ],
+  web: [
+    "serveur",
+    "pare-feu",
+    "portable",
+    "smartphone",
+    "cle-securite",
+    "routeur",
+    "box-internet",
+    "tablette",
+  ],
+  pentest: [
+    "serveur",
+    "pare-feu",
+    "routeur",
+    "raspberry-pi",
+    "disque-externe",
+    "portable",
+    "point-acces-wifi",
+    "switch",
+    "cle-usb",
+  ],
+  crypto: [
+    "cle-securite",
+    "serveur",
+    "portable",
+    "disque-externe",
+    "nas",
+    "smartphone",
+    "cle-usb",
+    "routeur",
+  ],
+  fundamentals: [
+    "smartphone",
+    "portable",
+    "cle-securite",
+    "box-internet",
+    "disque-externe",
+    "lecteur-badge",
+    "poste-fixe",
+    "pare-feu",
+    "nas",
+    "onduleur",
+  ],
 };
 
 const DOMAIN_COVER_SLIDES: Record<
@@ -585,16 +671,15 @@ function buildLessonVisualSlides(
     }
   }
 
-  // 3. Add domain hardware photos so every lesson has at least 4 real hardware photographs
+  // 3. Add all domain hardware photos so every lesson has a rich pool of real hardware photographs
   for (const devId of DOMAIN_EQUIPMENT_DEFAULTS[domain]) {
-    if (slides.length >= 4) break;
     const device = equipmentById(devId);
     if (device) {
       pushSlide(equipmentToVisualSlide(device, isEn));
     }
   }
 
-  // 4. Add domain visual cover & topology/resource illustration
+  // 4. Add domain visual cover & topology/resource illustrations
   const domainVisual = DOMAIN_COVER_SLIDES[domain];
   pushSlide({
     id: `resource-${domain}`,
@@ -611,6 +696,27 @@ function buildLessonVisualSlides(
         : "ILLUSTRATION TERRAIN",
     kind: domainVisual.resourceSrc.endsWith(".svg") ? "topology" : "illustration",
   });
+
+  if (domain === "network" || domain === "osi") {
+    pushSlide({
+      id: "topo-packet-tracer",
+      src: "/labs/packet-tracer-topologie.svg",
+      alt: "Topologie Cisco Packet Tracer",
+      title: "Schéma logique LAN / Passerelle",
+      caption: "Interconnexion entre postes clients, commutateur Ethernet, routeur passerelle et serveur.",
+      badge: isEn ? "NETWORK TOPOLOGY" : "TOPOLOGIE RÉSEAU",
+      kind: "topology",
+    });
+    pushSlide({
+      id: "topo-kora",
+      src: "/labs/projet-kora-topologie.svg",
+      alt: "Topologie multi-segments",
+      title: "Segmentation & Interconnexion",
+      caption: "Séparation des sous-réseaux et contrôle des flux entre zones LAN et WAN.",
+      badge: isEn ? "ARCHITECTURE SCHEMA" : "SCHÉMA D’ARCHITECTURE",
+      kind: "topology",
+    });
+  }
 
   pushSlide({
     id: `cover-${domain}`,
@@ -681,15 +787,23 @@ function buildLabVisualSlides(
 
   // 3. Supplement with domain hardware photos
   for (const devId of DOMAIN_EQUIPMENT_DEFAULTS[domain]) {
-    if (slides.length >= 5) break;
     const device = equipmentById(devId);
     if (device) {
       pushSlide(equipmentToVisualSlide(device, isEn));
     }
   }
 
-  // 4. Add domain cover illustration
+  // 4. Add domain cover & resource illustrations
   const domainVisual = DOMAIN_COVER_SLIDES[domain];
+  pushSlide({
+    id: `lab-resource-${domain}`,
+    src: domainVisual.resourceSrc,
+    alt: domainVisual.resourceTitle,
+    title: domainVisual.resourceTitle,
+    caption: domainVisual.resourceCaption,
+    badge: isEn ? "FIELD ILLUSTRATION" : "ILLUSTRATION TERRAIN",
+    kind: domainVisual.resourceSrc.endsWith(".svg") ? "topology" : "illustration",
+  });
   pushSlide({
     id: `lab-cover-${domain}`,
     src: domainVisual.src,
@@ -701,6 +815,289 @@ function buildLabVisualSlides(
   });
 
   return slides;
+}
+
+const KEYWORD_CATALOG: { pattern: RegExp; fr: string; en: string }[] = [
+  { pattern: /\b(lan|réseau local|local area network)\b/iu, fr: "Réseau local (LAN)", en: "Local Network (LAN)" },
+  { pattern: /\b(wan|réseau étendu|wide area network)\b/iu, fr: "Réseau étendu (WAN)", en: "Wide Area Network (WAN)" },
+  { pattern: /\b(commutateur|switch|vlan)\b/iu, fr: "Commutateur (Switch)", en: "Ethernet Switch" },
+  { pattern: /\b(routeur|routage|passerelle)\b/iu, fr: "Routeur & Passerelle", en: "Router & Gateway" },
+  { pattern: /\b(pare-feu|firewall|filtrage|acl)\b/iu, fr: "Pare-feu (Filtrage)", en: "Firewall Filtering" },
+  { pattern: /\b(imprimante)\b/iu, fr: "Imprimante partagée", en: "Shared Printer" },
+  { pattern: /\b(box|modem|opérateur)\b/iu, fr: "Box Opérateur", en: "ISP Gateway Box" },
+  { pattern: /\b(câble|rj45|ethernet|paire torsadée)\b/iu, fr: "Câble Ethernet RJ45", en: "RJ45 Ethernet Cable" },
+  { pattern: /\b(fibre|optique)\b/iu, fr: "Fibre optique", en: "Optical Fiber" },
+  { pattern: /\b(wi-?fi|sans fil|point d['’]accès|borne)\b/iu, fr: "Point d’accès Wi-Fi", en: "Wi-Fi Access Point" },
+  { pattern: /\b(serveur|http|https|apache|nginx)\b/iu, fr: "Serveur & Services", en: "Server & Services" },
+  { pattern: /\b(dns|résolution|domaine)\b/iu, fr: "Résolution DNS", en: "DNS Resolution" },
+  { pattern: /\b(dhcp|ip|ipv4|ipv6|cidr|masque)\b/iu, fr: "Adressage IP", en: "IP Addressing" },
+  { pattern: /\b(osi|couche|encapsulation|trame|paquet|segment)\b/iu, fr: "Couches & Encapsulation", en: "OSI Encapsulation" },
+  { pattern: /\b(topologie|étoile|maillée|bus|anneau|schéma)\b/iu, fr: "Topologie réseau", en: "Network Topology" },
+  { pattern: /\b(linux|bash|terminal|commande|cli|chmod|sudo)\b/iu, fr: "Terminal Linux", en: "Linux Terminal" },
+  { pattern: /\b(log|logs|journal|journaux|siem|soc|alerte|trace)\b/iu, fr: "Journaux & Traces SOC", en: "Security Logs & SOC" },
+  { pattern: /\b(mfa|2fa|authentification|mot de passe|fido)\b/iu, fr: "Authentification forte (MFA)", en: "Multi-Factor Auth (MFA)" },
+  { pattern: /\b(sauvegarde|nas|3-2-1|copie)\b/iu, fr: "Sauvegarde 3-2-1", en: "3-2-1 Backup" },
+  { pattern: /\b(chiffrement|aes|tls|sha-?256|hash|certificat)\b/iu, fr: "Chiffrement & Intégrité", en: "Encryption & Integrity" },
+  { pattern: /\b(hameçonnage|phishing|courriel|piège)\b/iu, fr: "Anti-Phishing", en: "Phishing Defense" },
+  { pattern: /\b(organisation|entreprise|configuration|atelier|bureau)\b/iu, fr: "Infrastructure locale", en: "Site Infrastructure" },
+  { pattern: /\b(internet|continent|pays|monde)\b/iu, fr: "Interconnexion mondiale", en: "Global Interconnect" },
+];
+
+function extractSentenceKeywords(sentence: string, isEn: boolean): string[] {
+  const found: string[] = [];
+  for (const item of KEYWORD_CATALOG) {
+    if (item.pattern.test(sentence)) {
+      found.push(isEn ? item.en : item.fr);
+      if (found.length >= 3) break;
+    }
+  }
+  if (!found.length) {
+    found.push(isEn ? "Key Concept" : "Point clé du cours");
+  }
+  return found;
+}
+
+const SENTENCE_DEVICE_MATCHERS: { pattern: RegExp; deviceIds: string[]; tagFr: string; tagEn: string }[] = [
+  {
+    pattern: /\b(imprimante)\b/iu,
+    deviceIds: ["imprimante-bureau", "switch", "box-internet"],
+    tagFr: "Équipement illustré · Imprimante & LAN",
+    tagEn: "Illustrated Hardware · Shared Printer",
+  },
+  {
+    pattern: /\b(box|atelier|foyer|domicile|modem)\b/iu,
+    deviceIds: ["box-internet", "routeur", "switch"],
+    tagFr: "Illustration · Box & Passerelle locale",
+    tagEn: "Illustration · Local Gateway Box",
+  },
+  {
+    pattern: /\b(commutateur|switch|trame|mac|vlan|étoile)\b/iu,
+    deviceIds: ["switch", "panneau-brassage", "cable-ethernet"],
+    tagFr: "Illustration · Commutateur Ethernet (LAN)",
+    tagEn: "Illustration · Ethernet Switch (LAN)",
+  },
+  {
+    pattern: /\b(wan|réseau étendu|opérateur|continent|pays|internet|interconnectés|routeur|routage|passerelle)\b/iu,
+    deviceIds: ["routeur", "fibre-optique", "baie"],
+    tagFr: "Illustration · Routeur & Liaison WAN",
+    tagEn: "Illustration · WAN Router & Link",
+  },
+  {
+    pattern: /\b(organisation|appartiennent|configuration|entreprise|baie|armoire|brassage)\b/iu,
+    deviceIds: ["baie", "panneau-brassage", "serveur", "switch"],
+    tagFr: "Illustration · Baie & Équipements de l’organisation",
+    tagEn: "Illustration · Organization Rack & Gear",
+  },
+  {
+    pattern: /\b(réseau local|\blan\b|salle de classe|étage de bureau|machines proches|ordinateurs)\b/iu,
+    deviceIds: ["poste-fixe", "switch", "portable", "cable-ethernet"],
+    tagFr: "Illustration · Postes reliés en Réseau Local (LAN)",
+    tagEn: "Illustration · Local Area Network (LAN)",
+  },
+  {
+    pattern: /\b(câble|rj45|cuivre|paire torsadée|branché|physique)\b/iu,
+    deviceIds: ["cable-ethernet", "panneau-brassage", "switch"],
+    tagFr: "Illustration · Câblage Ethernet RJ45",
+    tagEn: "Illustration · RJ45 Ethernet Cabling",
+  },
+  {
+    pattern: /\b(fibre|optique|lumière|très haut débit)\b/iu,
+    deviceIds: ["fibre-optique", "routeur", "baie"],
+    tagFr: "Illustration · Liaison Fibre Optique",
+    tagEn: "Illustration · Optical Fiber Link",
+  },
+  {
+    pattern: /\b(pare-feu|firewall|filtrer|filtrage|bloquer|règle|sécurité périmétrique)\b/iu,
+    deviceIds: ["pare-feu", "routeur", "serveur"],
+    tagFr: "Illustration · Pare-feu & Filtrage réseau",
+    tagEn: "Illustration · Hardware Firewall",
+  },
+  {
+    pattern: /\b(wi-?fi|sans fil|point d['’]accès|borne|radio|wpa)\b/iu,
+    deviceIds: ["point-acces-wifi", "portable", "smartphone"],
+    tagFr: "Illustration · Point d’accès Wi-Fi",
+    tagEn: "Illustration · Wi-Fi Access Point",
+  },
+  {
+    pattern: /\b(serveur|service|http|https|dns|dhcp|ssh|web|application)\b/iu,
+    deviceIds: ["serveur", "baie", "pare-feu"],
+    tagFr: "Illustration · Serveur en rack",
+    tagEn: "Illustration · Rack Server",
+  },
+  {
+    pattern: /\b(linux|terminal|commande|cli|bash|chmod|sudo|processus|raspberry)\b/iu,
+    deviceIds: ["raspberry-pi", "serveur", "portable"],
+    tagFr: "Illustration · Système Linux & Terminal",
+    tagEn: "Illustration · Linux System & CLI",
+  },
+  {
+    pattern: /\b(sauvegarde|nas|stockage|copie|archive|3-2-1|disque)\b/iu,
+    deviceIds: ["nas", "disque-externe", "serveur"],
+    tagFr: "Illustration · Stockage NAS & Sauvegarde",
+    tagEn: "Illustration · NAS & Offline Backup",
+  },
+  {
+    pattern: /\b(mfa|authentification|mot de passe|compte|fido|clé de sécurité|chiffrement|tls|sha)\b/iu,
+    deviceIds: ["cle-securite", "smartphone", "portable"],
+    tagFr: "Illustration · Clé de sécurité & Authentification",
+    tagEn: "Illustration · FIDO2 Security Key",
+  },
+  {
+    pattern: /\b(usb|support amovible)\b/iu,
+    deviceIds: ["cle-usb", "disque-externe", "portable"],
+    tagFr: "Illustration · Support USB & Contrôle",
+    tagEn: "Illustration · Removable USB Media",
+  },
+  {
+    pattern: /\b(badge|accès physique|locaux|entrée)\b/iu,
+    deviceIds: ["lecteur-badge", "camera-ip", "baie"],
+    tagFr: "Illustration · Contrôle d’accès physique",
+    tagEn: "Illustration · Physical Badge Access",
+  },
+  {
+    pattern: /\b(onduleur|électrique|coupure|disponibilité|panne)\b/iu,
+    deviceIds: ["onduleur", "baie", "serveur"],
+    tagFr: "Illustration · Continuité électrique (Onduleur)",
+    tagEn: "Illustration · UPS Power Continuity",
+  },
+];
+
+function matchSentenceIllustration(
+  sentence: string,
+  domain: VideoDomain,
+  pool: AcademyVideoVisualSlide[],
+  usedSrcs: Set<string>,
+  fallbackIndex: number,
+  isEn: boolean
+): { slide: AcademyVideoVisualSlide; conceptTag: string; keywords: string[] } {
+  const keywords = extractSentenceKeywords(sentence, isEn);
+
+  // 1. Check explicit topology/schema mention first
+  if (/\b(schéma|topologie|architecture|packet tracer|vue d['’]ensemble)\b/iu.test(sentence)) {
+    const topoSlide =
+      pool.find((s) => s.kind === "topology" && !usedSrcs.has(s.src)) ||
+      pool.find((s) => s.kind === "topology");
+    if (topoSlide) {
+      usedSrcs.add(topoSlide.src);
+      return {
+        slide: topoSlide,
+        conceptTag: isEn ? "Architecture & Topology Diagram" : "Schéma d’architecture & Topologie",
+        keywords,
+      };
+    }
+  }
+
+  // 2. Check sentence device/concept matchers
+  for (const matcher of SENTENCE_DEVICE_MATCHERS) {
+    if (matcher.pattern.test(sentence)) {
+      for (const devId of matcher.deviceIds) {
+        const dev = equipmentById(devId);
+        if (dev && !usedSrcs.has(dev.photo)) {
+          const slide = equipmentToVisualSlide(dev, isEn);
+          usedSrcs.add(slide.src);
+          return {
+            slide,
+            conceptTag: isEn ? matcher.tagEn : matcher.tagFr,
+            keywords,
+          };
+        }
+      }
+      // If all matched devices were already used in this chapter, pick the primary one if pool is exhausted
+      const primaryDev = equipmentById(matcher.deviceIds[0]);
+      if (primaryDev && usedSrcs.size >= pool.length) {
+        const slide = equipmentToVisualSlide(primaryDev, isEn);
+        return {
+          slide,
+          conceptTag: isEn ? matcher.tagEn : matcher.tagFr,
+          keywords,
+        };
+      }
+    }
+  }
+
+  // 3. Pick the next unused slide from the lesson/lab pool so every sentence shows a new visual
+  const unusedFromPool = pool.find((s) => !usedSrcs.has(s.src));
+  if (unusedFromPool) {
+    usedSrcs.add(unusedFromPool.src);
+    return {
+      slide: unusedFromPool,
+      conceptTag: isEn ? `Visual Illustration · ${unusedFromPool.title}` : `Illustration · ${unusedFromPool.title}`,
+      keywords,
+    };
+  }
+
+  // 4. Fallback rotation across pool
+  const fallbackSlide =
+    pool[fallbackIndex % Math.max(1, pool.length)] ||
+    ({
+      id: `fallback-${domain}`,
+      src: DOMAIN_COVER_SLIDES[domain].src,
+      alt: DOMAIN_COVER_SLIDES[domain].title,
+      title: DOMAIN_COVER_SLIDES[domain].title,
+      caption: DOMAIN_COVER_SLIDES[domain].caption,
+      badge: isEn ? "VISUAL SYNTHESIS" : "ILLUSTRATION COURS",
+      kind: "cover",
+    } satisfies AcademyVideoVisualSlide);
+
+  return {
+    slide: fallbackSlide,
+    conceptTag: isEn ? `Visual · ${fallbackSlide.title}` : `Illustration · ${fallbackSlide.title}`,
+    keywords,
+  };
+}
+
+function buildChapterCaptionsAndSlides(
+  narration: string,
+  domain: VideoDomain,
+  pool: AcademyVideoVisualSlide[],
+  chapterIndex: number,
+  isEn: boolean
+): { captions: VideoCaption[]; visualSlides: AcademyVideoVisualSlide[] } {
+  const baseCaptions = buildCaptions(narration);
+  const rotatedPool =
+    pool.length > 1
+      ? [...pool.slice(chapterIndex % pool.length), ...pool.slice(0, chapterIndex % pool.length)]
+      : pool;
+  const usedSrcs = new Set<string>();
+  const chapterSlides: AcademyVideoVisualSlide[] = [];
+
+  const enrichedCaptions: VideoCaption[] = baseCaptions.map((cap, idx) => {
+    const matched = matchSentenceIllustration(
+      cap.text,
+      domain,
+      rotatedPool,
+      usedSrcs,
+      chapterIndex + idx,
+      isEn
+    );
+    const slideWithStepId: AcademyVideoVisualSlide = {
+      ...matched.slide,
+      id: `${matched.slide.id}-ch${chapterIndex}-s${idx}`,
+    };
+    chapterSlides.push(slideWithStepId);
+    return {
+      ...cap,
+      visualSlide: slideWithStepId,
+      conceptTag: matched.conceptTag,
+      keywords: matched.keywords,
+    };
+  });
+
+  // Ensure at least 2 slides in chapter.visualSlides even if narration has 1 sentence
+  if (chapterSlides.length < 2 && rotatedPool.length >= 2) {
+    const extra = rotatedPool.find((s) => s.src !== chapterSlides[0]?.src) ?? rotatedPool[1];
+    if (extra) {
+      chapterSlides.push({
+        ...extra,
+        id: `${extra.id}-ch${chapterIndex}-extra`,
+      });
+    }
+  }
+
+  return {
+    captions: enrichedCaptions,
+    visualSlides: chapterSlides,
+  };
 }
 
 function selectSlidesForChapter(
@@ -1008,6 +1405,13 @@ export function buildLessonVideoSpec(input: LessonVideoInput, lang: "fr" | "en" 
   const lessonVisualSlides = buildLessonVisualSlides(input, domain, blocks, isEn);
   const posterImage = lessonVisualSlides[0]?.src || DOMAIN_COVER_SLIDES[domain].src;
 
+  const ch1Sync = buildChapterCaptionsAndSlides(ch1Narration, domain, lessonVisualSlides, 0, isEn);
+  const ch2Sync = buildChapterCaptionsAndSlides(ch2Narration, domain, lessonVisualSlides, 1, isEn);
+  const ch3Sync = buildChapterCaptionsAndSlides(ch3Narration, domain, lessonVisualSlides, 2, isEn);
+  const ch4Sync = buildChapterCaptionsAndSlides(ch4Narration, domain, lessonVisualSlides, 3, isEn);
+  const ch5Sync = buildChapterCaptionsAndSlides(ch5Narration, domain, lessonVisualSlides, 4, isEn);
+  const ch6Sync = buildChapterCaptionsAndSlides(ch6Narration, domain, lessonVisualSlides, 5, isEn);
+
   const chapters: AcademyVideoChapter[] = [
     {
       id: "ch-briefing",
@@ -1017,10 +1421,10 @@ export function buildLessonVideoSpec(input: LessonVideoInput, lang: "fr" | "en" 
       title: isEn ? "Operational Scenario & Learning Goals" : "Mise en situation & Objectifs",
       durationSeconds: estimateDuration(ch1Narration, 22, 34),
       narration: ch1Narration,
-      captions: buildCaptions(ch1Narration),
+      captions: ch1Sync.captions,
       bullets: objectiveBullets,
       audioPlaylist: buildLessonAudioPlaylist(domain, 0),
-      visualSlides: selectSlidesForChapter(lessonVisualSlides, 0, 3),
+      visualSlides: ch1Sync.visualSlides,
       highlightTitle: scenarioText
         ? isEn
           ? "Field Scenario"
@@ -1045,10 +1449,10 @@ export function buildLessonVideoSpec(input: LessonVideoInput, lang: "fr" | "en" 
       title: primaryFigure?.title || (isEn ? "System Topology & Key Components" : "Vue d’ensemble & Matériel réel"),
       durationSeconds: estimateDuration(ch2Narration, 24, 38),
       narration: ch2Narration,
-      captions: buildCaptions(ch2Narration),
+      captions: ch2Sync.captions,
       bullets: splitSentences(theoryPara1).slice(0, 4),
       audioPlaylist: buildLessonAudioPlaylist(domain, 1),
-      visualSlides: selectSlidesForChapter(lessonVisualSlides, 1, 3),
+      visualSlides: ch2Sync.visualSlides,
       figure: primaryFigure,
       highlightTitle: primaryFigure?.title || meta.label,
       highlightBody: primaryFigure?.caption || theoryPara1,
@@ -1068,10 +1472,10 @@ export function buildLessonVideoSpec(input: LessonVideoInput, lang: "fr" | "en" 
             : "Fonctionnement détaillé & Flux",
       durationSeconds: estimateDuration(ch3Narration, 22, 36),
       narration: ch3Narration,
-      captions: buildCaptions(ch3Narration),
+      captions: ch3Sync.captions,
       bullets: splitSentences(theoryPara2).slice(0, 4),
       audioPlaylist: buildLessonAudioPlaylist(domain, 2),
-      visualSlides: selectSlidesForChapter(lessonVisualSlides, 2, 3),
+      visualSlides: ch3Sync.visualSlides,
       figure: secondaryFigure !== primaryFigure ? secondaryFigure : null,
       highlightTitle: isEn ? "Key Analytical Mechanism" : "Mécanisme technique à maîtriser",
       highlightBody: theoryPara2,
@@ -1086,10 +1490,10 @@ export function buildLessonVideoSpec(input: LessonVideoInput, lang: "fr" | "en" 
       title: isEn ? "Live Verification & Diagnostic Walkthrough" : "Vérification en direct & Commandes",
       durationSeconds: estimateDuration(ch4Narration, 24, 38),
       narration: ch4Narration,
-      captions: buildCaptions(ch4Narration),
+      captions: ch4Sync.captions,
       bullets: splitSentences(guidedDemoPara).slice(0, 3),
       audioPlaylist: buildLessonAudioPlaylist(domain, 3),
-      visualSlides: selectSlidesForChapter(lessonVisualSlides, 3, 2),
+      visualSlides: ch4Sync.visualSlides,
       terminalPrompt: meta.defaultTerminalPrompt,
       terminalSteps,
       highlightTitle: isEn ? "Worked Case Analysis" : "Exemple corrigé sur le terrain",
@@ -1107,10 +1511,10 @@ export function buildLessonVideoSpec(input: LessonVideoInput, lang: "fr" | "en" 
       title: isEn ? "Common Mistakes vs. Security Reflexes" : "Pièges fréquents & Réflexes sécurité",
       durationSeconds: estimateDuration(ch5Narration, 20, 34),
       narration: ch5Narration,
-      captions: buildCaptions(ch5Narration),
+      captions: ch5Sync.captions,
       bullets: pitfallsList,
       audioPlaylist: buildLessonAudioPlaylist(domain, 4),
-      visualSlides: selectSlidesForChapter(lessonVisualSlides, 4, 2),
+      visualSlides: ch5Sync.visualSlides,
       pitfalls: pitfallsList,
       safeguards: safeguardsList,
       highlightTitle: isEn ? "Operational Safety" : "Sécurité et limites opérationnelles",
@@ -1129,10 +1533,10 @@ export function buildLessonVideoSpec(input: LessonVideoInput, lang: "fr" | "en" 
       title: isEn ? "Summary & Hands-On Lab Transition" : "Synthèse du cours & Mise en pratique",
       durationSeconds: estimateDuration(ch6Narration, 20, 32),
       narration: ch6Narration,
-      captions: buildCaptions(ch6Narration),
+      captions: ch6Sync.captions,
       bullets: takeawayBullets,
       audioPlaylist: buildLessonAudioPlaylist(domain, 5),
-      visualSlides: selectSlidesForChapter(lessonVisualSlides, 5, 3),
+      visualSlides: ch6Sync.visualSlides,
       highlightTitle: isEn ? "Next Step: Hands-on Practice" : "Prochaine étape : passer à l’action",
       highlightBody:
         practiceText ||
@@ -1318,6 +1722,12 @@ export function buildLabVideoSpec(input: LabVideoInput, lang: "fr" | "en" = "fr"
   const labVisualSlides = buildLabVisualSlides(lab, domain, isEn);
   const posterImage = labVisualSlides[0]?.src || DOMAIN_COVER_SLIDES[domain].src;
 
+  const labCh1Sync = buildChapterCaptionsAndSlides(ch1Narration, domain, labVisualSlides, 0, isEn);
+  const labCh2Sync = buildChapterCaptionsAndSlides(ch2Narration, domain, labVisualSlides, 1, isEn);
+  const labCh3Sync = buildChapterCaptionsAndSlides(ch3Narration, domain, labVisualSlides, 2, isEn);
+  const labCh4Sync = buildChapterCaptionsAndSlides(ch4Narration, domain, labVisualSlides, 3, isEn);
+  const labCh5Sync = buildChapterCaptionsAndSlides(ch5Narration, domain, labVisualSlides, 4, isEn);
+
   const chapters: AcademyVideoChapter[] = [
     {
       id: "lab-briefing",
@@ -1327,14 +1737,14 @@ export function buildLabVideoSpec(input: LabVideoInput, lang: "fr" | "en" = "fr"
       title: isEn ? "Scenario Context & Incident Scope" : "Contexte du scénario & Périmètre",
       durationSeconds: 24,
       narration: ch1Narration,
-      captions: buildCaptions(ch1Narration),
+      captions: labCh1Sync.captions,
       bullets: [
         `${isEn ? "Format" : "Format"} : ${formatName}`,
         `${isEn ? "Objectives" : "Objectifs"} : ${lab.objectives.length} ${isEn ? "key checks" : "points de contrôle"}`,
         `${isEn ? "Estimated time" : "Durée estimée"} : ${lab.estimated_minutes || 25} min`,
       ],
       audioPlaylist: buildLabAudioPlaylist(domain, 0),
-      visualSlides: selectSlidesForChapter(labVisualSlides, 0, 3),
+      visualSlides: labCh1Sync.visualSlides,
       highlightTitle: isEn ? "Operational Briefing" : "Briefing de mission",
       highlightBody: lab.briefing || lab.description,
       nodes: meta.nodes,
@@ -1348,10 +1758,10 @@ export function buildLabVideoSpec(input: LabVideoInput, lang: "fr" | "en" = "fr"
       title: isEn ? "What You Need to Identify & Prove" : "Objectifs d’investigation & Pièces fournies",
       durationSeconds: 26,
       narration: ch2Narration,
-      captions: buildCaptions(ch2Narration),
+      captions: labCh2Sync.captions,
       bullets: lab.objectives.slice(0, 5),
       audioPlaylist: buildLabAudioPlaylist(domain, 1),
-      visualSlides: selectSlidesForChapter(labVisualSlides, 1, 3),
+      visualSlides: labCh2Sync.visualSlides,
       highlightTitle:
         assets.length > 0
           ? isEn
@@ -1373,13 +1783,13 @@ export function buildLabVideoSpec(input: LabVideoInput, lang: "fr" | "en" = "fr"
       title: isEn ? "Recommended Tools & Analytical Workflow" : "Outils recommandés & Méthode d’analyse",
       durationSeconds: 26,
       narration: ch3Narration,
-      captions: buildCaptions(ch3Narration),
+      captions: labCh3Sync.captions,
       bullets:
         lab.tools.length > 0
           ? lab.tools.map((tool) => `${isEn ? "Tool" : "Outil"} : ${tool}`)
           : [isEn ? "Inspect the provided evidence methodically." : "Inspecter méthodiquement les preuves fournies."],
       audioPlaylist: buildLabAudioPlaylist(domain, 2),
-      visualSlides: selectSlidesForChapter(labVisualSlides, 2, 2),
+      visualSlides: labCh3Sync.visualSlides,
       terminalPrompt: meta.defaultTerminalPrompt,
       terminalSteps: toolSteps,
       highlightTitle: isEn ? "Analyst Methodology" : "Méthode d’investigation NetAcad",
@@ -1395,10 +1805,10 @@ export function buildLabVideoSpec(input: LabVideoInput, lang: "fr" | "en" = "fr"
       title: isEn ? "Operational Boundaries & Investigation Tips" : "Cadre, contraintes & Conseils d’analyste",
       durationSeconds: 22,
       narration: ch4Narration,
-      captions: buildCaptions(ch4Narration),
+      captions: labCh4Sync.captions,
       bullets: lab.constraints.length > 0 ? lab.constraints : [isEn ? "Work strictly on the lab files." : "Travailler uniquement sur les fichiers du laboratoire."],
       audioPlaylist: buildLabAudioPlaylist(domain, 3),
-      visualSlides: selectSlidesForChapter(labVisualSlides, 3, 2),
+      visualSlides: labCh4Sync.visualSlides,
       pitfalls:
         lab.constraints.length > 0
           ? lab.constraints
@@ -1429,10 +1839,10 @@ export function buildLabVideoSpec(input: LabVideoInput, lang: "fr" | "en" = "fr"
             : "Prêt à lancer le laboratoire",
       durationSeconds: 22,
       narration: ch5Narration,
-      captions: buildCaptions(ch5Narration),
+      captions: labCh5Sync.captions,
       bullets: taskOverview,
       audioPlaylist: buildLabAudioPlaylist(domain, 4),
-      visualSlides: selectSlidesForChapter(labVisualSlides, 4, 3),
+      visualSlides: labCh5Sync.visualSlides,
       highlightTitle: isEn ? "Start Below" : "À toi de jouer ci-dessous",
       highlightBody: isEn
         ? "Download or open the interactive viewer below, solve step 1 to unlock the next steps, and validate your skill!"
