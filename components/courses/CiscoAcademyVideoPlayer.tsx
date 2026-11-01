@@ -11,10 +11,11 @@ import {
   type AcademyVideoVisualSlide,
   type LabVideoInput,
   type LessonVideoInput,
+  type VideoCaption,
 } from "@/lib/academy-video";
 import { formatVoiceTime } from "@/lib/mascot/voice";
 import {
-  playCyberPingoAudioQueue,
+  prefetchRealisticVoice,
   speakRealisticVoice,
   stopRealisticVoice,
 } from "@/lib/mascot/sound-effects";
@@ -52,6 +53,7 @@ export default function CiscoAcademyVideoPlayer({
 
   const containerRef = useRef<HTMLElement | null>(null);
   const [chapterIndex, setChapterIndex] = useState(0);
+  const [captionIndex, setCaptionIndex] = useState(0);
   const [chapterElapsed, setChapterElapsed] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -67,6 +69,26 @@ export default function CiscoAcademyVideoPlayer({
   const chapters = videoSpec.chapters;
   const currentChapter: AcademyVideoChapter = chapters[chapterIndex] ?? chapters[0];
   const chapterDuration = Math.max(8, currentChapter?.durationSeconds ?? 24);
+
+  const chapterCaptions: VideoCaption[] = useMemo(() => {
+    if (currentChapter?.captions?.length) return currentChapter.captions;
+    return [
+      {
+        startRatio: 0,
+        endRatio: 1,
+        text: currentChapter?.narration ?? "",
+      },
+    ];
+  }, [currentChapter]);
+
+  const safeCaptionIndex = Math.min(
+    Math.max(0, captionIndex),
+    Math.max(0, chapterCaptions.length - 1)
+  );
+  const activeCaptionItem: VideoCaption =
+    chapterCaptions[safeCaptionIndex] ?? chapterCaptions[0] ?? { startRatio: 0, endRatio: 1, text: "" };
+  const activeCaption = activeCaptionItem.text || currentChapter?.narration || "";
+
   const chapterProgress = Math.min(1, Math.max(0, chapterElapsed / chapterDuration));
 
   const chapterSlides: AcademyVideoVisualSlide[] = useMemo(
@@ -92,7 +114,6 @@ export default function CiscoAcademyVideoPlayer({
     chapterSlides[activeSlideIndex] ?? chapterSlides[0];
 
   const spokenKeyRef = useRef<string | null>(null);
-  const voiceDoneRef = useRef<boolean>(false);
 
   const elapsedBeforeCurrent = useMemo(
     () => chapters.slice(0, chapterIndex).reduce((sum, ch) => sum + ch.durationSeconds, 0),
@@ -103,66 +124,116 @@ export default function CiscoAcademyVideoPlayer({
     elapsedBeforeCurrent + chapterElapsed
   );
 
-  const activeCaption = useMemo(() => {
-    if (!currentChapter?.captions?.length) return currentChapter?.narration ?? "";
-    const match = currentChapter.captions.find(
-      (cap) => chapterProgress >= cap.startRatio && chapterProgress <= cap.endRatio + 0.02
-    );
-    return match?.text ?? currentChapter.captions[currentChapter.captions.length - 1]?.text ?? "";
-  }, [currentChapter, chapterProgress]);
-
   const stopAudio = useCallback(() => {
     stopRealisticVoice();
     setVoiceActive(false);
   }, []);
 
-  // Reset manual slide selection when switching chapters
+  // Reset manual slide selection when switching chapters and prefetch first sentences
   useEffect(() => {
     setManualSlideIndex(null);
-  }, [chapterIndex]);
+    const voiceLang = isEn ? "en" : "fr";
+    const firstCaption = chapterCaptions[0]?.text;
+    const secondCaption = chapterCaptions[1]?.text;
+    if (firstCaption) {
+      prefetchRealisticVoice(firstCaption, {
+        expression: "explanation",
+        lang: voiceLang,
+        lineId: `netacad-${videoSpec.id}-${currentChapter?.id}-0`,
+      });
+    }
+    if (secondCaption) {
+      prefetchRealisticVoice(secondCaption, {
+        expression: "explanation",
+        lang: voiceLang,
+        lineId: `netacad-${videoSpec.id}-${currentChapter?.id}-1`,
+      });
+    }
+  }, [chapterIndex, chapterCaptions, currentChapter?.id, isEn, videoSpec.id]);
 
-  // Trigger genuine ElevenLabs CyberPingo voice narration when a chapter plays
+  // Synchronized sentence-by-sentence voice narration matching the exact active subtitle
   useEffect(() => {
-    if (!isPlaying || muted || !currentChapter) {
+    if (!isPlaying || muted || !currentChapter || !activeCaption) {
       if (muted || !isPlaying) {
         stopAudio();
       }
       return;
     }
 
-    const key = `${videoSpec.id}::${currentChapter.id}::${playbackRate}`;
+    const voiceLang = isEn ? "en" : "fr";
+    const key = `${videoSpec.id}::${currentChapter.id}::${safeCaptionIndex}::${playbackRate}::${voiceLang}`;
     if (spokenKeyRef.current === key) return;
     spokenKeyRef.current = key;
-    voiceDoneRef.current = false;
 
-    const playlist = currentChapter.audioPlaylist ?? [];
-    if (playlist.length > 0) {
-      void playCyberPingoAudioQueue(playlist, {
-        volume: 0.95,
-        playbackRate,
-        onStart: () => {
-          setVoiceActive(true);
-        },
-        onEnd: () => {
-          setVoiceActive(false);
-          voiceDoneRef.current = true;
-        },
-      });
-    } else {
-      speakRealisticVoice(currentChapter.narration, {
+    // Prefetch next sentence(s) for zero-latency transition between subtitles
+    const nextInChapter = chapterCaptions[safeCaptionIndex + 1]?.text;
+    const afterNextInChapter = chapterCaptions[safeCaptionIndex + 2]?.text;
+    const nextChapterFirst = chapters[chapterIndex + 1]?.captions?.[0]?.text;
+
+    if (nextInChapter) {
+      prefetchRealisticVoice(nextInChapter, {
         expression: "explanation",
-        volume: 0.95,
-        lineId: `netacad-${videoSpec.id}-${currentChapter.id}`,
-        onStart: () => {
-          setVoiceActive(true);
-        },
-        onEnd: () => {
-          setVoiceActive(false);
-          voiceDoneRef.current = true;
-        },
+        lang: voiceLang,
+        lineId: `netacad-${videoSpec.id}-${currentChapter.id}-${safeCaptionIndex + 1}`,
       });
     }
-  }, [isPlaying, muted, currentChapter, videoSpec.id, playbackRate, stopAudio]);
+    if (afterNextInChapter) {
+      prefetchRealisticVoice(afterNextInChapter, {
+        expression: "explanation",
+        lang: voiceLang,
+        lineId: `netacad-${videoSpec.id}-${currentChapter.id}-${safeCaptionIndex + 2}`,
+      });
+    } else if (nextChapterFirst && chapters[chapterIndex + 1]) {
+      prefetchRealisticVoice(nextChapterFirst, {
+        expression: "explanation",
+        lang: voiceLang,
+        lineId: `netacad-${videoSpec.id}-${chapters[chapterIndex + 1].id}-0`,
+      });
+    }
+
+    speakRealisticVoice(activeCaption, {
+      expression: "explanation",
+      volume: 0.95,
+      playbackRate,
+      lang: voiceLang,
+      strictTextMatch: true,
+      lineId: `netacad-${videoSpec.id}-${currentChapter.id}-${safeCaptionIndex}`,
+      onStart: () => {
+        setVoiceActive(true);
+      },
+      onEnd: () => {
+        setVoiceActive(false);
+        spokenKeyRef.current = null;
+        if (safeCaptionIndex < chapterCaptions.length - 1) {
+          const nextIdx = safeCaptionIndex + 1;
+          const nextStart = (chapterCaptions[nextIdx]?.startRatio ?? 0) * chapterDuration;
+          setCaptionIndex(nextIdx);
+          setChapterElapsed(nextStart);
+        } else if (chapterIndex < chapters.length - 1) {
+          setChapterIndex((idx) => Math.min(chapters.length - 1, idx + 1));
+          setCaptionIndex(0);
+          setChapterElapsed(0);
+        } else {
+          setIsPlaying(false);
+          setChapterElapsed(chapterDuration);
+        }
+      },
+    });
+  }, [
+    isPlaying,
+    muted,
+    currentChapter,
+    activeCaption,
+    safeCaptionIndex,
+    chapterCaptions,
+    chapterDuration,
+    chapterIndex,
+    chapters,
+    videoSpec.id,
+    playbackRate,
+    isEn,
+    stopAudio,
+  ]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -180,24 +251,50 @@ export default function CiscoAcademyVideoPlayer({
     return () => document.removeEventListener("fullscreenchange", onFsChange);
   }, []);
 
-  // Main playback timer loop
+  // Smooth timeline interpolation synchronized with the active subtitle sentence
   useEffect(() => {
     if (!isPlaying) return undefined;
 
     const tickMs = 100;
     const timer = window.setInterval(() => {
+      if (!muted) {
+        // When voice is active, keep progress inside the current spoken sentence's window
+        // so the subtitle and voice stay 100% locked together until onEnd advances to the next sentence
+        const segStart = activeCaptionItem.startRatio * chapterDuration;
+        const segEnd = activeCaptionItem.endRatio * chapterDuration;
+        const segWindow = Math.max(1.5, segEnd - segStart);
+        const estimatedSentenceSec = Math.max(
+          2.2,
+          Math.min(18, activeCaption.length / (14.5 * playbackRate))
+        );
+        const step = (segWindow / estimatedSentenceSec) * (tickMs / 1000);
+
+        setChapterElapsed((prev) => {
+          const base = Math.max(segStart, prev);
+          return Math.min(segEnd - 0.04, base + step);
+        });
+        return;
+      }
+
+      // Muted mode: advance timer and caption index at reading speed
       setChapterElapsed((prev) => {
         const next = prev + (tickMs / 1000) * playbackRate;
         if (next < chapterDuration) {
+          const nextRatio = next / chapterDuration;
+          const matchedIdx = chapterCaptions.findIndex(
+            (cap) => nextRatio >= cap.startRatio && nextRatio <= cap.endRatio + 0.01
+          );
+          if (matchedIdx !== -1 && matchedIdx !== safeCaptionIndex) {
+            setCaptionIndex(matchedIdx);
+          }
           return next;
         }
-        // Advance to next chapter or finish video
         if (chapterIndex < chapters.length - 1) {
           spokenKeyRef.current = null;
           setChapterIndex((idx) => Math.min(chapters.length - 1, idx + 1));
+          setCaptionIndex(0);
           return 0;
         }
-        // End of final chapter
         setIsPlaying(false);
         setVoiceActive(false);
         return chapterDuration;
@@ -205,7 +302,19 @@ export default function CiscoAcademyVideoPlayer({
     }, tickMs);
 
     return () => window.clearInterval(timer);
-  }, [isPlaying, playbackRate, chapterDuration, chapterIndex, chapters.length]);
+  }, [
+    isPlaying,
+    muted,
+    playbackRate,
+    chapterDuration,
+    chapterIndex,
+    chapters.length,
+    activeCaptionItem.startRatio,
+    activeCaptionItem.endRatio,
+    activeCaption.length,
+    chapterCaptions,
+    safeCaptionIndex,
+  ]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -214,27 +323,46 @@ export default function CiscoAcademyVideoPlayer({
       return;
     }
     setHasStarted(true);
-    // If at the very end, restart from chapter 0
-    if (chapterIndex === chapters.length - 1 && chapterElapsed >= chapterDuration - 0.5) {
+    // If at the very end, restart from chapter 0, sentence 0
+    if (
+      chapterIndex === chapters.length - 1 &&
+      safeCaptionIndex >= chapterCaptions.length - 1 &&
+      chapterElapsed >= chapterDuration - 0.5
+    ) {
       setChapterIndex(0);
+      setCaptionIndex(0);
       setChapterElapsed(0);
     }
     spokenKeyRef.current = null;
     setIsPlaying(true);
   };
 
-  const selectChapter = (index: number, autoPlay = isPlaying) => {
+  const selectChapter = (index: number, autoPlay = isPlaying, startCaptionIdx = 0) => {
     const clamped = Math.max(0, Math.min(chapters.length - 1, index));
+    const targetChapter = chapters[clamped] ?? chapters[0];
+    const targetCaptions = targetChapter?.captions ?? [];
+    const clampedCapIdx = Math.max(0, Math.min(Math.max(0, targetCaptions.length - 1), startCaptionIdx));
+    const startRatio = targetCaptions[clampedCapIdx]?.startRatio ?? 0;
+    const targetDuration = Math.max(8, targetChapter?.durationSeconds ?? 24);
+
     stopAudio();
     spokenKeyRef.current = null;
     setChapterIndex(clamped);
-    setChapterElapsed(0);
+    setCaptionIndex(clampedCapIdx);
+    setChapterElapsed(startRatio * targetDuration);
     setHasStarted(true);
     setIsPlaying(autoPlay);
   };
 
   const handleSeekInChapter = (ratio: number) => {
     const clamped = Math.max(0, Math.min(1, ratio));
+    const matchedIdx = chapterCaptions.findIndex(
+      (cap) => clamped >= cap.startRatio && clamped <= cap.endRatio + 0.01
+    );
+    const nextCapIdx = matchedIdx !== -1 ? matchedIdx : chapterCaptions.length - 1;
+    stopAudio();
+    spokenKeyRef.current = null;
+    setCaptionIndex(Math.max(0, nextCapIdx));
     setChapterElapsed(clamped * chapterDuration);
     setHasStarted(true);
   };
@@ -709,9 +837,16 @@ export default function CiscoAcademyVideoPlayer({
           </div>
         )}
 
-        {/* Closed Captions (CC) Subtitle Bar */}
+        {/* Closed Captions (CC) Subtitle Bar synchronized with spoken sentence */}
         {showCaptions && activeCaption && (
-          <div className="netacad-player__captions" aria-live="polite">
+          <div
+            className="netacad-player__captions"
+            data-speaking={voiceActive ? "true" : "false"}
+            aria-live="polite"
+          >
+            <small className="netacad-player__captions-idx" aria-hidden="true">
+              {voiceActive ? "🔊" : "CC"} {safeCaptionIndex + 1}/{chapterCaptions.length}
+            </small>
             <span>{activeCaption}</span>
           </div>
         )}
@@ -879,19 +1014,46 @@ export default function CiscoAcademyVideoPlayer({
             <small>{videoSpec.title}</small>
           </div>
           <ol className="netacad-player__transcript-list">
-            {chapters.map((chapter, idx) => (
-              <li
-                key={chapter.id}
-                className={idx === chapterIndex ? "is-current" : ""}
-              >
-                <button type="button" onClick={() => selectChapter(idx, true)}>
-                  <span>{chapter.badge}</span>
-                  <strong>{chapter.title}</strong>
-                  <small>{formatVoiceTime(chapter.durationSeconds)}</small>
-                </button>
-                <p>{chapter.narration}</p>
-              </li>
-            ))}
+            {chapters.map((chapter, idx) => {
+              const caps = chapter.captions?.length
+                ? chapter.captions
+                : [{ startRatio: 0, endRatio: 1, text: chapter.narration }];
+              return (
+                <li
+                  key={chapter.id}
+                  className={idx === chapterIndex ? "is-current" : ""}
+                >
+                  <button type="button" onClick={() => selectChapter(idx, true, 0)}>
+                    <span>{chapter.badge}</span>
+                    <strong>{chapter.title}</strong>
+                    <small>{formatVoiceTime(chapter.durationSeconds)}</small>
+                  </button>
+                  <p className="netacad-player__transcript-sentences">
+                    {caps.map((cap, capIdx) => {
+                      const isActiveSentence =
+                        idx === chapterIndex && capIdx === safeCaptionIndex;
+                      return (
+                        <span
+                          key={capIdx}
+                          role="button"
+                          tabIndex={0}
+                          className={`netacad-transcript-sentence ${isActiveSentence ? "is-speaking" : ""}`}
+                          onClick={() => selectChapter(idx, true, capIdx)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              selectChapter(idx, true, capIdx);
+                            }
+                          }}
+                        >
+                          {cap.text}{" "}
+                        </span>
+                      );
+                    })}
+                  </p>
+                </li>
+              );
+            })}
           </ol>
         </div>
       )}

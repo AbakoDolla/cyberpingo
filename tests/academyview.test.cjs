@@ -132,6 +132,10 @@ test("buildLessonVideoSpec and buildLabVideoSpec generate multi-chapter Cisco Ne
     assert.ok(fs.existsSync(path.join(root, "public", slide.src)), `missing slide image: ${slide.src}`);
   }
   for (const ch of lessonSpec.chapters) {
+    assert.ok(Array.isArray(ch.captions) && ch.captions.length >= 1);
+    assert.equal(ch.captions[0].startRatio, 0);
+    assert.equal(ch.captions[ch.captions.length - 1].endRatio, 1);
+    assert.equal(ch.captions.map((c) => c.text).join(" "), ch.narration);
     assert.ok(Array.isArray(ch.audioPlaylist) && ch.audioPlaylist.length >= 2);
     assert.ok(Array.isArray(ch.visualSlides) && ch.visualSlides.length >= 2);
     for (const audioUrl of ch.audioPlaylist) {

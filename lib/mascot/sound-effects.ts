@@ -489,6 +489,140 @@ export function playCyberPingoAudioQueue(
   playStep(0);
 }
 
+const ttsInFlightPromises = new Map<string, Promise<string | null>>();
+
+function buildTtsCacheKey(
+  text: string,
+  expression: string,
+  lineId?: string,
+  lang: "fr" | "en" = "fr"
+): string {
+  return `${lang}::${expression}::${lineId ?? ""}::${text.slice(0, 900)}`;
+}
+
+function fetchAndCacheTtsBlob(
+  text: string,
+  expression: string,
+  lineId?: string,
+  lang: "fr" | "en" = "fr"
+): Promise<string | null> {
+  const cleaned = text.trim();
+  if (!cleaned) return Promise.resolve(null);
+
+  const cacheKey = buildTtsCacheKey(cleaned, expression, lineId, lang);
+  const existingBlobUrl = ttsBlobCache.get(cacheKey);
+  if (existingBlobUrl) {
+    return Promise.resolve(existingBlobUrl);
+  }
+
+  const inFlight = ttsInFlightPromises.get(cacheKey);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const params = new URLSearchParams({
+    text: cleaned.slice(0, 900),
+    expression,
+    lang,
+  });
+  if (lineId) {
+    params.set("lineId", lineId);
+  }
+
+  const promise = fetch(`/api/tts?${params.toString()}`, {
+    method: "GET",
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error(`TTS HTTP ${res.status}`);
+      const arr = await res.arrayBuffer();
+      if (!arr.byteLength) throw new Error("Empty TTS payload");
+      const blob = new Blob([arr], { type: "audio/mpeg" });
+      const blobUrl = URL.createObjectURL(blob);
+      ttsBlobCache.set(cacheKey, blobUrl);
+
+      const ctx = getAudioContext();
+      if (ctx) {
+        try {
+          const decoded = await ctx.decodeAudioData(arr.slice(0));
+          audioBufferCache.set(blobUrl, decoded);
+        } catch {
+          // HTMLAudioElement will still play blobUrl
+        }
+      }
+
+      return blobUrl;
+    })
+    .catch(() => null)
+    .finally(() => {
+      ttsInFlightPromises.delete(cacheKey);
+    });
+
+  ttsInFlightPromises.set(cacheKey, promise);
+  return promise;
+}
+
+/**
+ * Pré-charge en arrière-plan la synthèse vocale d'une phrase (ex: le sous-titre suivant d'une vidéo)
+ * pour garantir une transition instantanée sans latence réseau entre deux phrases.
+ */
+export function prefetchRealisticVoice(
+  text: string,
+  options?: {
+    expression?: string;
+    lineId?: string;
+    lang?: "fr" | "en";
+  }
+): void {
+  if (typeof window === "undefined") return;
+  const cleaned = text.trim();
+  if (!cleaned) return;
+  const expression = options?.expression ?? "explanation";
+  const lang = options?.lang ?? "fr";
+  void fetchAndCacheTtsBlob(cleaned, expression, options?.lineId, lang);
+}
+
+function speakExactTextWithBrowserSynthesis(
+  text: string,
+  options: {
+    volume: number;
+    playbackRate: number;
+    lang: "fr" | "en";
+    onStart?: () => void;
+    onEnd?: () => void;
+  }
+): void {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+    options.onEnd?.();
+    return;
+  }
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = options.lang === "en" ? "en-US" : "fr-FR";
+    utterance.volume = options.volume;
+    utterance.rate = options.playbackRate;
+
+    const voices = window.speechSynthesis.getVoices();
+    const targetPrefix = options.lang === "en" ? "en" : "fr";
+    const preferredVoice =
+      voices.find(
+        (v) =>
+          v.lang.toLowerCase().startsWith(targetPrefix) &&
+          /natural|neural|henri|remy|paul|google|thomas|denise/i.test(v.name)
+      ) || voices.find((v) => v.lang.toLowerCase().startsWith(targetPrefix));
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+
+    utterance.onstart = () => options.onStart?.();
+    utterance.onend = () => options.onEnd?.();
+    utterance.onerror = () => options.onEnd?.();
+    window.speechSynthesis.speak(utterance);
+  } catch {
+    options.onEnd?.();
+  }
+}
+
 export function speakRealisticVoice(
   text: string,
   options?: {
@@ -496,6 +630,8 @@ export function speakRealisticVoice(
     playbackRate?: number;
     expression?: string;
     lineId?: string;
+    lang?: "fr" | "en";
+    strictTextMatch?: boolean;
     fallbackAudioUrl?: string;
     onEnd?: () => void;
     onStart?: () => void;
@@ -511,12 +647,25 @@ export function speakRealisticVoice(
     return;
   }
 
+  const gen = playbackGeneration;
   const expression = options?.expression ?? "encouraging";
+  const lang = options?.lang ?? "fr";
   const volume = Math.max(0, Math.min(1, options?.volume ?? 0.85));
   const playbackRate = options?.playbackRate ?? 1;
-  const cacheKey = `${expression}::${options?.lineId ?? ""}::${cleaned.slice(0, 900)}`;
+  const cacheKey = buildTtsCacheKey(cleaned, expression, options?.lineId, lang);
 
-  const playFallbackElevenLabsMp3 = () => {
+  const playFallback = () => {
+    if (gen !== playbackGeneration) return;
+    if (options?.strictTextMatch) {
+      speakExactTextWithBrowserSynthesis(cleaned, {
+        volume,
+        playbackRate,
+        lang,
+        onStart: options?.onStart,
+        onEnd: options?.onEnd,
+      });
+      return;
+    }
     const mp3Url =
       options?.fallbackAudioUrl || selectFallbackElevenLabsMp3(cleaned, expression, options?.lineId);
     playCyberPingoAudioUrl(mp3Url, {
@@ -529,12 +678,13 @@ export function speakRealisticVoice(
   };
 
   const playBlobUrl = (blobUrl: string) => {
+    if (gen !== playbackGeneration) return;
     playCyberPingoAudioUrl(blobUrl, {
       volume,
       playbackRate,
       onStart: options?.onStart,
       onEnd: options?.onEnd,
-      onError: playFallbackElevenLabsMp3,
+      onError: playFallback,
     });
   };
 
@@ -544,36 +694,14 @@ export function speakRealisticVoice(
     return;
   }
 
-  const controller = new AbortController();
-  activeAbortController = controller;
-
-  fetch("/api/tts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      text: cleaned,
-      expression,
-      lineId: options?.lineId,
-    }),
-    signal: controller.signal,
-  })
-    .then(async (res) => {
-      if (!res.ok) throw new Error(`TTS HTTP ${res.status}`);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      ttsBlobCache.set(cacheKey, blobUrl);
-      if (activeAbortController === controller) {
-        activeAbortController = null;
-        playBlobUrl(blobUrl);
-      }
-    })
-    .catch((err: unknown) => {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      if (activeAbortController === controller) {
-        activeAbortController = null;
-      }
-      playFallbackElevenLabsMp3();
-    });
+  void fetchAndCacheTtsBlob(cleaned, expression, options?.lineId, lang).then((blobUrl) => {
+    if (gen !== playbackGeneration) return;
+    if (blobUrl) {
+      playBlobUrl(blobUrl);
+    } else {
+      playFallback();
+    }
+  });
 }
 
 /** Stops any active speech synthesis */
