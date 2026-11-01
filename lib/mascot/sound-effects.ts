@@ -228,6 +228,7 @@ export function playCyberPingoAudioUrl(
   url: string,
   options?: {
     volume?: number;
+    playbackRate?: number;
     onStart?: () => void;
     onEnd?: () => void;
     onError?: () => void;
@@ -240,6 +241,7 @@ export function playCyberPingoAudioUrl(
 
   const gen = ++playbackGeneration;
   const volume = Math.max(0, Math.min(1, options?.volume ?? 0.85));
+  const playbackRate = Math.max(0.5, Math.min(2, options?.playbackRate ?? 1));
   let started = false;
 
   const notifyStart = () => {
@@ -278,6 +280,7 @@ export function playCyberPingoAudioUrl(
       const source = ctx.createBufferSource();
       const gainNode = ctx.createGain();
       gainNode.gain.value = volume;
+      source.playbackRate.value = playbackRate;
       source.buffer = decoded;
       source.connect(gainNode);
       gainNode.connect(ctx.destination);
@@ -303,6 +306,7 @@ export function playCyberPingoAudioUrl(
   const audio = new Audio(url);
   audio.preload = "auto";
   audio.volume = volume;
+  audio.playbackRate = playbackRate;
   activeAudio = audio;
 
   audio.onplay = () => {
@@ -382,53 +386,117 @@ export function playCyberPingoAudioUrl(
   });
 }
 
-function speakFallbackBrowserVoice(
-  text: string,
-  options?: { volume?: number; onEnd?: () => void; onStart?: () => void }
-) {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+const ELEVENLABS_FALLBACK_MP3_BY_EXPRESSION: Readonly<Record<string, string>> = {
+  welcome: "/audio/mascot/da285d27-f5dc-9470-288b-5239d3b4d73b.mp3",
+  happy: "/audio/mascot/ff1f8c62-0c3e-8b51-17fb-1aa2e1e0e778.mp3",
+  proud: "/audio/mascot/f81109a2-298b-3425-fd9a-8900724b9882.mp3",
+  celebration: "/audio/mascot/c92bb8fc-2df0-6989-781c-0b77358c1f0b.mp3",
+  surprised: "/audio/mascot/72a62b06-091f-21d3-b2d5-d8de43eaafe2.mp3",
+  encouraging: "/audio/mascot/d87276bc-32ac-b61e-b061-c611b495e6e5.mp3",
+  mission: "/audio/mascot/65b23789-9944-a131-fe16-66c717af20fa.mp3",
+  focused: "/audio/mascot/199c8897-2797-aff0-de28-71ca23bad1e1.mp3",
+  thinking: "/audio/mascot/fdbce325-8d11-86ed-0c3f-4711db554265.mp3",
+  disappointed: "/audio/mascot/d20265aa-6f59-18a3-fa9c-7efd94751304.mp3",
+  expert: "/audio/mascot/6fd7b129-3f65-3b43-f76e-1dffb8b3add4.mp3",
+  explanation: "/audio/videos/ch-architecture.mp3",
+};
+
+function selectFallbackElevenLabsMp3(text: string, expression?: string, lineId?: string): string {
+  const lower = `${lineId ?? ""} ${text}`.toLowerCase();
+  if (lower.includes("osi") || lower.includes("7 couches") || lower.includes("sept couches")) {
+    return "/audio/videos/osi-briefing.mp3";
+  }
+  if (lower.includes("terminal") || lower.includes("commande") || lower.includes("cli")) {
+    return "/audio/videos/ch-terminal.mp3";
+  }
+  if (lower.includes("erreur") || lower.includes("piège") || lower.includes("attention")) {
+    return "/audio/videos/ch-pitfalls.mp3";
+  }
+  if (lower.includes("retenir") || lower.includes("récapitulons") || lower.includes("synthèse")) {
+    return "/audio/videos/ch-takeaway.mp3";
+  }
+  if (lower.includes("laboratoire") || lower.includes("mission")) {
+    return "/audio/videos/lab-methodology.mp3";
+  }
+  if (lower.includes("linux") || lower.includes("systemd") || lower.includes("chmod")) {
+    return "/audio/videos/linux-briefing.mp3";
+  }
+  if (lower.includes("journal") || lower.includes("journaux") || lower.includes("soc") || lower.includes("siem")) {
+    return "/audio/videos/logs-briefing.mp3";
+  }
+  if (lower.includes("http") || lower.includes("cookie") || lower.includes("tls") || lower.includes("web")) {
+    return "/audio/videos/web-briefing.mp3";
+  }
+  if (lower.includes("pentest") || lower.includes("nmap") || lower.includes("intrusion")) {
+    return "/audio/videos/pentest-briefing.mp3";
+  }
+  if (lower.includes("sha-256") || lower.includes("chiffrement") || lower.includes("crypto")) {
+    return "/audio/videos/crypto-briefing.mp3";
+  }
+  if (lower.includes("routeur") || lower.includes("switch") || lower.includes("vlan") || lower.includes("réseau")) {
+    return "/audio/videos/network-briefing.mp3";
+  }
+  return (
+    (expression && ELEVENLABS_FALLBACK_MP3_BY_EXPRESSION[expression]) ||
+    "/audio/videos/fundamentals-briefing.mp3"
+  );
+}
+
+/**
+ * Lit enchaîné une liste de fichiers audio MP3 ElevenLabs CyberPingo (ex: narration de chapitre + conseil Pingo)
+ * avec prise en charge de la vitesse de lecture (0.75x à 1.5x).
+ */
+export function playCyberPingoAudioQueue(
+  urls: readonly string[],
+  options?: {
+    volume?: number;
+    playbackRate?: number;
+    onStart?: () => void;
+    onEnd?: () => void;
+  }
+): void {
+  const validUrls = urls.filter(Boolean);
+  if (typeof window === "undefined" || validUrls.length === 0) {
     options?.onEnd?.();
     return;
   }
 
-  window.speechSynthesis.cancel();
+  let hasStartedFirst = false;
 
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "fr-FR";
-  utterance.volume = options?.volume ?? 0.85;
-  utterance.rate = 0.92;
-  utterance.pitch = 0.94;
+  const playStep = (index: number) => {
+    if (index >= validUrls.length) {
+      options?.onEnd?.();
+      return;
+    }
+    playCyberPingoAudioUrl(validUrls[index], {
+      volume: options?.volume,
+      playbackRate: options?.playbackRate,
+      onStart: () => {
+        if (!hasStartedFirst) {
+          hasStartedFirst = true;
+          options?.onStart?.();
+        }
+      },
+      onEnd: () => {
+        playStep(index + 1);
+      },
+      onError: () => {
+        playStep(index + 1);
+      },
+    });
+  };
 
-  const voices = window.speechSynthesis.getVoices();
-  const preferredVoice =
-    voices.find(
-      (v) =>
-        v.lang.startsWith("fr") &&
-        (/thomas|henri|paul|claude|nicolas|remi|daniel|male|homme/i.test(v.name) ||
-          (/google/i.test(v.name) && v.lang === "fr-FR"))
-    ) || voices.find((v) => v.lang.startsWith("fr"));
-
-  if (preferredVoice) {
-    utterance.voice = preferredVoice;
-  }
-
-  if (options?.onStart) {
-    utterance.onstart = options.onStart;
-  }
-  if (options?.onEnd) {
-    utterance.onend = options.onEnd;
-    utterance.onerror = options.onEnd;
-  }
-
-  window.speechSynthesis.speak(utterance);
+  playStep(0);
 }
 
 export function speakRealisticVoice(
   text: string,
   options?: {
     volume?: number;
+    playbackRate?: number;
     expression?: string;
     lineId?: string;
+    fallbackAudioUrl?: string;
     onEnd?: () => void;
     onStart?: () => void;
   }
@@ -445,14 +513,28 @@ export function speakRealisticVoice(
 
   const expression = options?.expression ?? "encouraging";
   const volume = Math.max(0, Math.min(1, options?.volume ?? 0.85));
+  const playbackRate = options?.playbackRate ?? 1;
   const cacheKey = `${expression}::${options?.lineId ?? ""}::${cleaned.slice(0, 900)}`;
+
+  const playFallbackElevenLabsMp3 = () => {
+    const mp3Url =
+      options?.fallbackAudioUrl || selectFallbackElevenLabsMp3(cleaned, expression, options?.lineId);
+    playCyberPingoAudioUrl(mp3Url, {
+      volume,
+      playbackRate,
+      onStart: options?.onStart,
+      onEnd: options?.onEnd,
+      onError: options?.onEnd,
+    });
+  };
 
   const playBlobUrl = (blobUrl: string) => {
     playCyberPingoAudioUrl(blobUrl, {
       volume,
+      playbackRate,
       onStart: options?.onStart,
       onEnd: options?.onEnd,
-      onError: () => speakFallbackBrowserVoice(cleaned, options),
+      onError: playFallbackElevenLabsMp3,
     });
   };
 
@@ -490,7 +572,7 @@ export function speakRealisticVoice(
       if (activeAbortController === controller) {
         activeAbortController = null;
       }
-      speakFallbackBrowserVoice(cleaned, options);
+      playFallbackElevenLabsMp3();
     });
 }
 

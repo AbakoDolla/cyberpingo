@@ -8,11 +8,16 @@ import {
   buildLessonVideoSpec,
   type AcademyVideoChapter,
   type AcademyVideoSpec,
+  type AcademyVideoVisualSlide,
   type LabVideoInput,
   type LessonVideoInput,
 } from "@/lib/academy-video";
 import { formatVoiceTime } from "@/lib/mascot/voice";
-import { speakRealisticVoice, stopRealisticVoice } from "@/lib/mascot/sound-effects";
+import {
+  playCyberPingoAudioQueue,
+  speakRealisticVoice,
+  stopRealisticVoice,
+} from "@/lib/mascot/sound-effects";
 
 export interface CiscoAcademyVideoPlayerProps {
   mode?: "lesson" | "lab";
@@ -56,12 +61,35 @@ export default function CiscoAcademyVideoPlayer({
   const [speedIndex, setSpeedIndex] = useState(1); // 1x default
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [voiceActive, setVoiceActive] = useState(false);
+  const [manualSlideIndex, setManualSlideIndex] = useState<number | null>(null);
 
   const playbackRate = SPEEDS[speedIndex] ?? 1;
   const chapters = videoSpec.chapters;
   const currentChapter: AcademyVideoChapter = chapters[chapterIndex] ?? chapters[0];
   const chapterDuration = Math.max(8, currentChapter?.durationSeconds ?? 24);
   const chapterProgress = Math.min(1, Math.max(0, chapterElapsed / chapterDuration));
+
+  const chapterSlides: AcademyVideoVisualSlide[] = useMemo(
+    () =>
+      currentChapter?.visualSlides?.length
+        ? currentChapter.visualSlides
+        : videoSpec.visualSlides ?? [],
+    [currentChapter, videoSpec.visualSlides]
+  );
+
+  const activeSlideIndex = useMemo(() => {
+    if (!chapterSlides.length) return 0;
+    if (manualSlideIndex !== null && manualSlideIndex < chapterSlides.length) {
+      return manualSlideIndex;
+    }
+    return Math.min(
+      chapterSlides.length - 1,
+      Math.floor(chapterProgress * chapterSlides.length)
+    );
+  }, [chapterSlides.length, manualSlideIndex, chapterProgress]);
+
+  const activeSlide: AcademyVideoVisualSlide | undefined =
+    chapterSlides[activeSlideIndex] ?? chapterSlides[0];
 
   const spokenKeyRef = useRef<string | null>(null);
   const voiceDoneRef = useRef<boolean>(false);
@@ -88,7 +116,12 @@ export default function CiscoAcademyVideoPlayer({
     setVoiceActive(false);
   }, []);
 
-  // Trigger CyberPingo ElevenLabs / Web Speech narration when a chapter plays
+  // Reset manual slide selection when switching chapters
+  useEffect(() => {
+    setManualSlideIndex(null);
+  }, [chapterIndex]);
+
+  // Trigger genuine ElevenLabs CyberPingo voice narration when a chapter plays
   useEffect(() => {
     if (!isPlaying || muted || !currentChapter) {
       if (muted || !isPlaying) {
@@ -97,24 +130,39 @@ export default function CiscoAcademyVideoPlayer({
       return;
     }
 
-    const key = `${videoSpec.id}::${currentChapter.id}`;
+    const key = `${videoSpec.id}::${currentChapter.id}::${playbackRate}`;
     if (spokenKeyRef.current === key) return;
     spokenKeyRef.current = key;
     voiceDoneRef.current = false;
 
-    speakRealisticVoice(currentChapter.narration, {
-      expression: "explanation",
-      volume: 0.9,
-      lineId: `netacad-${videoSpec.id}-${currentChapter.id}`,
-      onStart: () => {
-        setVoiceActive(true);
-      },
-      onEnd: () => {
-        setVoiceActive(false);
-        voiceDoneRef.current = true;
-      },
-    });
-  }, [isPlaying, muted, currentChapter, videoSpec.id, stopAudio]);
+    const playlist = currentChapter.audioPlaylist ?? [];
+    if (playlist.length > 0) {
+      void playCyberPingoAudioQueue(playlist, {
+        volume: 0.95,
+        playbackRate,
+        onStart: () => {
+          setVoiceActive(true);
+        },
+        onEnd: () => {
+          setVoiceActive(false);
+          voiceDoneRef.current = true;
+        },
+      });
+    } else {
+      speakRealisticVoice(currentChapter.narration, {
+        expression: "explanation",
+        volume: 0.95,
+        lineId: `netacad-${videoSpec.id}-${currentChapter.id}`,
+        onStart: () => {
+          setVoiceActive(true);
+        },
+        onEnd: () => {
+          setVoiceActive(false);
+          voiceDoneRef.current = true;
+        },
+      });
+    }
+  }, [isPlaying, muted, currentChapter, videoSpec.id, playbackRate, stopAudio]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -237,6 +285,72 @@ export default function CiscoAcademyVideoPlayer({
     return Math.max(1, Math.min(total, Math.ceil((chapterProgress + 0.18) * total)));
   }, [currentChapter?.terminalSteps?.length, chapterProgress, hasStarted, isPlaying]);
 
+  const renderVisualShowcase = (compact = false) => {
+    if (!activeSlide) return null;
+    return (
+      <div className={`netacad-visual-showcase ${compact ? "netacad-visual-showcase--compact" : ""}`}>
+        <div className="netacad-visual-showcase__frame" data-playing={isPlaying ? "true" : "false"}>
+          <img
+            key={activeSlide.src}
+            src={activeSlide.src}
+            alt={activeSlide.alt}
+            className={`netacad-visual-showcase__img ${activeSlide.kind === "topology" ? "is-diagram" : ""}`}
+            loading="eager"
+          />
+          <div className="netacad-visual-showcase__overlay">
+            <div className="netacad-visual-showcase__top">
+              <span className="netacad-visual-showcase__badge">{activeSlide.badge}</span>
+              {activeSlide.credit && (
+                <span className="netacad-visual-showcase__credit">{activeSlide.credit}</span>
+              )}
+            </div>
+            <div className="netacad-visual-showcase__caption">
+              <strong>{activeSlide.title}</strong>
+              <p>{activeSlide.caption}</p>
+              {!compact && (activeSlide.risk || activeSlide.habit) && (
+                <div className="netacad-visual-showcase__chips">
+                  {activeSlide.risk && (
+                    <span className="netacad-visual-chip netacad-visual-chip--risk">
+                      <b>{isEn ? "Risk:" : "Risque :"}</b> {activeSlide.risk}
+                    </span>
+                  )}
+                  {activeSlide.habit && (
+                    <span className="netacad-visual-chip netacad-visual-chip--habit">
+                      <b>{isEn ? "Reflex:" : "Bon réflexe :"}</b> {activeSlide.habit}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {chapterSlides.length > 1 && (
+          <div
+            className="netacad-slide-strip"
+            role="tablist"
+            aria-label={isEn ? "Chapter illustrative visuals" : "Illustrations réelles du chapitre"}
+          >
+            {chapterSlides.map((slide, idx) => (
+              <button
+                key={slide.id}
+                type="button"
+                role="tab"
+                aria-selected={idx === activeSlideIndex}
+                className={`netacad-slide-thumb ${idx === activeSlideIndex ? "is-active" : ""}`}
+                onClick={() => setManualSlideIndex(idx)}
+                title={slide.title}
+              >
+                <img src={slide.src} alt="" loading="lazy" />
+                <span>{slide.title}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <figure
       ref={containerRef}
@@ -263,6 +377,10 @@ export default function CiscoAcademyVideoPlayer({
             {chapters.length} {isEn ? "chapters" : "chapitres"}
           </span>
           <span>·</span>
+          <span>
+            {(videoSpec.visualSlides ?? []).length} {isEn ? "real visuals" : "photos & schémas"}
+          </span>
+          <span>·</span>
           <span>{formatVoiceTime(videoSpec.totalDurationSeconds)}</span>
         </div>
       </header>
@@ -276,6 +394,11 @@ export default function CiscoAcademyVideoPlayer({
             <span>{currentChapter.title}</span>
           </div>
           <div className="netacad-player__voice-indicator" data-active={voiceActive ? "true" : "false"}>
+            <img
+              src="/images/mascot/professeur-pingo-face.png"
+              alt="Professeur Pingo"
+              className="netacad-player__voice-avatar"
+            />
             <span className="netacad-player__wave" aria-hidden="true">
               <i />
               <i />
@@ -289,18 +412,18 @@ export default function CiscoAcademyVideoPlayer({
                   : "Son coupé"
                 : voiceActive
                   ? isEn
-                    ? "Pingo Voice active"
-                    : "Voix CyberPingo active"
+                    ? "ElevenLabs CyberPingo active"
+                    : "Voix ElevenLabs CyberPingo active"
                   : isEn
-                    ? "CyberPingo Voice ready"
-                    : "Voix CyberPingo prête"}
+                    ? "ElevenLabs CyberPingo ready"
+                    : "Voix ElevenLabs CyberPingo"}
             </small>
           </div>
         </div>
 
         {/* Dynamic Scene Body */}
         <div className="netacad-player__scene" data-kind={currentChapter.kind}>
-          {/* SCENE 1: BRIEFING & SCENARIO */}
+          {/* SCENE 1: BRIEFING & SCENARIO + REAL PHOTOGRAPH SHOWCASE */}
           {currentChapter.kind === "briefing" && (
             <div className="netacad-scene netacad-scene--briefing">
               <div className="netacad-scene__card netacad-scene__card--primary">
@@ -308,25 +431,6 @@ export default function CiscoAcademyVideoPlayer({
                 <h3>{videoSpec.title}</h3>
                 <p>{currentChapter.highlightBody}</p>
 
-                {currentChapter.nodes && currentChapter.nodes.length > 0 && (
-                  <div className="netacad-topology-strip" aria-label={isEn ? "Architecture flow" : "Chaîne d’architecture"}>
-                    {currentChapter.nodes.map((node, idx) => (
-                      <div
-                        key={node.id}
-                        className={`netacad-topology-node tone-${node.tone} ${idx === activeNodeIndex ? "is-active" : idx < activeNodeIndex ? "is-passed" : ""}`}
-                      >
-                        <span className="netacad-topology-node__step">{idx + 1}</span>
-                        <div>
-                          <strong>{node.label}</strong>
-                          <small>{node.sub}</small>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="netacad-scene__card netacad-scene__card--list">
                 <span className="netacad-scene__eyebrow">
                   {mode === "lab"
                     ? isEn
@@ -336,7 +440,7 @@ export default function CiscoAcademyVideoPlayer({
                       ? "Learning Objectives"
                       : "Objectifs d’apprentissage"}
                 </span>
-                <ul className="netacad-checklist">
+                <ul className="netacad-checklist netacad-checklist--compact">
                   {currentChapter.bullets.map((bullet, idx) => (
                     <li
                       key={idx}
@@ -348,10 +452,12 @@ export default function CiscoAcademyVideoPlayer({
                   ))}
                 </ul>
               </div>
+
+              {renderVisualShowcase(false)}
             </div>
           )}
 
-          {/* SCENE 2 & 3: ARCHITECTURE DIAGRAM / MECHANISM */}
+          {/* SCENE 2 & 3: ARCHITECTURE DIAGRAM / MECHANISM + REAL HARDWARE PHOTOGRAPHS */}
           {(currentChapter.kind === "diagram" || currentChapter.kind === "mechanism") && (
             <div className="netacad-scene netacad-scene--diagram">
               <div className="netacad-scene__visual">
@@ -398,25 +504,26 @@ export default function CiscoAcademyVideoPlayer({
                     </div>
                   </div>
                 )}
+
+                {currentChapter.bullets.length > 0 && (
+                  <ul className="netacad-checklist netacad-checklist--inline">
+                    {currentChapter.bullets.slice(0, 3).map((bullet, idx) => (
+                      <li key={idx} className={idx <= activeBulletIndex ? "is-highlighted" : ""}>
+                        <span className="netacad-checklist__index">{idx + 1}</span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               <div className="netacad-scene__side">
-                <span className="netacad-scene__eyebrow">
-                  {isEn ? "Key Technical Points" : "Points clés à observer"}
-                </span>
-                <ul className="netacad-checklist netacad-checklist--compact">
-                  {currentChapter.bullets.map((bullet, idx) => (
-                    <li key={idx} className={idx <= activeBulletIndex ? "is-highlighted" : ""}>
-                      <span className="netacad-checklist__index">{idx + 1}</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+                {renderVisualShowcase(false)}
               </div>
             </div>
           )}
 
-          {/* SCENE 4: LIVE TERMINAL & DIAGNOSTIC WALKTHROUGH */}
+          {/* SCENE 4: LIVE TERMINAL & DIAGNOSTIC WALKTHROUGH + REAL HARDWARE CONTEXT */}
           {currentChapter.kind === "terminal" && (
             <div className="netacad-scene netacad-scene--terminal">
               <div className="netacad-terminal">
@@ -453,94 +560,68 @@ export default function CiscoAcademyVideoPlayer({
                 </div>
               </div>
 
-              <div className="netacad-scene__card netacad-scene__card--case">
-                <span className="netacad-scene__eyebrow">{currentChapter.highlightTitle}</span>
-                <p>{currentChapter.highlightBody}</p>
-                {currentChapter.bullets.length > 0 && (
+              <div className="netacad-scene__side">
+                {renderVisualShowcase(true)}
+                <div className="netacad-scene__card netacad-scene__card--case">
+                  <span className="netacad-scene__eyebrow">{currentChapter.highlightTitle}</span>
+                  <p>{currentChapter.highlightBody}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SCENE 5: PITFALLS & SECURITY + REAL HARDWARE RISK PHOTO */}
+          {currentChapter.kind === "pitfalls" && (
+            <div className="netacad-scene netacad-scene--pitfalls">
+              <div className="netacad-scene__pitfalls-stack">
+                <div className="netacad-scene__card netacad-scene__card--warn">
+                  <span className="netacad-scene__eyebrow">
+                    {mode === "lab"
+                      ? isEn
+                        ? "Operational Constraints"
+                        : "Contraintes & Cadre"
+                      : isEn
+                        ? "Common Mistakes to Avoid"
+                        : "Erreurs fréquentes à éviter"}
+                  </span>
                   <ul className="netacad-checklist netacad-checklist--compact">
-                    {currentChapter.bullets.map((bullet, idx) => (
+                    {(currentChapter.pitfalls ?? currentChapter.bullets).map((item, idx) => (
                       <li key={idx} className="is-highlighted">
-                        <span className="netacad-checklist__index">✓</span>
-                        <span>{bullet}</span>
+                        <span className="netacad-checklist__index netacad-checklist__index--warn">!</span>
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
-                )}
+                </div>
+
+                <div className="netacad-scene__card netacad-scene__card--safe">
+                  <span className="netacad-scene__eyebrow">
+                    {mode === "lab"
+                      ? isEn
+                        ? "Analyst Investigation Hints"
+                        : "Conseils & Pistes d’analyste"
+                      : isEn
+                        ? "Security & Best Practices"
+                        : "Réflexes de sécurité"}
+                  </span>
+                  <ul className="netacad-checklist netacad-checklist--compact">
+                    {(currentChapter.safeguards ?? []).map((item, idx) => (
+                      <li key={idx} className="is-highlighted">
+                        <span className="netacad-checklist__index netacad-checklist__index--safe">✓</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
+
+              {renderVisualShowcase(false)}
             </div>
           )}
 
-          {/* SCENE 5: PITFALLS & SECURITY */}
-          {currentChapter.kind === "pitfalls" && (
-            <div className="netacad-scene netacad-scene--pitfalls">
-              <div className="netacad-scene__card netacad-scene__card--warn">
-                <span className="netacad-scene__eyebrow">
-                  {mode === "lab"
-                    ? isEn
-                      ? "Operational Constraints"
-                      : "Contraintes & Cadre"
-                    : isEn
-                      ? "Common Mistakes to Avoid"
-                      : "Erreurs fréquentes à éviter"}
-                </span>
-                <ul className="netacad-checklist">
-                  {(currentChapter.pitfalls ?? currentChapter.bullets).map((item, idx) => (
-                    <li key={idx} className="is-highlighted">
-                      <span className="netacad-checklist__index netacad-checklist__index--warn">!</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="netacad-scene__card netacad-scene__card--safe">
-                <span className="netacad-scene__eyebrow">
-                  {mode === "lab"
-                    ? isEn
-                      ? "Analyst Investigation Hints"
-                      : "Conseils & Pistes d’analyste"
-                    : isEn
-                      ? "Security & Best Practices"
-                      : "Réflexes de sécurité"}
-                </span>
-                <ul className="netacad-checklist">
-                  {(currentChapter.safeguards ?? []).map((item, idx) => (
-                    <li key={idx} className="is-highlighted">
-                      <span className="netacad-checklist__index netacad-checklist__index--safe">✓</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                {currentChapter.highlightBody && (
-                  <p className="netacad-scene__note">{currentChapter.highlightBody}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* SCENE 6: SUMMARY & ACTION PLAN */}
+          {/* SCENE 6: SUMMARY & ACTION PLAN + REAL VISUAL SHOWCASE */}
           {currentChapter.kind === "summary" && (
             <div className="netacad-scene netacad-scene--summary">
-              <div className="netacad-scene__card netacad-scene__card--list">
-                <span className="netacad-scene__eyebrow">
-                  {mode === "lab"
-                    ? isEn
-                      ? "Investigation Steps Overview"
-                      : "Étapes de validation du laboratoire"
-                    : isEn
-                      ? "Essential Takeaways"
-                      : "À retenir absolument"}
-                </span>
-                <ul className="netacad-checklist">
-                  {currentChapter.bullets.map((bullet, idx) => (
-                    <li key={idx} className="is-highlighted">
-                      <span className="netacad-checklist__index netacad-checklist__index--safe">✓</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
               <div className="netacad-scene__card netacad-scene__card--action">
                 <span className="netacad-scene__eyebrow">{currentChapter.highlightTitle}</span>
                 <h3>
@@ -553,6 +634,14 @@ export default function CiscoAcademyVideoPlayer({
                       : "Passer de la théorie à la pratique"}
                 </h3>
                 <p>{currentChapter.highlightBody}</p>
+                <ul className="netacad-checklist netacad-checklist--compact">
+                  {currentChapter.bullets.map((bullet, idx) => (
+                    <li key={idx} className="is-highlighted">
+                      <span className="netacad-checklist__index netacad-checklist__index--safe">✓</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
                 <button
                   type="button"
                   className="netacad-replay-btn"
@@ -561,39 +650,62 @@ export default function CiscoAcademyVideoPlayer({
                   ↻ {isEn ? "Replay Video Capsule" : "Revoir la capsule depuis le début"}
                 </button>
               </div>
+
+              {renderVisualShowcase(false)}
             </div>
           )}
         </div>
 
-        {/* Click-to-start Poster Veil when not yet started */}
+        {/* Click-to-start Poster Veil with real background photograph when not yet started */}
         {!hasStarted && !isPlaying && (
           <div className="netacad-player__poster">
-            <button
-              type="button"
-              className="netacad-player__big-play"
-              onClick={togglePlay}
-              aria-label={isEn ? `Play video: ${videoSpec.title}` : `Lancer la vidéo : ${videoSpec.title}`}
-            >
-              <span className="netacad-player__big-play-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
-                  <path d="M8 5.5v13l10.5-6.5L8 5.5z" />
-                </svg>
-              </span>
-              <span className="netacad-player__big-play-text">
-                <strong>
-                  {mode === "lab"
-                    ? isEn
-                      ? "Watch Lab Briefing & Methodology"
-                      : "Lancer la démonstration vidéo du lab"
-                    : isEn
-                      ? "Watch Interactive Course Video"
-                      : "Lancer la capsule vidéo du cours"}
-                </strong>
-                <small>
-                  {videoSpec.title} · {chapters.length} {isEn ? "animated chapters" : "chapitres animés"} ({formatVoiceTime(videoSpec.totalDurationSeconds)})
-                </small>
-              </span>
-            </button>
+            {videoSpec.posterImage && (
+              <img
+                src={videoSpec.posterImage}
+                alt=""
+                aria-hidden="true"
+                className="netacad-player__poster-bg"
+              />
+            )}
+            <div className="netacad-player__poster-card">
+              <button
+                type="button"
+                className="netacad-player__big-play"
+                onClick={togglePlay}
+                aria-label={isEn ? `Play video: ${videoSpec.title}` : `Lancer la vidéo : ${videoSpec.title}`}
+              >
+                <span className="netacad-player__big-play-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
+                    <path d="M8 5.5v13l10.5-6.5L8 5.5z" />
+                  </svg>
+                </span>
+                <span className="netacad-player__big-play-text">
+                  <strong>
+                    {mode === "lab"
+                      ? isEn
+                        ? "Watch Lab Briefing & Methodology"
+                        : "Lancer la démonstration vidéo du lab"
+                      : isEn
+                        ? "Watch Interactive Course Video"
+                        : "Lancer la capsule vidéo du cours"}
+                  </strong>
+                  <small>
+                    {videoSpec.title} · {chapters.length} {isEn ? "animated chapters" : "chapitres animés"} ({formatVoiceTime(videoSpec.totalDurationSeconds)})
+                  </small>
+                </span>
+              </button>
+
+              {(videoSpec.visualSlides ?? []).length > 0 && (
+                <div className="netacad-player__poster-thumbs" aria-hidden="true">
+                  {videoSpec.visualSlides.slice(0, 4).map((slide) => (
+                    <div key={slide.id} className="netacad-player__poster-thumb">
+                      <img src={slide.src} alt="" loading="lazy" />
+                      <span>{slide.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

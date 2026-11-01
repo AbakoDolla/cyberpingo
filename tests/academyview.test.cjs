@@ -1,6 +1,10 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const { load } = require("../scripts/ts-loader.cjs");
+
+const root = path.join(__dirname, "..");
 
 const view = load("lib/academy-view");
 
@@ -122,30 +126,51 @@ test("buildLessonVideoSpec and buildLabVideoSpec generate multi-chapter Cisco Ne
   assert.equal(lessonSpec.chapters[1].figure.kind, "layers");
   assert.equal(lessonSpec.chapters[1].figure.title, "Les 7 couches OSI");
   assert.ok(lessonSpec.chapters[3].terminalSteps.length >= 1);
+  assert.ok(lessonSpec.posterImage.startsWith("/images/") || lessonSpec.posterImage.startsWith("/labs/"));
+  assert.ok(lessonSpec.visualSlides.length >= 4);
+  for (const slide of lessonSpec.visualSlides) {
+    assert.ok(fs.existsSync(path.join(root, "public", slide.src)), `missing slide image: ${slide.src}`);
+  }
+  for (const ch of lessonSpec.chapters) {
+    assert.ok(Array.isArray(ch.audioPlaylist) && ch.audioPlaylist.length >= 2);
+    assert.ok(Array.isArray(ch.visualSlides) && ch.visualSlides.length >= 2);
+    for (const audioUrl of ch.audioPlaylist) {
+      assert.ok(fs.existsSync(path.join(root, "public", audioUrl)), `missing ElevenLabs audio file: ${audioUrl}`);
+    }
+  }
 
   const labSpec = video.buildLabVideoSpec({
     lab: {
       id: "lab-arp-1",
+      slug: "premier-reseau-packet-tracer",
       title: "Inspection d'une capture ARP",
       category: "Network",
       difficulty: "easy",
+      format: "packet_tracer",
       points: 100,
-      estimatedMinutes: 15,
-      summary: "Analyse une capture ARP pour repérer une passerelle usurpée.",
+      estimated_minutes: 15,
+      description: "Analyse une capture ARP pour repérer une passerelle usurpée.",
       briefing: "Un poste du réseau signale des coupures intermittentes vers la passerelle.",
       objectives: ["Identifier l'adresse IP de la passerelle", "Repérer deux adresses MAC différentes pour la même IP"],
       tools: ["Journal ARP fourni", "Table des hôtes"],
       constraints: ["Lecture seule des journaux fournis"],
-      hints: [{ id: "h1", order: 1, costXp: 0, text: "Compare les annonces gratuites ARP." }]
+      hints: ["Compare les annonces gratuites ARP."]
     },
-    assets: [{ id: "a1", title: "capture-arp.log", kind: "log", content: "192.168.1.1 is-at aa:bb:cc:dd:ee:01" }],
+    assets: [{ id: "a1", title: "capture-arp.log", kind: "log", description: "192.168.1.1 is-at aa:bb:cc:dd:ee:01" }],
     tasks: [
-      { id: "t1", order: 1, title: "IP passerelle", prompt: "Quelle est l'adresse IP de la passerelle ?", placeholder: "192.168.x.x", formatHint: "IPv4", points: 50 }
+      { position: 1, prompt: "Quelle est l'adresse IP de la passerelle ?", answer_format: "IPv4" }
     ]
   });
 
   assert.equal(labSpec.mode, "lab");
   assert.equal(labSpec.chapters.length, 5);
   assert.ok(labSpec.chapters.every((ch) => ch.narration.length > 20));
+  assert.ok(labSpec.visualSlides.length >= 3);
+  for (const ch of labSpec.chapters) {
+    assert.ok(Array.isArray(ch.audioPlaylist) && ch.audioPlaylist.length >= 2);
+    for (const audioUrl of ch.audioPlaylist) {
+      assert.ok(fs.existsSync(path.join(root, "public", audioUrl)), `missing ElevenLabs lab audio file: ${audioUrl}`);
+    }
+  }
 });
 
