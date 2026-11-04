@@ -31,8 +31,13 @@ function stripMarkdownForSpeech(input: string): string {
     .replace(/\*([^*]+)\*/g, "$1")
     .replace(/^#+\s+/gm, "")
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[«»"]/gu, " ")
     .replace(/C\s*[·•]\s*I\s*[·•]\s*D/giu, "C, I, D")
+    .replace(/\/(\d{1,2})\b/gu, " slash $1")
+    .replace(/\.pkt\b/giu, " point P K T")
     .replace(/[→➔➜]/gu, ", vers ")
+    .replace(/\s*[·•]\s*/gu, ", ")
+    .replace(/\s*;\s*/gu, ". ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -93,27 +98,74 @@ async function synthesizeNeuralMp3Fallback(text: string, lang: "fr" | "en"): Pro
   if (!chunks.length) return null;
 
   const tl = lang === "en" ? "en" : "fr";
-  const buffers: Buffer[] = [];
 
-  for (const chunk of chunks) {
-    const url = `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${tl}&q=${encodeURIComponent(chunk)}`;
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
-        Accept: "audio/mpeg,audio/*;q=0.9,*/*;q=0.8",
-      },
-    });
-    if (!res.ok) return null;
-    const arr = await res.arrayBuffer();
-    if (!arr.byteLength) return null;
-    buffers.push(Buffer.from(arr));
+  const results = await Promise.all(
+    chunks.map(async (chunk) => {
+      const url = `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${tl}&q=${encodeURIComponent(chunk)}`;
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+          Accept: "audio/mpeg,audio/*;q=0.9,*/*;q=0.8",
+        },
+      });
+      if (!res.ok) return null;
+      const arr = await res.arrayBuffer();
+      if (!arr.byteLength) return null;
+      return Buffer.from(arr);
+    })
+  );
+
+  const buffers: Uint8Array[] = [];
+  for (const b of results) {
+    if (b) buffers.push(b);
   }
-
-  return buffers.length ? Buffer.concat(buffers) : null;
+  return buffers.length === chunks.length && buffers.length > 0 ? Buffer.concat(buffers) : null;
 }
 
 let elevenLabsCooldownUntil = 0;
+
+async function callElevenLabsTts(params: {
+  apiKey: string;
+  voiceId: string;
+  modelId: string;
+  text: string;
+  lang: "fr" | "en";
+  preset: { stability: number; similarity_boost: number; style: number };
+}): Promise<{ ok: boolean; status: number; buffer: ArrayBuffer | null }> {
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(params.voiceId)}?output_format=mp3_44100_128`,
+    {
+      method: "POST",
+      headers: {
+        "xi-api-key": params.apiKey,
+        "Content-Type": "application/json",
+        Accept: "audio/mpeg",
+      },
+      body: JSON.stringify({
+        text: params.text,
+        model_id: params.modelId,
+        language_code: params.lang,
+        voice_settings: {
+          stability: params.preset.stability,
+          similarity_boost: params.preset.similarity_boost,
+          style: params.preset.style,
+          use_speaker_boost: true,
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    return { ok: false, status: response.status, buffer: null };
+  }
+  const audioBuffer = await response.arrayBuffer();
+  return {
+    ok: audioBuffer.byteLength > 256,
+    status: response.status,
+    buffer: audioBuffer.byteLength > 256 ? audioBuffer : null,
+  };
+}
 
 async function handleTtsRequest(params: {
   rawText: string;
@@ -144,43 +196,39 @@ async function handleTtsRequest(params: {
     const modelId = process.env.ELEVENLABS_MODEL_ID?.trim() || CYBERPINGO_MODEL_ID;
 
     try {
-      const response = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}?output_format=mp3_44100_128`,
-        {
-          method: "POST",
-          headers: {
-            "xi-api-key": apiKey,
-            "Content-Type": "application/json",
-            Accept: "audio/mpeg",
-          },
-          body: JSON.stringify({
-            text: taggedText,
-            model_id: modelId,
-            language_code: lang,
-            voice_settings: {
-              stability: preset.stability,
-              similarity_boost: preset.similarity_boost,
-              style: preset.style,
-              use_speaker_boost: true,
-            },
-          }),
-        }
-      );
+      let result = await callElevenLabsTts({
+        apiKey,
+        voiceId,
+        modelId,
+        text: taggedText,
+        lang,
+        preset,
+      });
 
-      if (response.ok) {
-        const audioBuffer = await response.arrayBuffer();
-        if (audioBuffer.byteLength > 256) {
-          return new NextResponse(audioBuffer, {
-            status: 200,
-            headers: {
-              "Content-Type": "audio/mpeg",
-              "Cache-Control": "public, s-maxage=31536000, max-age=86400, immutable",
-              "X-TTS-Provider": "elevenlabs-cyberpingo",
-            },
-          });
-        }
-      } else if (response.status === 401 || response.status === 402 || response.status === 429) {
-        // Avoid adding latency on every sentence when ElevenLabs quota is reached
+      // If eleven_v3 fails or hits credit threshold, try eleven_flash_v2_5 (50% lower credit cost)
+      if (!result.ok && modelId !== "eleven_flash_v2_5") {
+        result = await callElevenLabsTts({
+          apiKey,
+          voiceId,
+          modelId: "eleven_flash_v2_5",
+          text: clippedText,
+          lang,
+          preset,
+        });
+      }
+
+      if (result.ok && result.buffer) {
+        return new NextResponse(result.buffer, {
+          status: 200,
+          headers: {
+            "Content-Type": "audio/mpeg",
+            "Cache-Control": "public, s-maxage=31536000, max-age=86400, immutable",
+            "X-TTS-Provider": "elevenlabs-cyberpingo",
+          },
+        });
+      }
+
+      if (result.status === 401 || result.status === 402 || result.status === 429) {
         elevenLabsCooldownUntil = Date.now() + 10 * 60 * 1000;
       }
     } catch {

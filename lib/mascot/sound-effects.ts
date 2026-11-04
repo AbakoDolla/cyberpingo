@@ -258,7 +258,10 @@ export function playCyberPingoAudioUrl(
     if (!ctx || gen !== playbackGeneration) return false;
     if (ctx.state === "suspended") {
       try {
-        await ctx.resume();
+        await Promise.race([
+          ctx.resume(),
+          new Promise<void>((resolve) => window.setTimeout(resolve, 180)),
+        ]);
       } catch {
         return false;
       }
@@ -327,7 +330,9 @@ export function playCyberPingoAudioUrl(
     void playViaWebAudio().then((ok) => {
       if (!ok && gen === playbackGeneration) {
         activeAudio = audio;
-        audio.play().catch(() => undefined);
+        audio.play().catch(() => {
+          if (gen === playbackGeneration) options?.onError?.();
+        });
       }
     });
     return;
