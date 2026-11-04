@@ -1,14 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import FigureView from "@/components/figures/Figure";
+import { FigureGlyph } from "@/components/figures/icons";
+import Pingo, { type PingoState } from "@/components/mascot/Pingo";
 import type {
   AcademyVideoChapter,
   AcademyVideoVisualSlide,
   VideoDomain,
 } from "@/lib/academy-video";
 
-export type CharacterPose = "thinking" | "explaining" | "pointing" | "warning" | "celebrating";
+export type CharacterPose =
+  | "thinking"
+  | "explaining"
+  | "pointing"
+  | "warning"
+  | "celebrating";
 
 export type CloudSceneKind =
   | "shield-lock"
@@ -20,25 +27,50 @@ export type CloudSceneKind =
   | "server-nas-backup"
   | "lab-investigation";
 
+const SCENE_TONE_RGB: Record<CloudSceneKind, string> = {
+  "shield-lock": "0 213 255",
+  "lan-wan-network": "86 150 255",
+  "osi-stack": "172 126 255",
+  "cables-fiber": "255 184 107",
+  "cli-terminal": "62 250 149",
+  "threat-firewall": "255 107 125",
+  "server-nas-backup": "0 213 255",
+  "lab-investigation": "172 126 255",
+};
+
+const EQUALIZER_BARS = [34, 68, 52, 88, 60, 96, 72, 46, 84, 58, 92, 64, 48, 78, 54, 40];
+
 export function detectCharacterPose(
   sentence: string,
   chapterKind: AcademyVideoChapter["kind"],
   sentenceIndex: number
 ): CharacterPose {
   const lower = sentence.toLowerCase();
-  if (/erreur|piège|attention|risque|danger|attaque|jamais|interdit|mistake|pitfall|risk/iu.test(lower)) {
+  if (
+    /erreur|piège|attention|risque|danger|attaque|jamais|interdit|mistake|pitfall|risk/iu.test(
+      lower
+    )
+  ) {
     return "warning";
   }
-  if (/bravo|prêt|valider|retenir|synthèse|félicitations|mission accomplie|ready|summary/iu.test(lower)) {
+  if (
+    /bravo|prêt|valider|retenir|synthèse|félicitations|mission accomplie|ready|summary/iu.test(
+      lower
+    )
+  ) {
     return "celebrating";
   }
-  if (/commande|terminal|observons|schéma|figure|voici|étape|exemple|inspect/iu.test(lower)) {
+  if (
+    /commande|terminal|observons|schéma|figure|voici|étape|exemple|inspect/iu.test(
+      lower
+    )
+  ) {
     return "pointing";
   }
   if (chapterKind === "pitfalls") return "warning";
   if (chapterKind === "summary") return "celebrating";
   if (chapterKind === "terminal") return "pointing";
-  return sentenceIndex % 2 === 0 ? "thinking" : "explaining";
+  return sentenceIndex % 2 === 0 ? "explaining" : "thinking";
 }
 
 export function detectCloudSceneKind(
@@ -58,7 +90,9 @@ export function detectCloudSceneKind(
     return "osi-stack";
   }
   if (
-    /câble|cable|rj45|fibre|optique|wi-fi|wifi|radio|brassage|baie|port|led|physique/iu.test(corpus)
+    /câble|cable|rj45|fibre|optique|wi-fi|wifi|radio|brassage|baie|port|led|physique/iu.test(
+      corpus
+    )
   ) {
     return "cables-fiber";
   }
@@ -78,11 +112,17 @@ export function detectCloudSceneKind(
   ) {
     return "threat-firewall";
   }
-  if (/serveur|nas|sauvegarde|3-2-1|raid|stockage|chiffrement|sha-256|hash|tls|certificat/iu.test(corpus)) {
+  if (
+    /serveur|nas|sauvegarde|3-2-1|raid|stockage|chiffrement|sha-256|hash|tls|certificat/iu.test(
+      corpus
+    )
+  ) {
     return "server-nas-backup";
   }
   if (
-    /laboratoire|packet tracer|mission|investigation|indice|étape|flag|scénario|enquête/iu.test(corpus) &&
+    /laboratoire|packet tracer|mission|investigation|indice|étape|flag|scénario|enquête/iu.test(
+      corpus
+    ) &&
     chapterKind === "summary"
   ) {
     return "lab-investigation";
@@ -94,11 +134,14 @@ export function detectCloudSceneKind(
   ) {
     return "lan-wan-network";
   }
-  if (/authentification|mfa|mot de passe|fido|yubikey|sécurité|confidentialité|intégrité|disponibilité|cid| accès/iu.test(corpus)) {
+  if (
+    /authentification|mfa|mot de passe|fido|yubikey|sécurité|confidentialité|intégrité|disponibilité|cid|accès/iu.test(
+      corpus
+    )
+  ) {
     return "shield-lock";
   }
 
-  // Fallback rotation by domain + sentence index so every sentence shows a rich animation
   const domainDefaults: Record<VideoDomain, CloudSceneKind[]> = {
     fundamentals: ["shield-lock", "threat-firewall", "server-nas-backup", "lan-wan-network"],
     network: ["lan-wan-network", "cables-fiber", "cli-terminal", "shield-lock"],
@@ -111,6 +154,19 @@ export function detectCloudSceneKind(
   };
   const pool = domainDefaults[domain] ?? domainDefaults.fundamentals;
   return pool[sentenceIndex % pool.length] ?? "shield-lock";
+}
+
+function mapPoseToPingoState(
+  pose: CharacterPose,
+  sceneKind: CloudSceneKind,
+  voiceActive: boolean
+): PingoState {
+  if (sceneKind === "cli-terminal" && voiceActive) return "typing";
+  if (pose === "celebrating") return "celebrate";
+  if (pose === "warning") return "sad";
+  if (pose === "thinking") return "thinking";
+  if (pose === "pointing") return "explain";
+  return voiceActive ? "explain" : "welcome";
 }
 
 interface CourseraAnimatedStageProps {
@@ -150,6 +206,8 @@ export default function CourseraAnimatedStage({
   isEn,
   onSelectSlide,
 }: CourseraAnimatedStageProps) {
+  const [showFullFigure, setShowFullFigure] = useState(false);
+
   const pose = detectCharacterPose(activeCaption, chapter.kind, safeCaptionIndex);
   const sceneKind = detectCloudSceneKind(
     activeCaption,
@@ -158,7 +216,17 @@ export default function CourseraAnimatedStage({
     activeSlide,
     safeCaptionIndex
   );
+  const pingoState = mapPoseToPingoState(pose, sceneKind, voiceActive);
+  const stageRgb = SCENE_TONE_RGB[sceneKind] ?? "0 213 255";
   const animKey = `${chapter.id}-s${safeCaptionIndex}-${sceneKind}`;
+
+  const activeTermStep =
+    chapter.terminalSteps?.[
+      Math.min(
+        Math.max(0, (chapter.terminalSteps?.length ?? 1) - 1),
+        Math.max(0, visibleTerminalStepCount - 1)
+      )
+    ];
 
   return (
     <div
@@ -167,683 +235,838 @@ export default function CourseraAnimatedStage({
       data-speaking={voiceActive ? "true" : "false"}
       data-pose={pose}
       data-scene={sceneKind}
+      style={{ ["--stage-rgb" as string]: stageRgb }}
     >
-      {/* LEFT COLUMN: Articulated Animated Instructor Character (Coursera / Google style) */}
-      <div className="coursera-stage__character-col">
-        <div className="coursera-character-wrap" data-pose={pose} data-speaking={voiceActive ? "true" : "false"}>
-          <svg
-            viewBox="0 0 320 420"
-            className="coursera-character-svg"
-            role="img"
-            aria-label={isEn ? "Animated cybersecurity instructor" : "Formatrice cybersécurité animée"}
-          >
-            <defs>
-              <linearGradient id="cpHairGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#111318" />
-                <stop offset="100%" stopColor="#050608" />
-              </linearGradient>
-              <linearGradient id="cpTopGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#f0592b" />
-                <stop offset="100%" stopColor="#d94318" />
-              </linearGradient>
-              <linearGradient id="cpPantsGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#7e22ce" />
-                <stop offset="100%" stopColor="#581c87" />
-              </linearGradient>
-              <filter id="cpSoftShadow" x="-15%" y="-15%" width="130%" height="130%">
-                <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#1e293b" floodOpacity="0.12" />
-              </filter>
-            </defs>
+      {/* Ambient Aurora Spotlights & Blueprint Perspective Grid (Stripe / Vercel / Apple Keynote style) */}
+      <div className="tg-stage-backdrop" aria-hidden="true">
+        <div className="tg-stage-aurora tg-stage-aurora--1" />
+        <div className="tg-stage-aurora tg-stage-aurora--2" />
+        <div className="tg-stage-grid" />
+        <div className="tg-stage-scanline" />
+      </div>
 
-            {/* Back flowing hair */}
-            <g className="coursera-char__hair-back">
-              <path
-                d="M115 74 C82 95, 76 175, 86 245 C92 260, 118 265, 132 252 L198 248 C215 245, 224 185, 212 115 C204 82, 175 64, 148 66 Z"
-                fill="url(#cpHairGrad)"
-              />
-            </g>
+      {/* TOP KEYNOTE HUD BAR */}
+      <div className="tg-stage-hud">
+        <div className="tg-stage-hud__left">
+          <span className="tg-hud-step">
+            {chapter.badge} · {safeCaptionIndex + 1}/{Math.max(1, totalCaptions)}
+          </span>
+          <span className="tg-hud-concept" key={`concept-${animKey}`}>
+            <span className="tg-hud-concept__dot" />
+            <strong>{activeConceptTag}</strong>
+          </span>
+        </div>
 
-            {/* Breathing Upper Body + Legs */}
-            <g className="coursera-char__body">
-              {/* Left Arm on Hip (Coursera confident posture) */}
-              <g className="coursera-char__arm-left">
-                <path
-                  d="M118 192 L62 252 L112 308 L122 294 L88 252 L130 212 Z"
-                  fill="#8d583e"
-                />
-                {/* Hand on hip */}
-                <path
-                  d="M108 296 C118 294, 128 302, 125 314 C120 320, 108 316, 104 306 Z"
-                  fill="#8d583e"
-                />
-              </g>
-
-              {/* Trousers / Lower Body */}
-              <path
-                d="M116 322 L202 322 L214 420 L168 420 L158 368 L148 420 L102 420 Z"
-                fill="url(#cpPantsGrad)"
-              />
-
-              {/* Torso / Orange Sleeveless Top */}
-              <path
-                d="M122 184 C138 192, 176 192, 192 184 L204 326 L112 326 Z"
-                fill="url(#cpTopGrad)"
-                filter="url(#cpSoftShadow)"
-              />
-
-              {/* Neck & Collarbone */}
-              <path
-                d="M145 152 L171 152 L175 190 C164 198, 150 198, 141 190 Z"
-                fill="#8d583e"
-              />
-              <path d="M145 162 Q158 172 171 160" stroke="#6f412b" strokeWidth="2" fill="none" opacity="0.55" />
-
-              {/* Head Group (nods & tilts with speech) */}
-              <g className="coursera-char__head">
-                {/* Gold Left & Right Earrings */}
-                <rect
-                  x="114"
-                  y="134"
-                  width="5.5"
-                  height="22"
-                  rx="2.5"
-                  fill="#f59e0b"
-                  className="coursera-char__earring"
-                />
-                <rect
-                  x="198"
-                  y="132"
-                  width="5.5"
-                  height="20"
-                  rx="2.5"
-                  fill="#f59e0b"
-                  className="coursera-char__earring"
-                />
-
-                {/* Face Base */}
-                <path
-                  d="M122 92 C122 65, 196 65, 196 95 C198 135, 188 164, 160 166 C132 164, 120 136, 122 92 Z"
-                  fill="#8d583e"
-                />
-
-                {/* Front Hair Sweep */}
-                <path
-                  d="M116 105 C118 66, 165 56, 194 78 C202 86, 206 104, 202 122 C192 102, 176 88, 158 84 C142 98, 128 108, 116 112 Z"
-                  fill="url(#cpHairGrad)"
-                />
-
-                {/* Eyebrows (expressive) */}
-                <g className="coursera-char__brows">
-                  <path
-                    d="M136 104 Q146 99 154 103"
-                    stroke="#1c1917"
-                    strokeWidth="3.2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                  <path
-                    d="M168 103 Q177 98 186 103"
-                    stroke="#1c1917"
-                    strokeWidth="3.2"
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                </g>
-
-                {/* Blinking Eyes looking toward the illustration cloud */}
-                <g className="coursera-char__eyes">
-                  <ellipse cx="146" cy="114" rx="4.2" ry="4.5" fill="#111827" />
-                  <circle cx="147.5" cy="112.5" r="1.4" fill="#ffffff" />
-                  <ellipse cx="177" cy="114" rx="4.2" ry="4.5" fill="#111827" />
-                  <circle cx="178.5" cy="112.5" r="1.4" fill="#ffffff" />
-                </g>
-
-                {/* Nose */}
-                <path
-                  d="M162 114 L166 128 L158 130"
-                  stroke="#683b26"
-                  strokeWidth="2.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-
-                {/* Animated Lip-Sync Mouth */}
-                <g className="coursera-char__mouth">
-                  {/* Idle / Smiling mouth */}
-                  <path
-                    className="coursera-mouth-smile"
-                    d="M148 140 Q162 152 175 139 Z"
-                    fill="#ffffff"
-                    stroke="#5c2f1c"
-                    strokeWidth="1.5"
-                  />
-                  {/* Speaking open vowel mouth (animated via CSS when voiceActive="true") */}
-                  <ellipse
-                    className="coursera-mouth-talk"
-                    cx="162"
-                    cy="143"
-                    rx="9"
-                    ry="6.5"
-                    fill="#451a14"
-                  />
-                  <path
-                    className="coursera-mouth-teeth"
-                    d="M154 139 L170 139 L169 142 L155 142 Z"
-                    fill="#ffffff"
-                  />
-                  <ellipse
-                    className="coursera-mouth-tongue"
-                    cx="162"
-                    cy="147"
-                    rx="5.5"
-                    ry="2.5"
-                    fill="#ef4444"
-                  />
-                </g>
-              </g>
-
-              {/* Right Arm (Dynamic gesture based on pose: thinking chin touch OR explaining open palm OR pointing) */}
-              <g className="coursera-char__arm-right">
-                {pose === "thinking" ? (
-                  /* Thinking pose matching screenshot: elbow down, hand raised to chin */
-                  <g className="coursera-arm-pose coursera-arm-pose--thinking">
-                    <path
-                      d="M190 192 L222 262 L185 162"
-                      stroke="#8d583e"
-                      strokeWidth="22"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      fill="none"
-                    />
-                    {/* Hand & Finger near chin */}
-                    <circle cx="182" cy="158" r="11" fill="#8d583e" />
-                    <path
-                      d="M178 154 L170 143"
-                      stroke="#8d583e"
-                      strokeWidth="6.5"
-                      strokeLinecap="round"
-                    />
-                  </g>
-                ) : pose === "pointing" ? (
-                  /* Pointing directly toward the animated cloud diagram */
-                  <g className="coursera-arm-pose coursera-arm-pose--pointing">
-                    <path
-                      d="M190 194 L232 232 L278 192"
-                      stroke="#8d583e"
-                      strokeWidth="21"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      fill="none"
-                    />
-                    <circle cx="282" cy="189" r="10" fill="#8d583e" />
-                    <path
-                      d="M286 187 L304 178"
-                      stroke="#8d583e"
-                      strokeWidth="6.5"
-                      strokeLinecap="round"
-                    />
-                  </g>
-                ) : (
-                  /* Explaining / Presenting open hand gesture */
-                  <g className="coursera-arm-pose coursera-arm-pose--explaining">
-                    <path
-                      d="M190 194 L228 246 L268 216"
-                      stroke="#8d583e"
-                      strokeWidth="21"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      fill="none"
-                    />
-                    <ellipse
-                      cx="275"
-                      cy="212"
-                      rx="13"
-                      ry="8"
-                      transform="rotate(-22 275 212)"
-                      fill="#8d583e"
-                    />
-                  </g>
-                )}
-              </g>
-            </g>
-
-            {/* Floating thought bubbles connecting Character to the Cloud (exact Coursera style) */}
-            <circle
-              cx="248"
-              cy="170"
-              r="7.5"
-              fill="#dce6fb"
-              className="coursera-thought-dot coursera-thought-dot--1"
-            />
-            <circle
-              cx="276"
-              cy="148"
-              r="12"
-              fill="#dce6fb"
-              className="coursera-thought-dot coursera-thought-dot--2"
-            />
-          </svg>
-
-          {/* Character & Pingo Companion Badge */}
-          <div className="coursera-instructor-pill">
-            <img
-              src="/images/mascot/professeur-pingo-face.png"
-              alt="Professeur Pingo"
-              className="coursera-instructor-pill__avatar"
-            />
-            <div>
-              <strong>Awa & Prof. Pingo</strong>
-              <small>
-                {voiceActive
+        <div className="tg-stage-hud__right">
+          {chapter.figure && (
+            <button
+              type="button"
+              className={`tg-hud-toggle ${showFullFigure ? "is-active" : ""}`}
+              onClick={() => setShowFullFigure((v) => !v)}
+            >
+              <FigureGlyph name={showFullFigure ? "play" : "layers"} size={14} />
+              <span>
+                {showFullFigure
                   ? isEn
-                    ? "Speaking live..."
-                    : "Explication vocale en cours..."
+                    ? "Animated Motion Stage"
+                    : "Scène Motion Animée"
                   : isEn
-                    ? "CyberPingo Instructor"
-                    : "Instructeurs CyberPingo"}
-              </small>
-            </div>
+                    ? "Interactive Course Schema"
+                    : "Schéma Interactif du Cours"}
+              </span>
+            </button>
+          )}
+
+          {/* Live Audio Spectrum Waveform */}
+          <div
+            className={`tg-hud-wave ${voiceActive ? "is-speaking" : ""}`}
+            aria-hidden="true"
+            title={voiceActive ? "Audio actif" : "Audio en veille"}
+          >
+            {EQUALIZER_BARS.map((h, i) => (
+              <span
+                key={i}
+                style={{
+                  height: `${voiceActive ? h : 22}%`,
+                  animationDelay: `${(i % 6) * 75}ms`,
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>
 
-      {/* RIGHT COLUMN: Animated Periwinkle Cloud + Dynamic Multi-Part Illustrations */}
-      <div className="coursera-stage__cloud-col">
-        <div key={animKey} className="coursera-cloud-container">
-          {/* Animated Cloud Backdrop SVG */}
-          <svg
-            viewBox="0 0 680 390"
-            className="coursera-cloud-bg-svg"
-            aria-hidden="true"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M115 318
-                 C54 316, 20 272, 34 218
-                 C14 176, 38 122, 88 112
-                 C104 62, 168 38, 224 62
-                 C268 22, 352 20, 398 58
-                 C454 30, 534 48, 558 102
-                 C618 108, 656 158, 638 214
-                 C658 266, 620 318, 560 322
-                 C522 356, 444 360, 396 336
-                 C340 364, 252 362, 204 332
-                 C168 346, 134 336, 115 318 Z"
-              fill="#dce6fb"
-            />
-          </svg>
+      {/* MAIN STUDIO WORKSPACE: Left Presenter Pod + Right Motion Graphics Canvas */}
+      <div className="tg-stage-body">
+        {/* LEFT COLUMN: Holographic Studio Presenter Pod with Animated CyberPingo Rig */}
+        <aside className="tg-presenter-pod" data-speaking={voiceActive ? "true" : "false"}>
+          <div className="tg-presenter-pod__stage">
+            {/* Concentric Sonic Ripples when speaking */}
+            <div className="tg-presenter-halo tg-presenter-halo--1" aria-hidden="true" />
+            <div className="tg-presenter-halo tg-presenter-halo--2" aria-hidden="true" />
+            <div className="tg-presenter-halo tg-presenter-halo--3" aria-hidden="true" />
 
-          {/* Foreground Content Inside the Cloud */}
-          <div className="coursera-cloud-content">
-            {/* Top Concept Header inside Cloud */}
-            <div className="coursera-cloud-header">
-              <span className="coursera-cloud-step-badge">
-                {chapter.badge} · {safeCaptionIndex + 1}/{Math.max(1, totalCaptions)}
-              </span>
-              <span className="coursera-cloud-concept-pill">
-                <i className="coursera-cloud-concept-dot" />
-                {activeConceptTag}
-              </span>
+            {/* Flagship Animated Vector Mascot with Lip-Sync Beak, Glasses & Bowtie */}
+            <div className="tg-presenter-avatar-rig">
+              <Pingo
+                state={pingoState}
+                rank={5}
+                size={136}
+                speaking={voiceActive}
+                title={isEn ? "Professor Pingo Animated Instructor" : "Professeur Pingo Instructeur Animé"}
+              />
             </div>
 
-            {/* Main Centerpiece: Animated Vector Scene + Synchronized Equipment Visual */}
-            <div className="coursera-cloud-main-grid">
-              {/* Left of Cloud: Custom Animated Vector Illustration matched to current sentence */}
-              <div className="coursera-vector-scene">
+            {/* Holographic Data Particles streaming from Presenter to Stage */}
+            <div className="tg-presenter-stream" aria-hidden="true">
+              <i className="tg-stream-dot tg-stream-dot--1" />
+              <i className="tg-stream-dot tg-stream-dot--2" />
+              <i className="tg-stream-dot tg-stream-dot--3" />
+            </div>
+          </div>
+
+          {/* Presenter Studio Badge */}
+          <div className="tg-presenter-card">
+            <img
+              src="/images/mascot/professeur-pingo-face.png"
+              alt="Professeur Pingo"
+              className="tg-presenter-card__img"
+            />
+            <div className="tg-presenter-card__meta">
+              <strong>Prof. Pingo</strong>
+              <small>
+                {voiceActive
+                  ? isEn
+                    ? "Live voice narration"
+                    : "Narration vocale active"
+                  : isEn
+                    ? "CyberPingo Studio"
+                    : "Studio CyberPingo"}
+              </small>
+            </div>
+          </div>
+
+          {/* Active Chapter Bullet Highlight inside Presenter Column */}
+          {chapter.bullets.length > 0 && (
+            <div className="tg-presenter-insight" key={`bullet-${chapter.id}-${activeBulletIndex}`}>
+              <span className="tg-presenter-insight__num">0{activeBulletIndex + 1}</span>
+              <p>{chapter.bullets[activeBulletIndex] ?? chapter.bullets[0]}</p>
+            </div>
+          )}
+        </aside>
+
+        {/* RIGHT COLUMN: Tech-Giant Motion Graphics Stage */}
+        <div className="tg-motion-viewport" key={animKey}>
+          {showFullFigure && chapter.figure ? (
+            <div className="tg-motion-figure-full">
+              <FigureView figure={chapter.figure} />
+            </div>
+          ) : (
+            <div className="tg-motion-split">
+              {/* PRIMARY ANIMATED ARCHITECTURE & PACKET STAGE */}
+              <div className="tg-motion-scene" data-scene={sceneKind}>
+                {/* SCENE 1: ZERO-TRUST & CIA TRIAD ENGINE */}
                 {sceneKind === "shield-lock" && (
-                  <svg viewBox="0 0 260 220" className="coursera-vector-svg">
-                    {/* Pulsing halo rings */}
-                    <circle cx="130" cy="110" r="88" fill="#bfdbfe" opacity="0.45" className="cv-pulse-ring" />
-                    <circle cx="130" cy="110" r="68" fill="#93c5fd" opacity="0.35" className="cv-pulse-ring cv-pulse-ring--delay" />
-                    {/* 3D Green Security Shield (exact Coursera screenshot style) */}
-                    <g className="cv-float-main">
-                      <path
-                        d="M130 22 L206 54 C206 122, 182 172, 130 198 C78 172, 54 122, 54 54 Z"
-                        fill="#43a047"
+                  <div className="tg-scene-canvas tg-scene--shield">
+                    {/* SVG Animated Laser Conduits & Moving Packets */}
+                    <svg
+                      viewBox="0 0 620 260"
+                      className="tg-scene-wires"
+                      aria-hidden="true"
+                    >
+                      <defs>
+                        <linearGradient id="tgWireCyan" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#00d5ff" stopOpacity="0.2" />
+                          <stop offset="50%" stopColor="#00d5ff" stopOpacity="0.95" />
+                          <stop offset="100%" stopColor="#3efa95" stopOpacity="0.85" />
+                        </linearGradient>
+                        <path id="tgPathAuthIn" d="M 135 130 C 190 130, 215 130, 265 130" />
+                        <path id="tgPathCia1" d="M 355 110 C 405 100, 425 56, 468 56" />
+                        <path id="tgPathCia2" d="M 360 130 C 410 130, 430 130, 468 130" />
+                        <path id="tgPathCia3" d="M 355 150 C 405 160, 425 204, 468 204" />
+                      </defs>
+
+                      {/* Glowing Conduit Paths */}
+                      <use href="#tgPathAuthIn" className="tg-wire-base" />
+                      <use href="#tgPathAuthIn" className="tg-wire-flow" />
+                      <use href="#tgPathCia1" className="tg-wire-base" />
+                      <use href="#tgPathCia1" className="tg-wire-flow" />
+                      <use href="#tgPathCia2" className="tg-wire-base" />
+                      <use href="#tgPathCia2" className="tg-wire-flow" />
+                      <use href="#tgPathCia3" className="tg-wire-base" />
+                      <use href="#tgPathCia3" className="tg-wire-flow" />
+
+                      {/* Orbiting Zero-Trust Rings around Central Core */}
+                      <circle
+                        cx="310"
+                        cy="130"
+                        r="68"
+                        className="tg-orbit-ring tg-orbit-ring--cw"
                       />
-                      <path
-                        d="M130 22 L206 54 C206 122, 182 172, 130 198 Z"
-                        fill="#2e7d32"
+                      <circle
+                        cx="310"
+                        cy="130"
+                        r="52"
+                        className="tg-orbit-ring tg-orbit-ring--ccw"
                       />
-                      <path
-                        d="M130 38 L188 63 C188 116, 168 156, 130 178 C92 156, 72 116, 72 63 Z"
-                        fill="#66bb6a"
-                      />
-                      <path
-                        d="M130 38 L188 63 C188 116, 168 156, 130 178 Z"
-                        fill="#388e3c"
-                      />
-                      {/* Animated Golden Padlock */}
-                      <g className="cv-padlock">
-                        <path
-                          className="cv-padlock__shackle"
-                          d="M108 100 L108 76 C108 60, 152 60, 152 76 L152 100"
-                          fill="none"
-                          stroke="#f8fafc"
-                          strokeWidth="12"
-                          strokeLinecap="round"
-                        />
-                        <rect x="94" y="96" width="72" height="56" rx="10" fill="#fbc02d" />
-                        <rect x="130" y="96" width="36" height="56" rx="6" fill="#f57f17" />
-                        <circle cx="130" cy="118" r="7" fill="#78350f" />
-                        <rect x="127" y="122" width="6" height="15" rx="3" fill="#78350f" />
-                      </g>
-                    </g>
-                    {/* Floating Orbiting Security Badges */}
-                    <g className="cv-orbit-badge cv-orbit-badge--1">
-                      <rect x="16" y="36" width="54" height="24" rx="12" fill="#ffffff" stroke="#3b82f6" strokeWidth="2" />
-                      <text x="43" y="52" textAnchor="middle" fill="#1e3a8a" fontSize="11" fontWeight="700">MFA ✓</text>
-                    </g>
-                    <g className="cv-orbit-badge cv-orbit-badge--2">
-                      <rect x="188" y="148" width="58" height="24" rx="12" fill="#ffffff" stroke="#16a34a" strokeWidth="2" />
-                      <text x="217" y="164" textAnchor="middle" fill="#14532d" fontSize="11" fontWeight="700">C · I · D</text>
-                    </g>
-                  </svg>
+
+                      {/* Moving Data Packets */}
+                      <circle r="5" fill="#00d5ff" className="tg-packet-glow">
+                        <animateMotion dur="1.8s" repeatCount="indefinite" path="M 135 130 C 190 130, 215 130, 265 130" />
+                      </circle>
+                      <circle r="4.5" fill="#3efa95" className="tg-packet-glow">
+                        <animateMotion dur="1.6s" begin="0.2s" repeatCount="indefinite" path="M 355 110 C 405 100, 425 56, 468 56" />
+                      </circle>
+                      <circle r="4.5" fill="#00d5ff" className="tg-packet-glow">
+                        <animateMotion dur="1.6s" begin="0.5s" repeatCount="indefinite" path="M 360 130 C 410 130, 430 130, 468 130" />
+                      </circle>
+                      <circle r="4.5" fill="#ac7eff" className="tg-packet-glow">
+                        <animateMotion dur="1.6s" begin="0.8s" repeatCount="indefinite" path="M 355 150 C 405 160, 425 204, 468 204" />
+                      </circle>
+                    </svg>
+
+                    {/* HTML Glass Nodes Positioned Over the SVG Conduits */}
+                    <div className="tg-shield-layout">
+                      {/* Left Source Node */}
+                      <div className="tg-node tg-node--cyan">
+                        <span className="tg-node__icon">
+                          <FigureGlyph name="user-check" size={20} />
+                        </span>
+                        <div className="tg-node__copy">
+                          <strong>{isEn ? "Identity & MFA" : "Identité & MFA"}</strong>
+                          <code>FIDO2 · Clé 2FA</code>
+                        </div>
+                      </div>
+
+                      {/* Center Holographic Core */}
+                      <div className="tg-core-hub tg-core-hub--cyan">
+                        <div className="tg-core-hub__emblem">
+                          <FigureGlyph name="shield-check" size={32} />
+                        </div>
+                        <strong>Zero-Trust Core</strong>
+                        <span>TLS 1.3 · AES-256</span>
+                      </div>
+
+                      {/* Right 3 CIA Pillars */}
+                      <div className="tg-cia-stack">
+                        <div className="tg-node tg-node--sm tg-node--cyan">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="lock" size={16} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>{isEn ? "Confidentiality" : "Confidentialité"}</strong>
+                            <small>{isEn ? "Authorized access only" : "Accès chiffré strict"}</small>
+                          </div>
+                        </div>
+                        <div className="tg-node tg-node--sm tg-node--green">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="fingerprint" size={16} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>{isEn ? "Integrity" : "Intégrité"}</strong>
+                            <small>{isEn ? "Tamper-proof SHA-256" : "Empreinte intacte"}</small>
+                          </div>
+                        </div>
+                        <div className="tg-node tg-node--sm tg-node--violet">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="activity" size={16} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>{isEn ? "Availability" : "Disponibilité"}</strong>
+                            <small>{isEn ? "99.99% Uptime SLA" : "Service continu 24/7"}</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
+                {/* SCENE 2: LIVE NETWORK PACKET ROUTING & SWITCHING (Cisco ThousandEyes / Cloudflare style) */}
                 {sceneKind === "lan-wan-network" && (
-                  <svg viewBox="0 0 280 220" className="coursera-vector-svg">
-                    {/* Network Links */}
-                    <line x1="58" y1="62" x2="136" y2="112" stroke="#60a5fa" strokeWidth="4" strokeDasharray="6 4" className="cv-net-line" />
-                    <line x1="58" y1="162" x2="136" y2="112" stroke="#60a5fa" strokeWidth="4" strokeDasharray="6 4" className="cv-net-line" />
-                    <line x1="136" y1="112" x2="224" y2="112" stroke="#2563eb" strokeWidth="5" />
+                  <div className="tg-scene-canvas tg-scene--network">
+                    <svg viewBox="0 0 620 260" className="tg-scene-wires" aria-hidden="true">
+                      <path
+                        id="tgNetLan1"
+                        d="M 130 74 C 185 74, 200 130, 250 130"
+                        className="tg-wire-base"
+                      />
+                      <path
+                        d="M 130 74 C 185 74, 200 130, 250 130"
+                        className="tg-wire-flow"
+                      />
+                      <path
+                        id="tgNetLan2"
+                        d="M 130 186 C 185 186, 200 130, 250 130"
+                        className="tg-wire-base"
+                      />
+                      <path
+                        d="M 130 186 C 185 186, 200 130, 250 130"
+                        className="tg-wire-flow"
+                      />
+                      <path
+                        id="tgNetWan"
+                        d="M 365 130 L 475 130"
+                        className="tg-wire-base"
+                      />
+                      <path
+                        d="M 365 130 L 475 130"
+                        className="tg-wire-flow tg-wire-flow--green"
+                      />
 
-                    {/* Animated Moving Packets */}
-                    <circle cx="58" cy="62" r="6" fill="#10b981" className="cv-packet cv-packet--lan1" />
-                    <circle cx="58" cy="162" r="6" fill="#3b82f6" className="cv-packet cv-packet--lan2" />
-                    <circle cx="136" cy="112" r="7" fill="#f59e0b" className="cv-packet cv-packet--wan" />
+                      {/* Animated Packets with Protocol Labels */}
+                      <g>
+                        <circle r="5.5" fill="#00d5ff" className="tg-packet-glow" />
+                        <animateMotion
+                          dur="1.7s"
+                          repeatCount="indefinite"
+                          path="M 130 74 C 185 74, 200 130, 250 130"
+                        />
+                      </g>
+                      <g>
+                        <circle r="5" fill="#ac7eff" className="tg-packet-glow" />
+                        <animateMotion
+                          dur="2.1s"
+                          begin="0.4s"
+                          repeatCount="indefinite"
+                          path="M 130 186 C 185 186, 200 130, 250 130"
+                        />
+                      </g>
+                      <g>
+                        <circle r="6" fill="#3efa95" className="tg-packet-glow" />
+                        <animateMotion
+                          dur="1.4s"
+                          begin="0.2s"
+                          repeatCount="indefinite"
+                          path="M 365 130 L 475 130"
+                        />
+                      </g>
+                    </svg>
 
-                    {/* PC Workstation Node */}
-                    <g className="cv-node-pop" transform="translate(22, 34)">
-                      <rect x="0" y="0" width="68" height="46" rx="8" fill="#1e3a8a" />
-                      <rect x="5" y="5" width="58" height="32" rx="4" fill="#60a5fa" />
-                      <rect x="22" y="46" width="24" height="6" fill="#475569" />
-                      <text x="34" y="25" textAnchor="middle" fill="#ffffff" fontSize="10" fontWeight="700">PC LAN</text>
-                    </g>
+                    <div className="tg-net-layout">
+                      {/* Left LAN Endpoints */}
+                      <div className="tg-net-endpoints">
+                        <div className="tg-node tg-node--sm tg-node--cyan">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="laptop" size={18} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>Poste LAN</strong>
+                            <code>192.168.1.10/24</code>
+                          </div>
+                        </div>
+                        <div className="tg-node tg-node--sm tg-node--violet">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="printer" size={18} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>Hôte Local</strong>
+                            <code>192.168.1.25/24</code>
+                          </div>
+                        </div>
+                      </div>
 
-                    {/* Printer / Local Host Node */}
-                    <g className="cv-node-pop cv-node-pop--delay1" transform="translate(22, 134)">
-                      <rect x="4" y="12" width="60" height="34" rx="6" fill="#334155" />
-                      <rect x="14" y="2" width="40" height="14" rx="3" fill="#ffffff" stroke="#94a3b8" strokeWidth="2" />
-                      <circle cx="52" cy="24" r="3" fill="#22c55e" />
-                      <text x="34" y="36" textAnchor="middle" fill="#f8fafc" fontSize="9.5" fontWeight="700">IMPRIMANTE</text>
-                    </g>
+                      {/* Center L2 Switch with Blinking Port Matrix */}
+                      <div className="tg-switch-hub">
+                        <div className="tg-switch-hub__top">
+                          <FigureGlyph name="switch" size={22} />
+                          <span>SWITCH L2 · TABLE MAC</span>
+                        </div>
+                        <div className="tg-switch-ports" aria-hidden="true">
+                          {[0, 1, 2, 3, 4, 5].map((p) => (
+                            <i
+                              key={p}
+                              className={`tg-port-led ${p % 3 === 2 ? "is-amber" : "is-green"}`}
+                              style={{ animationDelay: `${p * 130}ms` }}
+                            />
+                          ))}
+                        </div>
+                        <code>VLAN 10 · 1 Gbps Full-Duplex</code>
+                      </div>
 
-                    {/* Central Switch Node */}
-                    <g className="cv-node-pop cv-node-pop--delay2" transform="translate(100, 86)">
-                      <rect x="0" y="0" width="76" height="50" rx="10" fill="#0284c7" />
-                      <rect x="8" y="10" width="60" height="12" rx="3" fill="#0f172a" />
-                      <circle cx="16" cy="16" r="2.5" fill="#4ade80" className="cv-led-blink" />
-                      <circle cx="26" cy="16" r="2.5" fill="#4ade80" className="cv-led-blink" />
-                      <circle cx="36" cy="16" r="2.5" fill="#fbbf24" className="cv-led-blink" />
-                      <circle cx="46" cy="16" r="2.5" fill="#4ade80" className="cv-led-blink" />
-                      <text x="38" y="39" textAnchor="middle" fill="#ffffff" fontSize="10.5" fontWeight="800">SWITCH L2</text>
-                    </g>
+                      {/* Right WAN Router Gateway */}
+                      <div className="tg-node tg-node--green">
+                        <span className="tg-node__icon">
+                          <FigureGlyph name="router" size={20} />
+                        </span>
+                        <div className="tg-node__copy">
+                          <strong>Passerelle WAN</strong>
+                          <code>192.168.1.1 · NAT</code>
+                        </div>
+                      </div>
+                    </div>
 
-                    {/* WAN Router / Gateway Node */}
-                    <g className="cv-node-pop cv-node-pop--delay3" transform="translate(194, 78)">
-                      <circle cx="34" cy="34" r="34" fill="#16a34a" />
-                      <path d="M18 34 L50 34 M34 18 L34 50" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" />
-                      <text x="34" y="82" textAnchor="middle" fill="#0f172a" fontSize="10.5" fontWeight="800">ROUTEUR WAN</text>
-                    </g>
-                  </svg>
+                    {/* Bottom Live Network Telemetry Strip */}
+                    <div className="tg-telemetry-strip">
+                      <span>
+                        <b>PROTOCOLE</b> ARP / ICMP / TCP
+                      </span>
+                      <span>
+                        <b>LATENCE</b> 1.2 ms
+                      </span>
+                      <span>
+                        <b>ÉTAT LIEN</b> <em className="is-up">UP · 0% PERTE</em>
+                      </span>
+                    </div>
+                  </div>
                 )}
 
+                {/* SCENE 3: 7-LAYER OSI STACK & PDU ENCAPSULATION ENGINE */}
                 {sceneKind === "osi-stack" && (
-                  <svg viewBox="0 0 270 220" className="coursera-vector-svg">
-                    {[
-                      { num: 7, name: "Application (HTTP, DNS)", color: "#2563eb" },
-                      { num: 6, name: "Présentation (TLS)", color: "#3b82f6" },
-                      { num: 5, name: "Session", color: "#0284c7" },
-                      { num: 4, name: "Transport (TCP/UDP)", color: "#0d9488" },
-                      { num: 3, name: "Réseau (IP / Routeur)", color: "#16a34a" },
-                      { num: 2, name: "Liaison (MAC / Switch)", color: "#d97706" },
-                      { num: 1, name: "Physique (Câble / Fibre)", color: "#e11d48" },
-                    ].map((layer, idx) => (
-                      <g
-                        key={layer.num}
-                        className="cv-osi-bar"
-                        style={{ animationDelay: `${idx * 70}ms` }}
-                        transform={`translate(24, ${12 + idx * 28})`}
-                      >
-                        <rect x="0" y="0" width="222" height="23" rx="6" fill={layer.color} />
-                        <text x="12" y="15.5" fill="#ffffff" fontSize="11" fontWeight="800">
-                          {layer.num}. {layer.name}
-                        </text>
-                      </g>
-                    ))}
-                  </svg>
+                  <div className="tg-scene-canvas tg-scene--osi">
+                    <div className="tg-osi-grid">
+                      <ol className="tg-osi-layers">
+                        {[
+                          { n: 7, name: "Application", proto: "HTTPS · DNS · SSH", tone: "cyan" },
+                          { n: 6, name: "Présentation", proto: "TLS 1.3 · UTF-8", tone: "blue" },
+                          { n: 5, name: "Session", proto: "Sockets · RPC", tone: "violet" },
+                          { n: 4, name: "Transport", proto: "Segment TCP / UDP", tone: "green" },
+                          { n: 3, name: "Réseau", proto: "Paquet IP · Routeur", tone: "amber" },
+                          { n: 2, name: "Liaison", proto: "Trame MAC · Switch", tone: "cyan" },
+                          { n: 1, name: "Physique", proto: "Bits · Fibre / RJ45", tone: "red" },
+                        ].map((layer, idx) => (
+                          <li
+                            key={layer.n}
+                            className={`tg-osi-row tg-osi-row--${layer.tone}`}
+                            style={{ animationDelay: `${idx * 65}ms` }}
+                          >
+                            <span className="tg-osi-row__num">L{layer.n}</span>
+                            <strong>{layer.name}</strong>
+                            <code>{layer.proto}</code>
+                          </li>
+                        ))}
+                      </ol>
+
+                      {/* Animated PDU Encapsulation X-Ray Capsule */}
+                      <div className="tg-pdu-inspector">
+                        <div className="tg-pdu-inspector__head">
+                          <FigureGlyph name="package" size={16} />
+                          <span>ENCAPSULATION PDU EN DIRECT</span>
+                        </div>
+                        <div className="tg-pdu-bars">
+                          <span className="tg-pdu-seg tg-pdu-seg--mac">ETH MAC</span>
+                          <span className="tg-pdu-seg tg-pdu-seg--ip">IPv4 SRC/DST</span>
+                          <span className="tg-pdu-seg tg-pdu-seg--tcp">TCP :443</span>
+                          <span className="tg-pdu-seg tg-pdu-seg--data">PAYLOAD TLS</span>
+                          <span className="tg-pdu-seg tg-pdu-seg--fcs">FCS</span>
+                        </div>
+                        <p className="tg-pdu-inspector__note">
+                          {isEn
+                            ? "Each layer wraps the payload with its own control header before transmission."
+                            : "Chaque couche ajoute son en-tête (MAC, IP, Port TCP) avant l’émission sur le câble."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
+                {/* SCENE 4: PHYSICAL LAYER & OPTICAL / COPPER OSCILLOSCOPE */}
                 {sceneKind === "cables-fiber" && (
-                  <svg viewBox="0 0 270 220" className="coursera-vector-svg">
-                    {/* Ethernet RJ45 Jack & Cable */}
-                    <g className="cv-float-main">
-                      <path d="M18 85 Q80 85 118 85" stroke="#2563eb" strokeWidth="14" strokeLinecap="round" />
-                      <rect x="112" y="66" width="46" height="38" rx="6" fill="#f59e0b" stroke="#b45309" strokeWidth="2" />
-                      <rect x="168" y="54" width="76" height="62" rx="10" fill="#1e293b" />
-                      <circle cx="186" cy="72" r="4.5" fill="#22c55e" className="cv-led-blink" />
-                      <circle cx="224" cy="72" r="4.5" fill="#f59e0b" className="cv-led-blink" />
-                      <text x="206" y="102" textAnchor="middle" fill="#f8fafc" fontSize="11" fontWeight="700">PORT RJ45</text>
-                    </g>
-                    {/* Fiber Optic Laser Pulse */}
-                    <g transform="translate(20, 145)">
-                      <rect x="0" y="12" width="230" height="18" rx="9" fill="#0f172a" />
-                      <line x1="12" y1="21" x2="218" y2="21" stroke="#38bdf8" strokeWidth="4" strokeDasharray="14 8" className="cv-net-line" />
-                      <circle cx="40" cy="21" r="6" fill="#3efa95" className="cv-packet cv-packet--wan" />
-                      <text x="115" y="48" textAnchor="middle" fill="#1e3a8a" fontSize="11" fontWeight="800">
-                        FIBRE OPTIQUE · IMPULSION LUMINEUSE
-                      </text>
-                    </g>
-                  </svg>
+                  <div className="tg-scene-canvas tg-scene--cables">
+                    <div className="tg-media-lanes">
+                      <div className="tg-media-lane tg-media-lane--cyan">
+                        <div className="tg-media-lane__meta">
+                          <FigureGlyph name="cable" size={18} />
+                          <div>
+                            <strong>Cuivre RJ45 Cat6A</strong>
+                            <code>Signal électrique · 1–10 Gbps</code>
+                          </div>
+                        </div>
+                        <svg viewBox="0 0 220 36" className="tg-wave-svg" aria-hidden="true">
+                          <path
+                            d="M 4 26 L 28 26 L 28 8 L 54 8 L 54 26 L 82 26 L 82 8 L 112 8 L 112 26 L 140 26 L 140 8 L 172 8 L 172 26 L 216 26"
+                            className="tg-wave-path tg-wave-path--cyan"
+                          />
+                        </svg>
+                      </div>
+
+                      <div className="tg-media-lane tg-media-lane--green">
+                        <div className="tg-media-lane__meta">
+                          <FigureGlyph name="zap" size={18} />
+                          <div>
+                            <strong>Fibre Optique SFP+</strong>
+                            <code>Impulsion laser · Longue distance</code>
+                          </div>
+                        </div>
+                        <svg viewBox="0 0 220 36" className="tg-wave-svg" aria-hidden="true">
+                          <path
+                            d="M 4 18 Q 22 2, 40 18 T 76 18 T 112 18 T 148 18 T 184 18 T 216 18"
+                            className="tg-wave-path tg-wave-path--green"
+                          />
+                        </svg>
+                      </div>
+
+                      <div className="tg-media-lane tg-media-lane--violet">
+                        <div className="tg-media-lane__meta">
+                          <FigureGlyph name="wifi" size={18} />
+                          <div>
+                            <strong>Wi-Fi 6E · WPA3</strong>
+                            <code>Ondes radio chiffrées · Sans-fil</code>
+                          </div>
+                        </div>
+                        <svg viewBox="0 0 220 36" className="tg-wave-svg" aria-hidden="true">
+                          <path
+                            d="M 4 18 C 30 0, 50 36, 76 18 C 102 0, 122 36, 148 18 C 174 0, 194 36, 216 18"
+                            className="tg-wave-path tg-wave-path--violet"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div className="tg-telemetry-strip">
+                      <span>
+                        <b>COUCHE 1</b> PHYSIQUE
+                      </span>
+                      <span>
+                        <b>LEDS PORT</b> <em className="is-up">LINK VERT · ACT CLIGNOTANT</em>
+                      </span>
+                    </div>
+                  </div>
                 )}
 
+                {/* SCENE 5: LIVE SOC TERMINAL & COMMAND PARSER */}
                 {sceneKind === "cli-terminal" && (
-                  <svg viewBox="0 0 280 220" className="coursera-vector-svg">
-                    <g className="cv-float-main">
-                      <rect x="14" y="20" width="252" height="176" rx="14" fill="#0f172a" stroke="#3b82f6" strokeWidth="3" />
-                      <rect x="14" y="20" width="252" height="30" rx="12" fill="#1e293b" />
-                      <circle cx="32" cy="35" r="5" fill="#ef4444" />
-                      <circle cx="48" cy="35" r="5" fill="#f59e0b" />
-                      <circle cx="64" cy="35" r="5" fill="#22c55e" />
-                      <text x="140" y="39" textAnchor="middle" fill="#94a3b8" fontSize="10" fontFamily="monospace" fontWeight="700">
-                        analyst@cyberpingo:~
-                      </text>
-                      <text x="28" y="76" fill="#38bdf8" fontSize="12" fontFamily="monospace" fontWeight="700">
-                        $ {(chapter.terminalSteps?.[0]?.command || "ping -c 4 192.168.1.1").slice(0, 26)}
-                      </text>
-                      <text x="28" y="102" fill="#a7f3d0" fontSize="11" fontFamily="monospace">
-                        64 bytes: icmp_seq=1 ttl=64
-                      </text>
-                      <text x="28" y="122" fill="#a7f3d0" fontSize="11" fontFamily="monospace">
-                        0% packet loss · LINK UP ✓
-                      </text>
-                      <rect x="28" y="144" width="196" height="32" rx="8" fill="#064e3b" stroke="#10b981" strokeWidth="1.5" />
-                      <text x="126" y="164" textAnchor="middle" fill="#ecfdf5" fontSize="11.5" fontWeight="700">
-                        ✓ Preuve technique vérifiée
-                      </text>
-                    </g>
-                  </svg>
+                  <div className="tg-scene-canvas tg-scene--terminal">
+                    <div className="tg-term-window">
+                      <div className="tg-term-window__bar">
+                        <span className="tg-term-dots" aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                        <code>analyst@cyberpingo-soc:~</code>
+                        <span className="tg-term-status">BASH · SSH</span>
+                      </div>
+                      <div className="tg-term-window__body">
+                        <div className="tg-term-cmd">
+                          <span className="tg-term-prompt">$</span>
+                          <code>
+                            {activeTermStep?.command ||
+                              "ping -c 4 192.168.1.1 && ip -br addr"}
+                          </code>
+                          <span className="tg-term-cursor" aria-hidden="true" />
+                        </div>
+                        <pre className="tg-term-output">
+                          {activeTermStep?.output ||
+                            "64 bytes from 192.168.1.1: icmp_seq=1 ttl=64 time=1.18 ms\neth0  UP  192.168.1.10/24  fe80::1a2b/64\n--- 0% packet loss · passerelle joignable ---"}
+                        </pre>
+                        <div className="tg-term-verdict">
+                          <FigureGlyph name="shield-check" size={16} />
+                          <span>
+                            {activeTermStep?.note ||
+                              (isEn
+                                ? "Technical proof verified in real time."
+                                : "Preuve technique vérifiée dans la console.")}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
+                {/* SCENE 6: ACTIVE THREAT INTERCEPTION & FIREWALL SHIELD */}
                 {sceneKind === "threat-firewall" && (
-                  <svg viewBox="0 0 280 220" className="coursera-vector-svg">
-                    {/* Incoming Red Threat Arrows blocked by Blue Firewall Shield */}
-                    <g className="cv-threat-arrows">
-                      <path d="M18 76 L92 76" stroke="#ef4444" strokeWidth="6" strokeLinecap="round" />
-                      <polygon points="96,76 80,66 80,86" fill="#ef4444" />
-                      <path d="M18 134 L92 134" stroke="#f97316" strokeWidth="6" strokeLinecap="round" />
-                      <polygon points="96,134 80,124 80,144" fill="#f97316" />
-                      <text x="54" y="56" textAnchor="middle" fill="#b91c1c" fontSize="10.5" fontWeight="800">MENACE</text>
-                    </g>
+                  <div className="tg-scene-canvas tg-scene--threat">
+                    <svg viewBox="0 0 620 260" className="tg-scene-wires" aria-hidden="true">
+                      {/* Red Attack Vectors Blocked at X=305 */}
+                      <path
+                        d="M 140 72 C 205 72, 235 110, 290 122"
+                        className="tg-wire-base tg-wire-base--red"
+                      />
+                      <path
+                        d="M 140 72 C 205 72, 235 110, 290 122"
+                        className="tg-wire-flow tg-wire-flow--red"
+                      />
+                      <path
+                        d="M 140 188 C 205 188, 235 150, 290 138"
+                        className="tg-wire-base tg-wire-base--red"
+                      />
+                      <path
+                        d="M 140 188 C 205 188, 235 150, 290 138"
+                        className="tg-wire-flow tg-wire-flow--red"
+                      />
+                      {/* Clean Verified Traffic Passing Right */}
+                      <path d="M 355 130 L 470 130" className="tg-wire-base" />
+                      <path
+                        d="M 355 130 L 470 130"
+                        className="tg-wire-flow tg-wire-flow--green"
+                      />
 
-                    {/* Firewall Wall */}
-                    <g className="cv-float-main">
-                      <rect x="112" y="34" width="38" height="148" rx="8" fill="#2563eb" stroke="#1d4ed8" strokeWidth="2" />
-                      <line x1="112" y1="70" x2="150" y2="70" stroke="#93c5fd" strokeWidth="2" />
-                      <line x1="112" y1="108" x2="150" y2="108" stroke="#93c5fd" strokeWidth="2" />
-                      <line x1="112" y1="146" x2="150" y2="146" stroke="#93c5fd" strokeWidth="2" />
-                      <text x="131" y="200" textAnchor="middle" fill="#1e3a8a" fontSize="10.5" fontWeight="800">PARE-FEU</text>
-                    </g>
+                      {/* Impact Shockwave at Firewall */}
+                      <circle cx="292" cy="130" r="18" className="tg-impact-ring" />
 
-                    {/* Protected Green Zone */}
-                    <g className="cv-node-pop" transform="translate(174, 58)">
-                      <path d="M44 10 L82 26 C82 68, 66 96, 44 112 C22 96, 6 68, 6 26 Z" fill="#16a34a" />
-                      <path d="M30 58 L41 69 L60 46" stroke="#ffffff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                    </g>
-                  </svg>
+                      {/* Attack Projectiles stopping at Firewall */}
+                      <circle r="5.5" fill="#ff6b7d" className="tg-packet-glow">
+                        <animateMotion
+                          dur="1.3s"
+                          repeatCount="indefinite"
+                          path="M 140 72 C 205 72, 235 110, 290 122"
+                        />
+                      </circle>
+                      <circle r="5.5" fill="#ffb86b" className="tg-packet-glow">
+                        <animateMotion
+                          dur="1.5s"
+                          begin="0.4s"
+                          repeatCount="indefinite"
+                          path="M 140 188 C 205 188, 235 150, 290 138"
+                        />
+                      </circle>
+                      {/* Clean Traffic Projectile */}
+                      <circle r="5.5" fill="#3efa95" className="tg-packet-glow">
+                        <animateMotion
+                          dur="1.4s"
+                          repeatCount="indefinite"
+                          path="M 355 130 L 470 130"
+                        />
+                      </circle>
+                    </svg>
+
+                    <div className="tg-net-layout">
+                      <div className="tg-net-endpoints">
+                        <div className="tg-node tg-node--sm tg-node--red">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="skull" size={18} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>Vecteur Menace</strong>
+                            <code>Spoofing / Phishing</code>
+                          </div>
+                        </div>
+                        <div className="tg-node tg-node--sm tg-node--amber">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="bug" size={18} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>Intrusion / Scan</strong>
+                            <code>DROP · ACL #403</code>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="tg-core-hub tg-core-hub--cyan">
+                        <div className="tg-core-hub__emblem">
+                          <FigureGlyph name="firewall" size={28} />
+                        </div>
+                        <strong>Pare-feu & MFA</strong>
+                        <span>Filtrage Actif ✓</span>
+                      </div>
+
+                      <div className="tg-node tg-node--green">
+                        <span className="tg-node__icon">
+                          <FigureGlyph name="server" size={20} />
+                        </span>
+                        <div className="tg-node__copy">
+                          <strong>Zone Protégée</strong>
+                          <code>Flux légitime isolé</code>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
+                {/* SCENE 7: CRYPTOGRAPHIC VAULT & 3-2-1 BACKUP ARCHITECTURE */}
                 {sceneKind === "server-nas-backup" && (
-                  <svg viewBox="0 0 280 220" className="coursera-vector-svg">
-                    <g className="cv-float-main">
-                      {/* Server Rack */}
-                      <rect x="36" y="28" width="96" height="156" rx="10" fill="#1e293b" stroke="#475569" strokeWidth="3" />
-                      {[0, 1, 2].map((slot) => (
-                        <g key={slot} transform={`translate(48, ${44 + slot * 44})`}>
-                          <rect x="0" y="0" width="72" height="30" rx="5" fill="#0f172a" />
-                          <circle cx="14" cy="15" r="4" fill="#22c55e" className="cv-led-blink" />
-                          <circle cx="28" cy="15" r="4" fill="#38bdf8" className="cv-led-blink" />
-                          <rect x="42" y="11" width="22" height="8" rx="3" fill="#334155" />
-                        </g>
-                      ))}
-                      {/* Encrypted Backup Cloud / NAS */}
-                      <path d="M138 106 L176 106" stroke="#16a34a" strokeWidth="5" strokeDasharray="6 4" className="cv-net-line" />
-                      <rect x="176" y="58" width="78" height="96" rx="14" fill="#0284c7" />
-                      <circle cx="215" cy="96" r="18" fill="#fef08a" />
-                      <text x="215" y="101" textAnchor="middle" fill="#854d0e" fontSize="14" fontWeight="900">🔒</text>
-                      <text x="215" y="136" textAnchor="middle" fill="#ffffff" fontSize="10.5" fontWeight="800">SAUVEGARDE</text>
-                    </g>
-                  </svg>
+                  <div className="tg-scene-canvas tg-scene--backup">
+                    <svg viewBox="0 0 620 260" className="tg-scene-wires" aria-hidden="true">
+                      <path d="M 140 130 L 260 130" className="tg-wire-base" />
+                      <path d="M 140 130 L 260 130" className="tg-wire-flow" />
+                      <path d="M 360 112 C 410 100, 430 56, 470 56" className="tg-wire-base" />
+                      <path
+                        d="M 360 112 C 410 100, 430 56, 470 56"
+                        className="tg-wire-flow tg-wire-flow--green"
+                      />
+                      <path d="M 360 130 L 470 130" className="tg-wire-base" />
+                      <path
+                        d="M 360 130 L 470 130"
+                        className="tg-wire-flow tg-wire-flow--green"
+                      />
+                      <path d="M 360 148 C 410 160, 430 204, 470 204" className="tg-wire-base" />
+                      <path
+                        d="M 360 148 C 410 160, 430 204, 470 204"
+                        className="tg-wire-flow tg-wire-flow--green"
+                      />
+                      <circle cx="310" cy="130" r="62" className="tg-orbit-ring tg-orbit-ring--cw" />
+                    </svg>
+
+                    <div className="tg-shield-layout">
+                      <div className="tg-node tg-node--cyan">
+                        <span className="tg-node__icon">
+                          <FigureGlyph name="database" size={20} />
+                        </span>
+                        <div className="tg-node__copy">
+                          <strong>Données Source</strong>
+                          <code>Production Critique</code>
+                        </div>
+                      </div>
+
+                      <div className="tg-core-hub tg-core-hub--cyan">
+                        <div className="tg-core-hub__emblem">
+                          <FigureGlyph name="file-lock" size={28} />
+                        </div>
+                        <strong>AES-256 + SHA</strong>
+                        <span>a94f...8c2e ✓</span>
+                      </div>
+
+                      <div className="tg-cia-stack">
+                        <div className="tg-node tg-node--sm tg-node--cyan">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="server" size={16} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>1 · Baie Locale</strong>
+                            <small>RAID redondant</small>
+                          </div>
+                        </div>
+                        <div className="tg-node tg-node--sm tg-node--green">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="nas" size={16} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>2 · NAS Réseau</strong>
+                            <small>Support distinct</small>
+                          </div>
+                        </div>
+                        <div className="tg-node tg-node--sm tg-node--violet">
+                          <span className="tg-node__icon">
+                            <FigureGlyph name="cloud" size={16} />
+                          </span>
+                          <div className="tg-node__copy">
+                            <strong>3 · Hors-site</strong>
+                            <small>Copie isolée (3-2-1)</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
+                {/* SCENE 8: FORENSIC INVESTIGATION & CORRELATION GRAPH */}
                 {sceneKind === "lab-investigation" && (
-                  <svg viewBox="0 0 280 220" className="coursera-vector-svg">
-                    <g className="cv-float-main">
-                      <rect x="26" y="34" width="180" height="142" rx="12" fill="#ffffff" stroke="#3b82f6" strokeWidth="3" />
-                      <rect x="44" y="54" width="90" height="12" rx="6" fill="#2563eb" />
-                      <rect x="44" y="78" width="140" height="10" rx="5" fill="#93c5fd" />
-                      <rect x="44" y="98" width="120" height="10" rx="5" fill="#bfdbfe" />
-                      <rect x="44" y="124" width="84" height="28" rx="8" fill="#16a34a" />
-                      <text x="86" y="142" textAnchor="middle" fill="#ffffff" fontSize="11" fontWeight="800">PREUVE ✓</text>
+                  <div className="tg-scene-canvas tg-scene--forensic">
+                    <div className="tg-forensic-steps">
+                      {[
+                        { icon: "radar" as const, title: "1. Détection", sub: "Alerte / Symptôme", tone: "cyan" },
+                        { icon: "file-search" as const, title: "2. Collecte", sub: "Logs & Trames PCAP", tone: "blue" },
+                        { icon: "microscope" as const, title: "3. Corrélation", sub: "Cause racine isolée", tone: "violet" },
+                        { icon: "flag" as const, title: "4. Validation", sub: "Preuve & Remédiation", tone: "green" },
+                      ].map((item, idx) => (
+                        <div
+                          key={item.title}
+                          className={`tg-forensic-card tg-forensic-card--${item.tone}`}
+                          style={{ animationDelay: `${idx * 90}ms` }}
+                        >
+                          <span className="tg-node__icon">
+                            <FigureGlyph name={item.icon} size={18} />
+                          </span>
+                          <strong>{item.title}</strong>
+                          <small>{item.sub}</small>
+                        </div>
+                      ))}
+                    </div>
 
-                      {/* Animated Magnifying Glass */}
-                      <g className="cv-loupe">
-                        <circle cx="182" cy="112" r="34" fill="rgba(56, 189, 248, 0.22)" stroke="#0284c7" strokeWidth="7" />
-                        <line x1="206" y1="136" x2="238" y2="168" stroke="#0f172a" strokeWidth="10" strokeLinecap="round" />
-                      </g>
-                    </g>
-                  </svg>
+                    <div className="tg-pdu-inspector">
+                      <div className="tg-pdu-inspector__head">
+                        <FigureGlyph name="scan" size={16} />
+                        <span>INSPECTION D’INDICE SYNCHRONISÉE</span>
+                      </div>
+                      <div className="tg-pdu-bars">
+                        <span className="tg-pdu-seg tg-pdu-seg--mac">HORODATAGE UTC</span>
+                        <span className="tg-pdu-seg tg-pdu-seg--ip">SRC 10.0.0.42</span>
+                        <span className="tg-pdu-seg tg-pdu-seg--tcp">PROTOCOLE VÉRIFIÉ</span>
+                        <span className="tg-pdu-seg tg-pdu-seg--data">PREUVE VALIDÉE ✓</span>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              {/* Right of Cloud: Synchronized Equipment / Schema Card & Key Takeaways */}
-              <div className="coursera-cloud-card">
-                {chapter.figure && (chapter.kind === "diagram" || chapter.kind === "mechanism") ? (
-                  <div className="coursera-cloud-figure-mini">
-                    <FigureView figure={chapter.figure} />
-                  </div>
-                ) : (
-                  activeSlide && (
-                    <div className="coursera-cloud-slide-card">
-                      <div className="coursera-cloud-slide-card__media">
-                        <img
-                          src={activeSlide.src}
-                          alt={activeSlide.alt}
-                          className={activeSlide.kind === "topology" ? "is-diagram" : ""}
-                        />
-                        <span className="coursera-cloud-slide-card__badge">{activeSlide.badge}</span>
-                      </div>
-                      <div className="coursera-cloud-slide-card__body">
-                        <strong>{activeSlide.title}</strong>
-                        <p>{activeSlide.caption}</p>
-                        {(activeSlide.risk || activeSlide.habit) && (
-                          <div className="coursera-cloud-slide-card__tips">
-                            {activeSlide.risk && (
-                              <span className="coursera-tip coursera-tip--risk">
-                                <b>{isEn ? "Risk:" : "Risque :"}</b> {activeSlide.risk}
-                              </span>
-                            )}
-                            {activeSlide.habit && (
-                              <span className="coursera-tip coursera-tip--habit">
-                                <b>{isEn ? "Reflex:" : "Réflexe :"}</b> {activeSlide.habit}
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
+              {/* RIGHT SPOTLIGHT CARD: Real Equipment Photo + Active Concept Insights + Keywords */}
+              <div className="tg-spotlight-panel">
+                {activeSlide && (
+                  <div className="tg-equip-card">
+                    <div className="tg-equip-card__media">
+                      <img
+                        src={activeSlide.src}
+                        alt={activeSlide.alt}
+                        className={activeSlide.kind === "topology" ? "is-diagram" : ""}
+                      />
+                      <span className="tg-equip-card__badge">{activeSlide.badge}</span>
                     </div>
-                  )
+                    <div className="tg-equip-card__body">
+                      <strong>{activeSlide.title}</strong>
+                      <p>{activeSlide.caption}</p>
+                      {(activeSlide.risk || activeSlide.habit) && (
+                        <div className="tg-equip-card__tips">
+                          {activeSlide.risk && (
+                            <span className="tg-tip tg-tip--risk">
+                              <FigureGlyph name="alert" size={13} />
+                              <span>{activeSlide.risk}</span>
+                            </span>
+                          )}
+                          {activeSlide.habit && (
+                            <span className="tg-tip tg-tip--habit">
+                              <FigureGlyph name="check" size={13} />
+                              <span>{activeSlide.habit}</span>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
 
                 {/* Animated Keyword Chips that pop in as the sentence is spoken */}
                 {activeKeywords.length > 0 && (
-                  <div className="coursera-keyword-row">
+                  <div className="tg-keywords">
                     {activeKeywords.map((kw, idx) => (
                       <span
                         key={`${animKey}-kw-${idx}`}
-                        className="coursera-keyword-pill"
-                        style={{ animationDelay: `${idx * 95}ms` }}
+                        className="tg-keyword-chip"
+                        style={{ animationDelay: `${idx * 85}ms` }}
                       >
-                        <span aria-hidden="true">✦</span> {kw}
+                        <i aria-hidden="true">✦</i> {kw}
                       </span>
                     ))}
                   </div>
                 )}
-
-                {/* Active Chapter Bullet / Terminal Step Highlight */}
-                {chapter.kind === "terminal" && chapter.terminalSteps?.length ? (
-                  <div className="coursera-mini-cli">
-                    <code>
-                      $ {chapter.terminalSteps[Math.min(chapter.terminalSteps.length - 1, visibleTerminalStepCount - 1)]?.command}
-                    </code>
-                    <small>
-                      {chapter.terminalSteps[Math.min(chapter.terminalSteps.length - 1, visibleTerminalStepCount - 1)]?.note}
-                    </small>
-                  </div>
-                ) : (
-                  chapter.bullets.length > 0 && (
-                    <div className="coursera-active-bullet">
-                      <span className="coursera-active-bullet__num">{activeBulletIndex + 1}</span>
-                      <p>{chapter.bullets[activeBulletIndex] ?? chapter.bullets[0]}</p>
-                    </div>
-                  )
-                )}
               </div>
             </div>
-
-            {/* Bottom Storyboard Strip inside the Stage */}
-            {chapterSlides.length > 1 && (
-              <div
-                className="coursera-storyboard-strip"
-                role="tablist"
-                aria-label={isEn ? "Sentence illustrations" : "Illustrations synchronisées phrase par phrase"}
-              >
-                {chapterSlides.map((slide, idx) => {
-                  const isCurrent = idx === activeSlideIndex;
-                  const isDone = idx < activeSlideIndex;
-                  return (
-                    <button
-                      key={`${slide.id}-${idx}`}
-                      type="button"
-                      role="tab"
-                      aria-selected={isCurrent}
-                      className={`coursera-storyboard-chip ${isCurrent ? "is-current" : isDone ? "is-done" : ""}`}
-                      onClick={() => onSelectSlide(idx)}
-                      title={`${idx + 1}. ${slide.title}`}
-                    >
-                      <img src={slide.src} alt="" loading="lazy" />
-                      <span>{slide.title}</span>
-                      <small>{isCurrent && voiceActive ? "🔊" : isDone ? "✓" : idx + 1}</small>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
+
+      {/* BOTTOM INTERACTIVE STORYBOARD DOCK (Sentence-by-Sentence Visual Selector) */}
+      {chapterSlides.length > 1 && (
+        <div
+          className="tg-storyboard-dock"
+          role="tablist"
+          aria-label={
+            isEn
+              ? "Sentence illustrations"
+              : "Illustrations synchronisées phrase par phrase"
+          }
+        >
+          {chapterSlides.map((slide, idx) => {
+            const isCurrent = idx === activeSlideIndex;
+            const isDone = idx < activeSlideIndex;
+            return (
+              <button
+                key={`${slide.id}-${idx}`}
+                type="button"
+                role="tab"
+                aria-selected={isCurrent}
+                className={`tg-storyboard-pill ${isCurrent ? "is-current" : isDone ? "is-done" : ""}`}
+                onClick={() => onSelectSlide(idx)}
+                title={`${idx + 1}. ${slide.title}`}
+              >
+                <img src={slide.src} alt="" loading="lazy" />
+                <span>{slide.title}</span>
+                <small>{isCurrent && voiceActive ? "🔊" : isDone ? "✓" : idx + 1}</small>
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
+

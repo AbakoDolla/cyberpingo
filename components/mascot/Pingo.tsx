@@ -18,6 +18,7 @@ type PingoProps = {
   state?: PingoState;
   rank?: number;
   size?: number;
+  speaking?: boolean;
   className?: string;
   title?: string;
 };
@@ -25,7 +26,7 @@ type PingoProps = {
 const CYAN = "#00E5FF";
 const ORANGE = "#FF9F1C";
 
-export default function Pingo({ state = "idle", rank = 1, size = 200, className, title }: PingoProps) {
+export default function Pingo({ state = "idle", rank = 1, size = 200, speaking = false, className, title }: PingoProps) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   const iris = `pingo-iris-${uid}`;
   const cloth = `pingo-cloth-${uid}`;
@@ -36,6 +37,7 @@ export default function Pingo({ state = "idle", rank = 1, size = 200, className,
     <svg
       className={["pingo", className].filter(Boolean).join(" ")}
       data-state={state}
+      data-speaking={speaking ? "true" : undefined}
       width={size}
       height={Math.round(size * 1.2)}
       viewBox="0 0 200 240"
@@ -124,8 +126,13 @@ export default function Pingo({ state = "idle", rank = 1, size = 200, className,
 
             <ellipse cx="66" cy="106" rx="6.5" ry="3.6" fill="#ff7aa8" opacity=".38" />
             <ellipse cx="134" cy="106" rx="6.5" ry="3.6" fill="#ff7aa8" opacity=".38" />
-            <path className="pingo__beak" d="M91 104 C95 99.5 105 99.5 109 104 C106 111 103 115 100 116 C97 115 94 111 91 104 Z" fill={ORANGE} />
-            <path d="M94 104.5 C97 103 103 103 106 104.5" stroke="#ffd08a" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+            <g className="pingo__beak-group">
+              <ellipse className="pingo__mouth-cavity" cx="100" cy="111.5" rx="6.2" ry="4.8" fill="#2d0919" />
+              <ellipse className="pingo__mouth-tongue" cx="100" cy="113.5" rx="3.8" ry="2.1" fill="#ff6b8b" />
+              <path className="pingo__beak" d="M91 104 C95 99.5 105 99.5 109 104 C106 111 103 115 100 116 C97 115 94 111 91 104 Z" fill={ORANGE} />
+              <path className="pingo__beak-lower" d="M93 108 C96 115 104 115 107 108 C104 111 96 111 93 108 Z" fill="#e07b00" />
+              <path d="M94 104.5 C97 103 103 103 106 104.5" stroke="#ffd08a" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+            </g>
 
             {/* Navy bow tie when rank >= 5 */}
             {rank >= 5 && (
